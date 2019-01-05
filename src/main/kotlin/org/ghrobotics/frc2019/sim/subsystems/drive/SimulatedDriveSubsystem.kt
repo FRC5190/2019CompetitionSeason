@@ -5,9 +5,9 @@ import org.ghrobotics.frc2019.common.Constants
 import org.ghrobotics.frc2019.common.subsystems.drive.DriveSSMatrices
 import org.ghrobotics.frc2019.common.subsystems.drive.DriveSubsystemBase
 import org.ghrobotics.frc2019.sim.motors.SimulatedMotor
-import org.ghrobotics.lib.mathematics.statespace.control.Matrix
-import org.ghrobotics.lib.mathematics.statespace.control.plus
-import org.ghrobotics.lib.mathematics.statespace.control.times
+import org.ghrobotics.lib.mathematics.statespace.Matrix
+import org.ghrobotics.lib.mathematics.statespace.plus
+import org.ghrobotics.lib.mathematics.statespace.times
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Twist2d
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity

@@ -3,9 +3,7 @@ package org.ghrobotics.frc2019.common.subsystems.drive
 import com.team254.lib.physics.DCMotorTransmission
 import com.team254.lib.physics.DifferentialDrive
 import org.ghrobotics.frc2019.common.Constants
-import org.ghrobotics.lib.mathematics.statespace.control.Matrix
-import org.ghrobotics.lib.mathematics.statespace.control.TwoStateFFClosedLoopController
-import org.ghrobotics.lib.mathematics.statespace.observers.KalmanFilter
+import org.ghrobotics.lib.mathematics.statespace.*
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
 import org.ghrobotics.lib.subsystems.drive.DifferentialTrackerDriveBase
 import kotlin.math.pow
@@ -34,7 +32,10 @@ interface DriveSubsystemBase : DifferentialTrackerDriveBase {
                 doubleArrayOf(rightMotor.velocity.value)
             )
         )
-        val u = velocityReferenceTracker.getClosedLoopOutput(r, y)
+
+        velocityReferenceTracker.nextR = r
+        velocityReferenceTracker.correct(y)
+        val u = velocityReferenceTracker.update()
 
         leftMotor.percentOutput = u.data[0][0] / 12.0
         rightMotor.percentOutput = u.data[1][0] / 12.0
@@ -42,14 +43,18 @@ interface DriveSubsystemBase : DifferentialTrackerDriveBase {
 
     @Suppress("ObjectPropertyName", "ObjectPropertyNaming")
     private companion object {
-        val _velocityReferenceTracker = TwoStateFFClosedLoopController(
-            DriveSSMatrices.K,
-            KalmanFilter(
-                DriveSSMatrices.L, DriveSSMatrices.A, DriveSSMatrices.B, DriveSSMatrices.C, DriveSSMatrices.D,
-                DriveSSMatrices.initialState
+        val _velocityReferenceTracker = StateSpaceLoop(
+            StateSpacePlantCoefficients(
+                DriveSSMatrices.A,
+                DriveSSMatrices.A.inv(),
+                DriveSSMatrices.B,
+                DriveSSMatrices.C,
+                DriveSSMatrices.D
             ),
-            DriveSSMatrices.A,
-            DriveSSMatrices.KFF
+            StateSpaceControllerCoefficients(
+                DriveSSMatrices.K, DriveSSMatrices.Kff
+            ),
+            StateSpaceObserverCoefficients(DriveSSMatrices.L)
         )
 
         val _dcTransmission = DCMotorTransmission(

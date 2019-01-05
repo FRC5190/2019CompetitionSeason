@@ -1,6 +1,6 @@
 package org.ghrobotics.frc2019.common.subsystems.drive
 
-import org.ghrobotics.lib.mathematics.statespace.control.Matrix
+import org.ghrobotics.lib.mathematics.statespace.Matrix
 
 object DriveSSMatrices {
     val A = Matrix(
@@ -30,7 +30,7 @@ object DriveSSMatrices {
         )
     )
 
-    val KFF = Matrix(
+    val Kff = Matrix(
         arrayOf(
             doubleArrayOf(220.44918245, -0.92751936),
             doubleArrayOf(-0.92751936, 220.44918245)
@@ -44,8 +44,10 @@ object DriveSSMatrices {
         )
     )
 
-    val initialState = Matrix(arrayOf(
-        doubleArrayOf(0.0),
-        doubleArrayOf(0.0)
-    ))
+    val initialState = Matrix(
+        arrayOf(
+            doubleArrayOf(0.0),
+            doubleArrayOf(0.0)
+        )
+    )
 }
