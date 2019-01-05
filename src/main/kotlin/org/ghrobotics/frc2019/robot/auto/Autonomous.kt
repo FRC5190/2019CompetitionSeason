@@ -1,15 +1,17 @@
 package org.ghrobotics.frc2019.robot.auto
 
 import kotlinx.coroutines.GlobalScope
+import org.ghrobotics.frc2019.robot.Network
+import org.ghrobotics.frc2019.robot.Robot
+import org.ghrobotics.frc2019.robot.auto.routines.cargoShipRoutine
+import org.ghrobotics.frc2019.robot.auto.routines.characterizationRoutine
+import org.ghrobotics.frc2019.robot.auto.routines.rocketRoutine
+import org.ghrobotics.frc2019.robot.subsytems.drive.DriveSubsystem
 import org.ghrobotics.lib.commands.S3ND
 import org.ghrobotics.lib.commands.stateCommandGroup
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.utils.*
 import org.ghrobotics.lib.wrappers.FalconRobotBase
-import org.ghrobotics.frc2019.robot.Network
-import org.ghrobotics.frc2019.robot.Robot
-import org.ghrobotics.frc2019.robot.auto.routines.routineCharacterization
-import org.ghrobotics.frc2019.robot.subsytems.drive.DriveSubsystem
 
 object Autonomous {
 
@@ -21,12 +23,9 @@ object Autonomous {
 
     // Autonomous Master Group
     private val JUST = stateCommandGroup(autoMode) {
-        state(AutoMode.REAL) {
-            stateCommandGroup(startingPosition) {
-
-            }
-        }
-        state(AutoMode.CHARACTERIZE, routineCharacterization())
+        state(AutoMode.ROCKET, rocketRoutine())
+        state(AutoMode.CARGO_SHIP, cargoShipRoutine())
+        state(AutoMode.CHARACTERIZE, characterizationRoutine())
     }
 
     init {
@@ -47,11 +46,10 @@ object Autonomous {
     }
 }
 
-/* TODO Find Actual Value */
 enum class StartingPositions(val pose: Pose2d) {
-    LEFT(Pose2d()),
-    CENTER(Pose2d()),
-    RIGHT(Pose2d())
+    LEFT(Trajectories.kSideStart.mirror),
+    CENTER(Trajectories.kCenterStart),
+    RIGHT(Trajectories.kSideStart)
 }
 
-enum class AutoMode { CHARACTERIZE, REAL }
+enum class AutoMode { CHARACTERIZE, ROCKET, CARGO_SHIP }

@@ -5,17 +5,16 @@
 
 package org.ghrobotics.frc2019.robot.auto
 
+import org.ghrobotics.frc2019.common.Constants
+import org.ghrobotics.frc2019.robot.subsytems.drive.DriveSubsystem
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
-import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature
-import org.ghrobotics.lib.mathematics.twodim.trajectory.DefaultTrajectoryGenerator
 import org.ghrobotics.lib.mathematics.twodim.trajectory.constraints.CentripetalAccelerationConstraint
 import org.ghrobotics.lib.mathematics.twodim.trajectory.constraints.DifferentialDriveDynamicsConstraint
-import org.ghrobotics.lib.mathematics.twodim.trajectory.constraints.TimingConstraint
-import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedTrajectory
-import org.ghrobotics.lib.mathematics.units.derivedunits.*
+import org.ghrobotics.lib.mathematics.units.degree
+import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
+import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
+import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.feet
-import org.ghrobotics.lib.mathematics.units.meter
-import org.ghrobotics.frc2019.robot.subsytems.drive.DriveSubsystem
 
 object Trajectories {
 
@@ -30,24 +29,17 @@ object Trajectories {
         DifferentialDriveDynamicsConstraint(DriveSubsystem.differentialDrive, 10.0.volt)
     )
 
-    private fun waypoints(vararg waypoints: Pose2d) = waypoints.toList()
-
-    private fun List<Pose2d>.generateTrajectory(
-        name: String,
-        reversed: Boolean,
-        maxVelocity: LinearVelocity = kMaxVelocity,
-        maxAcceleration: LinearAcceleration = kMaxAcceleration,
-        constraints: List<TimingConstraint<Pose2dWithCurvature>> = kConstraints
-    ): TimedTrajectory<Pose2dWithCurvature> {
-        println("Generating $name...")
-        return DefaultTrajectoryGenerator.generateTrajectory(
-            reversed = reversed,
-            wayPoints = this,
-            constraints = constraints,
-            startVelocity = 0.meter.velocity,
-            endVelocity = 0.meter.velocity,
-            maxVelocity = maxVelocity,
-            maxAcceleration = maxAcceleration
+    val kSideStart =
+        Pose2d(
+            Constants.kLevel2RightX + Constants.kBumperLength + Constants.kRobotLength / 2.0,
+            Constants.kLevel2BottomY + Constants.kBumperLength + Constants.kRobotWidth / 2.0,
+            0.degree
         )
-    }
+
+    val kCenterStart =
+        Pose2d(
+            Constants.kLevel2RightX + Constants.kBumperLength + Constants.kRobotLength / 2.0,
+            13.5.feet,
+            0.degree
+        )
 }

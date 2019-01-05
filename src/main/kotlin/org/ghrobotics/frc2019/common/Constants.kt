@@ -7,6 +7,7 @@ package org.ghrobotics.frc2019.common
 
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.units.degree
+import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.mathematics.units.meter
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitLengthModel
@@ -36,12 +37,16 @@ object Constants {
     const val kPCMId = 41
     const val kDriveSolenoidId = 3 // TODO Find Actual Value
 
+    // FIELD
+    val kLevel2RightX = 4.feet
+    val kLevel2BottomY = 97.inch
+
     // ROBOT
     val kRobotWidth = 27.inch // TODO Find Actual Value
     val kRobotLength = 33.inch // TODO Find Actual Value
     val kBumperLength = 2.0.inch // TODO Find Actual Value
 
-    val kRobotStartX = kRobotLength / 2.0 + kBumperLength
+    val kRobotStartX = kLevel2RightX + kRobotLength / 2.0 + kBumperLength
 
     const val kRobotMass = 60.0 // kg // TODO Find Actual Value
     const val kRobotMomentOfInertia = 10.0 // kg m^2 // TODO Find Actual Value
