@@ -29,16 +29,20 @@ object Trajectories {
         DifferentialDriveDynamicsConstraint(DriveSubsystem.differentialDrive, 10.0.volt)
     )
 
+    private val kRobotStartX =
+        Constants.kLevel2RightX + Constants.kBumperLength + Constants.kRobotLength / 2.0 -
+            Constants.kHypotenuseDifferenceForRamp
+
     val kSideStart =
         Pose2d(
-            Constants.kLevel2RightX + Constants.kBumperLength + Constants.kRobotLength / 2.0,
+            kRobotStartX,
             Constants.kLevel2BottomY + Constants.kBumperLength + Constants.kRobotWidth / 2.0,
             0.degree
         )
 
     val kCenterStart =
         Pose2d(
-            Constants.kLevel2RightX + Constants.kBumperLength + Constants.kRobotLength / 2.0,
+            kRobotStartX,
             13.5.feet,
             0.degree
         )

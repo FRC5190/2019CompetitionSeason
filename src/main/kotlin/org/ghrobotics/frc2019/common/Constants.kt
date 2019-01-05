@@ -41,12 +41,12 @@ object Constants {
     val kLevel2RightX = 4.feet
     val kLevel2BottomY = 97.inch
 
+    val kHypotenuseDifferenceForRamp = 0.433.inch
+
     // ROBOT
     val kRobotWidth = 27.inch // TODO Find Actual Value
     val kRobotLength = 33.inch // TODO Find Actual Value
     val kBumperLength = 2.0.inch // TODO Find Actual Value
-
-    val kRobotStartX = kLevel2RightX + kRobotLength / 2.0 + kBumperLength
 
     const val kRobotMass = 60.0 // kg // TODO Find Actual Value
     const val kRobotMomentOfInertia = 10.0 // kg m^2 // TODO Find Actual Value
