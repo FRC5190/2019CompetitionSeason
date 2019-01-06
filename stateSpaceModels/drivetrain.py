@@ -59,7 +59,7 @@ class Drivetrain(frccnt.System):
         self.in_low_gear = False
 
         # Number of motors per side
-        self.num_motors = 2.0
+        self.num_motors = 3.0
 
         # High and low gear ratios of drivetrain
         Glow = 7.29
@@ -83,7 +83,7 @@ class Drivetrain(frccnt.System):
             self.Gr = Ghigh
 
         self.model = drivetrain(
-            frccnt.models.MOTOR_CIM,
+            frccnt.models.MOTOR_MINI_CIM,
             self.num_motors,
             self.m,
             self.r,
@@ -133,7 +133,7 @@ class Drivetrain(frccnt.System):
         self.design_two_state_feedforward([qff_vel, qff_vel], [12, 12])
 
    
-        q_vel = 1.0
+        q_vel = 2.0
         r_vel = 0.01
 
         """Keyword arguments:

@@ -21,7 +21,7 @@ object Trajectories {
 
     // Constants in Feet Per Second
     private val kMaxVelocity = 10.0.feet.velocity // TODO Find Actual Value
-    private val kMaxAcceleration = 6.0.feet.acceleration // TODO Find Actual Value
+    private val kMaxAcceleration = 8.0.feet.acceleration // TODO Find Actual Value
     private val kMaxCentripetalAcceleration = 4.5.feet.acceleration // TODO Find Actual Value
 
 
@@ -56,8 +56,6 @@ object Trajectories {
     val sideStartToFarRocket = DefaultTrajectoryGenerator.generateTrajectory(
         wayPoints = listOf(
             kSideStart,
-            Pose2d(11.611.feet, 9.757.feet, 0.degree),
-            Pose2d(18.015.feet, 9.48.feet, (-12).degree),
             kFarRocketPose
         ),
         constraints = kConstraints, startVelocity = 0.0.feet.velocity, endVelocity = 0.0.feet.velocity,
@@ -79,6 +77,15 @@ object Trajectories {
         wayPoints = listOf(
             kLoadingStationPose,
             kNearRocketPose
+        ),
+        constraints = kConstraints, startVelocity = 0.0.feet.velocity, endVelocity = 0.0.feet.velocity,
+        maxVelocity = kMaxVelocity, maxAcceleration = kMaxAcceleration, reversed = false
+    )
+
+    val baseline = DefaultTrajectoryGenerator.generateTrajectory(
+        wayPoints = listOf(
+            kSideStart,
+            kSideStart + Pose2d(10.feet, 0.feet)
         ),
         constraints = kConstraints, startVelocity = 0.0.feet.velocity, endVelocity = 0.0.feet.velocity,
         maxVelocity = kMaxVelocity, maxAcceleration = kMaxAcceleration, reversed = false

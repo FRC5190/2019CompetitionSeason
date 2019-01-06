@@ -3,6 +3,7 @@ package org.ghrobotics.frc2019.robot.auto
 import kotlinx.coroutines.GlobalScope
 import org.ghrobotics.frc2019.robot.Network
 import org.ghrobotics.frc2019.robot.Robot
+import org.ghrobotics.frc2019.robot.auto.routines.baselineRoutine
 import org.ghrobotics.frc2019.robot.auto.routines.cargoShipRoutine
 import org.ghrobotics.frc2019.robot.auto.routines.characterizationRoutine
 import org.ghrobotics.frc2019.robot.auto.routines.rocketRoutine
@@ -22,11 +23,13 @@ object Autonomous {
     private val isReady = { Robot.isAutonomous && Robot.isEnabled } and configValid
 
     // Autonomous Master Group
-    private val JUST = stateCommandGroup(autoMode) {
-        state(AutoMode.ROCKET, rocketRoutine())
-        state(AutoMode.CARGO_SHIP, cargoShipRoutine())
-        state(AutoMode.CHARACTERIZE, characterizationRoutine())
-    }
+    private val JUST =
+        stateCommandGroup(autoMode) {
+            state(AutoMode.ROCKET, rocketRoutine())
+            state(AutoMode.CARGO_SHIP, cargoShipRoutine())
+            state(AutoMode.CHARACTERIZE, characterizationRoutine())
+            state(AutoMode.BASELINE, baselineRoutine())
+        }
 
     init {
         @Suppress("LocalVariableName")
@@ -52,4 +55,4 @@ enum class StartingPositions(val pose: Pose2d) {
     RIGHT(Trajectories.kSideStart)
 }
 
-enum class AutoMode { CHARACTERIZE, ROCKET, CARGO_SHIP }
+enum class AutoMode { CHARACTERIZE, ROCKET, CARGO_SHIP, BASELINE }

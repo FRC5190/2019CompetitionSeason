@@ -27,12 +27,12 @@ class DriveGearbox(
 
         // Configure Inversion
         master.inverted = inverted
-        slaveOne.inverted = inverted
-        slaveTwo.inverted = !inverted
+        slaveOne.inverted = !inverted
+        slaveTwo.inverted = inverted
 
         // Configure Encoder
         master.feedbackSensor = FeedbackDevice.QuadEncoder
-        master.encoderPhase = false
+        master.encoderPhase = inverted
         master.sensorPosition = 0.meter
 
         allMotors.forEach { motor ->

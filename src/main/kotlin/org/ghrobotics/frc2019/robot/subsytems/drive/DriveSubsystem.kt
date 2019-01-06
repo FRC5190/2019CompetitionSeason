@@ -5,17 +5,24 @@
 
 package org.ghrobotics.frc2019.robot.subsytems.drive
 
+import com.ctre.phoenix.motorcontrol.StatusFrame
 import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod
 import com.ctre.phoenix.sensors.PigeonIMU
+import com.kauailabs.navx.frc.AHRS
 import com.team254.lib.physics.DCMotorTransmission
 import com.team254.lib.physics.DifferentialDrive
+import edu.wpi.first.wpilibj.I2C
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.robot.Constants
 import org.ghrobotics.frc2019.robot.Robot
 import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.statespace.*
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
+import org.ghrobotics.lib.mathematics.units.degree
+import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
+import org.ghrobotics.lib.mathematics.units.meter
 import org.ghrobotics.lib.mathematics.units.millisecond
+import org.ghrobotics.lib.mathematics.units.radian
 import org.ghrobotics.lib.sensors.asSource
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
 import kotlin.math.pow
@@ -102,38 +109,49 @@ object DriveSubsystem : TankDriveSubsystem() {
     init {
         lowGear = false
         defaultCommand = ManualDriveCommand()
+        allMasters.forEach { it.kP = 0.75; it.kD = 1.0 }
     }
 
     override fun autoReset() {
-        allMasters.forEach { it.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms) }
+        allMasters.forEach {
+            it.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10)
+            it.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms)
+        }
     }
 
     override fun teleopReset() {
-        allMasters.forEach { it.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_50Ms) }
+        allMasters.forEach { it.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_100Ms) }
+        allMasters.forEach { it.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 100) }
     }
 
-    override fun setOutput(
-        wheelVelocities: DifferentialDrive.WheelState, wheelVoltages: DifferentialDrive.WheelState
-    ) {
-        val r = Matrix(
-            arrayOf(
-                doubleArrayOf(wheelVelocities.left * Constants.kWheelRadius.value),
-                doubleArrayOf(wheelVelocities.right * Constants.kWheelRadius.value)
-            )
-        )
-
-        val y = Matrix(
-            arrayOf(
-                doubleArrayOf(leftMotor.sensorVelocity.value),
-                doubleArrayOf(rightMotor.sensorVelocity.value)
-            )
-        )
-
-        velocityReferenceTracker.nextR = r
-        velocityReferenceTracker.correct(y)
-        val u = velocityReferenceTracker.update()
-
-        leftMotor.percentOutput = u.data[0][0] / 12.0
-        rightMotor.percentOutput = u.data[1][0] / 12.0
+    override fun zeroOutputs() {
+        leftMotor.velocity = 0.meter.velocity
+        rightMotor.velocity = 0.meter.velocity
     }
+
+    // Remove this to use the Talon SRX Velocity Loop with Arbitrary Feedforward
+//    override fun setOutput(
+//        wheelVelocities: DifferentialDrive.WheelState, wheelVoltages: DifferentialDrive.WheelState
+//    ) {
+//        val r = Matrix(
+//            arrayOf(
+//                doubleArrayOf(wheelVelocities.left * Constants.kWheelRadius.value),
+//                doubleArrayOf(wheelVelocities.right * Constants.kWheelRadius.value)
+//            )
+//        )
+//
+//        val y = Matrix(
+//            arrayOf(
+//                doubleArrayOf(leftMotor.sensorVelocity.value),
+//                doubleArrayOf(rightMotor.sensorVelocity.value)
+//            )
+//        )
+//
+//        velocityReferenceTracker.nextR = r
+//        velocityReferenceTracker.correct(y)
+//        val u = velocityReferenceTracker.update()
+//
+//        leftMotor.percentOutput = u.data[0][0] / 12.0
+//        rightMotor.percentOutput = u.data[1][0] / 12.0
+//    }
 }
