@@ -1,0 +1,161 @@
+<grip:Pipeline>
+  <sources>
+    <grip:MultiImageFile>
+      <property name="path[21]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\LoadingStraightDark48in.jpg"/>
+      <property name="path[24]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\LoadingStraightDark108in.jpg"/>
+      <property name="path[27]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketBallStraightDark29in.jpg"/>
+      <property name="path[40]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketPanelStraightDark72in.jpg"/>
+      <property name="path[0]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoAngledDark48in.jpg"/>
+      <property name="path[11]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\LoadingAngleDark36in.jpg"/>
+      <property name="path[3]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoSideStraightDark72in.jpg"/>
+      <property name="path[14]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\LoadingStraight36in.jpg"/>
+      <property name="path[6]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoStraightDark24in.jpg"/>
+      <property name="path[17]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\LoadingStraightDark10in.jpg"/>
+      <property name="path[9]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoStraightDark90in.jpg"/>
+      <property name="path[30]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketPanelAngleDark60in.jpg"/>
+      <property name="path[33]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketPanelStraight84in.jpg"/>
+      <property name="path[36]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketPanelStraightDark24in.jpg"/>
+      <property name="path[39]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketPanelStraightDark60in.jpg"/>
+      <property name="path[20]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\LoadingStraightDark36in.jpg"/>
+      <property name="path[23]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\LoadingStraightDark84in.jpg"/>
+      <property name="path[26]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketBallStraightDark24in.jpg"/>
+      <property name="path[29]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketPanelAngleDark48in.jpg"/>
+      <property name="path[42]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketStraightDark96in.jpg"/>
+      <property name="path[10]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\LoadingAngle36in.jpg"/>
+      <property name="path[2]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoSideStraightDark60in.jpg"/>
+      <property name="path[13]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\LoadingAngleDark96in.jpg"/>
+      <property name="path[5]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoStraightDark19in.jpg"/>
+      <property name="path[16]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\LoadingStraightDark9in.jpg"/>
+      <property name="path[8]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoStraightDark72in.jpg"/>
+      <property name="path[19]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\LoadingStraightDark21in.jpg"/>
+      <property name="path[32]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketPanelStraight48in.jpg"/>
+      <property name="path[35]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketPanelStraightDark16in.jpg"/>
+      <property name="path[38]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketPanelStraightDark48in.jpg"/>
+      <property name="index" value="36"/>
+      <property name="path[22]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\LoadingStraightDark60in.jpg"/>
+      <property name="path[25]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketBallStraightDark19in.jpg"/>
+      <property name="path[28]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketBallStraightDark48in.jpg"/>
+      <property name="path[41]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketPanelStraightDark96in.jpg"/>
+      <property name="path[1]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoSideStraightDark36in.jpg"/>
+      <property name="path[4]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoSideStraightPanelDark36in.jpg"/>
+      <property name="path[12]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\LoadingAngleDark60in.jpg"/>
+      <property name="path[7]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoStraightDark48in.jpg"/>
+      <property name="path[15]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\LoadingStraight108in.jpg"/>
+      <property name="path[18]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\LoadingStraightDark13in.jpg"/>
+      <property name="numImages" value="43"/>
+      <property name="path[31]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketPanelAngleDark84in.jpg"/>
+      <property name="path[34]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketPanelStraightDark12in.jpg"/>
+      <property name="path[37]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketPanelStraightDark36in.jpg"/>
+    </grip:MultiImageFile>
+  </sources>
+  <steps>
+    <grip:Step name="HSL Threshold">
+      <grip:Input step="0" socket="0"/>
+      <grip:Input step="0" socket="1">
+        <value>
+          <double>59.89208633093524</double>
+          <double>89.38566552901025</double>
+        </value>
+      </grip:Input>
+      <grip:Input step="0" socket="2">
+        <value>
+          <double>130.71043165467623</double>
+          <double>255.0</double>
+        </value>
+      </grip:Input>
+      <grip:Input step="0" socket="3">
+        <value>
+          <double>96.31294964028777</double>
+          <double>255.0</double>
+        </value>
+      </grip:Input>
+      <grip:Output step="0" socket="0" previewed="false"/>
+    </grip:Step>
+    <grip:Step name="Find Contours">
+      <grip:Input step="1" socket="0"/>
+      <grip:Input step="1" socket="1">
+        <value>false</value>
+      </grip:Input>
+      <grip:Output step="1" socket="0" previewed="false"/>
+    </grip:Step>
+    <grip:Step name="Filter Contours">
+      <grip:Input step="2" socket="0"/>
+      <grip:Input step="2" socket="1">
+        <value>0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="2">
+        <value>0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="3">
+        <value>10.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="4">
+        <value>1000</value>
+      </grip:Input>
+      <grip:Input step="2" socket="5">
+        <value>10.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="6">
+        <value>1000</value>
+      </grip:Input>
+      <grip:Input step="2" socket="7">
+        <value>
+          <double>80.03597122302158</double>
+          <int>100</int>
+        </value>
+      </grip:Input>
+      <grip:Input step="2" socket="8">
+        <value>1000000</value>
+      </grip:Input>
+      <grip:Input step="2" socket="9">
+        <value>0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="10">
+        <value>0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="11">
+        <value>1000</value>
+      </grip:Input>
+      <grip:Output step="2" socket="0" previewed="false"/>
+    </grip:Step>
+    <grip:Step name="Convex Hulls">
+      <grip:Input step="3" socket="0"/>
+      <grip:Output step="3" socket="0" previewed="true"/>
+    </grip:Step>
+  </steps>
+  <connections>
+    <grip:Connection>
+      <grip:Output step="2" socket="0" previewed="false"/>
+      <grip:Input step="3" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output step="0" socket="0" previewed="false"/>
+      <grip:Input step="1" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output step="1" socket="0" previewed="false"/>
+      <grip:Input step="2" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output source="0" socket="0" previewed="true"/>
+      <grip:Input step="0" socket="0"/>
+    </grip:Connection>
+  </connections>
+  <settings>
+    <teamNumber>0</teamNumber>
+    <publishAddress>roboRIO-0-FRC.local</publishAddress>
+    <deployAddress>roboRIO-0-FRC.local</deployAddress>
+    <deployDir>/home/lvuser</deployDir>
+    <deployUser>lvuser</deployUser>
+    <deployJavaHome>/usr/local/frc/JRE/</deployJavaHome>
+    <deployJvmOptions>-Xmx50m -XX:-OmitStackTraceInFastThrow -XX:+HeapDumpOnOutOfMemoryError -XX:MaxNewSize=16m</deployJvmOptions>
+  </settings>
+  <codeGenerationSettings>
+    <language>Python</language>
+    <className>GripPipeline</className>
+    <implementWpilibPipeline>false</implementWpilibPipeline>
+    <saveDir>C:\Users\mpmsr\Desktop</saveDir>
+    <packageName></packageName>
+    <moduleName>grip</moduleName>
+  </codeGenerationSettings>
+</grip:Pipeline>

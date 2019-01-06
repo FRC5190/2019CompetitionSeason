@@ -1,0 +1,124 @@
+<grip:Pipeline>
+  <sources>
+    <grip:MultiImageFile>
+      <property name="path[5]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoLine60in.jpg"/>
+      <property name="numImages" value="6"/>
+      <property name="path[0]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoAngledLine48in.jpg"/>
+      <property name="path[1]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoLine16in.jpg"/>
+      <property name="index" value="1"/>
+      <property name="path[2]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoLine24in.jpg"/>
+      <property name="path[3]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoLine36in.jpg"/>
+      <property name="path[4]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoLine48in.jpg"/>
+    </grip:MultiImageFile>
+  </sources>
+  <steps>
+    <grip:Step name="HSL Threshold">
+      <grip:Input step="0" socket="0"/>
+      <grip:Input step="0" socket="1">
+        <value>
+          <double>0.0</double>
+          <double>180.0</double>
+        </value>
+      </grip:Input>
+      <grip:Input step="0" socket="2">
+        <value>
+          <double>0.0</double>
+          <double>255.0</double>
+        </value>
+      </grip:Input>
+      <grip:Input step="0" socket="3">
+        <value>
+          <double>133.00359712230215</double>
+          <double>255.0</double>
+        </value>
+      </grip:Input>
+      <grip:Output step="0" socket="0" previewed="true"/>
+    </grip:Step>
+    <grip:Step name="Find Contours">
+      <grip:Input step="1" socket="0"/>
+      <grip:Input step="1" socket="1">
+        <value>false</value>
+      </grip:Input>
+      <grip:Output step="1" socket="0" previewed="false"/>
+    </grip:Step>
+    <grip:Step name="Filter Contours">
+      <grip:Input step="2" socket="0"/>
+      <grip:Input step="2" socket="1">
+        <value>0.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="2">
+        <value>0.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="3">
+        <value>16.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="4">
+        <value>1000.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="5">
+        <value>0.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="6">
+        <value>1000.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="7">
+        <value>
+          <double>90.10791366906474</double>
+          <int>100</int>
+        </value>
+      </grip:Input>
+      <grip:Input step="2" socket="8">
+        <value>1000000.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="9">
+        <value>0.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="10">
+        <value>0.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="11">
+        <value>10000.0</value>
+      </grip:Input>
+      <grip:Output step="2" socket="0" previewed="true"/>
+    </grip:Step>
+    <grip:Step name="Convex Hulls">
+      <grip:Input step="3" socket="0"/>
+      <grip:Output step="3" socket="0" previewed="true"/>
+    </grip:Step>
+  </steps>
+  <connections>
+    <grip:Connection>
+      <grip:Output step="2" socket="0" previewed="true"/>
+      <grip:Input step="3" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output step="0" socket="0" previewed="true"/>
+      <grip:Input step="1" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output step="1" socket="0" previewed="false"/>
+      <grip:Input step="2" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output source="0" socket="0" previewed="true"/>
+      <grip:Input step="0" socket="0"/>
+    </grip:Connection>
+  </connections>
+  <settings>
+    <teamNumber>0</teamNumber>
+    <publishAddress>roboRIO-0-FRC.local</publishAddress>
+    <deployAddress>roboRIO-0-FRC.local</deployAddress>
+    <deployDir>/home/lvuser</deployDir>
+    <deployUser>lvuser</deployUser>
+    <deployJavaHome>/usr/local/frc/JRE/</deployJavaHome>
+    <deployJvmOptions>-Xmx50m -XX:-OmitStackTraceInFastThrow -XX:+HeapDumpOnOutOfMemoryError -XX:MaxNewSize=16m</deployJvmOptions>
+  </settings>
+  <codeGenerationSettings>
+    <language>Python</language>
+    <className>GripPipeline</className>
+    <implementWpilibPipeline>false</implementWpilibPipeline>
+    <saveDir>C:\Users\mpmsr\Desktop</saveDir>
+    <packageName></packageName>
+    <moduleName>grip</moduleName>
+  </codeGenerationSettings>
+</grip:Pipeline>
