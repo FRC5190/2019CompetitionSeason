@@ -149,7 +149,7 @@ class Drivetrain(frccnt.System):
 
 
 def main():
-    dt = 0.005
+    dt = 0.01
     drivetrain = Drivetrain(dt)
 
    

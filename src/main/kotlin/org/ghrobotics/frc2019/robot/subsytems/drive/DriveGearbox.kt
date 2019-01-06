@@ -7,7 +7,7 @@ import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.meter
 import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.wrappers.ctre.FalconSRX
-import org.ghrobotics.frc2019.common.Constants
+import org.ghrobotics.frc2019.robot.Constants
 
 class DriveGearbox(
     masterId: Int,

@@ -1,6 +1,6 @@
 package org.ghrobotics.frc2019.robot.auto.routines
 
-import org.ghrobotics.frc2019.common.Constants
+import org.ghrobotics.frc2019.robot.Constants
 import org.ghrobotics.frc2019.robot.subsytems.drive.DriveSubsystem
 
 fun characterizationRoutine() = autoRoutine {

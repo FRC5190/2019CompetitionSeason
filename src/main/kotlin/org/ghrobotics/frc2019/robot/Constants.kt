@@ -3,7 +3,7 @@
  * Green Hope Falcons
  */
 
-package org.ghrobotics.frc2019.common
+package org.ghrobotics.frc2019.robot
 
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.units.degree
