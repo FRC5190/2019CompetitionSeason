@@ -6,13 +6,13 @@
 package org.ghrobotics.frc2019.robot.subsytems.drive
 
 import edu.wpi.first.wpilibj.GenericHID
+import org.ghrobotics.frc2019.robot.Controls
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.utils.withDeadband
 import org.ghrobotics.lib.wrappers.hid.getRawButton
 import org.ghrobotics.lib.wrappers.hid.getX
 import org.ghrobotics.lib.wrappers.hid.getY
 import org.ghrobotics.lib.wrappers.hid.kX
-import org.ghrobotics.frc2019.robot.Controls
 
 class ManualDriveCommand : FalconCommand(DriveSubsystem) {
     companion object {
@@ -23,10 +23,9 @@ class ManualDriveCommand : FalconCommand(DriveSubsystem) {
     }
 
     override suspend fun execute() {
-        DriveSubsystem.curvatureDrive(
-            -speedSource(),
-            rotationSource(),
-            quickTurnSource()
+        DriveSubsystem.tankDrive(
+            -Controls.mainXbox.getY(GenericHID.Hand.kLeft)(),
+            -Controls.mainXbox.getY(GenericHID.Hand.kRight)()
         )
     }
 }
