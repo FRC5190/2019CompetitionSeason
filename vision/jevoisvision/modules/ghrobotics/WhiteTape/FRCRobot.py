@@ -1,9 +1,7 @@
 import libjevois as jevois
-import cv2
-import numpy
 import json
 import time
-from .ReflectiveTape import reflective_tape
+from . import white_tape
 
 
 class FRCRobot:
@@ -13,7 +11,7 @@ class FRCRobot:
         self.actualDistance = 44.5
         self.pixelDimension = 61
         self.focalLength = self.pixelDimension * self.actualDistance / self.actualDimension
-        self.reflectiveVision = reflective_tape.ReflectiveTape()
+        self.reflectiveVision = white_tape.ReflectiveTape()
 
     def processAndSend(self, source0):
         timestamp = time.time()

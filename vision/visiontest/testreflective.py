@@ -1,6 +1,6 @@
 import cv2
 
-from jevoisvision.modules.JeVois.FRCRobot.ReflectiveTape import reflective_tape
+from jevoisvision.modules.JeVois.ReflectiveTape import reflective_tape
 
 reflectiveTape = reflective_tape.ReflectiveTape()
 
