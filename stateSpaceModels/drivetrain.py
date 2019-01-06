@@ -62,8 +62,8 @@ class Drivetrain(frccnt.System):
         self.num_motors = 2.0
 
         # High and low gear ratios of drivetrain
-        Glow = 5.0
-        Ghigh = 5.0
+        Glow = 7.29
+        Ghigh = 7.29
 
         # Drivetrain mass in kg
         self.m = 60
