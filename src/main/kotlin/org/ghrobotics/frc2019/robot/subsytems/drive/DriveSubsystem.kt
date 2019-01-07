@@ -8,24 +8,18 @@ package org.ghrobotics.frc2019.robot.subsytems.drive
 import com.ctre.phoenix.motorcontrol.StatusFrame
 import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod
 import com.ctre.phoenix.sensors.PigeonIMU
-import com.kauailabs.navx.frc.AHRS
-import com.team254.lib.physics.DCMotorTransmission
-import com.team254.lib.physics.DifferentialDrive
-import edu.wpi.first.wpilibj.I2C
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.robot.Constants
 import org.ghrobotics.frc2019.robot.Robot
+import org.ghrobotics.frc2019.robot.auto.Trajectories
 import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.statespace.*
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
-import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.meter
 import org.ghrobotics.lib.mathematics.units.millisecond
-import org.ghrobotics.lib.mathematics.units.radian
 import org.ghrobotics.lib.sensors.asSource
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
-import kotlin.math.pow
 import kotlin.properties.Delegates.observable
 
 object DriveSubsystem : TankDriveSubsystem() {
@@ -75,22 +69,7 @@ object DriveSubsystem : TankDriveSubsystem() {
 
     val kStateSpaceControllerDt = 10.millisecond
 
-    private val dcTransmission = DCMotorTransmission(
-        1 / Constants.kVDrive,
-        Constants.kWheelRadius.value.pow(2) * Constants.kRobotMass / (2.0 * Constants.kADrive),
-        Constants.kStaticFrictionVoltage
-    )
-
-    override val differentialDrive = DifferentialDrive(
-        Constants.kRobotMass,
-        Constants.kRobotMomentOfInertia,
-        Constants.kRobotAngularDrag,
-        Constants.kWheelRadius.value,
-        Constants.kTrackWidth.value / 2.0,
-        dcTransmission,
-        dcTransmission
-    )
-
+    override val differentialDrive = Trajectories.differentialDrive
     override val trajectoryTracker = RamseteTracker(Constants.kDriveBeta, Constants.kDriveZeta)
 
     private val velocityReferenceTracker = StateSpaceLoop(

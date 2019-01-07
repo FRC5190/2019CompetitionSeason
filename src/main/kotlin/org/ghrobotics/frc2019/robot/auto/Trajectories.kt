@@ -5,8 +5,9 @@
 
 package org.ghrobotics.frc2019.robot.auto
 
+import com.team254.lib.physics.DCMotorTransmission
+import com.team254.lib.physics.DifferentialDrive
 import org.ghrobotics.frc2019.robot.Constants
-import org.ghrobotics.frc2019.robot.subsytems.drive.DriveSubsystem
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.trajectory.DefaultTrajectoryGenerator
 import org.ghrobotics.lib.mathematics.twodim.trajectory.constraints.CentripetalAccelerationConstraint
@@ -16,8 +17,28 @@ import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.feet
+import kotlin.math.pow
 
 object Trajectories {
+
+    // DC Motor Transmission for the DriveSubsystem
+    private val dcTransmission = DCMotorTransmission(
+        1 / Constants.kVDrive,
+        Constants.kWheelRadius.value.pow(2) * Constants.kRobotMass / (2.0 * Constants.kADrive),
+        Constants.kStaticFrictionVoltage
+    )
+
+    // Differential Drive. We are defining this here so that this class can be accessed by tests
+    // without having to initialize WPILib.
+    val differentialDrive = DifferentialDrive(
+        Constants.kRobotMass,
+        Constants.kRobotMomentOfInertia,
+        Constants.kRobotAngularDrag,
+        Constants.kWheelRadius.value,
+        Constants.kTrackWidth.value / 2.0,
+        dcTransmission,
+        dcTransmission
+    )
 
     // Constants in Feet Per Second
     private val kMaxVelocity = 10.0.feet.velocity // TODO Find Actual Value
@@ -28,7 +49,7 @@ object Trajectories {
     // Constraints
     private val kConstraints = listOf(
         CentripetalAccelerationConstraint(kMaxCentripetalAcceleration),
-        DifferentialDriveDynamicsConstraint(DriveSubsystem.differentialDrive, 10.0.volt)
+        DifferentialDriveDynamicsConstraint(differentialDrive, 10.0.volt)
     )
 
 
