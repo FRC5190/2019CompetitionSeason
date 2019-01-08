@@ -32,9 +32,9 @@ object Network {
     init {
         // Initialize sendable choosers
         autoModeChooser.addOption("Characterize", AutoMode.CHARACTERIZE)
-        autoModeChooser.addOption("Cargo Ship", AutoMode.CARGO_SHIP)
+        autoModeChooser.addOption("Cargo Ship", AutoMode.FORWARD_CARGO_SHIP)
         autoModeChooser.addOption("Baseline", AutoMode.BASELINE)
-        autoModeChooser.setDefaultOption("Rocket", AutoMode.ROCKET)
+        autoModeChooser.setDefaultOption("Rocket", AutoMode.DOUBLE_HATCH_ROCKET)
 
         startingPositionChooser.setDefaultOption("Left", StartingPositions.LEFT)
         startingPositionChooser.addOption("Center", StartingPositions.CENTER)

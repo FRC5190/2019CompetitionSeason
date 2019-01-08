@@ -120,14 +120,6 @@ object Trajectories {
         kRightForwardCargoShip
     ).generateTrajectory(false)
 
-    // Go from the right-forward bay of the cargo ship to the depot to pick up a ball
-    val rightForwardCargoShipToDepot = waypoints(
-        kRightForwardCargoShip,
-        kBottomRightDepotBall
-    ).generateTrajectory(true)
-
-    val baseline = waypoints(kSideStart, kSideStart + Pose2d(10.feet, 0.feet)).generateTrajectory(false)
-
     /************************************ HELPER METHODS ************************************/
 
     private fun waypoints(vararg points: Pose2d) = listOf(*points)

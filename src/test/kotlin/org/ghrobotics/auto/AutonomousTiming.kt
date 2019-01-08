@@ -16,8 +16,7 @@ class AutonomousTiming {
     fun forwardCargoShipAutoTimer() {
         val trajectories = Trajectories.centerStartToLeftForwardCargoShip.lastState.t.second +
             Trajectories.leftForwardCargoShipToLoadingStation.lastState.t.second +
-            Trajectories.loadingStationToRightForwardCargoShip.lastState.t.second +
-            Trajectories.rightForwardCargoShipToDepot.lastState.t.second
+            Trajectories.loadingStationToRightForwardCargoShip.lastState.t.second
         println(trajectories)
     }
 }

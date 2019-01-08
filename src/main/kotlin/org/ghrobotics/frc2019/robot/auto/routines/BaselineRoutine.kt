@@ -1,15 +1,12 @@
 package org.ghrobotics.frc2019.robot.auto.routines
 
-import org.ghrobotics.frc2019.robot.auto.Autonomous
-import org.ghrobotics.frc2019.robot.auto.StartingPositions
-import org.ghrobotics.frc2019.robot.auto.Trajectories
 import org.ghrobotics.frc2019.robot.subsytems.drive.DriveSubsystem
-import org.ghrobotics.lib.utils.withEquals
+import org.ghrobotics.lib.commands.PeriodicRunnableCommand
+import org.ghrobotics.lib.mathematics.units.second
 
 fun baselineRoutine() = autoRoutine {
-    +DriveSubsystem.followTrajectory(
-        trajectory = Trajectories.baseline,
-        pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
-        dt = DriveSubsystem.kPathFollowingDt
-    )
+    // The only reason we will ever run baseline is if encoders don't work. So it makes no sense to run a trajectory.
+    +PeriodicRunnableCommand({
+        DriveSubsystem.tankDrive(0.3, 0.3)
+    }, { false }).withTimeout(5.second)
 }
