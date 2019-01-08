@@ -3,8 +3,6 @@ import edu.wpi.first.gradlerio.frc.FRCJavaArtifact
 import edu.wpi.first.gradlerio.frc.RoboRIO
 import edu.wpi.first.toolchain.NativePlatforms
 import io.gitlab.arturbosch.detekt.detekt
-import jaci.gradle.deploy.artifact.FileTreeArtifact
-import jaci.gradle.deploy.context.DeployContext
 
 plugins {
     kotlin("jvm") version "1.3.11"
@@ -70,10 +68,10 @@ detekt {
 }
 
 repositories {
+    mavenLocal()
     jcenter()
     maven { setUrl("http://dl.bintray.com/kyonifer/maven") }
     maven { setUrl("https://jitpack.io") }
-    mavenLocal()
 }
 
 dependencies {
@@ -82,7 +80,7 @@ dependencies {
     compile("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.1.0")
 
     // FalconLibrary
-    compile("org.ghrobotics", "FalconLibrary", "d9bb0f5")
+    compile("org.ghrobotics", "FalconLibrary", "31bf852")
 
     // WPILib and Vendors
     wpi.deps.wpilib().forEach { compile(it) }

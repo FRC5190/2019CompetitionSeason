@@ -10,7 +10,6 @@ import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod
 import com.ctre.phoenix.sensors.PigeonIMU
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.robot.Constants
-import org.ghrobotics.frc2019.robot.Robot
 import org.ghrobotics.frc2019.robot.auto.Trajectories
 import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.statespace.*
@@ -51,8 +50,9 @@ object DriveSubsystem : TankDriveSubsystem() {
 
     // Type of localization to determine position on the field
     override val localization = TankEncoderLocalization(
-        PigeonIMU(Constants.kPigeonIMUId).asSource(), { leftMotor.sensorPosition }, { rightMotor.sensorPosition },
-        Robot.coroutineContext
+        PigeonIMU(Constants.kPigeonIMUId).asSource(),
+        leftMotor::sensorPosition,
+        rightMotor::sensorPosition
     )
 
     // Shift up and down

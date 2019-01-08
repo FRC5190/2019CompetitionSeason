@@ -292,17 +292,17 @@ formatting:
     autoCorrect: true
 
 naming:
-  active: true
+  active: false
   ClassNaming:
-    active: true
+    active: false
     classPattern: '[A-Z$][a-zA-Z0-9$]*'
   ConstructorParameterNaming:
-    active: true
+    active: false
     parameterPattern: '[a-z][A-Za-z0-9]*'
     privateParameterPattern: '[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
   EnumNaming:
-    active: true
+    active: false
     enumEntryPattern: '^[A-Z][_a-zA-Z0-9]*'
   ForbiddenClassName:
     active: false
@@ -314,30 +314,30 @@ naming:
     active: false
     minimumFunctionNameLength: 3
   FunctionNaming:
-    active: true
+    active: false
     functionPattern: '^([a-z$][a-zA-Z$0-9]*)|(`.*`)$'
     excludeClassPattern: '$^'
     ignoreOverridden: true
   FunctionParameterNaming:
-    active: true
+    active: false
     parameterPattern: '[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
     ignoreOverriddenFunctions: true
   MatchingDeclarationName:
-    active: true
+    active: false
   MemberNameEqualsClassName:
     active: false
     ignoreOverriddenFunction: true
   ObjectPropertyNaming:
-    active: true
+    active: false
     constantPattern: '[A-Za-z][_A-Za-z0-9]*'
     propertyPattern: '[A-Za-z][_A-Za-z0-9]*'
     privatePropertyPattern: '(_)?[A-Za-z][_A-Za-z0-9]*'
   PackageNaming:
-    active: true
+    active: false
     packagePattern: '^[a-z]+(\.[a-z][a-z0-9]*)*$'
   TopLevelPropertyNaming:
-    active: true
+    active: false
     constantPattern: '[A-Z][_A-Z0-9]*'
     propertyPattern: '[A-Za-z][_A-Za-z0-9]*'
     privatePropertyPattern: '(_)?[A-Za-z][A-Za-z0-9]*'
@@ -348,7 +348,7 @@ naming:
     active: false
     minimumVariableNameLength: 1
   VariableNaming:
-    active: true
+    active: false
     variablePattern: '[a-z][A-Za-z0-9]*'
     privateVariablePattern: '(_)?[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'

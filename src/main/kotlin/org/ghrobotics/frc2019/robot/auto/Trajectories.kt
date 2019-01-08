@@ -122,7 +122,7 @@ object Trajectories {
 
     /************************************ HELPER METHODS ************************************/
 
-    private fun waypoints(vararg points: Pose2d) = listOf(*points)
+    private fun waypoints(vararg points: Pose2d) = points.toList()
 
     private fun List<Pose2d>.generateTrajectory(reversed: Boolean) = DefaultTrajectoryGenerator.generateTrajectory(
         wayPoints = this, constraints = kConstraints,
