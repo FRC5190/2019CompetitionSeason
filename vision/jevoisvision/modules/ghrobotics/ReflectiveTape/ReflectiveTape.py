@@ -16,8 +16,25 @@ class ReflectiveTape:
 
     def processAndSend(self, source0):
         timestamp = time.time()
+        # numpy.array(source0, copy=True)
+        self.reflectiveVision.process(source0)
         height, width, _ = source0.shape
-        list = []
+        json_pair_list = []
+        for pair in self.reflectiveVision.pairs:
+            x, y, w, h = pair.bounding_rect
+
+            # Normalize
+            nx = (x * 2 - width) / width
+            ny = (y * 2 - height) / height
+            nw = (w * 2 - width) / width
+            nh = (h * 2 - height) / height
+
+            json_pair_list.append({
+                "x": nx,
+                "y": ny,
+                "w": nw,
+                "h": nh
+            })
         # for contour in self.gripPipeline.filter_contours_output:
         #     x, y, w, h = cv2.boundingRect(contour)
         #
@@ -37,12 +54,11 @@ class ReflectiveTape:
         #         "angle": numpy.degrees(angle),
         #         "distance": distance
         #     })
-        jevois.sendSerial(json.dumps({"Epoch Time": timestamp, "Contours": list}))
+        jevois.sendSerial(json.dumps({"Epoch Time": timestamp, "Contours": json_pair_list}))
 
     # Process function with no USB output
     def processNoUSB(self, inframe):
         inimg = inframe.getCvBGR()
-        self.reflectiveVision.process(inimg)
         self.processAndSend(inimg)
 
     # Process function with USB output
@@ -54,23 +70,22 @@ class ReflectiveTape:
         jevois.paste(inimg, outimg, 0, 0)
         inframe.done()
 
-        self.reflectiveVision.process(numpy.array(imgbgr, copy=True))
         self.processAndSend(imgbgr)
 
         for leftTape in self.reflectiveVision.leftTapes:
             x, y, w, h = leftTape.bounding_rect
 
             jevois.drawRect(outimg, x, y, w, h, jevois.YUYV.White)
-            jevois.writeText(outimg, str(leftTape.angle), x, y, jevois.YUYV.White, jevois.Font.Font6x10)
+            jevois.writeText(outimg, str(leftTape.angle), x, y - 10, jevois.YUYV.White, jevois.Font.Font6x10)
 
         for rightTape in self.reflectiveVision.rightTapes:
             x, y, w, h = rightTape.bounding_rect
 
             jevois.drawRect(outimg, x, y, w, h, jevois.YUYV.White)
-            jevois.writeText(outimg, str(rightTape.angle), x, y, jevois.YUYV.White, jevois.Font.Font6x10)
+            jevois.writeText(outimg, str(rightTape.angle), x, y - 10, jevois.YUYV.White, jevois.Font.Font6x10)
 
         for pair in self.reflectiveVision.pairs:
-            x, y, w, h = pair[0].bounds(pair[1])
+            x, y, w, h = pair.bounding_rect
 
             jevois.drawRect(outimg, x - 5, y - 5, w + 10, h + 10, jevois.YUYV.White)
 
@@ -122,7 +137,7 @@ class ReflectiveTapeProcess:
                     best_distance = distance
 
             if best_match is not None:
-                self.pairs.append((tape1, best_match))
+                self.pairs.append(TapePair(tape1, best_match))
                 temp_right_tapes.remove(best_match)
 
     def filterTapes(self):
@@ -162,6 +177,14 @@ class Tape:
         h = max(max_y1, max_y2) - y
 
         return x, y, w, h
+
+
+class TapePair:
+
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+        self.bounding_rect = self.left.bounds(self.right)
 
 
 class GripPipeline:
