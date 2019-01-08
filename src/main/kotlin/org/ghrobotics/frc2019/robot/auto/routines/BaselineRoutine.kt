@@ -10,6 +10,6 @@ fun baselineRoutine() = autoRoutine {
     +DriveSubsystem.followTrajectory(
         trajectory = Trajectories.baseline,
         pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
-        dt = DriveSubsystem.kStateSpaceControllerDt
+        dt = DriveSubsystem.kPathFollowingDt
     )
 }

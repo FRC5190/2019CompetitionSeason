@@ -67,7 +67,7 @@ object DriveSubsystem : TankDriveSubsystem() {
 
     /* SOFTWARE */
 
-    val kStateSpaceControllerDt = 10.millisecond
+    val kPathFollowingDt = 10.millisecond
 
     override val differentialDrive = Trajectories.differentialDrive
     override val trajectoryTracker = RamseteTracker(Constants.kDriveBeta, Constants.kDriveZeta)

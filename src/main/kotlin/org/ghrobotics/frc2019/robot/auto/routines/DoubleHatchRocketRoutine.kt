@@ -10,16 +10,16 @@ fun rocketRoutine() = autoRoutine {
     +DriveSubsystem.followTrajectory(
         trajectory = Trajectories.sideStartToFarRocket,
         pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
-        dt = DriveSubsystem.kStateSpaceControllerDt
+        dt = DriveSubsystem.kPathFollowingDt
     )
     +DriveSubsystem.followTrajectory(
         trajectory = Trajectories.farRocketToLoadingStation,
         pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
-        dt = DriveSubsystem.kStateSpaceControllerDt
+        dt = DriveSubsystem.kPathFollowingDt
     )
     +DriveSubsystem.followTrajectory(
         trajectory = Trajectories.loadingStationToNearRocket,
         pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
-        dt = DriveSubsystem.kStateSpaceControllerDt
+        dt = DriveSubsystem.kPathFollowingDt
     )
 }
