@@ -11,14 +11,19 @@ import com.ctre.phoenix.sensors.PigeonIMU
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.robot.Constants
 import org.ghrobotics.frc2019.robot.auto.Trajectories
+import org.ghrobotics.frc2019.robot.auto.generateTrajectory
+import org.ghrobotics.frc2019.robot.auto.waypoints
+import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.statespace.*
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
+import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.meter
 import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.sensors.asSource
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
+import org.ghrobotics.lib.utils.Source
 import kotlin.properties.Delegates.observable
 
 object DriveSubsystem : TankDriveSubsystem() {
@@ -91,6 +96,16 @@ object DriveSubsystem : TankDriveSubsystem() {
         allMasters.forEach { it.kP = 0.75; it.kD = 1.0 }
     }
 
+    fun driveToLocation(location: Pose2d) = driveToLocation { location }
+
+    fun driveToLocation(location: Source<Pose2d>): FalconCommand {
+        return followTrajectory(
+            trajectory = waypoints(localization(), location()).generateTrajectory(false),
+            pathMirrored = false,
+            dt = kPathFollowingDt
+        )
+    }
+
     override fun autoReset() {
         allMasters.forEach {
             it.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10)
@@ -107,6 +122,7 @@ object DriveSubsystem : TankDriveSubsystem() {
         leftMotor.velocity = 0.meter.velocity
         rightMotor.velocity = 0.meter.velocity
     }
+
 
     // Remove this to use the Talon SRX Velocity Loop with Arbitrary Feedforward
 //    override fun setOutput(

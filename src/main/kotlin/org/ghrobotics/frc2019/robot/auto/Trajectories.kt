@@ -43,11 +43,11 @@ object Trajectories {
         dcTransmission
     )
 
-    private val kMaxVelocity = 10.0.feet.velocity
-    private val kMaxAcceleration = 8.0.feet.acceleration
+    val kMaxVelocity = 10.0.feet.velocity
+    val kMaxAcceleration = 8.0.feet.acceleration
     private val kMaxCentripetalAcceleration = 4.5.feet.acceleration
 
-    private val kConstraints = listOf(
+    val kConstraints = listOf(
         CentripetalAccelerationConstraint(kMaxCentripetalAcceleration),
         DifferentialDriveDynamicsConstraint(differentialDrive, 10.0.volt)
     )
@@ -119,14 +119,14 @@ object Trajectories {
         Pose2d(10.6.feet, 6.614.feet, 69.degree),
         kRightForwardCargoShip
     ).generateTrajectory(false)
-
-    /************************************ HELPER METHODS ************************************/
-
-    private fun waypoints(vararg points: Pose2d) = points.toList()
-
-    private fun List<Pose2d>.generateTrajectory(reversed: Boolean) = DefaultTrajectoryGenerator.generateTrajectory(
-        wayPoints = this, constraints = kConstraints,
-        startVelocity = 0.0.meter.velocity, endVelocity = 0.0.meter.velocity,
-        maxVelocity = kMaxVelocity, maxAcceleration = kMaxAcceleration, reversed = reversed
-    )
 }
+
+/************************************ HELPER METHODS ************************************/
+
+fun waypoints(vararg points: Pose2d) = points.toList()
+
+fun List<Pose2d>.generateTrajectory(reversed: Boolean) = DefaultTrajectoryGenerator.generateTrajectory(
+    wayPoints = this, constraints = Trajectories.kConstraints,
+    startVelocity = 0.0.meter.velocity, endVelocity = 0.0.meter.velocity,
+    maxVelocity = Trajectories.kMaxVelocity, maxAcceleration = Trajectories.kMaxAcceleration, reversed = reversed
+)
