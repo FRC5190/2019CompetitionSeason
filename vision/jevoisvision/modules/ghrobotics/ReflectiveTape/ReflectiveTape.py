@@ -5,23 +5,48 @@ import cv2
 import math
 import numpy
 
+
 class ReflectiveTape:
 
     def __init__(self):
-        self.actualDimension = 7.875
-        self.actualDistance = 44.5
-        self.pixelDimension = 61
-        self.focalLength = self.pixelDimension * self.actualDistance / self.actualDimension
+        winw = (12 + 9) * 0.0254  # width in meters
+        winh = (12 + 4.25) * 0.0254  # height in meters
+
+        self.objPoints = numpy.array([(-winw * 0.5, -winh * 0.5, 0),
+                                      (-winw * 0.5, winh * 0.5, 0),
+                                      (winw * 0.5, winh * 0.5, 0),
+                                      (winw * 0.5, -winh * 0.5, 0)])
+
         self.reflectiveVision = ReflectiveTapeProcess()
+
+    def loadCameraCalibration(self, w, h):
+        cpf = "/jevois/share/camera/calibration{}x{}.yaml".format(w, h)
+        fs = cv2.FileStorage(cpf, cv2.FILE_STORAGE_READ)
+        if fs.isOpened():
+            self.camMatrix = fs.getNode("camera_matrix").mat()
+            self.distCoeffs = fs.getNode("distortion_coefficients").mat()
+            jevois.LINFO("Loaded camera calibration from {}".format(cpf))
+        else:
+            jevois.LFATAL("Failed to read camera parameters from file [{}]".format(cpf))
+
+    def estimatePose(self, tapePair):
+        return cv2.solvePnP(objPoints, tapePair.imagePoints, self.camMatrix, self.distCoeffs)
 
     def processAndSend(self, source0):
         timestamp = time.time()
         # numpy.array(source0, copy=True)
         self.reflectiveVision.process(source0)
         height, width, _ = source0.shape
+
+        # Load camera calibration if needed:
+        if not hasattr(self, 'camMatrix'):
+            self.loadCameraCalibration(width, height)
+
         json_pair_list = []
         for pair in self.reflectiveVision.pairs:
             x, y, w, h = pair.bounding_rect
+
+            (retval, tvec, rvec) = self.estimatePose(pair)
 
             # Normalize
             nx = (x * 2 - width) / width
@@ -33,27 +58,11 @@ class ReflectiveTape:
                 "x": nx,
                 "y": ny,
                 "w": nw,
-                "h": nh
+                "h": nh,
+                "retval": retval,
+                "rvec": rvec,
+                "tvec": tvec
             })
-        # for contour in self.gripPipeline.filter_contours_output:
-        #     x, y, w, h = cv2.boundingRect(contour)
-        #
-        #     # angle and distance from camera (angles in radians)
-        #     cA = numpy.arctan2(x + w / 2 - width / 2, self.focalLength)
-        #     cD = self.actualDimension * self.focalLength / w
-        #
-        #     # angle and distance after accounting for camera displacement (angles in radians)
-        #     angle = numpy.arctan2(cD * numpy.sin(cA), cD * numpy.cos(cA))
-        #     distance = cD * numpy.cos(cA) / numpy.cos(angle)
-        #
-        #     list.append({
-        #         "x": x,
-        #         "y": y,
-        #         "w": w,
-        #         "h": h,
-        #         "angle": numpy.degrees(angle),
-        #         "distance": distance
-        #     })
         jevois.sendSerial(json.dumps({"Epoch Time": timestamp, "Contours": json_pair_list}))
 
     # Process function with no USB output
@@ -185,6 +194,12 @@ class TapePair:
         self.left = left
         self.right = right
         self.bounding_rect = self.left.bounds(self.right)
+        lx, ly, lw, lh = self.left.bounding_rect
+        rx, ry, rw, rh = self.right.bounding_rect
+        self.imagePoints = numpy.array([(lx, ly),
+                                        (x, ly + lh),
+                                        (rx + rw, ry + rh),
+                                        (rx + rw, ry)])
 
 
 class GripPipeline:
@@ -226,27 +241,39 @@ class GripPipeline:
 
         self.convex_hulls_output = None
 
-
     def process(self, source0):
         """
         Runs the pipeline and sets all outputs to new values.
         """
         # Step HSL_Threshold0:
         self.__hsl_threshold_input = source0
-        (self.hsl_threshold_output) = self.__hsl_threshold(self.__hsl_threshold_input, self.__hsl_threshold_hue, self.__hsl_threshold_saturation, self.__hsl_threshold_luminance)
+        (self.hsl_threshold_output) = self.__hsl_threshold(self.__hsl_threshold_input, self.__hsl_threshold_hue,
+                                                           self.__hsl_threshold_saturation,
+                                                           self.__hsl_threshold_luminance)
 
         # Step Find_Contours0:
         self.__find_contours_input = self.hsl_threshold_output
-        (self.find_contours_output) = self.__find_contours(self.__find_contours_input, self.__find_contours_external_only)
+        (self.find_contours_output) = self.__find_contours(self.__find_contours_input,
+                                                           self.__find_contours_external_only)
 
         # Step Filter_Contours0:
         self.__filter_contours_contours = self.find_contours_output
-        (self.filter_contours_output) = self.__filter_contours(self.__filter_contours_contours, self.__filter_contours_min_area, self.__filter_contours_min_perimeter, self.__filter_contours_min_width, self.__filter_contours_max_width, self.__filter_contours_min_height, self.__filter_contours_max_height, self.__filter_contours_solidity, self.__filter_contours_max_vertices, self.__filter_contours_min_vertices, self.__filter_contours_min_ratio, self.__filter_contours_max_ratio)
+        (self.filter_contours_output) = self.__filter_contours(self.__filter_contours_contours,
+                                                               self.__filter_contours_min_area,
+                                                               self.__filter_contours_min_perimeter,
+                                                               self.__filter_contours_min_width,
+                                                               self.__filter_contours_max_width,
+                                                               self.__filter_contours_min_height,
+                                                               self.__filter_contours_max_height,
+                                                               self.__filter_contours_solidity,
+                                                               self.__filter_contours_max_vertices,
+                                                               self.__filter_contours_min_vertices,
+                                                               self.__filter_contours_min_ratio,
+                                                               self.__filter_contours_max_ratio)
 
         # Step Convex_Hulls0:
         self.__convex_hulls_contours = self.filter_contours_output
         (self.convex_hulls_output) = self.__convex_hulls(self.__convex_hulls_contours)
-
 
     @staticmethod
     def __hsl_threshold(input, hue, sat, lum):
@@ -260,7 +287,7 @@ class GripPipeline:
             A black and white numpy.ndarray.
         """
         out = cv2.cvtColor(input, cv2.COLOR_BGR2HLS)
-        return cv2.inRange(out, (hue[0], lum[0], sat[0]),  (hue[1], lum[1], sat[1]))
+        return cv2.inRange(out, (hue[0], lum[0], sat[0]), (hue[1], lum[1], sat[1]))
 
     @staticmethod
     def __find_contours(input, external_only):
@@ -271,12 +298,12 @@ class GripPipeline:
         Return:
             A list of numpy.ndarray where each one represents a contour.
         """
-        if(external_only):
+        if (external_only):
             mode = cv2.RETR_EXTERNAL
         else:
             mode = cv2.RETR_LIST
         method = cv2.CHAIN_APPROX_SIMPLE
-        im2, contours, hierarchy =cv2.findContours(input, mode=mode, method=method)
+        im2, contours, hierarchy = cv2.findContours(input, mode=mode, method=method)
         return contours
 
     @staticmethod
@@ -302,7 +329,7 @@ class GripPipeline:
         """
         output = []
         for contour in input_contours:
-            x,y,w,h = cv2.boundingRect(contour)
+            x, y, w, h = cv2.boundingRect(contour)
             if (w < min_width or w > max_width):
                 continue
             if (h < min_height or h > max_height):
@@ -336,5 +363,3 @@ class GripPipeline:
         for contour in input_contours:
             output.append(cv2.convexHull(contour))
         return output
-
-
