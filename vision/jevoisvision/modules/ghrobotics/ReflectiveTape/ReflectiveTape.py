@@ -197,7 +197,7 @@ class TapePair:
         lx, ly, lw, lh = self.left.bounding_rect
         rx, ry, rw, rh = self.right.bounding_rect
         self.imagePoints = numpy.array([(lx, ly),
-                                        (x, ly + lh),
+                                        (lx, ly + lh),
                                         (rx + rw, ry + rh),
                                         (rx + rw, ry)])
 
