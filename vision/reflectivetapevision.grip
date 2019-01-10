@@ -48,7 +48,7 @@
       <property name="path[37]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketPanelStraightDark36in.jpg"/>
     </grip:MultiImageFile>
     <grip:Camera>
-      <property name="deviceNumber" value="1"/>
+      <property name="deviceNumber" value="0"/>
     </grip:Camera>
   </sources>
   <steps>
@@ -56,19 +56,19 @@
       <grip:Input step="0" socket="0"/>
       <grip:Input step="0" socket="1">
         <value>
-          <double>48.5611510791367</double>
-          <double>95.52901023890786</double>
+          <double>27.5179856115108</double>
+          <double>98.60068259385665</double>
         </value>
       </grip:Input>
       <grip:Input step="0" socket="2">
         <value>
-          <double>135.29676258992808</double>
+          <double>87.14028776978417</double>
           <double>255.0</double>
         </value>
       </grip:Input>
       <grip:Input step="0" socket="3">
         <value>
-          <double>61.915467625899275</double>
+          <double>43.57014388489208</double>
           <double>255.0</double>
         </value>
       </grip:Input>
@@ -132,7 +132,7 @@
       <grip:Input step="2" socket="0"/>
     </grip:Connection>
     <grip:Connection>
-      <grip:Output source="1" socket="0" previewed="true"/>
+      <grip:Output source="1" socket="0" previewed="false"/>
       <grip:Input step="0" socket="0"/>
     </grip:Connection>
     <grip:Connection>
