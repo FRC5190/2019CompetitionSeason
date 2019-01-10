@@ -42,16 +42,19 @@ object Constants {
     val kHypotenuseDifferenceForRamp = 0.433.inch
 
     // ROBOT
-    val kRobotWidth = 29.inch // TODO Find Actual Value
-    val kRobotLength = 30.inch // TODO Find Actual Value
-    val kBumperLength = 2.0.inch // TODO Find Actual Value
+    val kRobotWidth = 29.inch
+    val kRobotLength = 30.inch
+    val kBumperLength = 2.0.inch
+    val kIntakeLength = 10.inch
+
 
     const val kRobotMass = 60.0 // kg // TODO Find Actual Value
     const val kRobotMomentOfInertia = 10.0 // kg m^2 // TODO Find Actual Value
     const val kRobotAngularDrag = 12.0 // N*m / (rad/sec) // TODO Find Actual Value
 
     // TRANSFORMATIONS
-    val kCenterToFrontBumper = Pose2d(-(kRobotLength / 2.0) - kBumperLength, 0.meter, 0.degree)
+    val kFrontBumperToCenter = Pose2d(-(kRobotLength / 2.0) - kBumperLength, 0.meter, 0.degree)
+    val kIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeLength, 0.meter, 0.degree)
     val kCenterToCamera = Pose2d(14.inch, 0.inch, 0.degree) // Camera is on front of the robot facing forward
 
     // DRIVE
