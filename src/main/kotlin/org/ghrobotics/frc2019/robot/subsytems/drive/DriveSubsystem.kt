@@ -98,7 +98,7 @@ object DriveSubsystem : TankDriveSubsystem() {
 
     fun driveToLocation(location: Source<Pose2d>): FalconCommand {
         return followTrajectory(
-            trajectory = waypoints(localization(), location()).generateTrajectory(false),
+            trajectory = { waypoints(localization(), location()).generateTrajectory(false) },
             pathMirrored = false,
             dt = kPathFollowingDt
         )
