@@ -24,11 +24,9 @@ object Constants {
     // MOTOR IDS
     const val kLeftMasterId = 1
     const val kLeftSlaveId1 = 2
-    const val kLeftSlaveId2 = 5
 
     const val kRightMasterId = 3
-    const val kRightSlaveId1 = 4
-    const val kRightSlaveId2 = 6
+    const val kRightSlaveId1 = 6
 
     // GYROS
     const val kPigeonIMUId = 17
@@ -54,6 +52,7 @@ object Constants {
 
     // TRANSFORMATIONS
     val kCenterToFrontBumper = Pose2d(-(kRobotLength / 2.0) - kBumperLength, 0.meter, 0.degree)
+    val kCenterToCamera = Pose2d(14.inch, 0.inch, 0.degree) // Camera is on front of the robot facing forward
 
     // DRIVE
     val kDriveSensorUnitsPerRotation = 1440.STU // TODO Find Actual Value

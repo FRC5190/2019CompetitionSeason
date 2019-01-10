@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.Timer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.produce
+import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
+import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.*
 import kotlin.coroutines.CoroutineContext
 
@@ -91,7 +93,9 @@ data class VisionData(
 data class VisionContour(
     val angle: Rotation2d,
     val distance: Length
-)
+) {
+    val cameraRelativePose = Pose2d(Translation2d(distance, angle), 0.degree)
+}
 
 fun CoroutineScope.spiReadToChannel(
     serialPort: SerialPort

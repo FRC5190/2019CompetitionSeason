@@ -34,13 +34,11 @@ object DriveSubsystem : TankDriveSubsystem() {
     private val leftGearbox = DriveGearbox(
         Constants.kLeftMasterId,
         Constants.kLeftSlaveId1,
-        Constants.kLeftSlaveId2,
         false
     )
     private val rightGearbox = DriveGearbox(
         Constants.kRightMasterId,
         Constants.kRightSlaveId1,
-        Constants.kRightSlaveId2,
         true
     )
 
@@ -100,7 +98,7 @@ object DriveSubsystem : TankDriveSubsystem() {
 
     fun driveToLocation(location: Source<Pose2d>): FalconCommand {
         return followTrajectory(
-            trajectory = waypoints(localization(), location()).generateTrajectory(false),
+            trajectory = { waypoints(localization(), location()).generateTrajectory(false) },
             pathMirrored = false,
             dt = kPathFollowingDt
         )
