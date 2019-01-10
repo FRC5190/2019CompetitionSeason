@@ -1,4 +1,4 @@
-package org.ghrobotics.frc2019.auto
+package org.ghrobotics.frc2019.robot.auto
 
 import org.ghrobotics.frc2019.robot.auto.Trajectories
 import org.junit.Test
