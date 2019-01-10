@@ -26,7 +26,7 @@ object Constants {
     const val kLeftSlaveId1 = 2
 
     const val kRightMasterId = 3
-    const val kRightSlaveId1 = 6
+    const val kRightSlaveId1 = 4
 
     // GYROS
     const val kPigeonIMUId = 17
@@ -67,8 +67,8 @@ object Constants {
         kWheelRadius
     )
 
-    const val kPDrive = 1.7 // Talon SRX Units
-    const val kDDrive = 10.0
+    const val kPDrive = 0.75 // Talon SRX Units
+    const val kDDrive = 1.0
 
     const val kStaticFrictionVoltage = 1.2 // Volts // TODO Find Actual Value
     const val kVDrive = 0.185 // Volts per radians per second // TODO Find Actual Value

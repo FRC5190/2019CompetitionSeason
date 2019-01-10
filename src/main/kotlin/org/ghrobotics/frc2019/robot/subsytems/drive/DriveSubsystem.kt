@@ -11,11 +11,8 @@ import com.ctre.phoenix.sensors.PigeonIMU
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.robot.Constants
 import org.ghrobotics.frc2019.robot.auto.Trajectories
-import org.ghrobotics.frc2019.robot.auto.generateTrajectory
-import org.ghrobotics.frc2019.robot.auto.waypoints
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.localization.TankEncoderLocalization
-import org.ghrobotics.lib.mathematics.statespace.*
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
@@ -75,30 +72,14 @@ object DriveSubsystem : TankDriveSubsystem() {
     override val differentialDrive = Trajectories.differentialDrive
     override val trajectoryTracker = RamseteTracker(Constants.kDriveBeta, Constants.kDriveZeta)
 
-    private val velocityReferenceTracker = StateSpaceLoop(
-        StateSpacePlantCoefficients(
-            DriveSSMatrices.A,
-            DriveSSMatrices.A.inv(),
-            DriveSSMatrices.B,
-            DriveSSMatrices.C,
-            DriveSSMatrices.D
-        ),
-        StateSpaceControllerCoefficients(DriveSSMatrices.K, DriveSSMatrices.Kff),
-        StateSpaceObserverCoefficients(DriveSSMatrices.L)
-    )
-
-
     init {
         lowGear = false
         defaultCommand = ManualDriveCommand()
-        allMasters.forEach { it.kP = 0.75; it.kD = 1.0 }
     }
-
-    fun driveToLocation(location: Pose2d) = driveToLocation { location }
 
     fun driveToLocation(location: Source<Pose2d>): FalconCommand {
         return followTrajectory(
-            trajectory = { waypoints(localization(), location()).generateTrajectory(false) },
+            trajectory = { DriveOTFSplineGenerator.create(location()) },
             pathMirrored = false,
             dt = kPathFollowingDt
         )
@@ -112,39 +93,14 @@ object DriveSubsystem : TankDriveSubsystem() {
     }
 
     override fun teleopReset() {
-        allMasters.forEach { it.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_100Ms) }
-        allMasters.forEach { it.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 100) }
+        allMasters.forEach {
+            it.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_100Ms)
+            it.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 100)
+        }
     }
 
     override fun zeroOutputs() {
         leftMotor.velocity = 0.meter.velocity
         rightMotor.velocity = 0.meter.velocity
     }
-
-
-    // Remove this to use the Talon SRX Velocity Loop with Arbitrary Feedforward
-//    override fun setOutput(
-//        wheelVelocities: DifferentialDrive.WheelState, wheelVoltages: DifferentialDrive.WheelState
-//    ) {
-//        val r = Matrix(
-//            arrayOf(
-//                doubleArrayOf(wheelVelocities.left * Constants.kWheelRadius.value),
-//                doubleArrayOf(wheelVelocities.right * Constants.kWheelRadius.value)
-//            )
-//        )
-//
-//        val y = Matrix(
-//            arrayOf(
-//                doubleArrayOf(leftMotor.sensorVelocity.value),
-//                doubleArrayOf(rightMotor.sensorVelocity.value)
-//            )
-//        )
-//
-//        velocityReferenceTracker.nextR = r
-//        velocityReferenceTracker.correct(y)
-//        val u = velocityReferenceTracker.update()
-//
-//        leftMotor.percentOutput = u.data[0][0] / 12.0
-//        rightMotor.percentOutput = u.data[1][0] / 12.0
-//    }
 }

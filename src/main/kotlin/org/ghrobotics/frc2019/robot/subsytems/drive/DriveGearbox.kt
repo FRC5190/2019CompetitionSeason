@@ -47,6 +47,9 @@ class DriveGearbox(
             motor.peakCurrentLimitDuration = 0.millisecond
             motor.continuousCurrentLimit = 40.amp // TODO Find Actual Value
             motor.currentLimitingEnabled = true
+
+            motor.kP = Constants.kPDrive
+            motor.kD = Constants.kDDrive
         }
     }
 }
