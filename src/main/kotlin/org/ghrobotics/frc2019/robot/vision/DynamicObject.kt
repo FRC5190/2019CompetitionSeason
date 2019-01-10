@@ -13,16 +13,16 @@ import org.ghrobotics.lib.mathematics.units.Time
  */
 class DynamicObject(
     private val localization: Localization,
-    defaultLocation: Translation2d
+    defaultLocation: Pose2d = Pose2d()
 ) {
 
     var objectLocationOnField = defaultLocation
         private set
 
-    val objectLocationRelativeToRobot get() = Pose2d(objectLocationOnField) inFrameOfReferenceOf localization()
+    val objectLocationRelativeToRobot get() = objectLocationOnField inFrameOfReferenceOf localization()
 
     fun setSample(sampleTime: Time, robotToObjectPose: Pose2d) {
         val fieldToRobotPose = localization[sampleTime]
-        objectLocationOnField = fieldToRobotPose.transformBy(robotToObjectPose).translation
+        objectLocationOnField = fieldToRobotPose + robotToObjectPose
     }
 }
