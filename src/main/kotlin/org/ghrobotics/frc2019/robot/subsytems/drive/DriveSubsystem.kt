@@ -34,13 +34,11 @@ object DriveSubsystem : TankDriveSubsystem() {
     private val leftGearbox = DriveGearbox(
         Constants.kLeftMasterId,
         Constants.kLeftSlaveId1,
-        Constants.kLeftSlaveId2,
         false
     )
     private val rightGearbox = DriveGearbox(
         Constants.kRightMasterId,
         Constants.kRightSlaveId1,
-        Constants.kRightSlaveId2,
         true
     )
 
