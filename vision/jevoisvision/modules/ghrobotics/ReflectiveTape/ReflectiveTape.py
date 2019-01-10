@@ -9,28 +9,17 @@ import numpy
 class ReflectiveTape:
 
     def __init__(self):
-        winw = (12 + 9) * 0.0254  # width in meters
-        winh = (12 + 4.25) * 0.0254  # height in meters
+        self.actualDimensionW = 14.5
+        self.actualDistanceW = 54
+        self.pixelDimensionW = 177
+        self.focalLengthW = self.pixelDimensionW * self.actualDistanceW / self.actualDimensionW
 
-        self.objPoints = numpy.array([(-winw * 0.5, -winh * 0.5, 0),
-                                      (-winw * 0.5, winh * 0.5, 0),
-                                      (winw * 0.5, winh * 0.5, 0),
-                                      (winw * 0.5, -winh * 0.5, 0)])
+        self.actualDimensionH = 5.5
+        self.actualDistanceH = 68.5
+        self.pixelDimensionH = 55
+        self.focalLengthH = self.pixelDimensionH * self.actualDistanceH / self.actualDimensionH
 
         self.reflectiveVision = ReflectiveTapeProcess()
-
-    def loadCameraCalibration(self, w, h):
-        cpf = "/jevois/share/camera/calibration{}x{}.yaml".format(w, h)
-        fs = cv2.FileStorage(cpf, cv2.FILE_STORAGE_READ)
-        if fs.isOpened():
-            self.camMatrix = fs.getNode("camera_matrix").mat()
-            self.distCoeffs = fs.getNode("distortion_coefficients").mat()
-            jevois.LINFO("Loaded camera calibration from {}".format(cpf))
-        else:
-            jevois.LFATAL("Failed to read camera parameters from file [{}]".format(cpf))
-
-    def estimatePose(self, tapePair):
-        return cv2.solvePnP(objPoints, tapePair.imagePoints, self.camMatrix, self.distCoeffs)
 
     def processAndSend(self, source0):
         timestamp = time.time()
@@ -38,32 +27,32 @@ class ReflectiveTape:
         self.reflectiveVision.process(source0)
         height, width, _ = source0.shape
 
-        # Load camera calibration if needed:
-        if not hasattr(self, 'camMatrix'):
-            self.loadCameraCalibration(width, height)
-
         json_pair_list = []
         for pair in self.reflectiveVision.pairs:
-            x, y, w, h = pair.bounding_rect
+            x = pair.cX
+            y = pair.cY
+            w = pair.cW
+            h = pair.cH
 
-            (retval, tvec, rvec) = self.estimatePose(pair)
+            # angle and distance from camera (angles in radians)
+            cAW = numpy.arctan2(x + w / 2 - width / 2, self.focalLengthW)
+            cDW = self.actualDimensionW * self.focalLengthW / w
 
-            # Normalize
-            nx = (x * 2 - width) / width
-            ny = (y * 2 - height) / height
-            nw = (w * 2 - width) / width
-            nh = (h * 2 - height) / height
+            cAH = numpy.arctan2(y + h / 2 - height / 2, self.focalLengthH)
+            cDH = self.actualDimensionH * self.focalLengthH / h
+
+            # angle and distance
+            angleW = numpy.arctan2(cDW * numpy.sin(cAW), cDW * numpy.cos(cAW))
+            pair.angle = numpy.degrees(angleW)
+
+            angleH = numpy.arctan2(cDH * numpy.sin(cAH), cDH * numpy.cos(cAH))
+            pair.distance = cDH * numpy.cos(cAH) / numpy.cos(angleH)
 
             json_pair_list.append({
-                "x": nx,
-                "y": ny,
-                "w": nw,
-                "h": nh,
-                "retval": retval,
-                "rvec": rvec,
-                "tvec": tvec
+                "angle": pair.angle,
+                "distance": pair.distance
             })
-        jevois.sendSerial(json.dumps({"Epoch Time": timestamp, "Contours": json_pair_list}))
+        jevois.sendSerial(json.dumps({"Epoch Time": timestamp, "Targets": json_pair_list}))
 
     # Process function with no USB output
     def processNoUSB(self, inframe):
@@ -83,22 +72,33 @@ class ReflectiveTape:
 
         for leftTape in self.reflectiveVision.leftTapes:
             x, y, w, h = leftTape.bounding_rect
-
-            jevois.drawRect(outimg, x, y, w, h, jevois.YUYV.White)
-            jevois.writeText(outimg, str(leftTape.angle), x, y - 10, jevois.YUYV.White, jevois.Font.Font6x10)
+            jevois.drawRect(outimg, x, y, w, h, jevois.YUYV.MedGrey)
 
         for rightTape in self.reflectiveVision.rightTapes:
             x, y, w, h = rightTape.bounding_rect
-
-            jevois.drawRect(outimg, x, y, w, h, jevois.YUYV.White)
-            jevois.writeText(outimg, str(rightTape.angle), x, y - 10, jevois.YUYV.White, jevois.Font.Font6x10)
+            jevois.drawRect(outimg, x, y, w, h, jevois.YUYV.MedGrey)
 
         for pair in self.reflectiveVision.pairs:
             x, y, w, h = pair.bounding_rect
+            jevois.drawLine(outimg, int(pair.imagePoints[0][0]), int(pair.imagePoints[0][1]),
+                            int(pair.imagePoints[1][0]), int(pair.imagePoints[1][1]),
+                            1, jevois.YUYV.LightGrey)
+            jevois.drawLine(outimg, int(pair.imagePoints[1][0]), int(pair.imagePoints[1][1]),
+                            int(pair.imagePoints[2][0]), int(pair.imagePoints[2][1]),
+                            1, jevois.YUYV.LightGrey)
+            jevois.drawLine(outimg, int(pair.imagePoints[2][0]), int(pair.imagePoints[2][1]),
+                            int(pair.imagePoints[3][0]), int(pair.imagePoints[3][1]),
+                            1, jevois.YUYV.LightGrey)
+            jevois.drawLine(outimg, int(pair.imagePoints[3][0]), int(pair.imagePoints[3][1]),
+                            int(pair.imagePoints[0][0]), int(pair.imagePoints[0][1]),
+                            1, jevois.YUYV.LightGrey)
+            jevois.writeText(outimg, "W: " + str(w) + "px " + str(pair.distanceW) + "in", int(pair.imagePoints[0][0]),
+                             int(pair.imagePoints[0][1]) - 22, jevois.YUYV.White, jevois.Font.Font10x20)
+            jevois.writeText(outimg, "H: " + str(h) + "px " + str(pair.distanceH) + "in", int(pair.imagePoints[0][0]),
+                             int(pair.imagePoints[0][1]) - 42, jevois.YUYV.White, jevois.Font.Font10x20)
+            jevois.writeText(outimg, str(pair.angle) + "degrees", int(pair.imagePoints[0][0]),
+                             int(pair.imagePoints[0][1]) - 62, jevois.YUYV.White, jevois.Font.Font10x20)
 
-            jevois.drawRect(outimg, x - 5, y - 5, w + 10, h + 10, jevois.YUYV.White)
-
-        # jevois.writeText(outimg, fps, 3, h - 10, jevois.YUYV.White, jevois.Font.Font6x10)
         outframe.send()
 
 
@@ -194,12 +194,21 @@ class TapePair:
         self.left = left
         self.right = right
         self.bounding_rect = self.left.bounds(self.right)
+        self.distance = None
+        self.angle = None
+        x, y, w, h = self.bounding_rect
         lx, ly, lw, lh = self.left.bounding_rect
         rx, ry, rw, rh = self.right.bounding_rect
-        self.imagePoints = numpy.array([(lx, ly),
-                                        (lx, ly + lh),
-                                        (rx + rw, ry + rh),
-                                        (rx + rw, ry)])
+
+        self.cX = x
+        self.cY = (ly + lx) / 2.0
+        self.cW = w
+        self.cH = ((ly + lh) + (ry + rh)) / 2.0 - self.cY
+
+        self.imagePoints = numpy.array([[lx, ly],
+                                        [lx, ly + lh],
+                                        [rx + rw, ry + rh],
+                                        [rx + rw, ry]], dtype=numpy.float32)
 
 
 class GripPipeline:
@@ -211,9 +220,9 @@ class GripPipeline:
         """initializes all values to presets or None if need to be set
         """
 
-        self.__hsl_threshold_hue = [48.5611510791367, 95.52901023890786]
-        self.__hsl_threshold_saturation = [135.29676258992808, 255.0]
-        self.__hsl_threshold_luminance = [61.915467625899275, 255.0]
+        self.__hsl_threshold_hue = [27.5179856115108, 98.60068259385665]
+        self.__hsl_threshold_saturation = [87.14028776978417, 255.0]
+        self.__hsl_threshold_luminance = [43.57014388489208, 255.0]
 
         self.hsl_threshold_output = None
 
