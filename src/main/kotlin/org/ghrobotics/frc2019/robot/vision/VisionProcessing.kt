@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.SerialPort
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import org.ghrobotics.frc2019.robot.Constants
 import org.ghrobotics.frc2019.robot.subsytems.drive.DriveSubsystem
 
 fun CoroutineScope.startVisionProcessing() {
@@ -28,7 +29,7 @@ fun CoroutineScope.startVisionProcessing() {
                 // TODO: we also need to get the angle OF the object (not angle to the object) for perfect tracking.
                 VisionProcessing.currentlyTrackedObject.setSample(
                     visionData.timestamp,
-                    closestContour.cameraRelativePose
+                    Constants.kCenterToCamera + closestContour.cameraRelativePose
                 )
             }
         }

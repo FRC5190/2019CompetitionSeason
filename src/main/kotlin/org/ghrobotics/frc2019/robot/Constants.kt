@@ -52,6 +52,7 @@ object Constants {
 
     // TRANSFORMATIONS
     val kCenterToFrontBumper = Pose2d(-(kRobotLength / 2.0) - kBumperLength, 0.meter, 0.degree)
+    val kCenterToCamera = Pose2d(14.inch, 0.inch, 0.degree) // Camera is on front of the robot facing forward
 
     // DRIVE
     val kDriveSensorUnitsPerRotation = 1440.STU // TODO Find Actual Value
