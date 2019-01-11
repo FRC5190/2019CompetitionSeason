@@ -9,8 +9,6 @@ import com.team254.lib.physics.DCMotorTransmission
 import com.team254.lib.physics.DifferentialDrive
 import org.ghrobotics.frc2019.robot.Constants
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
-import org.ghrobotics.lib.mathematics.twodim.geometry.Rectangle2d
-import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.twodim.trajectory.DefaultTrajectoryGenerator
 import org.ghrobotics.lib.mathematics.twodim.trajectory.constraints.CentripetalAccelerationConstraint
 import org.ghrobotics.lib.mathematics.twodim.trajectory.constraints.DifferentialDriveDynamicsConstraint
@@ -47,16 +45,13 @@ object Trajectories {
     )
 
     private val kMaxVelocity = 12.0.feet.velocity
-    private val kMaxAcceleration = 8.0.feet.acceleration
-    private val kMaxCentripetalAcceleration = 7.0.feet.acceleration
+    private val kMaxAcceleration = 10.0.feet.acceleration
+    private val kMaxCentripetalAcceleration = 9.0.feet.acceleration
 
     private val kConstraints = listOf(
         CentripetalAccelerationConstraint(kMaxCentripetalAcceleration),
         DifferentialDriveDynamicsConstraint(differentialDrive, 10.0.volt),
-        VelocityLimitRegionConstraint(
-            Rectangle2d(Translation2d(4.feet, 7.feet), Translation2d(8.feet, 20.feet)),
-            3.feet.velocity
-        )
+        VelocityLimitRegionConstraint(Constants.kLevel1Platform, 3.feet.velocity)
     )
 
     /************************************ STARTING LOCATIONS ************************************/
@@ -73,8 +68,10 @@ object Trajectories {
     /************************************ FIELD ELEMENTS ************************************/
 
     private val kRocketCenterlineX = 19.feet
-    private val kRocketHatchXOffset = 2.359.feet
-    private val kRocketHatchY = 2.2.feet
+    private val kRocketHatchXOffset = 1.254.feet
+    private val kRocketHatchY = 1.568.feet
+
+    private val kRocketBayY = 2.35.feet
 
     private val kLoadingStation = Pose2d(1.8.feet, 2.2.feet, 0.degree)
 
@@ -84,15 +81,24 @@ object Trajectories {
 
     //************************************ FIELD POSES ************************************/
 
-    private val kNearRocketHatch = Pose2d(kRocketCenterlineX - kRocketHatchXOffset, kRocketHatchY, (-30).degree)
-    private val kFarRocketHatch = Pose2d(kRocketCenterlineX + kRocketHatchXOffset, kRocketHatchY, (-150).degree)
+    private val kNearRocketHatch =
+        Pose2d(kRocketCenterlineX - kRocketHatchXOffset, kRocketHatchY, (-30).degree) + Constants.kForwardIntakeToCenter
+
+    private val kFarRocketHatch =
+        Pose2d(
+            kRocketCenterlineX + kRocketHatchXOffset,
+            kRocketHatchY,
+            (-150).degree
+        ) + Constants.kForwardIntakeToCenter
+
+    private val kRocketBay = Pose2d(kRocketCenterlineX, kRocketBayY, (-90).degree) + Constants.kForwardIntakeToCenter
 
     private val kLeftForwardCargoShip =
         Pose2d(kForwardCargoShipX, kCargoShipCenterlineY + kForwardCargoShipYOffset, 0.degree)
     private val kRightForwardCargoShip =
         Pose2d(kForwardCargoShipX, kCargoShipCenterlineY - kForwardCargoShipYOffset, 0.degree)
 
-    private val kBottomRightDepotBall = Pose2d(4.091.feet, 5.788.feet, (-42).degree)
+    private val kBottomRightDepotBall = Pose2d(3.376.feet, 6.447.feet, (-30).degree) + Constants.kBackwardIntakeToCenter
 
     /************************************ TRAJECTORIES ************************************/
 
@@ -109,6 +115,12 @@ object Trajectories {
 
     // Go from the loading station to the near side of the rocket
     val loadingStationToNearRocket = waypoints(kLoadingStation, kNearRocketHatch).generateTrajectory(false)
+
+    // Back up from near hatch of the rocket to pick up the cargo ball
+    val nearRocketToCargoBall1 = waypoints(kNearRocketHatch, kBottomRightDepotBall).generateTrajectory(true)
+
+    // Drop the cargo ball in the rocket bay
+    val cargoBall1ToRocketBay = waypoints(kBottomRightDepotBall, kRocketBay).generateTrajectory(false)
 
     // Start in the center of the platform and go the left-forward bay of the cargo ship
     val centerStartToLeftForwardCargoShip = waypoints(kCenterStart, kLeftForwardCargoShip).generateTrajectory(false)

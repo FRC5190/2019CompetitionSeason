@@ -17,7 +17,7 @@ object Controls {
     val mainXbox = xboxController(0) {
         button(kA).change(
             DriveSubsystem.driveToLocation {
-                val pose = VisionProcessing.currentlyTrackedObject.objectLocationOnField + Constants.kIntakeToCenter
+                val pose = VisionProcessing.currentlyTrackedObject.objectLocationOnField + Constants.kForwardIntakeToCenter
                 val snappedAngle = (Math.round(DriveSubsystem.localization().rotation.degree / 90.0) * 90.0).degree
                 Pose2d(pose.translation, snappedAngle)
             }

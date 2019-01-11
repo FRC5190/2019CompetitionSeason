@@ -6,6 +6,8 @@
 package org.ghrobotics.frc2019.robot
 
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
+import org.ghrobotics.lib.mathematics.twodim.geometry.Rectangle2d
+import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.inch
@@ -38,6 +40,7 @@ object Constants {
     // FIELD
     val kLevel2RightX = 4.feet
     val kLevel2BottomY = 97.inch
+    val kLevel1Platform = Rectangle2d(Translation2d(4.feet, 7.feet), Translation2d(8.feet, 20.feet))
 
     val kHypotenuseDifferenceForRamp = 0.433.inch
 
@@ -54,7 +57,8 @@ object Constants {
 
     // TRANSFORMATIONS
     val kFrontBumperToCenter = Pose2d(-(kRobotLength / 2.0) - kBumperLength, 0.meter, 0.degree)
-    val kIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeLength, 0.meter, 0.degree)
+    val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeLength, 0.meter, 0.degree)
+    val kBackwardIntakeToCenter = Pose2d((kRobotLength / 2.0) + kIntakeLength, 0.meter, 0.degree)
     val kCenterToCamera = Pose2d(14.inch, 0.inch, 0.degree) // Camera is on front of the robot facing forward
 
     // DRIVE
