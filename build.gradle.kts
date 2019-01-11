@@ -3,6 +3,7 @@ import edu.wpi.first.gradlerio.frc.FRCJavaArtifact
 import edu.wpi.first.gradlerio.frc.RoboRIO
 import edu.wpi.first.toolchain.NativePlatforms
 import io.gitlab.arturbosch.detekt.detekt
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.3.11"
@@ -80,7 +81,7 @@ dependencies {
     compile("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.1.0")
 
     // FalconLibrary
-    compile("org.ghrobotics", "FalconLibrary", "31bf852")
+    compile("org.ghrobotics", "FalconLibrary", "abbab11")
 
     // WPILib and Vendors
     wpi.deps.wpilib().forEach { compile(it) }
@@ -107,6 +108,14 @@ tasks.jar {
     }
 }
 
-tasks.withType<Wrapper>().configureEach {
-    gradleVersion = "5.0"
+tasks {
+    withType<Wrapper>().configureEach {
+        gradleVersion = "5.0"
+    }
+    withType<KotlinCompile>().configureEach {
+        kotlinOptions {
+            jvmTarget = "1.8"
+            freeCompilerArgs += "-Xjvm-default=compatibility"
+        }
+    }
 }

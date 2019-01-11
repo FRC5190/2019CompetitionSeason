@@ -59,7 +59,7 @@ object Constants {
 
     // DRIVE
     val kDriveSensorUnitsPerRotation = 1440.STU // TODO Find Actual Value
-    val kWheelRadius = 3.4.inch // TODO Find Actual Value
+    val kWheelRadius = 3.05.inch // TODO Find Actual Value
     val kTrackWidth = 0.8128.meter // TODO Find Actual Value
 
     val kDriveNativeUnitModel = NativeUnitLengthModel(
@@ -67,7 +67,7 @@ object Constants {
         kWheelRadius
     )
 
-    const val kPDrive = 0.75 // Talon SRX Units
+    const val kPDrive = 0.80 // Talon SRX Units
     const val kDDrive = 1.0
 
     const val kStaticFrictionVoltage = 1.2 // Volts // TODO Find Actual Value
@@ -75,5 +75,5 @@ object Constants {
     const val kADrive = 0.012 // Volts per radians per second per second // TODO Find Actual Value
 
     const val kDriveBeta = 2.00 // Inverse meters squared // TODO Find Actual Value
-    const val kDriveZeta = 0.70 // Unitless dampening co-efficient // TODO Find Actual Value
+    const val kDriveZeta = 0.90 // Unitless dampening co-efficient // TODO Find Actual Value
 }

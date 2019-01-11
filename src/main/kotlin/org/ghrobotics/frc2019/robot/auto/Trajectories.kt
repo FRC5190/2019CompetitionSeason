@@ -9,9 +9,12 @@ import com.team254.lib.physics.DCMotorTransmission
 import com.team254.lib.physics.DifferentialDrive
 import org.ghrobotics.frc2019.robot.Constants
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
+import org.ghrobotics.lib.mathematics.twodim.geometry.Rectangle2d
+import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.twodim.trajectory.DefaultTrajectoryGenerator
 import org.ghrobotics.lib.mathematics.twodim.trajectory.constraints.CentripetalAccelerationConstraint
 import org.ghrobotics.lib.mathematics.twodim.trajectory.constraints.DifferentialDriveDynamicsConstraint
+import org.ghrobotics.lib.mathematics.twodim.trajectory.constraints.VelocityLimitRegionConstraint
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
@@ -43,13 +46,17 @@ object Trajectories {
         dcTransmission
     )
 
-    private val kMaxVelocity = 10.0.feet.velocity
+    private val kMaxVelocity = 12.0.feet.velocity
     private val kMaxAcceleration = 8.0.feet.acceleration
-    private val kMaxCentripetalAcceleration = 4.5.feet.acceleration
+    private val kMaxCentripetalAcceleration = 7.0.feet.acceleration
 
     private val kConstraints = listOf(
         CentripetalAccelerationConstraint(kMaxCentripetalAcceleration),
-        DifferentialDriveDynamicsConstraint(differentialDrive, 10.0.volt)
+        DifferentialDriveDynamicsConstraint(differentialDrive, 10.0.volt),
+        VelocityLimitRegionConstraint(
+            Rectangle2d(Translation2d(4.feet, 7.feet), Translation2d(8.feet, 20.feet)),
+            3.feet.velocity
+        )
     )
 
     /************************************ STARTING LOCATIONS ************************************/

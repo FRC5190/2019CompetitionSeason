@@ -23,9 +23,10 @@ class ManualDriveCommand : FalconCommand(DriveSubsystem) {
     }
 
     override suspend fun execute() {
-        DriveSubsystem.tankDrive(
-            -Controls.mainXbox.getY(GenericHID.Hand.kLeft)(),
-            -Controls.mainXbox.getY(GenericHID.Hand.kRight)()
+        DriveSubsystem.curvatureDrive(
+            -speedSource(),
+            rotationSource(),
+            quickTurnSource()
         )
     }
 }
