@@ -9,14 +9,21 @@ import numpy
 class ReflectiveTape:
 
     def __init__(self):
+        self.DIM = (640, 480)
+        self.K = numpy.array(
+            [[402.56679421300635, 0.0, 326.0125901609549], [0.0, 402.63097026394826, 225.2408285699041],
+             [0.0, 0.0, 1.0]])
+        self.D = numpy.array([[-0.2847610313234561], [1.5393686107435003], [-3.7781953960127272], [3.045419119554048]])
+        self.fisheye_balance = 0.8
+
         self.actualDimensionW = 14.5
         self.actualDistanceW = 54
         self.pixelDimensionW = 177
         self.focalLengthW = self.pixelDimensionW * self.actualDistanceW / self.actualDimensionW
 
         self.actualDimensionH = 5.5
-        self.actualDistanceH = 68.5
-        self.pixelDimensionH = 55
+        self.actualDistanceH = 65
+        self.pixelDimensionH = 24.5
         self.focalLengthH = self.pixelDimensionH * self.actualDistanceH / self.actualDimensionH
 
         self.reflectiveVision = ReflectiveTapeProcess()
@@ -54,52 +61,42 @@ class ReflectiveTape:
             })
         jevois.sendSerial(json.dumps({"Epoch Time": timestamp, "Targets": json_pair_list}))
 
+    def undistort(self, inimg):
+        if not hasattr(self, 'fisheye_maps'):
+            dim1 = inimg.shape[:2][::-1]  # dim1 is the dimension of input image to un-distort
+            assert dim1[0] / dim1[1] == self.DIM[0] / self.DIM[1], \
+                "Image to undistort needs to have same aspect ratio as the ones used in calibration"
+            scaled_K = self.K * dim1[0] / self.DIM[0]  # The values of K is to scale with image dimension.
+            scaled_K[2][2] = 1.0  # Except that K[2][2] is always 1.0
+            # This is how scaled_K, dim2 and balance are used to determine the final K used to un-distort image.
+            # OpenCV document failed to make this clear!
+            new_K = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(scaled_K, self.D, dim1, numpy.eye(3),
+                                                                           balance=self.fisheye_balance)
+            self.fisheye_maps = cv2.fisheye.initUndistortRectifyMap(scaled_K, self.D, numpy.eye(3), new_K, dim1,
+                                                                    cv2.CV_16SC2)
+
+        return cv2.remap(inimg, self.fisheye_maps[0], self.fisheye_maps[1],
+                         interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+
     # Process function with no USB output
     def processNoUSB(self, inframe):
-        inimg = inframe.getCvBGR()
-        self.processAndSend(inimg)
+        self.processAndSend(self.undistort(inframe.getCvBGR()))
 
     # Process function with USB output
     def process(self, inframe, outframe):
-        inimg = inframe.get()
-
-        imgbgr = jevois.convertToCvBGR(inimg)
-        outimg = outframe.get()
-        jevois.paste(inimg, outimg, 0, 0)
+        inimg = self.undistort(inframe.getCvBGR())
         inframe.done()
+        self.processAndSend(inimg)
 
-        self.processAndSend(imgbgr)
+        outimg = inimg.copy()
 
-        for leftTape in self.reflectiveVision.leftTapes:
-            x, y, w, h = leftTape.bounding_rect
-            jevois.drawRect(outimg, x, y, w, h, jevois.YUYV.MedGrey)
-
-        for rightTape in self.reflectiveVision.rightTapes:
-            x, y, w, h = rightTape.bounding_rect
-            jevois.drawRect(outimg, x, y, w, h, jevois.YUYV.MedGrey)
+        for tape in self.reflectiveVision.tapes:
+            tape.draw(outimg)
 
         for pair in self.reflectiveVision.pairs:
-            x, y, w, h = pair.bounding_rect
-            jevois.drawLine(outimg, int(pair.imagePoints[0][0]), int(pair.imagePoints[0][1]),
-                            int(pair.imagePoints[1][0]), int(pair.imagePoints[1][1]),
-                            1, jevois.YUYV.LightGrey)
-            jevois.drawLine(outimg, int(pair.imagePoints[1][0]), int(pair.imagePoints[1][1]),
-                            int(pair.imagePoints[2][0]), int(pair.imagePoints[2][1]),
-                            1, jevois.YUYV.LightGrey)
-            jevois.drawLine(outimg, int(pair.imagePoints[2][0]), int(pair.imagePoints[2][1]),
-                            int(pair.imagePoints[3][0]), int(pair.imagePoints[3][1]),
-                            1, jevois.YUYV.LightGrey)
-            jevois.drawLine(outimg, int(pair.imagePoints[3][0]), int(pair.imagePoints[3][1]),
-                            int(pair.imagePoints[0][0]), int(pair.imagePoints[0][1]),
-                            1, jevois.YUYV.LightGrey)
-            jevois.writeText(outimg, "W: " + str(w) + "px " + str(pair.distanceW) + "in", int(pair.imagePoints[0][0]),
-                             int(pair.imagePoints[0][1]) - 22, jevois.YUYV.White, jevois.Font.Font10x20)
-            jevois.writeText(outimg, "H: " + str(h) + "px " + str(pair.distanceH) + "in", int(pair.imagePoints[0][0]),
-                             int(pair.imagePoints[0][1]) - 42, jevois.YUYV.White, jevois.Font.Font10x20)
-            jevois.writeText(outimg, str(pair.angle) + "degrees", int(pair.imagePoints[0][0]),
-                             int(pair.imagePoints[0][1]) - 62, jevois.YUYV.White, jevois.Font.Font10x20)
+            pair.draw(outimg)
 
-        outframe.send()
+        outframe.sendCv(outimg)
 
 
 class ReflectiveTapeProcess:
@@ -107,20 +104,29 @@ class ReflectiveTapeProcess:
     def __init__(self):
         self.gripPipeline = GripPipeline()
 
-        self.leftTapes = None
-        self.rightTapes = None
-
+        self.tapes = None
         self.pairs = None
 
     def process(self, source: []):
         self.gripPipeline.process(source)
 
-        self.filterTapes()
+        self.tapes = []
+
+        for contour in self.gripPipeline.convex_hulls_output:
+            self.tapes.append(Tape(contour))
+
+        left_tapes = []
+        right_tapes = []
+
+        for tape in self.tapes:
+            if tape.is_left:
+                left_tapes.append(tape)
+            else:
+                right_tapes.append(tape)
 
         self.pairs = []
-        temp_right_tapes = self.rightTapes.copy()
         # pair up the vision tapes
-        for tape1 in self.leftTapes:
+        for tape1 in left_tapes:
             x1, y1, w1, h1 = tape1.bounding_rect
 
             cx1 = x1 + w1 / 2
@@ -129,7 +135,7 @@ class ReflectiveTapeProcess:
             best_match = None
             best_distance = 0
 
-            for tape2 in temp_right_tapes:
+            for tape2 in right_tapes:
                 x2, y2, w2, h2 = tape2.bounding_rect
 
                 # Only pair up if right is on the right of left
@@ -147,19 +153,7 @@ class ReflectiveTapeProcess:
 
             if best_match is not None:
                 self.pairs.append(TapePair(tape1, best_match))
-                temp_right_tapes.remove(best_match)
-
-    def filterTapes(self):
-        self.leftTapes = []
-        self.rightTapes = []
-
-        for contour in self.gripPipeline.convex_hulls_output:
-            tape = Tape(contour)
-
-            if tape.is_left:
-                self.leftTapes.append(tape)
-            else:
-                self.rightTapes.append(tape)
+                right_tapes.remove(best_match)
 
 
 class Tape:
@@ -170,6 +164,11 @@ class Tape:
         self.rotated_rect = cv2.minAreaRect(contour)
         self.angle = self.rotated_rect[2]
         self.is_left = self.angle < -46
+
+    def draw(self, img):
+        box = cv2.boxPoints(self.rotated_rect)
+        box = numpy.int0(box)
+        cv2.drawContours(img, [box], 0, (64, 64, 64), 2)
 
     def bounds(self, other_tape):
         min_x1, min_y1, w1, h1 = self.bounding_rect
@@ -201,14 +200,21 @@ class TapePair:
         rx, ry, rw, rh = self.right.bounding_rect
 
         self.cX = x
-        self.cY = (ly + lx) / 2.0
+        self.cY = (ly + ly) / 2.0
         self.cW = w
         self.cH = ((ly + lh) + (ry + rh)) / 2.0 - self.cY
 
-        self.imagePoints = numpy.array([[lx, ly],
-                                        [lx, ly + lh],
-                                        [rx + rw, ry + rh],
-                                        [rx + rw, ry]], dtype=numpy.float32)
+        self.imagePoints = numpy.array([(lx, ly),
+                                        (lx, ly + lh),
+                                        (rx + rw, ry + rh),
+                                        (rx + rw, ry)], dtype=numpy.int32).reshape((-1, 1, 2))
+
+    def draw(self, img):
+        x, y, w, h = self.bounding_rect
+        cv2.polylines(img, [self.imagePoints], True, (128, 128, 128))
+        cv2.putText(img, "W: " + str(self.cH) + "px " + str(self.distance) + "in", (x, y - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255))
+        cv2.putText(img, str(self.angle) + " degrees", (x, y - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255))
 
 
 class GripPipeline:
@@ -312,7 +318,7 @@ class GripPipeline:
         else:
             mode = cv2.RETR_LIST
         method = cv2.CHAIN_APPROX_SIMPLE
-        im2, contours, hierarchy = cv2.findContours(input, mode=mode, method=method)
+        contours, hierarchy = cv2.findContours(input, mode=mode, method=method)
         return contours
 
     @staticmethod

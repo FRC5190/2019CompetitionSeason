@@ -1,8 +1,5 @@
 import cv2
-
-assert cv2.__version__[0] == '3', 'The fisheye module requires opencv version >= 3.0.0'
 import numpy as np
-import os
 import glob
 
 CHECKERBOARD = (6, 9)
@@ -13,7 +10,7 @@ objp[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
 _img_shape = None
 objpoints = []  # 3d point in real world space
 imgpoints = []  # 2d points in image plane.
-images = glob.glob('*.png')
+images = glob.glob('*.jpg')
 for fname in images:
     img = cv2.imread(fname)
     if _img_shape == None:
