@@ -26,10 +26,10 @@ fun doubleHatchRocketRoutine() = autoRoutine {
 
     /*
     +DriveSubsystem.followVisionAssistedTrajectory(
-        trajectory = { Trajectories.sideStartToFarRocket },
+        trajectory = Trajectories.sideStartToFarRocket,
         mirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
-        dynamicObject = { VisionProcessing.currentlyTrackedObject },
-        expectedLocation = { Trajectories.kFarRocketHatch.translation }
+        dynamicObject = VisionProcessing.currentlyTrackedObject,
+        expectedLocation = Trajectories.kFarRocketHatch.translation
     )
     +DriveSubsystem.followTrajectory(
         trajectory = Trajectories.farRocketToLoadingStation,
@@ -37,11 +37,10 @@ fun doubleHatchRocketRoutine() = autoRoutine {
         dt = DriveSubsystem.kPathFollowingDt
     )
     +DriveSubsystem.followVisionAssistedTrajectory(
-        trajectory = { Trajectories.loadingStationToNearRocket },
+        trajectory = Trajectories.loadingStationToNearRocket,
         mirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
-        dynamicObject = { VisionProcessing.currentlyTrackedObject },
-        expectedLocation = { Trajectories.kNearRocketHatch.translation }
+        dynamicObject = VisionProcessing.currentlyTrackedObject,
+        expectedLocation = Trajectories.kNearRocketHatch.translation
     )
     */
-
 }

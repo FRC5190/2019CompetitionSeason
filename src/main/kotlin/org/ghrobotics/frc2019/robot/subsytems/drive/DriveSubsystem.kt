@@ -11,6 +11,7 @@ import com.ctre.phoenix.sensors.PigeonIMU
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.robot.Constants
 import org.ghrobotics.frc2019.robot.auto.Trajectories
+import org.ghrobotics.frc2019.robot.auto.VisionAssistedTrajectory
 import org.ghrobotics.frc2019.robot.vision.DynamicObject
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.localization.TankEncoderLocalization
@@ -20,12 +21,13 @@ import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedTrajectory
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.mirror
-import org.ghrobotics.lib.mathematics.units.*
+import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
+import org.ghrobotics.lib.mathematics.units.meter
+import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.sensors.asSource
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
 import org.ghrobotics.lib.utils.Source
-import org.ghrobotics.lib.utils.map
 import kotlin.properties.Delegates.observable
 
 object DriveSubsystem : TankDriveSubsystem() {
@@ -91,17 +93,19 @@ object DriveSubsystem : TankDriveSubsystem() {
     }
 
     fun followVisionAssistedTrajectory(
-        trajectory: Source<TimedTrajectory<Pose2dWithCurvature>>,
+        trajectory: TimedTrajectory<Pose2dWithCurvature>,
         mirrored: Source<Boolean>,
-        dynamicObject: Source<DynamicObject>,
-        expectedLocation: Source<Translation2d>,
-        error: Source<Length> = { 2.feet },
+        dynamicObject: DynamicObject,
+        expectedLocation: Translation2d,
         dt: Time = kPathFollowingDt
-    ) = VisionAssistedTrajectoryTrackerCommand(
-        trajectory.map {
-            if (mirrored()) it.mirror() else it
-        },
-        dynamicObject, expectedLocation, error, dt
+    ) = followTrajectory(
+        trajectory = VisionAssistedTrajectory(
+            originalTrajectory = if (mirrored()) trajectory else trajectory.mirror(),
+            dynamicObject = dynamicObject,
+            expectedTargetLocation = expectedLocation
+        ),
+        pathMirrored = false,
+        dt = dt
     )
 
     override fun autoReset() {
