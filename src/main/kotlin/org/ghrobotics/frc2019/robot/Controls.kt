@@ -23,4 +23,8 @@ object Controls {
             }
         )
     }
+
+    fun update(){
+        mainXbox.update()
+    }
 }

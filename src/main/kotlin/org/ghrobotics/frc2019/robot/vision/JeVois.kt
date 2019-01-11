@@ -33,44 +33,49 @@ class JeVois(
     init {
         scope.launch {
             while (isActive) {
-
                 try {
-                    val serialPort = SerialPort(115200, port)
-                    val readChannel = spiReadToChannel(serialPort)
-
-                    serialPort.writeString("setpar serout USB\n")
-                    serialPort.writeString("date 0101000070\n")
-                    val fpgaOffset = Timer.getFPGATimestamp()
-
-                    serialPort.writeString("streamon\n")
-
-                    for (dataString in readChannel) {
-                        if (!dataString.startsWith('{')) continue
-                        try {
-                            val jsonData = kJevoisGson.fromJson<JsonObject>(dataString)
-
-                            val timestamp = (jsonData["Epoch Time"].asDouble + fpgaOffset).second
-                            val contours = jsonData["Contours"].asJsonArray
-                                .asSequence()
-                                .filterIsInstance<JsonObject>()
-                                .map { contourData ->
-                                    VisionContour(
-                                        contourData["angle"].asDouble.degree,
-                                        contourData["distance"].asDouble.inch
-                                    )
-                                }.toList()
-
-                            visionDataChannel.send(VisionData(timestamp, contours))
-                        } catch (e: JsonParseException) {
-                            e.printStackTrace()
-                            println("[JeVois-${port.name}] Got Invalid Data: $dataString")
-                        }
+                    coroutineScope {
+                        run()
                     }
                 } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
                     e.printStackTrace()
                     println("[JeVois-${port.name}] Failure in connection... retrying in 5 seconds...")
                     delay(5000)
                 }
+            }
+        }
+    }
+
+    private suspend fun CoroutineScope.run() {
+        val serialPort = SerialPort(115200, port)
+        val readChannel = spiReadToChannel(serialPort)
+
+        serialPort.writeString("setpar serout USB\n")
+        serialPort.writeString("date 0101000070\n")
+        val fpgaOffset = Timer.getFPGATimestamp()
+
+        serialPort.writeString("streamon\n")
+
+        for (dataString in readChannel) {
+            if (!dataString.startsWith('{')) continue
+            try {
+                val jsonData = kJevoisGson.fromJson<JsonObject>(dataString)
+
+                val timestamp = (jsonData["Epoch Time"].asDouble + fpgaOffset).second
+                val contours = jsonData["Targets"].asJsonArray
+                    .asSequence()
+                    .filterIsInstance<JsonObject>()
+                    .map { contourData ->
+                        VisionTarget(
+                            contourData["angle"].asDouble.degree,
+                            contourData["distance"].asDouble.inch
+                        )
+                    }.toList()
+
+                visionDataChannel.send(VisionData(timestamp, contours))
+            } catch (e: JsonParseException) {
+                e.printStackTrace()
+                println("[JeVois-${port.name}] Got Invalid Data: $dataString")
             }
         }
     }
@@ -87,10 +92,10 @@ class JeVois(
 
 data class VisionData(
     val timestamp: Time,
-    val contours: List<VisionContour>
+    val targets: List<VisionTarget>
 )
 
-data class VisionContour(
+data class VisionTarget(
     val angle: Rotation2d,
     val distance: Length
 ) {

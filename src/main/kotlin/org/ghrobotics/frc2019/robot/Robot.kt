@@ -11,7 +11,7 @@ import kotlinx.coroutines.Job
 import org.ghrobotics.frc2019.robot.auto.Autonomous
 import org.ghrobotics.frc2019.robot.auto.Trajectories
 import org.ghrobotics.frc2019.robot.subsytems.drive.DriveSubsystem
-import org.ghrobotics.frc2019.robot.vision.startVisionProcessing
+import org.ghrobotics.frc2019.robot.vision.VisionProcessing
 import org.ghrobotics.lib.wrappers.FalconRobotBase
 
 object Robot : FalconRobotBase(), CoroutineScope {
@@ -26,11 +26,11 @@ object Robot : FalconRobotBase(), CoroutineScope {
         Autonomous
         Trajectories
 
-        startVisionProcessing()
+        VisionProcessing
     }
 
     override fun periodic() {
-        Controls.mainXbox.update()
+        Controls.update()
         Network.update()
     }
 
