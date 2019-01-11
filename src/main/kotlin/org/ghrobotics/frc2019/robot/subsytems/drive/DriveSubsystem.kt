@@ -100,7 +100,7 @@ object DriveSubsystem : TankDriveSubsystem() {
         dt: Time = kPathFollowingDt
     ) = followTrajectory(
         trajectory = VisionAssistedTrajectory(
-            originalTrajectory = if (mirrored()) trajectory else trajectory.mirror(),
+            originalTrajectory = if (!mirrored()) trajectory else trajectory.mirror(),
             dynamicObject = dynamicObject,
             expectedTargetLocation = expectedLocation
         ),
