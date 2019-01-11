@@ -11,16 +11,21 @@ import com.ctre.phoenix.sensors.PigeonIMU
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.robot.Constants
 import org.ghrobotics.frc2019.robot.auto.Trajectories
+import org.ghrobotics.frc2019.robot.vision.DynamicObject
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
+import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature
+import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
+import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedTrajectory
+import org.ghrobotics.lib.mathematics.twodim.trajectory.types.mirror
+import org.ghrobotics.lib.mathematics.units.*
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
-import org.ghrobotics.lib.mathematics.units.meter
-import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.sensors.asSource
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
 import org.ghrobotics.lib.utils.Source
+import org.ghrobotics.lib.utils.map
 import kotlin.properties.Delegates.observable
 
 object DriveSubsystem : TankDriveSubsystem() {
@@ -84,6 +89,20 @@ object DriveSubsystem : TankDriveSubsystem() {
             dt = kPathFollowingDt
         )
     }
+
+    fun followVisionAssistedTrajectory(
+        trajectory: Source<TimedTrajectory<Pose2dWithCurvature>>,
+        mirrored: Source<Boolean>,
+        dynamicObject: Source<DynamicObject>,
+        expectedLocation: Source<Translation2d>,
+        error: Source<Length> = { 2.feet },
+        dt: Time = kPathFollowingDt
+    ) = VisionAssistedTrajectoryTrackerCommand(
+        trajectory.map {
+            if (mirrored()) it.mirror() else it
+        },
+        dynamicObject, expectedLocation, error, dt
+    )
 
     override fun autoReset() {
         allMasters.forEach {

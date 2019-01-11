@@ -81,24 +81,24 @@ object Trajectories {
 
     //************************************ FIELD POSES ************************************/
 
-    private val kNearRocketHatch =
+    val kNearRocketHatch =
         Pose2d(kRocketCenterlineX - kRocketHatchXOffset, kRocketHatchY, (-30).degree) + Constants.kForwardIntakeToCenter
 
-    private val kFarRocketHatch =
+    val kFarRocketHatch =
         Pose2d(
             kRocketCenterlineX + kRocketHatchXOffset,
             kRocketHatchY,
             (-150).degree
         ) + Constants.kForwardIntakeToCenter
 
-    private val kRocketBay = Pose2d(kRocketCenterlineX, kRocketBayY, (-90).degree) + Constants.kForwardIntakeToCenter
+    val kRocketBay = Pose2d(kRocketCenterlineX, kRocketBayY, (-90).degree) + Constants.kForwardIntakeToCenter
 
-    private val kLeftForwardCargoShip =
+    val kLeftForwardCargoShip =
         Pose2d(kForwardCargoShipX, kCargoShipCenterlineY + kForwardCargoShipYOffset, 0.degree)
-    private val kRightForwardCargoShip =
+    val kRightForwardCargoShip =
         Pose2d(kForwardCargoShipX, kCargoShipCenterlineY - kForwardCargoShipYOffset, 0.degree)
 
-    private val kBottomRightDepotBall = Pose2d(3.376.feet, 6.447.feet, (-30).degree) + Constants.kBackwardIntakeToCenter
+    val kBottomRightDepotBall = Pose2d(3.376.feet, 6.447.feet, (-30).degree) + Constants.kBackwardIntakeToCenter
 
     /************************************ TRAJECTORIES ************************************/
 
