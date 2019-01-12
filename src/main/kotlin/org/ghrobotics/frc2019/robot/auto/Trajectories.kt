@@ -18,6 +18,7 @@ import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.feet
+import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.mathematics.units.meter
 import kotlin.math.pow
 
@@ -57,11 +58,15 @@ object Trajectories {
     /************************************ STARTING LOCATIONS ************************************/
 
     private val kRobotStartX =
-        Constants.kLevel2RightX + Constants.kBumperLength + Constants.kRobotLength / 2.0 -
-            Constants.kHypotenuseDifferenceForRamp
+        Constants.kLevel1RightX - Constants.kBumperLength - Constants.kRobotWidth / 2.0
 
     val kSideStart =
-        Pose2d(kRobotStartX, Constants.kLevel2BottomY + Constants.kBumperLength + Constants.kRobotWidth / 2.0, 0.degree)
+        Pose2d(
+            kRobotStartX,
+            Constants.kLevel2BottomY + Constants.kBumperLength + Constants.kRobotLength / 2.0 +
+                Constants.kHypotenuseDifferenceForRamp,
+            (-90).degree
+        )
 
     val kCenterStart = Pose2d(kRobotStartX, 13.5.feet, 0.degree)
 
@@ -69,70 +74,69 @@ object Trajectories {
 
     private val kRocketCenterlineX = 19.feet
     private val kRocketHatchXOffset = 1.254.feet
-    private val kRocketHatchY = 1.568.feet
+    private val kRocketHatchY = 16.inch
 
     private val kRocketBayY = 2.35.feet
 
-    private val kLoadingStation = Pose2d(1.8.feet, 2.2.feet, 0.degree)
+    private val kLoadingStation = Pose2d(0.0.feet, 2.2.feet, 0.degree) + Constants.kBackwardIntakeToCenter
 
-    private val kForwardCargoShipX = 17.15.feet
+    private val kForwardCargoShipX = 18.456.feet
     private val kCargoShipCenterlineY = 13.5.feet
     private val kForwardCargoShipYOffset = 0.952.feet
 
-    //************************************ FIELD POSES ************************************/
+    /************************************ FIELD POSES ************************************/
 
     val kNearRocketHatch =
         Pose2d(kRocketCenterlineX - kRocketHatchXOffset, kRocketHatchY, (-30).degree) + Constants.kForwardIntakeToCenter
 
     val kFarRocketHatch =
         Pose2d(
-            kRocketCenterlineX + kRocketHatchXOffset,
-            kRocketHatchY,
+            kRocketCenterlineX + kRocketHatchXOffset + 4.inch,
+            kRocketHatchY - 15.inch,
             (-150).degree
         ) + Constants.kForwardIntakeToCenter
 
     val kRocketBay = Pose2d(kRocketCenterlineX, kRocketBayY, (-90).degree) + Constants.kForwardIntakeToCenter
 
     val kLeftForwardCargoShip =
-        Pose2d(kForwardCargoShipX, kCargoShipCenterlineY + kForwardCargoShipYOffset, 0.degree)
+        Pose2d(
+            kForwardCargoShipX,
+            kCargoShipCenterlineY + kForwardCargoShipYOffset,
+            0.degree
+        ) + Constants.kForwardIntakeToCenter
     val kRightForwardCargoShip =
-        Pose2d(kForwardCargoShipX, kCargoShipCenterlineY - kForwardCargoShipYOffset, 0.degree)
+        Pose2d(
+            kForwardCargoShipX,
+            kCargoShipCenterlineY - kForwardCargoShipYOffset,
+            0.degree
+        ) + Constants.kForwardIntakeToCenter
 
-    val kBottomRightDepotBall = Pose2d(3.376.feet, 6.447.feet, (-30).degree) + Constants.kBackwardIntakeToCenter
+    val kBottomRightDepotBall = Pose2d(4.376.feet, 6.447.feet, (-30).degree) + Constants.kBackwardIntakeToCenter
 
     /************************************ TRAJECTORIES ************************************/
 
-    // Start on the side of the platform and go to the far side of the rocket
-    val sideStartToFarRocket = waypoints(kSideStart, kFarRocketHatch).generateTrajectory(false)
+    val sideStartToNearRocketHatch =
+        waypoints(kSideStart, Pose2d(7.74.feet, 4.708.feet, (-20).degree), kNearRocketHatch).generateTrajectory(false)
 
-    // Back up from the far side of the rocket and go to the loading station
-    val farRocketToLoadingStation = waypoints(
+    val nearRocketHatchToLoadingStation = waypoints(kNearRocketHatch, kLoadingStation).generateTrajectory(true)
+
+    val loadingStationToFarRocketHatch =
+        waypoints(kLoadingStation, Pose2d(19.805.feet, 6.378.feet, 9.degree), kFarRocketHatch).generateTrajectory(false)
+
+    val farRocketHatchToCargoBall1 = waypoints(
         kFarRocketHatch,
-        Pose2d(18.552.feet, 5.601.feet, 5.degree),
-        Pose2d(5.feet, 2.2.feet, 0.degree),
-        kLoadingStation
+        Pose2d(19.216.feet, 5.345.feet, 5.degree),
+        kBottomRightDepotBall
     ).generateTrajectory(true)
 
-    // Go from the loading station to the near side of the rocket
-    val loadingStationToNearRocket = waypoints(kLoadingStation, kNearRocketHatch).generateTrajectory(false)
-
-    // Back up from near hatch of the rocket to pick up the cargo ball
-    val nearRocketToCargoBall1 = waypoints(kNearRocketHatch, kBottomRightDepotBall).generateTrajectory(true)
-
-    // Drop the cargo ball in the rocket bay
-    val cargoBall1ToRocketBay = waypoints(kBottomRightDepotBall, kRocketBay).generateTrajectory(false)
-
-    // Start in the center of the platform and go the left-forward bay of the cargo ship
     val centerStartToLeftForwardCargoShip = waypoints(kCenterStart, kLeftForwardCargoShip).generateTrajectory(false)
 
-    // Back up from the left-forward bay of the cargo ship to the loading station
     val leftForwardCargoShipToLoadingStation = waypoints(
         kLeftForwardCargoShip,
         Pose2d(10.6.feet, 6.614.feet, 69.degree),
         kLoadingStation
     ).generateTrajectory(true)
 
-    // Go from the loading station to the right-forward bay of the cargo ship
     val loadingStationToRightForwardCargoShip = waypoints(
         kLoadingStation,
         Pose2d(10.6.feet, 6.614.feet, 69.degree),

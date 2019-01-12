@@ -9,12 +9,14 @@ import com.google.gson.JsonParseException
 import edu.wpi.first.wpilibj.SerialPort
 import edu.wpi.first.wpilibj.Timer
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.produce
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.*
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.pow
 
 fun CoroutineScope.createJeVois(
     port: SerialPort.Port,
@@ -67,7 +69,7 @@ class JeVois(
                     .filterIsInstance<JsonObject>()
                     .map { contourData ->
                         VisionTarget(
-                            contourData["angle"].asDouble.degree,
+                            -contourData["angle"].asDouble.degree,
                             contourData["distance"].asDouble.inch
                         )
                     }.toList()
@@ -99,12 +101,20 @@ data class VisionTarget(
     val angle: Rotation2d,
     val distance: Length
 ) {
-    val cameraRelativePose = Pose2d(Translation2d(distance, angle), 0.degree)
+    val cameraRelativePose: Pose2d
+
+    init {
+        val a = 5.0.inch.meter.pow(2)
+        val c = distance.meter.pow(2)
+        val b = Math.sqrt(c - a).meter
+
+        cameraRelativePose = Pose2d(Translation2d(b, angle), 0.degree)
+    }
 }
 
 fun CoroutineScope.spiReadToChannel(
     serialPort: SerialPort
-) = produce {
+) = produce(capacity = Channel.CONFLATED) {
     val messageBuffer = StringBuilder()
     while (isActive) {
         for (byteReceived in serialPort.read(serialPort.bytesReceived)) {

@@ -9,6 +9,8 @@ import org.ghrobotics.lib.mathematics.units.*
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.junit.Test
+import org.knowm.xchart.QuickChart
+import org.knowm.xchart.SwingWrapper
 import kotlin.system.measureNanoTime
 
 class TrajectoryGenerationTest {
@@ -45,7 +47,7 @@ class TrajectoryGenerationTest {
         visualize(trajectory, "Default Trajectory Generator")
     }
 
-    private fun visualize(trajectory: TimedTrajectory<Pose2dWithCurvature>, type: String) {
+    fun visualize(trajectory: TimedTrajectory<Pose2dWithCurvature>, type: String) {
         val iterator = trajectory.iterator()
 
         val x = arrayListOf<Double>()
@@ -57,7 +59,7 @@ class TrajectoryGenerationTest {
             y.add(translation.y.value)
         }
 
-//        SwingWrapper(QuickChart.getChart(type, "X", "Y", "Path", x.toDoubleArray(), y.toDoubleArray())).displayChart()
+        SwingWrapper(QuickChart.getChart(type, "X", "Y", "Path", x.toDoubleArray(), y.toDoubleArray())).displayChart()
     }
 
 }

@@ -32,6 +32,7 @@ object Robot : FalconRobotBase(), CoroutineScope {
     override fun periodic() {
         Controls.update()
         Network.update()
+        Autonomous.update()
     }
 
     @JvmStatic

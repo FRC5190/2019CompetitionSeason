@@ -2,6 +2,7 @@ package org.ghrobotics.frc2019.robot.subsytems.drive
 
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature
+import org.ghrobotics.lib.mathematics.twodim.trajectory.DefaultTrajectoryGenerator
 import org.ghrobotics.lib.mathematics.twodim.trajectory.TrajectoryGenerator
 import org.ghrobotics.lib.mathematics.twodim.trajectory.constraints.CentripetalAccelerationConstraint
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedTrajectory
@@ -27,7 +28,7 @@ object DriveOTFSplineGenerator {
 
     // Creates a trajectory generator with lower tolerances than the default trajectory generator used for autonomous.
     // This allows us to generate trajectories on-the-fly quicker.
-    private val lowToleranceTrajectoryGenerator = TrajectoryGenerator(3.feet, 2.feet, 10.degree)
+    private val lowToleranceTrajectoryGenerator = DefaultTrajectoryGenerator
 
     /**
      * Creates a trajectory with the current position as the starting point and [endpoint] as the end point.

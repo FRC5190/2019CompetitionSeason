@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.robot.Constants
 import org.ghrobotics.frc2019.robot.auto.Trajectories
 import org.ghrobotics.frc2019.robot.auto.VisionAssistedTrajectory
+import org.ghrobotics.frc2019.robot.subsytems.d.DriveGearbox
 import org.ghrobotics.frc2019.robot.vision.DynamicObject
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.localization.TankEncoderLocalization

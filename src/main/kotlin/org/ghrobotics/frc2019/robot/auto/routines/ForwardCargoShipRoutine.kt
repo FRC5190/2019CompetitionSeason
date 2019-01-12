@@ -2,6 +2,8 @@ package org.ghrobotics.frc2019.robot.auto.routines
 
 import org.ghrobotics.frc2019.robot.auto.Trajectories
 import org.ghrobotics.frc2019.robot.subsytems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.robot.vision.VisionProcessing
+import org.ghrobotics.lib.utils.Source
 
 fun forwardCargoShipRoutine() = autoRoutine {
     +DriveSubsystem.followTrajectory(
@@ -9,6 +11,14 @@ fun forwardCargoShipRoutine() = autoRoutine {
         pathMirrored = false,
         dt = DriveSubsystem.kPathFollowingDt
     )
+
+//    +DriveSubsystem.followVisionAssistedTrajectory(
+//        trajectory = Trajectories.centerStartToLeftForwardCargoShip,
+//        mirrored = Source(false),
+//        dynamicObject = VisionProcessing.currentlyTrackedObject,
+//        expectedLocation = Trajectories.kLeftForwardCargoShip.translation
+//    )
+
     +DriveSubsystem.followTrajectory(
         trajectory = Trajectories.leftForwardCargoShipToLoadingStation,
         pathMirrored = false,
@@ -27,4 +37,6 @@ fun forwardCargoShipRoutine() = autoRoutine {
         pathMirrored = false,
         dt = DriveSubsystem.kPathFollowingDt
     )
+
+
 }

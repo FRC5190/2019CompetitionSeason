@@ -5,11 +5,10 @@ import org.junit.Test
 class AutonomousTiming {
     @Test
     fun doubleHatchRocketAutoTimer() {
-        val time = Trajectories.sideStartToFarRocket.lastState.t.second +
-            Trajectories.farRocketToLoadingStation.lastState.t.second +
-            Trajectories.loadingStationToNearRocket.lastState.t.second +
-            Trajectories.nearRocketToCargoBall1.lastState.t.second +
-            Trajectories.cargoBall1ToRocketBay.lastState.t.second
+        val time = Trajectories.sideStartToNearRocketHatch.lastState.t.second +
+            Trajectories.nearRocketHatchToLoadingStation.lastState.t.second +
+            Trajectories.loadingStationToFarRocketHatch.lastState.t.second +
+            Trajectories.farRocketHatchToCargoBall1.lastState.t.second
         println("Double Hatch Rocket Execution Time: $time")
     }
 

@@ -9,38 +9,23 @@ import org.ghrobotics.lib.utils.withEquals
 
 fun doubleHatchRocketRoutine() = autoRoutine {
     +DriveSubsystem.followTrajectory(
-        trajectory = Trajectories.sideStartToFarRocket,
+        trajectory = Trajectories.sideStartToNearRocketHatch,
         pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
         dt = DriveSubsystem.kPathFollowingDt
     )
     +DriveSubsystem.followTrajectory(
-        trajectory = Trajectories.farRocketToLoadingStation,
+        trajectory = Trajectories.nearRocketHatchToLoadingStation,
         pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
         dt = DriveSubsystem.kPathFollowingDt
     )
     +DriveSubsystem.followTrajectory(
-        trajectory = Trajectories.loadingStationToNearRocket,
+        trajectory = Trajectories.loadingStationToFarRocketHatch,
         pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
         dt = DriveSubsystem.kPathFollowingDt
-    )
-
-    /*
-    +DriveSubsystem.followVisionAssistedTrajectory(
-        trajectory = Trajectories.sideStartToFarRocket,
-        mirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
-        dynamicObject = VisionProcessing.currentlyTrackedObject,
-        expectedLocation = Trajectories.kFarRocketHatch.translation
     )
     +DriveSubsystem.followTrajectory(
-        trajectory = Trajectories.farRocketToLoadingStation,
+        trajectory = Trajectories.farRocketHatchToCargoBall1,
         pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
         dt = DriveSubsystem.kPathFollowingDt
     )
-    +DriveSubsystem.followVisionAssistedTrajectory(
-        trajectory = Trajectories.loadingStationToNearRocket,
-        mirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
-        dynamicObject = VisionProcessing.currentlyTrackedObject,
-        expectedLocation = Trajectories.kNearRocketHatch.translation
-    )
-    */
 }

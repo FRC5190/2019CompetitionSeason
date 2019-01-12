@@ -26,7 +26,7 @@ class VisionAssistedTrajectory(
     private val originalTrajectory: TimedTrajectory<Pose2dWithCurvature>,
     private val dynamicObject: DynamicObject,
     private val expectedTargetLocation: Translation2d,
-    private val maxErrorRadius: Length = 2.feet
+    private val maxErrorRadius: Length = 5.feet
 ) : Trajectory<Time, TimedEntry<Pose2dWithCurvature>> {
 
     private var visionOffset = Translation2d()
@@ -79,9 +79,12 @@ class VisionAssistedTrajectory(
     private fun updateOffset() {
         val dynamicObjectLocation = dynamicObject.objectLocationOnField.translation
         // Only adjust when the target is within an error range (this is to help prevent tracking wrong targets)
-        visionOffset = if (expectedTargetLocation.distance(expectedTargetLocation) < maxErrorRadius.value) {
-            dynamicObjectLocation - expectedTargetLocation
-        } else Translation2d()
+        if (dynamicObjectLocation.distance(expectedTargetLocation) < maxErrorRadius.value) {
+            visionOffset = visionOffset.interpolate(
+                dynamicObjectLocation - expectedTargetLocation,
+                0.1
+            )
+        }
     }
 
 

@@ -35,11 +35,12 @@ object Constants {
 
     // PNEUMATICS
     const val kPCMId = 41
-    const val kDriveSolenoidId = 3 // TODO Find Actual Value
+    const val kDriveSolenoidId = 3
 
     // FIELD
     val kLevel2RightX = 4.feet
-    val kLevel2BottomY = 97.inch
+    val kLevel2BottomY = 8.feet
+    val kLevel1RightX = 7.feet
     val kLevel1Platform = Rectangle2d(Translation2d(4.feet, 7.feet), Translation2d(8.feet, 20.feet))
 
     val kHypotenuseDifferenceForRamp = 0.433.inch
@@ -47,37 +48,37 @@ object Constants {
     // ROBOT
     val kRobotWidth = 29.inch
     val kRobotLength = 30.inch
-    val kBumperLength = 2.0.inch
+    val kBumperLength = 4.5.inch
     val kIntakeLength = 10.inch
 
 
-    const val kRobotMass = 60.0 // kg // TODO Find Actual Value
-    const val kRobotMomentOfInertia = 10.0 // kg m^2 // TODO Find Actual Value
-    const val kRobotAngularDrag = 12.0 // N*m / (rad/sec) // TODO Find Actual Value
+    const val kRobotMass = 18.0 // kg
+    const val kRobotMomentOfInertia = 9.0 // kg m^2
+    const val kRobotAngularDrag = 6.0
 
     // TRANSFORMATIONS
     val kFrontBumperToCenter = Pose2d(-(kRobotLength / 2.0) - kBumperLength, 0.meter, 0.degree)
     val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeLength, 0.meter, 0.degree)
     val kBackwardIntakeToCenter = Pose2d((kRobotLength / 2.0) + kIntakeLength, 0.meter, 0.degree)
-    val kCenterToCamera = Pose2d(14.inch, 0.inch, 0.degree) // Camera is on front of the robot facing forward
+    val kCenterToCamera = Pose2d(6.0.inch, 5.5.inch, 0.degree)
 
     // DRIVE
-    val kDriveSensorUnitsPerRotation = 1440.STU // TODO Find Actual Value
-    val kWheelRadius = 3.05.inch // TODO Find Actual Value
-    val kTrackWidth = 0.8128.meter // TODO Find Actual Value
+    val kDriveSensorUnitsPerRotation = 1440.STU
+    val kWheelRadius = 3.0856025633758268193941419970783.inch
+    val kTrackWidth = 27.75.inch
 
     val kDriveNativeUnitModel = NativeUnitLengthModel(
         kDriveSensorUnitsPerRotation,
         kWheelRadius
     )
 
-    const val kPDrive = 0.80 // Talon SRX Units
-    const val kDDrive = 1.0
+    const val kPDrive = 1.2 // Talon SRX Units
+    const val kDDrive = 0.0
 
-    const val kStaticFrictionVoltage = 1.2 // Volts // TODO Find Actual Value
-    const val kVDrive = 0.185 // Volts per radians per second // TODO Find Actual Value
+    const val kStaticFrictionVoltage = 0.8 // Volts
+    const val kVDrive = 0.135 // Volts per radians per second // TODO Find Actual Value
     const val kADrive = 0.012 // Volts per radians per second per second // TODO Find Actual Value
 
-    const val kDriveBeta = 2.00 // Inverse meters squared // TODO Find Actual Value
-    const val kDriveZeta = 0.90 // Unitless dampening co-efficient // TODO Find Actual Value
+    const val kDriveBeta = 2.0 // Inverse meters squared
+    const val kDriveZeta = 0.7 // Unitless dampening co-efficient
 }

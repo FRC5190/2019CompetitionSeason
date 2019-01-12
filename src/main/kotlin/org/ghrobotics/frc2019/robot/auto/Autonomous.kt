@@ -1,6 +1,5 @@
 package org.ghrobotics.frc2019.robot.auto
 
-import kotlinx.coroutines.GlobalScope
 import org.ghrobotics.frc2019.robot.Network
 import org.ghrobotics.frc2019.robot.Robot
 import org.ghrobotics.frc2019.robot.auto.routines.baselineRoutine
@@ -13,7 +12,10 @@ import org.ghrobotics.lib.commands.S3ND
 import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.commands.stateCommandGroup
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
-import org.ghrobotics.lib.utils.*
+import org.ghrobotics.lib.utils.Source
+import org.ghrobotics.lib.utils.and
+import org.ghrobotics.lib.utils.monitor
+import org.ghrobotics.lib.utils.onChangeToTrue
 import org.ghrobotics.lib.wrappers.FalconRobotBase
 
 object Autonomous {
@@ -55,20 +57,18 @@ object Autonomous {
         }
     }
 
-    init {
-        @Suppress("LocalVariableName")
-        val IT = ""
+    @Suppress("LocalVariableName")
+    private val IT = ""
 
-        val startingPositionMonitor = startingPosition.monitor
-        val isReadyMonitor = isReady.monitor
-        val modeMonitor = { Robot.currentMode }.monitor
+    private val startingPositionMonitor = startingPosition.monitor
+    private val isReadyMonitor = isReady.monitor
+    private val modeMonitor = { Robot.currentMode }.monitor
 
-        GlobalScope.launchFrequency {
-            startingPositionMonitor.onChange { DriveSubsystem.localization.reset(it.pose) }
-            isReadyMonitor.onChangeToTrue { JUST S3ND IT }
-            modeMonitor.onChange { newValue ->
-                if (newValue != FalconRobotBase.Mode.AUTONOMOUS) JUST.stop()
-            }
+    fun update() {
+        startingPositionMonitor.onChange { DriveSubsystem.localization.reset(it.pose) }
+        isReadyMonitor.onChangeToTrue { JUST S3ND IT }
+        modeMonitor.onChange { newValue ->
+            if (newValue != FalconRobotBase.Mode.AUTONOMOUS) JUST.stop()
         }
     }
 }

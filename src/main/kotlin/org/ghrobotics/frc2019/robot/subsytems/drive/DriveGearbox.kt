@@ -1,4 +1,4 @@
-package org.ghrobotics.frc2019.robot.subsytems.drive
+package org.ghrobotics.frc2019.robot.subsytems.d//ve
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import com.ctre.phoenix.motorcontrol.NeutralMode
@@ -21,14 +21,13 @@ class DriveGearbox(
 
     init {
         slaveOne.follow(master)
-
         // Configure Inversion
         master.inverted = inverted
         slaveOne.inverted = inverted
 
         // Configure Encoder
         master.feedbackSensor = FeedbackDevice.QuadEncoder
-        master.encoderPhase = false
+        master.encoderPhase = inverted
         master.sensorPosition = 0.meter
 
         allMotors.forEach { motor ->
