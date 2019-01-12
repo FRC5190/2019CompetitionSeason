@@ -11,10 +11,17 @@ import com.ctre.phoenix.sensors.PigeonIMU
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.robot.Constants
 import org.ghrobotics.frc2019.robot.auto.Trajectories
+import org.ghrobotics.frc2019.robot.auto.VisionAssistedTrajectory
+import org.ghrobotics.frc2019.robot.vision.DynamicObject
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
+import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature
+import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
+import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedTrajectory
+import org.ghrobotics.lib.mathematics.twodim.trajectory.types.mirror
+import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.meter
 import org.ghrobotics.lib.mathematics.units.millisecond
@@ -84,6 +91,22 @@ object DriveSubsystem : TankDriveSubsystem() {
             dt = kPathFollowingDt
         )
     }
+
+    fun followVisionAssistedTrajectory(
+        trajectory: TimedTrajectory<Pose2dWithCurvature>,
+        mirrored: Source<Boolean>,
+        dynamicObject: DynamicObject,
+        expectedLocation: Translation2d,
+        dt: Time = kPathFollowingDt
+    ) = followTrajectory(
+        trajectory = VisionAssistedTrajectory(
+            originalTrajectory = if (!mirrored()) trajectory else trajectory.mirror(),
+            dynamicObject = dynamicObject,
+            expectedTargetLocation = expectedLocation
+        ),
+        pathMirrored = false,
+        dt = dt
+    )
 
     override fun autoReset() {
         allMasters.forEach {
