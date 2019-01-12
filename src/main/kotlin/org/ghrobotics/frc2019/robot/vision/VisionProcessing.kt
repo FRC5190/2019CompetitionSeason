@@ -27,11 +27,12 @@ object VisionProcessing {
 
             for (visionData in visionDataChannel) {
                 // Apply camera offset first
-                val contourActualLocations = visionData.targets.associateWith { Constants.kCenterToCamera + it.cameraRelativePose }
+                val contourActualLocations =
+                    visionData.targets.associateWith { Constants.kCenterToCamera + it.cameraRelativePose }
                 // Find target thats closest
                 val closestTarget = contourActualLocations.minBy { it.value.translation.norm.value } ?: continue
 
-                // TODO: we also need to get the angle OF the object (not angle to the object) for perfect tracking.
+                // TODO we also need to get the angle OF the object (not angle to the object) for perfect tracking.
                 currentlyTrackedObject.setSample(
                     visionData.timestamp,
                     closestTarget.value

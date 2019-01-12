@@ -3,10 +3,8 @@ package org.ghrobotics.frc2019.robot.subsytems.drive
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature
 import org.ghrobotics.lib.mathematics.twodim.trajectory.DefaultTrajectoryGenerator
-import org.ghrobotics.lib.mathematics.twodim.trajectory.TrajectoryGenerator
 import org.ghrobotics.lib.mathematics.twodim.trajectory.constraints.CentripetalAccelerationConstraint
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedTrajectory
-import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.feet
@@ -21,7 +19,7 @@ object DriveOTFSplineGenerator {
     private val kOTFMaxAcceleration = 4.0.feet.acceleration
     private val kOTFMaxCentripetalAcceleration = 4.5.feet.acceleration
 
-     private val kOTFConstraints = listOf(CentripetalAccelerationConstraint(kOTFMaxCentripetalAcceleration))
+    private val kOTFConstraints = listOf(CentripetalAccelerationConstraint(kOTFMaxCentripetalAcceleration))
 
     // Estimates the velocity lost when generating the spline and no human inputs are given
     private val kSplineGenerationDelayDeceleration = 0.2.feet.velocity

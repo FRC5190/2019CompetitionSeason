@@ -2,7 +2,6 @@ package org.ghrobotics.frc2019.robot.vision
 
 import org.ghrobotics.lib.localization.Localization
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
-import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.Time
 
 /**

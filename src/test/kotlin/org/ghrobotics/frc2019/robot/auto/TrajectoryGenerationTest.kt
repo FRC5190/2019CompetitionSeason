@@ -59,7 +59,7 @@ class TrajectoryGenerationTest {
             y.add(translation.y.value)
         }
 
-        SwingWrapper(QuickChart.getChart(type, "X", "Y", "Path", x.toDoubleArray(), y.toDoubleArray())).displayChart()
+//        SwingWrapper(QuickChart.getChart(type, "X", "Y", "Path", x.toDoubleArray(), y.toDoubleArray())).displayChart()
     }
 
 }
