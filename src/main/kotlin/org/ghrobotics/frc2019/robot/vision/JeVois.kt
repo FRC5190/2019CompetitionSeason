@@ -8,62 +8,67 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import edu.wpi.first.wpilibj.SerialPort
 import edu.wpi.first.wpilibj.Timer
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.channels.sendBlocking
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.*
-import kotlin.coroutines.CoroutineContext
+import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 import kotlin.math.pow
-
-fun CoroutineScope.createJeVois(
-    port: SerialPort.Port,
-    visionDataChannel: SendChannel<VisionData>
-) = JeVois(port, visionDataChannel, this.coroutineContext)
 
 class JeVois(
     private val port: SerialPort.Port,
-    private val visionDataChannel: SendChannel<VisionData>,
-    parent: CoroutineContext
+    private val visionDataChannel: SendChannel<VisionData>
 ) {
 
-    private val job = Job(parent[Job])
-    private val scope = CoroutineScope(parent + job)
+    private var fpgaOffset = 0.second
 
     init {
-        scope.launch {
-            while (isActive) {
+        thread {
+            while (true) {
                 try {
-                    coroutineScope {
-                        run()
-                    }
+                    val port = createSerialPort()
+                    initPort(port)
+                    readPort(port)
                 } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
                     e.printStackTrace()
-                    println("[JeVois-${port.name}] Failure in connection... retrying in 5 seconds...")
-                    delay(5000)
+                    println("[JeVois-${port.name}] Failure in connection!!!")
                 }
             }
         }
     }
 
-    private suspend fun CoroutineScope.run() {
-        val serialPort = SerialPort(115200, port)
-        val readChannel = spiReadToChannel(serialPort)
-
-        serialPort.writeString("setpar serout USB\n")
-        serialPort.writeString("date 0101000070\n")
-        val fpgaOffset = Timer.getFPGATimestamp()
-
-        serialPort.writeString("streamon\n")
-
-        for (dataString in readChannel) {
-            if (!dataString.startsWith('{')) continue
+    private fun createSerialPort(): SerialPort {
+        println("[JeVois-${port.name}] Trying to create serial port...")
+        while (true) {
             try {
-                val jsonData = kJevoisGson.fromJson<JsonObject>(dataString)
+                val serialPort = SerialPort(115200, port)
+                serialPort.setTimeout(0.5)
+                return serialPort
+            } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
+                e.printStackTrace()
+                TimeUnit.MILLISECONDS.sleep(10)
+            }
+        }
+    }
 
-                val timestamp = (jsonData["Epoch Time"].asDouble + fpgaOffset).second
+    private fun initPort(serialPort: SerialPort) {
+        serialPort.writeString("setpar serout USB\n")
+
+        serialPort.writeString("date 0101000070\n")
+        fpgaOffset = Timer.getFPGATimestamp().second
+    }
+
+    private fun readPort(serialPort: SerialPort) {
+        while (true) {
+            val line = serialPort.readLine()
+
+            if (!line.startsWith('{')) continue
+            try {
+                val jsonData = kJevoisGson.fromJson<JsonObject>(line)
+
+                val timestamp = (jsonData["Epoch Time"].asDouble.second + fpgaOffset)
                 val contours = jsonData["Targets"].asJsonArray
                     .asSequence()
                     .filterIsInstance<JsonObject>()
@@ -74,16 +79,26 @@ class JeVois(
                         )
                     }.toList()
 
-                visionDataChannel.send(VisionData(timestamp, contours))
+                visionDataChannel.sendBlocking(VisionData(timestamp, contours))
             } catch (e: JsonParseException) {
                 e.printStackTrace()
-                println("[JeVois-${port.name}] Got Invalid Data: $dataString")
+                println("[JeVois-${port.name}] Got Invalid Data: $line")
             }
         }
     }
 
-    fun free() {
-        job.cancel()
+    private val tempStringBuilder = StringBuilder()
+    private fun SerialPort.readLine(): String {
+        tempStringBuilder.clear()
+        while (true) {
+            val nextChar = read(1).first().toChar()
+            if (nextChar == '\n') {
+                val result = tempStringBuilder.toString()
+                tempStringBuilder.clear()
+                return result
+            }
+            tempStringBuilder.append(nextChar)
+        }
     }
 
     companion object {
@@ -109,23 +124,5 @@ data class VisionTarget(
         val b = Math.sqrt(c - a).meter
 
         cameraRelativePose = Pose2d(Translation2d(b, angle), 0.degree)
-    }
-}
-
-fun CoroutineScope.spiReadToChannel(
-    serialPort: SerialPort
-) = produce(capacity = Channel.CONFLATED) {
-    val messageBuffer = StringBuilder()
-    while (isActive) {
-        for (byteReceived in serialPort.read(serialPort.bytesReceived)) {
-            val charReceived = byteReceived.toChar()
-            if (charReceived == '\n') {
-                send(messageBuffer.toString())
-                messageBuffer.clear()
-            } else {
-                messageBuffer.append(charReceived)
-            }
-        }
-        delay(1)
     }
 }

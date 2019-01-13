@@ -23,7 +23,7 @@ object VisionProcessing {
         val visionDataChannel = Channel<VisionData>(Channel.CONFLATED)
 
         Robot.launch {
-            createJeVois(SerialPort.Port.kUSB1, visionDataChannel)
+            JeVois(SerialPort.Port.kUSB1, visionDataChannel)
 
             for (visionData in visionDataChannel) {
                 // Apply camera offset first
