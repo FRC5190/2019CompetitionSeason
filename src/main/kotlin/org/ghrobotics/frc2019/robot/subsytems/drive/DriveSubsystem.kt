@@ -12,12 +12,9 @@ import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.robot.Constants
 import org.ghrobotics.frc2019.robot.auto.Trajectories
 import org.ghrobotics.frc2019.robot.auto.VisionAssistedTrajectory
-import org.ghrobotics.frc2019.robot.subsytems.d.DriveGearbox
 import org.ghrobotics.frc2019.robot.vision.DynamicObject
-import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
-import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedTrajectory
@@ -75,6 +72,12 @@ object DriveSubsystem : TankDriveSubsystem() {
 
     /* SOFTWARE */
 
+    val distanceTraveled
+        get() = (leftMotor.sensorPosition + rightMotor.sensorPosition) / 2.0
+
+    val velocity
+        get() = (leftMotor.velocity + rightMotor.velocity) / 2.0
+
     val kPathFollowingDt = 10.millisecond
 
     override val differentialDrive = Trajectories.differentialDrive
@@ -83,14 +86,6 @@ object DriveSubsystem : TankDriveSubsystem() {
     init {
         lowGear = false
         defaultCommand = ManualDriveCommand()
-    }
-
-    fun driveToLocation(location: Source<Pose2d>): FalconCommand {
-        return followTrajectory(
-            trajectory = { DriveOTFSplineGenerator.create(location()) },
-            pathMirrored = false,
-            dt = kPathFollowingDt
-        )
     }
 
     fun followVisionAssistedTrajectory(
