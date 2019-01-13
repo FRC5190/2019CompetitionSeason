@@ -9,21 +9,14 @@ import numpy
 class ReflectiveTape:
 
     def __init__(self):
-        self.DIM = (640, 480)
-        self.K = numpy.array(
-            [[402.56679421300635, 0.0, 326.0125901609549], [0.0, 402.63097026394826, 225.2408285699041],
-             [0.0, 0.0, 1.0]])
-        self.D = numpy.array([[-0.2847610313234561], [1.5393686107435003], [-3.7781953960127272], [3.045419119554048]])
-        self.fisheye_balance = 0.8
+        fov_norm_x = 0.42
+        fov_distance_a = 65.0
+        fov_distance_o = 27.0
+        self.FOV = math.degrees(math.atan2(fov_distance_o, fov_distance_a)) / fov_norm_x
 
-        self.actualDimensionW = 14.5
-        self.actualDistanceW = 54
-        self.pixelDimensionW = 177
-        self.focalLengthW = self.pixelDimensionW * self.actualDistanceW / self.actualDimensionW
-
-        self.actualDimensionH = 5.5
-        self.actualDistanceH = 65
-        self.pixelDimensionH = 24.5
+        self.actualDimensionH = 5.75
+        self.actualDistanceH = 67.0
+        self.pixelDimensionH = 32.0
         self.focalLengthH = self.pixelDimensionH * self.actualDistanceH / self.actualDimensionH
 
         self.reflectiveVision = ReflectiveTapeProcess()
@@ -36,21 +29,15 @@ class ReflectiveTape:
 
         json_pair_list = []
         for pair in self.reflectiveVision.pairs:
-            x = pair.cX
             y = pair.cY
-            w = pair.cW
             h = pair.cH
 
-            # angle and distance from camera (angles in radians)
-            cAW = numpy.arctan2(x + w / 2 - width / 2, self.focalLengthW)
-            cDW = self.actualDimensionW * self.focalLengthW / w
+            pair.norm_center_x = (pair.center_x * 2 - width) / width
+
+            pair.angle = pair.norm_center_x * self.FOV
 
             cAH = numpy.arctan2(y + h / 2 - height / 2, self.focalLengthH)
             cDH = self.actualDimensionH * self.focalLengthH / h
-
-            # angle and distance
-            angleW = numpy.arctan2(cDW * numpy.sin(cAW), cDW * numpy.cos(cAW))
-            pair.angle = numpy.degrees(angleW)
 
             angleH = numpy.arctan2(cDH * numpy.sin(cAH), cDH * numpy.cos(cAH))
             pair.distance = cDH * numpy.cos(cAH) / numpy.cos(angleH)
@@ -63,20 +50,33 @@ class ReflectiveTape:
 
     def undistort(self, inimg):
         if not hasattr(self, 'fisheye_maps'):
-            dim1 = inimg.shape[:2][::-1]  # dim1 is the dimension of input image to un-distort
-            assert dim1[0] / dim1[1] == self.DIM[0] / self.DIM[1], \
-                "Image to undistort needs to have same aspect ratio as the ones used in calibration"
-            scaled_K = self.K * dim1[0] / self.DIM[0]  # The values of K is to scale with image dimension.
-            scaled_K[2][2] = 1.0  # Except that K[2][2] is always 1.0
-            # This is how scaled_K, dim2 and balance are used to determine the final K used to un-distort image.
-            # OpenCV document failed to make this clear!
-            new_K = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(scaled_K, self.D, dim1, numpy.eye(3),
-                                                                           balance=self.fisheye_balance)
-            self.fisheye_maps = cv2.fisheye.initUndistortRectifyMap(scaled_K, self.D, numpy.eye(3), new_K, dim1,
-                                                                    cv2.CV_16SC2)
+            width = inimg.shape[1]
+            height = inimg.shape[0]
 
-        return cv2.remap(inimg, self.fisheye_maps[0], self.fisheye_maps[1],
-                         interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+            distCoeff = numpy.zeros((4, 1), numpy.float64)
+
+            # TODO: add your coefficients here!
+            k1 = -1.3e-4;  # negative to remove barrel distortion
+            k2 = 0.0;
+            p1 = 0.0;
+            p2 = 0.0;
+
+            distCoeff[0, 0] = k1;
+            distCoeff[1, 0] = k2;
+            distCoeff[2, 0] = p1;
+            distCoeff[3, 0] = p2;
+            self.distCoeff = distCoeff
+
+            # assume unit matrix for camera
+            cam = numpy.eye(3, dtype=numpy.float32)
+
+            cam[0, 2] = width / 2.0  # define center x
+            cam[1, 2] = height / 2.0  # define center y
+            cam[0, 0] = 10.  # define focal length x
+            cam[1, 1] = 10.  # define focal length y
+            self.cam = cam
+
+        return cv2.undistort(inimg,self.cam,self.distCoeff)
 
     # Process function with no USB output
     def processNoUSB(self, inframe):
@@ -204,6 +204,9 @@ class TapePair:
         self.cW = w
         self.cH = ((ly + lh) + (ry + rh)) / 2.0 - self.cY
 
+        self.center_x = self.cX + self.cW / 2
+        self.norm_center_x = None
+
         self.imagePoints = numpy.array([(lx, ly),
                                         (lx, ly + lh),
                                         (rx + rw, ry + rh),
@@ -214,7 +217,8 @@ class TapePair:
         cv2.polylines(img, [self.imagePoints], True, (128, 128, 128))
         cv2.putText(img, "W: " + str(self.cH) + "px " + str(self.distance) + "in", (x, y - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255))
-        cv2.putText(img, str(self.angle) + " degrees", (x, y - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255))
+        cv2.putText(img, str(round(self.norm_center_x * 1000.0) / 1000.0) + " norm " + str(int(self.angle)) +
+                    " deg", (x, y - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255))
 
 
 class GripPipeline:

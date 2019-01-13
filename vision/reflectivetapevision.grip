@@ -48,7 +48,7 @@
       <property name="path[37]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\RocketPanelStraightDark36in.jpg"/>
     </grip:MultiImageFile>
     <grip:Camera>
-      <property name="deviceNumber" value="0"/>
+      <property name="deviceNumber" value="1"/>
     </grip:Camera>
   </sources>
   <steps>
@@ -56,23 +56,23 @@
       <grip:Input step="0" socket="0"/>
       <grip:Input step="0" socket="1">
         <value>
-          <double>27.5179856115108</double>
-          <double>98.60068259385665</double>
+          <double>45.32374100719425</double>
+          <double>87.84982935153582</double>
         </value>
       </grip:Input>
       <grip:Input step="0" socket="2">
         <value>
-          <double>87.14028776978417</double>
+          <double>185.74640287769782</double>
           <double>255.0</double>
         </value>
       </grip:Input>
       <grip:Input step="0" socket="3">
         <value>
-          <double>43.57014388489208</double>
+          <double>52.74280575539568</double>
           <double>255.0</double>
         </value>
       </grip:Input>
-      <grip:Output step="0" socket="0" previewed="true"/>
+      <grip:Output step="0" socket="0" previewed="false"/>
     </grip:Step>
     <grip:Step name="Find Contours">
       <grip:Input step="1" socket="0"/>
@@ -90,20 +90,20 @@
         <value>0.0</value>
       </grip:Input>
       <grip:Input step="2" socket="3">
-        <value>10.0</value>
+        <value>4.0</value>
       </grip:Input>
       <grip:Input step="2" socket="4">
         <value>1000.0</value>
       </grip:Input>
       <grip:Input step="2" socket="5">
-        <value>10.0</value>
+        <value>6.0</value>
       </grip:Input>
       <grip:Input step="2" socket="6">
         <value>1000.0</value>
       </grip:Input>
       <grip:Input step="2" socket="7">
         <value>
-          <double>80.03597122302158</double>
+          <double>56.65467625899279</double>
           <int>100</int>
         </value>
       </grip:Input>
@@ -132,16 +132,16 @@
       <grip:Input step="2" socket="0"/>
     </grip:Connection>
     <grip:Connection>
-      <grip:Output source="1" socket="0" previewed="false"/>
-      <grip:Input step="0" socket="0"/>
-    </grip:Connection>
-    <grip:Connection>
       <grip:Output step="2" socket="0" previewed="false"/>
       <grip:Input step="3" socket="0"/>
     </grip:Connection>
     <grip:Connection>
-      <grip:Output step="0" socket="0" previewed="true"/>
+      <grip:Output step="0" socket="0" previewed="false"/>
       <grip:Input step="1" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output source="1" socket="0" previewed="true"/>
+      <grip:Input step="0" socket="0"/>
     </grip:Connection>
   </connections>
   <settings>
