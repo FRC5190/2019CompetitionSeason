@@ -10,12 +10,10 @@ import edu.wpi.first.wpilibj.SerialPort
 import edu.wpi.first.wpilibj.Timer
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.sendBlocking
-import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
-import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
-import org.ghrobotics.lib.mathematics.units.*
+import org.ghrobotics.lib.mathematics.units.Time
+import org.ghrobotics.lib.mathematics.units.second
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
-import kotlin.math.pow
 
 class JeVois(
     private val port: SerialPort.Port,
@@ -70,14 +68,7 @@ class JeVois(
 
                 val timestamp = (jsonData["Epoch Time"].asDouble.second + fpgaOffset)
                 val contours = jsonData["Targets"].asJsonArray
-                    .asSequence()
                     .filterIsInstance<JsonObject>()
-                    .map { contourData ->
-                        VisionTarget(
-                            -contourData["angle"].asDouble.degree,
-                            contourData["distance"].asDouble.inch
-                        )
-                    }.toList()
 
                 visionDataChannel.sendBlocking(VisionData(timestamp, contours))
             } catch (e: JsonParseException) {
@@ -109,20 +100,5 @@ class JeVois(
 
 data class VisionData(
     val timestamp: Time,
-    val targets: List<VisionTarget>
+    val targets: List<JsonObject>
 )
-
-data class VisionTarget(
-    val angle: Rotation2d,
-    val distance: Length
-) {
-    val cameraRelativePose: Pose2d
-
-    init {
-        val a = 5.0.inch.meter.pow(2)
-        val c = distance.meter.pow(2)
-        val b = Math.sqrt(c - a).meter
-
-        cameraRelativePose = Pose2d(Translation2d(b, angle), 0.degree)
-    }
-}

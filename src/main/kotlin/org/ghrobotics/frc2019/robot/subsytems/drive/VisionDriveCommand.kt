@@ -27,18 +27,27 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
     lateinit var iterator: DistanceIterator<Pose2dWithCurvature>
     lateinit var prevDistance: Length
     lateinit var prevVelocity: DifferentialDrive.ChassisState
+    private var isFinished = false
 
     init {
         executeFrequency = 50
+        finishCondition += ::isFinished
     }
 
     override suspend fun initialize() {
+        val endPose = VisionProcessing.currentBestTarget
+        if (endPose == null) {
+            isFinished = true
+            return
+        } else {
+            isFinished = false
+        }
         iterator = DistanceTrajectory(
             ParametricSplineGenerator.parameterizeSplines(
                 listOf(
                     ParametricQuinticHermiteSpline(
                         DriveSubsystem.localization(),
-                        VisionProcessing.currentlyTrackedObject.objectLocationOnField
+                        endPose
                     )
                 ),
                 kMaxDx.value, kMaxDy.value, kMaxDTheta
@@ -49,6 +58,7 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
     }
 
     override suspend fun execute() {
+        if (isFinished) return
         val distance = DriveSubsystem.distanceTraveled
         val dx = distance - prevDistance
         prevDistance = distance

@@ -9,10 +9,8 @@ import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.robot.Controls
 import org.ghrobotics.frc2019.robot.vision.VisionProcessing
 import org.ghrobotics.lib.commands.FalconCommand
-import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.utils.withDeadband
 import org.ghrobotics.lib.wrappers.hid.*
-import kotlin.math.absoluteValue
 
 class ManualDriveCommand : FalconCommand(DriveSubsystem) {
     companion object {
@@ -24,12 +22,11 @@ class ManualDriveCommand : FalconCommand(DriveSubsystem) {
     }
 
     override suspend fun execute() {
-        val location = VisionProcessing.currentlyTrackedObject.objectLocationRelativeToRobot.translation
-        val angle = Rotation2d(location.x.value, location.y.value, true)
-        if (visionAssistSource() && angle.degree.absoluteValue < 30.0) {
+        val location = VisionProcessing.currentBestTarget
+        if (visionAssistSource() && location != null) {
             DriveSubsystem.curvatureDrive(
                 -speedSource(),
-                -location.y.value,
+                -(location inFrameOfReferenceOf DriveSubsystem.robotPosition).translation.y.value,
                 false
             )
         } else {

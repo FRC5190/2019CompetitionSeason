@@ -45,8 +45,11 @@ object Network {
         leftPositionEntry.setDouble(DriveSubsystem.leftMotor.getSelectedSensorPosition(0).toDouble())
         rightPositionEntry.setDouble(DriveSubsystem.rightMotor.getSelectedSensorPosition(0).toDouble())
 
-        val visionTargetTranslation = VisionProcessing.currentlyTrackedObject.objectLocationRelativeToRobot.translation
-        visionTargetX.setDouble(visionTargetTranslation.x.inch)
-        visionTargetY.setDouble(visionTargetTranslation.y.inch)
+        val trackedObject = VisionProcessing.currentBestTarget
+        if(trackedObject != null) {
+            val visionTargetTranslation = trackedObject.translation
+            visionTargetX.setDouble(visionTargetTranslation.x.inch)
+            visionTargetY.setDouble(visionTargetTranslation.y.inch)
+        }
     }
 }

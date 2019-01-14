@@ -8,10 +8,7 @@ package org.ghrobotics.frc2019.robot
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Rectangle2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
-import org.ghrobotics.lib.mathematics.units.degree
-import org.ghrobotics.lib.mathematics.units.feet
-import org.ghrobotics.lib.mathematics.units.inch
-import org.ghrobotics.lib.mathematics.units.meter
+import org.ghrobotics.lib.mathematics.units.*
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitLengthModel
 import org.ghrobotics.lib.mathematics.units.nativeunits.STU
 
@@ -61,6 +58,11 @@ object Constants {
     val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeLength, 0.meter, 0.degree)
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeLength, 0.meter, 0.degree)
     val kCenterToCamera = Pose2d(6.0.inch, 5.5.inch, 0.degree)
+    const val kCameraYaw = 0.0
+    val kGroundToCamera = 0.meter
+
+    // LINE TRACKING
+    val kMinLineLength = 10.inch
 
     // DRIVE
     val kDriveSensorUnitsPerRotation = 1440.STU
