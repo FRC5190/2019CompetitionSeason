@@ -76,12 +76,13 @@ object VisionProcessing {
     private fun processWhiteTapePoint(data: JsonObject): Translation2d {
         // {"h": -16.875, "v": -32.4375}
 
-        val h = Constants.kCameraYaw + data["h"].asDouble
-        val v = data["v"].asDouble.degree
+        val h = data["h"].asDouble
+        val v = Constants.kCameraYaw + data["v"].asDouble
 
-        val distance = Constants.kGroundToCamera / Math.tan(Math.toRadians(h))
+        val xDistance = (Constants.kGroundToCamera / Math.tan(Math.toRadians(v))).absoluteValue
+        val yDistance = xDistance * Math.tan(Math.toRadians(h))
 
-        return Translation2d(distance.absoluteValue, v)
+        return Translation2d(xDistance, yDistance)
     }
 
 }
