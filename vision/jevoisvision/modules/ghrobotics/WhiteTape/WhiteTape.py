@@ -2,51 +2,18 @@ import libjevois as jevois
 import json
 import time
 import cv2
-import math
-import numpy
+import numpy as np
 
 
-class ReflectiveTape:
+class WhiteTape:
 
     def __init__(self):
-        fov_norm_x = 0.42
-        fov_distance_a = 65.0
-        fov_distance_o = 27.0
-        self.FOV = math.degrees(math.atan2(fov_distance_o, fov_distance_a)) / fov_norm_x
+        self.grip_pipeline = GripPipeline()
 
-        self.actualDimensionH = 5.75
-        self.actualDistanceH = 67.0
-        self.pixelDimensionH = 32.0
-        self.focalLengthH = self.pixelDimensionH * self.actualDistanceH / self.actualDimensionH
+        self.fov = 120
 
-        self.reflectiveVision = ReflectiveTapeProcess()
-
-    def processAndSend(self, source0):
-        timestamp = time.time()
-        # numpy.array(source0, copy=True)
-        self.reflectiveVision.process(source0)
-        height, width, _ = source0.shape
-
-        json_pair_list = []
-        for pair in self.reflectiveVision.pairs:
-            y = pair.cY
-            h = pair.cH
-
-            pair.norm_center_x = (pair.center_x * 2 - width) / width
-
-            pair.angle = pair.norm_center_x * self.FOV
-
-            cAH = numpy.arctan2(y + h / 2 - height / 2, self.focalLengthH)
-            cDH = self.actualDimensionH * self.focalLengthH / h
-
-            angleH = numpy.arctan2(cDH * numpy.sin(cAH), cDH * numpy.cos(cAH))
-            pair.distance = cDH * numpy.cos(cAH) / numpy.cos(angleH)
-
-            json_pair_list.append({
-                "angle": pair.angle,
-                "distance": pair.distance
-            })
-        jevois.sendSerial(json.dumps({"Epoch Time": timestamp, "Targets": json_pair_list}))
+        self.lines = None
+        self.line_angles = None
 
     def undistort(self, inimg):
         if not hasattr(self, 'fisheye_maps'):
@@ -78,147 +45,85 @@ class ReflectiveTape:
 
         return cv2.undistort(inimg,self.cam,self.distCoeff)
 
+    def processAndSend(self, source0):
+        timestamp = time.time()
+        self.grip_pipeline.process(source0)
+        height, width, _ = source0.shape
+        self.lines = []
+        self.line_angles = []
+        line_angles_json = []
+
+        for contour in self.grip_pipeline.convex_hulls_output:
+            rotated_rect = cv2.minAreaRect(contour)
+            box = cv2.boxPoints(rotated_rect)  # cv2.boxPoints(rect) for OpenCV 3.x
+            box = np.int0(box)
+            [vx, vy, _, _] = cv2.fitLine(box, cv2.DIST_L2, 0, 10.0, 10.0)
+
+            w, h = rotated_rect[1]
+            x, y = rotated_rect[0]
+            if w > h:
+                h = w
+
+            h = h / 2
+
+            end_point_1 = (x + vx * h, y + vy * h)
+            end_point_2 = (x - vx * h, y - vy * h)
+
+            end_angles_1 = self.calc_angles(source0, end_point_1)
+            end_angles_2 = self.calc_angles(source0, end_point_2)
+
+            self.lines.append((end_point_1, end_point_2))
+            self.line_angles.append((end_angles_1, end_angles_2))
+
+            line_angles_json.append({
+                "one": {
+                    "h": end_angles_1[0],
+                    "v": end_angles_1[1]
+                },
+                "two": {
+                    "h": end_angles_2[0],
+                    "v": end_angles_2[1]
+                }
+            })
+
+        # jevois.sendSerial(json.dumps({"Epoch Time": timestamp, "Targets": line_angles_json}))
+
+    def calc_angles(self, img, point):
+        height, width, _ = img.shape
+        horizontal_fov = self.fov
+        vertical_fov = horizontal_fov / width * height
+
+        norm_point = (
+            (point[0] * 2 - width) / width,
+            (point[1] * 2 - height) / height
+        )
+
+        return (
+            -norm_point[0] * horizontal_fov / 2,
+            -norm_point[1] * vertical_fov / 2
+        )
+
     # Process function with no USB output
     def processNoUSB(self, inframe):
-        self.processAndSend(self.undistort(inframe.getCvBGR()))
+        inimg = self.undistort(inframe.getCvBGR())
+        self.processAndSend(inimg)
 
     # Process function with USB output
     def process(self, inframe, outframe):
         inimg = self.undistort(inframe.getCvBGR())
-        inframe.done()
         self.processAndSend(inimg)
 
         outimg = inimg.copy()
 
-        for tape in self.reflectiveVision.tapes:
-            tape.draw(outimg)
-
-        for pair in self.reflectiveVision.pairs:
-            pair.draw(outimg)
+        for idx, line in enumerate(self.lines):
+            angles = self.line_angles[idx]
+            cv2.line(outimg, line[0], line[1], 255, 2)
+            cv2.putText(outimg, "V:" + str(angles[0][0]) + " H:" + str(angles[0][1]), line[0],
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255))
+            cv2.putText(outimg, "V:" + str(angles[1][0]) + " H:" + str(angles[1][1]), line[1],
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255))
 
         outframe.sendCv(outimg)
-
-
-class ReflectiveTapeProcess:
-
-    def __init__(self):
-        self.gripPipeline = GripPipeline()
-
-        self.tapes = None
-        self.pairs = None
-
-    def process(self, source: []):
-        self.gripPipeline.process(source)
-
-        self.tapes = []
-
-        for contour in self.gripPipeline.convex_hulls_output:
-            self.tapes.append(Tape(contour))
-
-        left_tapes = []
-        right_tapes = []
-
-        for tape in self.tapes:
-            if tape.is_left:
-                left_tapes.append(tape)
-            else:
-                right_tapes.append(tape)
-
-        self.pairs = []
-        # pair up the vision tapes
-        for tape1 in left_tapes:
-            x1, y1, w1, h1 = tape1.bounding_rect
-
-            cx1 = x1 + w1 / 2
-            cy1 = y1 + h1 / 2
-
-            best_match = None
-            best_distance = 0
-
-            for tape2 in right_tapes:
-                x2, y2, w2, h2 = tape2.bounding_rect
-
-                # Only pair up if right is on the right of left
-                if x1 + w1 > x2:
-                    continue
-
-                cx2 = x2 + w2 / 2
-                cy2 = y2 + h2 / 2
-
-                distance = math.sqrt(math.pow(cx1 - cx2, 2) + math.pow(cy1 - cy2, 2))
-
-                if best_match is None or distance < best_distance:
-                    best_match = tape2
-                    best_distance = distance
-
-            if best_match is not None:
-                self.pairs.append(TapePair(tape1, best_match))
-                right_tapes.remove(best_match)
-
-
-class Tape:
-
-    def __init__(self, contour):
-        self.contour = contour
-        self.bounding_rect = cv2.boundingRect(contour)
-        self.rotated_rect = cv2.minAreaRect(contour)
-        self.angle = self.rotated_rect[2]
-        self.is_left = self.angle < -46
-
-    def draw(self, img):
-        box = cv2.boxPoints(self.rotated_rect)
-        box = numpy.int0(box)
-        cv2.drawContours(img, [box], 0, (64, 64, 64), 2)
-
-    def bounds(self, other_tape):
-        min_x1, min_y1, w1, h1 = self.bounding_rect
-        min_x2, min_y2, w2, h2 = other_tape.bounding_rect
-
-        max_x1 = min_x1 + w1
-        max_y1 = min_y1 + h1
-        max_x2 = min_x2 + w2
-        max_y2 = min_y2 + h2
-
-        x = min(min_x1, min_x2)
-        y = min(min_y1, min_y2)
-        w = max(max_x1, max_x2) - x
-        h = max(max_y1, max_y2) - y
-
-        return x, y, w, h
-
-
-class TapePair:
-
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-        self.bounding_rect = self.left.bounds(self.right)
-        self.distance = None
-        self.angle = None
-        x, y, w, h = self.bounding_rect
-        lx, ly, lw, lh = self.left.bounding_rect
-        rx, ry, rw, rh = self.right.bounding_rect
-
-        self.cX = x
-        self.cY = (ly + ly) / 2.0
-        self.cW = w
-        self.cH = ((ly + lh) + (ry + rh)) / 2.0 - self.cY
-
-        self.center_x = self.cX + self.cW / 2
-        self.norm_center_x = None
-
-        self.imagePoints = numpy.array([(lx, ly),
-                                        (lx, ly + lh),
-                                        (rx + rw, ry + rh),
-                                        (rx + rw, ry)], dtype=numpy.int32).reshape((-1, 1, 2))
-
-    def draw(self, img):
-        x, y, w, h = self.bounding_rect
-        cv2.polylines(img, [self.imagePoints], True, (128, 128, 128))
-        cv2.putText(img, "W: " + str(self.cH) + "px " + str(self.distance) + "in", (x, y - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255))
-        cv2.putText(img, str(round(self.norm_center_x * 1000.0) / 1000.0) + " norm " + str(int(self.angle)) +
-                    " deg", (x, y - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255))
 
 
 class GripPipeline:
@@ -230,9 +135,9 @@ class GripPipeline:
         """initializes all values to presets or None if need to be set
         """
 
-        self.__hsl_threshold_hue = [27.5179856115108, 98.60068259385665]
-        self.__hsl_threshold_saturation = [87.14028776978417, 255.0]
-        self.__hsl_threshold_luminance = [43.57014388489208, 255.0]
+        self.__hsl_threshold_hue = [0.0, 180.0]
+        self.__hsl_threshold_saturation = [0.0, 255.0]
+        self.__hsl_threshold_luminance = [133.00359712230215, 255.0]
 
         self.hsl_threshold_output = None
 
@@ -244,15 +149,15 @@ class GripPipeline:
         self.__filter_contours_contours = self.find_contours_output
         self.__filter_contours_min_area = 0.0
         self.__filter_contours_min_perimeter = 0.0
-        self.__filter_contours_min_width = 10.0
+        self.__filter_contours_min_width = 16.0
         self.__filter_contours_max_width = 1000.0
-        self.__filter_contours_min_height = 10.0
+        self.__filter_contours_min_height = 0.0
         self.__filter_contours_max_height = 1000.0
-        self.__filter_contours_solidity = [80.03597122302158, 100]
+        self.__filter_contours_solidity = [90.10791366906474, 100]
         self.__filter_contours_max_vertices = 1000000.0
         self.__filter_contours_min_vertices = 0.0
         self.__filter_contours_min_ratio = 0.0
-        self.__filter_contours_max_ratio = 1000.0
+        self.__filter_contours_max_ratio = 10000.0
 
         self.filter_contours_output = None
 
