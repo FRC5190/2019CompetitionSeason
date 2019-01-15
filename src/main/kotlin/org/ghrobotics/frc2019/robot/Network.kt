@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
 import org.ghrobotics.frc2019.robot.auto.AutoMode
 import org.ghrobotics.frc2019.robot.auto.StartingPositions
 import org.ghrobotics.frc2019.robot.subsytems.drive.DriveSubsystem
-import org.ghrobotics.frc2019.robot.vision.VisionProcessing
+import org.ghrobotics.frc2019.robot.vision.TargetTracker
 import org.ghrobotics.lib.wrappers.networktables.enumSendableChooser
 
 object Network {
@@ -30,6 +30,8 @@ object Network {
 
     private val visionTargetX: NetworkTableEntry = mainShuffleboardDisplay.add("Vision Target X", 0.0).entry
     private val visionTargetY: NetworkTableEntry = mainShuffleboardDisplay.add("Vision Target Y", 0.0).entry
+    private val visionTargetRotation: NetworkTableEntry =
+        mainShuffleboardDisplay.add("Vision Target Rotation", 0.0).entry
 
     init {
         // Put choosers on dashboard
@@ -45,11 +47,12 @@ object Network {
         leftPositionEntry.setDouble(DriveSubsystem.leftMotor.getSelectedSensorPosition(0).toDouble())
         rightPositionEntry.setDouble(DriveSubsystem.rightMotor.getSelectedSensorPosition(0).toDouble())
 
-        val trackedObject = VisionProcessing.currentBestTarget
-        if(trackedObject != null) {
-            val visionTargetTranslation = trackedObject.translation
-            visionTargetX.setDouble(visionTargetTranslation.x.inch)
-            visionTargetY.setDouble(visionTargetTranslation.y.inch)
+        val trackedObject = TargetTracker.bestTarget
+        if (trackedObject != null) {
+            val visionTargetPose = trackedObject.averagePose
+            visionTargetX.setDouble(visionTargetPose.translation.x.inch)
+            visionTargetY.setDouble(visionTargetPose.translation.y.inch)
+            visionTargetRotation.setDouble(visionTargetPose.rotation.degree)
         }
     }
 }

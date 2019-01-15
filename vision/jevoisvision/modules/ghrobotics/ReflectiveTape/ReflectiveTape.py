@@ -48,10 +48,10 @@ class ReflectiveTape:
             leftAngle = -(((lx + lw / 2) * 2 - width) / width) * hfov / 2
             rightAngle = -(((rx + rw / 2) * 2 - width) / width) * hfov / 2
 
-            leftX = math.cos(leftAngle) * leftDistance
-            leftY = math.sin(leftAngle) * leftDistance
-            rightX = math.cos(rightAngle) * rightDistance
-            rightY = math.sin(rightAngle) * rightDistance
+            leftX = math.cos(math.radians(leftAngle)) * leftDistance
+            leftY = math.sin(math.radians(leftAngle)) * leftDistance
+            rightX = math.cos(math.radians(rightAngle)) * rightDistance
+            rightY = math.sin(math.radians(rightAngle)) * rightDistance
 
             rotation = math.atan2(
                 leftX - rightX,
@@ -60,7 +60,7 @@ class ReflectiveTape:
 
             json_pair_list.append({
                 "angle": pair.angleH,
-                "rotation": rotation,
+                "rotation": math.degrees(rotation),
                 "distance": pair.distance
             })
         jevois.sendSerial(json.dumps({"Epoch Time": timestamp, "Targets": json_pair_list}))

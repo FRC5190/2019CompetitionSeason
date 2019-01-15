@@ -2,7 +2,8 @@ package org.ghrobotics.frc2019.robot.subsytems.drive
 
 import com.team254.lib.physics.DifferentialDrive
 import org.ghrobotics.frc2019.robot.Constants
-import org.ghrobotics.frc2019.robot.vision.VisionProcessing
+import org.ghrobotics.frc2019.robot.vision.TargetTracker
+import org.ghrobotics.frc2019.robot.vision.TrackedTarget
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.mathematics.epsilonEquals
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
@@ -22,37 +23,32 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
     lateinit var iterator: DistanceIterator<Pose2dWithCurvature>
     lateinit var prevDistance: Length
     lateinit var prevVelocity: DifferentialDrive.ChassisState
-    private var endPose: Pose2d? = null
+    private var trackedTarget: TrackedTarget? = null
+    private var lastEndPose: Pose2d? = null
 
     init {
         executeFrequency = 50
-        finishCondition += { endPose == null }
+        finishCondition += { trackedTarget?.isAlive != true }
     }
 
     override suspend fun initialize() {
-        val endPose = VisionProcessing.currentBestTarget
-        this.endPose = endPose
-        if (endPose == null) return
+        val trackedTarget = TargetTracker.bestTarget
+        this.trackedTarget = trackedTarget
+        if (trackedTarget == null) return
         regenPath()
     }
 
     private fun updatePath() {
-        val endPose = this.endPose ?: return
-        val newEndPose = VisionProcessing.currentlyTrackedObjects.minBy {
-            it.translation.distance(endPose.translation)
-        }
-        if (newEndPose == null) {
-            this.endPose = null
-            return
-        }
-        if (endPose.translation.distance(newEndPose.translation) > 0.25) {
-            this.endPose = newEndPose
+        val lastEndPose = this.lastEndPose!!
+        val newEndPose = this.trackedTarget!!.averagePose
+        if (lastEndPose.translation.distance(newEndPose.translation) > 0.1) {
+            this.lastEndPose = newEndPose
             regenPath()
         }
     }
 
     private fun regenPath() {
-        val endPose = this.endPose ?: return
+        val endPose = this.lastEndPose ?: return
         iterator = DistanceTrajectory(
             ParametricSplineGenerator.parameterizeSplines(
                 listOf(
@@ -70,7 +66,7 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
 
     override suspend fun execute() {
         updatePath()
-        if (endPose == null) return
+        if (lastEndPose == null) return
         val distance = DriveSubsystem.distanceTraveled
         val dx = distance - prevDistance
         prevDistance = distance
