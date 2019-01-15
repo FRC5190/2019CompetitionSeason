@@ -1,6 +1,6 @@
 package org.ghrobotics.frc2019.auto.routines
 
-import org.ghrobotics.frc2019.robot.subsystems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.commands.PeriodicRunnableCommand
 import org.ghrobotics.lib.mathematics.units.second
 

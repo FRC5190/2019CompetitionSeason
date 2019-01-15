@@ -2,11 +2,11 @@ package org.ghrobotics.frc2019.auto
 
 import org.ghrobotics.frc2019.Network
 import org.ghrobotics.frc2019.Robot
-import org.ghrobotics.frc2019.robot.auto.routines.baselineRoutine
-import org.ghrobotics.frc2019.robot.auto.routines.characterizationRoutine
-import org.ghrobotics.frc2019.robot.auto.routines.doubleHatchRocketRoutine
-import org.ghrobotics.frc2019.robot.auto.routines.forwardCargoShipRoutine
-import org.ghrobotics.frc2019.robot.subsystems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.auto.routines.baselineRoutine
+import org.ghrobotics.frc2019.auto.routines.characterizationRoutine
+import org.ghrobotics.frc2019.auto.routines.doubleHatchRocketRoutine
+import org.ghrobotics.frc2019.auto.routines.forwardCargoShipRoutine
+import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.commands.InstantRunnableCommand
 import org.ghrobotics.lib.commands.S3ND
 import org.ghrobotics.lib.commands.sequential
@@ -20,11 +20,11 @@ import org.ghrobotics.lib.wrappers.FalconRobotBase
 
 object Autonomous {
 
-    private val autoMode = { org.ghrobotics.frc2019.Network.autoModeChooser.selected }
-    val startingPosition = { org.ghrobotics.frc2019.Network.startingPositionChooser.selected }
+    private val autoMode = { Network.autoModeChooser.selected }
+    val startingPosition = { Network.startingPositionChooser.selected }
 
     private var configValid = Source(true)
-    private val isReady = { org.ghrobotics.frc2019.Robot.isAutonomous && org.ghrobotics.frc2019.Robot.isEnabled } and org.ghrobotics.frc2019.auto.Autonomous.configValid
+    private val isReady = { Robot.isAutonomous && Robot.isEnabled } and configValid
 
 
     private val invalidOptionRoutine
@@ -36,28 +36,28 @@ object Autonomous {
         }
 
     // Autonomous Master Group
-    private val JUST = stateCommandGroup(org.ghrobotics.frc2019.auto.Autonomous.startingPosition) {
-        state(org.ghrobotics.frc2019.auto.StartingPositions.LEFT, org.ghrobotics.frc2019.auto.StartingPositions.RIGHT) {
-            stateCommandGroup(org.ghrobotics.frc2019.auto.Autonomous.autoMode) {
-                state(org.ghrobotics.frc2019.auto.AutoMode.DOUBLE_HATCH_ROCKET, doubleHatchRocketRoutine())
-                state(org.ghrobotics.frc2019.auto.AutoMode.BASELINE, baselineRoutine())
-                state(org.ghrobotics.frc2019.auto.AutoMode.CHARACTERIZE, characterizationRoutine())
+    private val JUST = stateCommandGroup(startingPosition) {
+        state(StartingPositions.LEFT, StartingPositions.RIGHT) {
+            stateCommandGroup(autoMode) {
+                state(AutoMode.DOUBLE_HATCH_ROCKET, doubleHatchRocketRoutine())
+                state(AutoMode.BASELINE, baselineRoutine())
+                state(AutoMode.CHARACTERIZE, characterizationRoutine())
 
                 state(
-                    org.ghrobotics.frc2019.auto.AutoMode.FORWARD_CARGO_SHIP,
-                    org.ghrobotics.frc2019.auto.Autonomous.invalidOptionRoutine
+                    AutoMode.FORWARD_CARGO_SHIP,
+                    invalidOptionRoutine
                 )
             }
         }
-        state(org.ghrobotics.frc2019.auto.StartingPositions.CENTER) {
-            stateCommandGroup(org.ghrobotics.frc2019.auto.Autonomous.autoMode) {
-                state(org.ghrobotics.frc2019.auto.AutoMode.FORWARD_CARGO_SHIP, forwardCargoShipRoutine())
-                state(org.ghrobotics.frc2019.auto.AutoMode.BASELINE, baselineRoutine())
-                state(org.ghrobotics.frc2019.auto.AutoMode.CHARACTERIZE, characterizationRoutine())
+        state(StartingPositions.CENTER) {
+            stateCommandGroup(autoMode) {
+                state(AutoMode.FORWARD_CARGO_SHIP, forwardCargoShipRoutine())
+                state(AutoMode.BASELINE, baselineRoutine())
+                state(AutoMode.CHARACTERIZE, characterizationRoutine())
 
                 state(
-                    org.ghrobotics.frc2019.auto.AutoMode.DOUBLE_HATCH_ROCKET,
-                    org.ghrobotics.frc2019.auto.Autonomous.invalidOptionRoutine
+                    AutoMode.DOUBLE_HATCH_ROCKET,
+                    invalidOptionRoutine
                 )
             }
         }
@@ -66,23 +66,23 @@ object Autonomous {
     @Suppress("LocalVariableName")
     private val IT = ""
 
-    private val startingPositionMonitor = org.ghrobotics.frc2019.auto.Autonomous.startingPosition.monitor
-    private val isReadyMonitor = org.ghrobotics.frc2019.auto.Autonomous.isReady.monitor
-    private val modeMonitor = { org.ghrobotics.frc2019.Robot.currentMode }.monitor
+    private val startingPositionMonitor = startingPosition.monitor
+    private val isReadyMonitor = isReady.monitor
+    private val modeMonitor = { Robot.currentMode }.monitor
 
     fun update() {
-        org.ghrobotics.frc2019.auto.Autonomous.startingPositionMonitor.onChange { DriveSubsystem.localization.reset(it.pose) }
-        org.ghrobotics.frc2019.auto.Autonomous.isReadyMonitor.onChangeToTrue { org.ghrobotics.frc2019.auto.Autonomous.JUST S3ND org.ghrobotics.frc2019.auto.Autonomous.IT }
-        org.ghrobotics.frc2019.auto.Autonomous.modeMonitor.onChange { newValue ->
-            if (newValue != FalconRobotBase.Mode.AUTONOMOUS) org.ghrobotics.frc2019.auto.Autonomous.JUST.stop()
+        startingPositionMonitor.onChange { DriveSubsystem.localization.reset(it.pose) }
+        isReadyMonitor.onChangeToTrue { JUST S3ND IT }
+        modeMonitor.onChange { newValue ->
+            if (newValue != FalconRobotBase.Mode.AUTONOMOUS) JUST.stop()
         }
     }
 }
 
 enum class StartingPositions(val pose: Pose2d) {
-    LEFT(org.ghrobotics.frc2019.auto.Trajectories.kSideStart.mirror),
-    CENTER(org.ghrobotics.frc2019.auto.Trajectories.kCenterStart),
-    RIGHT(org.ghrobotics.frc2019.auto.Trajectories.kSideStart)
+    LEFT(Trajectories.kSideStart.mirror),
+    CENTER(Trajectories.kCenterStart),
+    RIGHT(Trajectories.kSideStart)
 }
 
 enum class AutoMode { CHARACTERIZE, DOUBLE_HATCH_ROCKET, FORWARD_CARGO_SHIP, BASELINE }

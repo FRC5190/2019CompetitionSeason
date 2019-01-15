@@ -18,11 +18,11 @@ class DriveModelTest {
         val speed = ArrayList<Double>()
 
         for (i in 0..500) {
-            speed.add(velocity.left * org.ghrobotics.frc2019.Constants.kWheelRadius.value)
+            speed.add(velocity.left * Constants.kWheelRadius.value)
             time.add(t)
 
             val predictedAcceleration =
-                org.ghrobotics.frc2019.auto.Trajectories.differentialDrive.solveForwardDynamics(velocity, voltage).wheelAcceleration
+                Trajectories.differentialDrive.solveForwardDynamics(velocity, voltage).wheelAcceleration
             velocity = DifferentialDrive.WheelState(
                 velocity.left + predictedAcceleration.left * dt,
                 velocity.right + predictedAcceleration.right * dt

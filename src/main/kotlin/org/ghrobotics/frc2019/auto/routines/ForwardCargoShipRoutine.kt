@@ -1,11 +1,11 @@
 package org.ghrobotics.frc2019.auto.routines
 
 import org.ghrobotics.frc2019.auto.Trajectories
-import org.ghrobotics.frc2019.robot.subsystems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 
 fun forwardCargoShipRoutine() = autoRoutine {
     +DriveSubsystem.followTrajectory(
-        trajectory = org.ghrobotics.frc2019.auto.Trajectories.centerStartToLeftForwardCargoShip,
+        trajectory = Trajectories.centerStartToLeftForwardCargoShip,
         pathMirrored = false,
         dt = DriveSubsystem.kPathFollowingDt
     )
@@ -18,12 +18,12 @@ fun forwardCargoShipRoutine() = autoRoutine {
 //    )
 
     +DriveSubsystem.followTrajectory(
-        trajectory = org.ghrobotics.frc2019.auto.Trajectories.leftForwardCargoShipToLoadingStation,
+        trajectory = Trajectories.leftForwardCargoShipToLoadingStation,
         pathMirrored = false,
         dt = DriveSubsystem.kPathFollowingDt
     )
     +DriveSubsystem.followTrajectory(
-        trajectory = org.ghrobotics.frc2019.auto.Trajectories.loadingStationToRightForwardCargoShip,
+        trajectory = Trajectories.loadingStationToRightForwardCargoShip,
         pathMirrored = false,
         dt = DriveSubsystem.kPathFollowingDt
     )
@@ -31,7 +31,7 @@ fun forwardCargoShipRoutine() = autoRoutine {
     // We will let the Ramsete controller correct for the error due to starting at the right crago-bay
     // instead of the left.
     +DriveSubsystem.followTrajectory(
-        trajectory = org.ghrobotics.frc2019.auto.Trajectories.leftForwardCargoShipToLoadingStation,
+        trajectory = Trajectories.leftForwardCargoShipToLoadingStation,
         pathMirrored = false,
         dt = DriveSubsystem.kPathFollowingDt
     )

@@ -27,6 +27,11 @@ object Constants {
     const val kRightMasterId = 3
     const val kRightSlaveId1 = 4
 
+    const val kElevatorMasterId = 5
+    const val kElevatorSlave1Id = 6
+    const val kElevatorSlave2Id = 7
+    const val kElevatorSlave3Id = 8
+
     // GYROS
     const val kPigeonIMUId = 17
 
@@ -54,9 +59,9 @@ object Constants {
     const val kRobotAngularDrag = 6.0
 
     // TRANSFORMATIONS
-    val kFrontBumperToCenter = Pose2d(-(org.ghrobotics.frc2019.Constants.kRobotLength / 2.0) - org.ghrobotics.frc2019.Constants.kBumperLength, 0.meter, 0.degree)
-    val kForwardIntakeToCenter = Pose2d(-(org.ghrobotics.frc2019.Constants.kRobotLength / 2.0) - org.ghrobotics.frc2019.Constants.kIntakeLength, 0.meter, 0.degree)
-    val kBackwardIntakeToCenter = Pose2d(org.ghrobotics.frc2019.Constants.kRobotLength / 2.0 + org.ghrobotics.frc2019.Constants.kIntakeLength, 0.meter, 0.degree)
+    val kFrontBumperToCenter = Pose2d(-(kRobotLength / 2.0) - kBumperLength, 0.meter, 0.degree)
+    val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeLength, 0.meter, 0.degree)
+    val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeLength, 0.meter, 0.degree)
     // val kCenterToCamera = Pose2d(6.0.inch, 5.5.inch, 0.degree)
     val kCenterToCamera = Pose2d(7.inch, (-5.0).inch, 0.degree)
     val kGroundToCamera = 0.meter
@@ -70,8 +75,8 @@ object Constants {
     val kTrackWidth = 27.75.inch
 
     val kDriveNativeUnitModel = NativeUnitLengthModel(
-        org.ghrobotics.frc2019.Constants.kDriveSensorUnitsPerRotation,
-        org.ghrobotics.frc2019.Constants.kWheelRadius
+        kDriveSensorUnitsPerRotation,
+        kWheelRadius
     )
 
     const val kPDrive = 1.2 // Talon SRX Units
@@ -83,4 +88,15 @@ object Constants {
 
     const val kDriveBeta = 2.0 // Inverse meters squared
     const val kDriveZeta = 0.7 // Unitless dampening co-efficient
+
+
+    // ELEVATOR
+    val kElevatorSensorUnitsPerRotaton = 1440.STU
+    val kElevatorWinchRadius = 1.25.inch / 2
+    val kElevatorNativeUnitModel = NativeUnitLengthModel(
+        kDriveSensorUnitsPerRotation,
+        kElevatorWinchRadius
+    )
+
+    const val kElevatorKp = 0.3 // TODO Tune me
 }

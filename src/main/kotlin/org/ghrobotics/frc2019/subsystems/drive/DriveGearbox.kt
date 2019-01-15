@@ -14,8 +14,8 @@ class DriveGearbox(
     slaveOneId: Int,
     inverted: Boolean
 ) {
-    val master = FalconSRX(masterId, org.ghrobotics.frc2019.Constants.kDriveNativeUnitModel)
-    val slaveOne = FalconSRX(slaveOneId, org.ghrobotics.frc2019.Constants.kDriveNativeUnitModel)
+    val master = FalconSRX(masterId, Constants.kDriveNativeUnitModel)
+    val slaveOne = FalconSRX(slaveOneId, Constants.kDriveNativeUnitModel)
 
     val allMotors = listOf(master, slaveOne)
 
@@ -47,8 +47,8 @@ class DriveGearbox(
             motor.continuousCurrentLimit = 40.amp // TODO Find Actual Value
             motor.currentLimitingEnabled = true
 
-            motor.kP = org.ghrobotics.frc2019.Constants.kPDrive
-            motor.kD = org.ghrobotics.frc2019.Constants.kDDrive
+            motor.kP = Constants.kPDrive
+            motor.kD = Constants.kDDrive
         }
     }
 }

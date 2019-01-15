@@ -5,7 +5,7 @@
 
 package org.ghrobotics.frc2019
 
-import org.ghrobotics.frc2019.robot.subsystems.drive.VisionDriveCommand
+import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
 import org.ghrobotics.lib.wrappers.hid.button
 import org.ghrobotics.lib.wrappers.hid.kA
 import org.ghrobotics.lib.wrappers.hid.xboxController
@@ -16,6 +16,6 @@ object Controls {
     }
 
     fun update() {
-        org.ghrobotics.frc2019.Controls.mainXbox.update()
+        mainXbox.update()
     }
 }

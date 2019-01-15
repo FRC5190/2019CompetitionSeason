@@ -2,8 +2,8 @@ package org.ghrobotics.frc2019.subsystems.drive
 
 import com.team254.lib.physics.DifferentialDrive
 import org.ghrobotics.frc2019.Constants
-import org.ghrobotics.frc2019.robot.vision.TargetTracker
-import org.ghrobotics.frc2019.robot.vision.TrackedTarget
+import org.ghrobotics.frc2019.vision.TargetTracker
+import org.ghrobotics.frc2019.vision.TrackedTarget
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.mathematics.epsilonEquals
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
@@ -18,6 +18,7 @@ import org.ghrobotics.lib.mathematics.units.inch
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+@Suppress("LateinitUsage", "UnsafeCallOnNullableType")
 class VisionDriveCommand : FalconCommand(DriveSubsystem) {
 
     lateinit var iterator: DistanceIterator<Pose2dWithCurvature>
@@ -54,7 +55,7 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
                 listOf(
                     ParametricQuinticHermiteSpline(
                         DriveSubsystem.localization(),
-                        endPose + org.ghrobotics.frc2019.Constants.kForwardIntakeToCenter
+                        endPose + Constants.kForwardIntakeToCenter
                     )
                 ),
                 kMaxDx.value, kMaxDy.value,
@@ -81,12 +82,12 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
 
         // Compute Ramsete Error and Gains
         val error = reference.state.pose inFrameOfReferenceOf DriveSubsystem.localization()
-        val k1 = 2 * org.ghrobotics.frc2019.Constants.kDriveZeta * sqrt(wd * wd + org.ghrobotics.frc2019.Constants.kDriveZeta * vd * vd)
+        val k1 = 2 * Constants.kDriveZeta * sqrt(wd * wd + Constants.kDriveZeta * vd * vd)
 
         // Solve for Adjusted Angular Velocity
         val adjustedAngularVelocity =
             wd +
-                org.ghrobotics.frc2019.Constants.kDriveBeta * vd * sinc(
+                Constants.kDriveBeta * vd * sinc(
                 error.rotation.radian
             ) * error.translation.y.value +
                 k1 * error.rotation.radian

@@ -99,8 +99,8 @@ class ManualDriveCommand : FalconCommand(DriveSubsystem) {
         }
 
         val velocity = DifferentialDrive.WheelState(
-            DriveSubsystem.voltageToSIVelocity(leftMotorOutput * 12.0) / org.ghrobotics.frc2019.Constants.kWheelRadius.value,
-            DriveSubsystem.voltageToSIVelocity(rightMotorOutput * 12.0) / org.ghrobotics.frc2019.Constants.kWheelRadius.value
+            DriveSubsystem.voltageToSIVelocity(leftMotorOutput * 12.0) / Constants.kWheelRadius.value,
+            DriveSubsystem.voltageToSIVelocity(rightMotorOutput * 12.0) / Constants.kWheelRadius.value
         )
         val acceleration = DifferentialDrive.WheelState(
             (velocity.left - prevVelocity.left) * executeFrequency,
@@ -115,11 +115,11 @@ class ManualDriveCommand : FalconCommand(DriveSubsystem) {
     companion object {
         private const val deadband = 0.02
 
-        val speedSource = org.ghrobotics.frc2019.Controls.mainXbox.getY(GenericHID.Hand.kLeft).withDeadband(deadband)
+        val speedSource = Controls.mainXbox.getY(GenericHID.Hand.kLeft).withDeadband(deadband)
 
-        private val rotationSource = org.ghrobotics.frc2019.Controls.mainXbox.getX(GenericHID.Hand.kLeft).withDeadband(
+        private val rotationSource = Controls.mainXbox.getX(GenericHID.Hand.kLeft).withDeadband(
             deadband
         )
-        private val quickTurnSource = org.ghrobotics.frc2019.Controls.mainXbox.getRawButton(kX)
+        private val quickTurnSource = Controls.mainXbox.getRawButton(kX)
     }
 }

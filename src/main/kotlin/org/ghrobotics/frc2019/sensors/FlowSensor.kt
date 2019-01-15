@@ -8,5 +8,5 @@ val flowSensor = ADNS3080FlowSensor(
     SPI.Port.kOnboardCS0,
     2866.0 / 10.0,
     0.degree,
-    org.ghrobotics.frc2019.Robot.coroutineContext
+    Robot.coroutineContext
 )

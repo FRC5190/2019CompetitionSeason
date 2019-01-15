@@ -8,7 +8,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.Robot
-import org.ghrobotics.frc2019.robot.subsystems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.degree
@@ -26,7 +26,7 @@ object VisionProcessing {
 
         val visionDataChannel = Channel<VisionData>(Channel.CONFLATED)
 
-        org.ghrobotics.frc2019.Robot.launch {
+        Robot.launch {
             JeVois(SerialPort.Port.kUSB1, visionDataChannel)
 
             for (visionData in visionDataChannel) {
@@ -51,7 +51,7 @@ object VisionProcessing {
         val rotation = data["rotation"].asDouble.degree
         val distance = data["distance"].asDouble.inch
 
-        return org.ghrobotics.frc2019.Constants.kCenterToCamera + Pose2d(Translation2d(distance, angle), rotation)
+        return Constants.kCenterToCamera + Pose2d(Translation2d(distance, angle), rotation)
     }
 
 //    private fun processWhiteTape(data: JsonObject): Pose2d? {

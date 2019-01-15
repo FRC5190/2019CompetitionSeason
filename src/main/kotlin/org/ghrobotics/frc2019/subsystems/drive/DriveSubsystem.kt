@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.auto.Trajectories
 import org.ghrobotics.frc2019.auto.VisionAssistedTrajectory
-import org.ghrobotics.frc2019.robot.vision.DynamicObject
+import org.ghrobotics.frc2019.vision.DynamicObject
 import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.kEpsilon
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
@@ -35,13 +35,13 @@ object DriveSubsystem : TankDriveSubsystem() {
 
     // Gearboxes
     private val leftGearbox = DriveGearbox(
-        org.ghrobotics.frc2019.Constants.kLeftMasterId,
-        org.ghrobotics.frc2019.Constants.kLeftSlaveId1,
+        Constants.kLeftMasterId,
+        Constants.kLeftSlaveId1,
         false
     )
     private val rightGearbox = DriveGearbox(
-        org.ghrobotics.frc2019.Constants.kRightMasterId,
-        org.ghrobotics.frc2019.Constants.kRightSlaveId1,
+        Constants.kRightMasterId,
+        Constants.kRightSlaveId1,
         true
     )
 
@@ -55,11 +55,11 @@ object DriveSubsystem : TankDriveSubsystem() {
     )
 
     // Shifter for two-speed gearbox
-    private val shifter = Solenoid(org.ghrobotics.frc2019.Constants.kPCMId, org.ghrobotics.frc2019.Constants.kDriveSolenoidId)
+    private val shifter = Solenoid(Constants.kPCMId, Constants.kDriveSolenoidId)
 
     // Type of localization to determine position on the field
     override val localization = TankEncoderLocalization(
-        PigeonIMU(org.ghrobotics.frc2019.Constants.kPigeonIMUId).asSource(),
+        PigeonIMU(Constants.kPigeonIMUId).asSource(),
         leftMotor::sensorPosition,
         rightMotor::sensorPosition
     )
@@ -84,8 +84,8 @@ object DriveSubsystem : TankDriveSubsystem() {
 
     val kPathFollowingDt = 10.millisecond
 
-    override val differentialDrive = org.ghrobotics.frc2019.auto.Trajectories.differentialDrive
-    override val trajectoryTracker = RamseteTracker(org.ghrobotics.frc2019.Constants.kDriveBeta, org.ghrobotics.frc2019.Constants.kDriveZeta)
+    override val differentialDrive = Trajectories.differentialDrive
+    override val trajectoryTracker = RamseteTracker(Constants.kDriveBeta, Constants.kDriveZeta)
 
     init {
         lowGear = false
@@ -93,8 +93,8 @@ object DriveSubsystem : TankDriveSubsystem() {
     }
 
     fun voltageToSIVelocity(voltage: Double): Double = when {
-        voltage > kEpsilon -> Math.max(0.0, voltage - org.ghrobotics.frc2019.Constants.kStaticFrictionVoltage) / org.ghrobotics.frc2019.Constants.kVDrive
-        voltage < -kEpsilon -> Math.min(0.0, voltage + org.ghrobotics.frc2019.Constants.kStaticFrictionVoltage) / org.ghrobotics.frc2019.Constants.kVDrive
+        voltage > kEpsilon -> Math.max(0.0, voltage - Constants.kStaticFrictionVoltage) / Constants.kVDrive
+        voltage < -kEpsilon -> Math.min(0.0, voltage + Constants.kStaticFrictionVoltage) / Constants.kVDrive
         else -> 0.0
     }
 
@@ -105,7 +105,7 @@ object DriveSubsystem : TankDriveSubsystem() {
         expectedLocation: Translation2d,
         dt: Time = kPathFollowingDt
     ) = followTrajectory(
-        trajectory = org.ghrobotics.frc2019.auto.VisionAssistedTrajectory(
+        trajectory = VisionAssistedTrajectory(
             originalTrajectory = if (!mirrored()) trajectory else trajectory.mirror(),
             dynamicObject = dynamicObject,
             expectedTargetLocation = expectedLocation

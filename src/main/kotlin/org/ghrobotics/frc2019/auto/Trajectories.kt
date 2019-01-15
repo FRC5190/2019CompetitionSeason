@@ -28,21 +28,21 @@ object Trajectories {
 
     // DC Motor Transmission for the DriveSubsystem
     private val dcTransmission = DCMotorTransmission(
-        1 / org.ghrobotics.frc2019.Constants.kVDrive,
-        org.ghrobotics.frc2019.Constants.kWheelRadius.value.pow(2) * org.ghrobotics.frc2019.Constants.kRobotMass / (2.0 * org.ghrobotics.frc2019.Constants.kADrive),
-        org.ghrobotics.frc2019.Constants.kStaticFrictionVoltage
+        1 / Constants.kVDrive,
+        Constants.kWheelRadius.value.pow(2) * Constants.kRobotMass / (2.0 * Constants.kADrive),
+        Constants.kStaticFrictionVoltage
     )
 
     // Differential Drive. We are defining this here so that this class can be accessed by tests
     // without having to initialize WPILib.
     val differentialDrive = DifferentialDrive(
-        org.ghrobotics.frc2019.Constants.kRobotMass,
-        org.ghrobotics.frc2019.Constants.kRobotMomentOfInertia,
-        org.ghrobotics.frc2019.Constants.kRobotAngularDrag,
-        org.ghrobotics.frc2019.Constants.kWheelRadius.value,
-        org.ghrobotics.frc2019.Constants.kTrackWidth.value / 2.0,
-        org.ghrobotics.frc2019.auto.Trajectories.dcTransmission,
-        org.ghrobotics.frc2019.auto.Trajectories.dcTransmission
+        Constants.kRobotMass,
+        Constants.kRobotMomentOfInertia,
+        Constants.kRobotAngularDrag,
+        Constants.kWheelRadius.value,
+        Constants.kTrackWidth.value / 2.0,
+        dcTransmission,
+        dcTransmission
     )
 
     private val kMaxVelocity = 12.0.feet.velocity
@@ -50,25 +50,25 @@ object Trajectories {
     private val kMaxCentripetalAcceleration = 9.0.feet.acceleration
 
     private val kConstraints = listOf(
-        CentripetalAccelerationConstraint(org.ghrobotics.frc2019.auto.Trajectories.kMaxCentripetalAcceleration),
-        DifferentialDriveDynamicsConstraint(org.ghrobotics.frc2019.auto.Trajectories.differentialDrive, 10.0.volt),
-        VelocityLimitRegionConstraint(org.ghrobotics.frc2019.Constants.kLevel1Platform, 3.feet.velocity)
+        CentripetalAccelerationConstraint(kMaxCentripetalAcceleration),
+        DifferentialDriveDynamicsConstraint(differentialDrive, 10.0.volt),
+        VelocityLimitRegionConstraint(Constants.kLevel1Platform, 3.feet.velocity)
     )
 
     /************************************ STARTING LOCATIONS ************************************/
 
     private val kRobotStartX =
-        org.ghrobotics.frc2019.Constants.kLevel1RightX - org.ghrobotics.frc2019.Constants.kBumperLength - org.ghrobotics.frc2019.Constants.kRobotWidth / 2.0
+        Constants.kLevel1RightX - Constants.kBumperLength - Constants.kRobotWidth / 2.0
 
     val kSideStart =
         Pose2d(
-            org.ghrobotics.frc2019.auto.Trajectories.kRobotStartX,
-            org.ghrobotics.frc2019.Constants.kLevel2BottomY + org.ghrobotics.frc2019.Constants.kBumperLength + org.ghrobotics.frc2019.Constants.kRobotLength / 2.0 +
-                org.ghrobotics.frc2019.Constants.kHypotenuseDifferenceForRamp,
+            kRobotStartX,
+            Constants.kLevel2BottomY + Constants.kBumperLength + Constants.kRobotLength / 2.0 +
+                Constants.kHypotenuseDifferenceForRamp,
             (-90).degree
         )
 
-    val kCenterStart = Pose2d(org.ghrobotics.frc2019.auto.Trajectories.kRobotStartX, 13.5.feet, 0.degree)
+    val kCenterStart = Pose2d(kRobotStartX, 13.5.feet, 0.degree)
 
     /************************************ FIELD ELEMENTS ************************************/
 
@@ -78,7 +78,7 @@ object Trajectories {
 
     private val kRocketBayY = 2.35.feet
 
-    private val kLoadingStation = Pose2d(0.0.feet, 2.2.feet, 0.degree) + org.ghrobotics.frc2019.Constants.kBackwardIntakeToCenter
+    private val kLoadingStation = Pose2d(0.0.feet, 2.2.feet, 0.degree) + Constants.kBackwardIntakeToCenter
 
     private val kForwardCargoShipX = 18.456.feet
     private val kCargoShipCenterlineY = 13.5.feet
@@ -88,77 +88,77 @@ object Trajectories {
 
     val kNearRocketHatch =
         Pose2d(
-            org.ghrobotics.frc2019.auto.Trajectories.kRocketCenterlineX - org.ghrobotics.frc2019.auto.Trajectories.kRocketHatchXOffset,
-            org.ghrobotics.frc2019.auto.Trajectories.kRocketHatchY, (-30).degree) + org.ghrobotics.frc2019.Constants.kForwardIntakeToCenter
+            kRocketCenterlineX - kRocketHatchXOffset,
+            kRocketHatchY, (-30).degree) + Constants.kForwardIntakeToCenter
 
     val kFarRocketHatch =
         Pose2d(
-            org.ghrobotics.frc2019.auto.Trajectories.kRocketCenterlineX + org.ghrobotics.frc2019.auto.Trajectories.kRocketHatchXOffset + 4.inch,
-            org.ghrobotics.frc2019.auto.Trajectories.kRocketHatchY - 15.inch,
+            kRocketCenterlineX + kRocketHatchXOffset + 4.inch,
+            kRocketHatchY - 15.inch,
             (-150).degree
-        ) + org.ghrobotics.frc2019.Constants.kForwardIntakeToCenter
+        ) + Constants.kForwardIntakeToCenter
 
     val kRocketBay = Pose2d(
-        org.ghrobotics.frc2019.auto.Trajectories.kRocketCenterlineX,
-        org.ghrobotics.frc2019.auto.Trajectories.kRocketBayY, (-90).degree) + org.ghrobotics.frc2019.Constants.kForwardIntakeToCenter
+        kRocketCenterlineX,
+        kRocketBayY, (-90).degree) + Constants.kForwardIntakeToCenter
 
     val kLeftForwardCargoShip =
         Pose2d(
-            org.ghrobotics.frc2019.auto.Trajectories.kForwardCargoShipX,
-            org.ghrobotics.frc2019.auto.Trajectories.kCargoShipCenterlineY + org.ghrobotics.frc2019.auto.Trajectories.kForwardCargoShipYOffset,
+            kForwardCargoShipX,
+            kCargoShipCenterlineY + kForwardCargoShipYOffset,
             0.degree
-        ) + org.ghrobotics.frc2019.Constants.kForwardIntakeToCenter
+        ) + Constants.kForwardIntakeToCenter
     val kRightForwardCargoShip =
         Pose2d(
-            org.ghrobotics.frc2019.auto.Trajectories.kForwardCargoShipX,
-            org.ghrobotics.frc2019.auto.Trajectories.kCargoShipCenterlineY - org.ghrobotics.frc2019.auto.Trajectories.kForwardCargoShipYOffset,
+            kForwardCargoShipX,
+            kCargoShipCenterlineY - kForwardCargoShipYOffset,
             0.degree
-        ) + org.ghrobotics.frc2019.Constants.kForwardIntakeToCenter
+        ) + Constants.kForwardIntakeToCenter
 
-    val kBottomRightDepotBall = Pose2d(4.376.feet, 6.447.feet, (-30).degree) + org.ghrobotics.frc2019.Constants.kBackwardIntakeToCenter
+    val kBottomRightDepotBall = Pose2d(4.376.feet, 6.447.feet, (-30).degree) + Constants.kBackwardIntakeToCenter
 
     /************************************ TRAJECTORIES ************************************/
 
     val sideStartToNearRocketHatch =
-        org.ghrobotics.frc2019.auto.Trajectories.waypoints(
-            org.ghrobotics.frc2019.auto.Trajectories.kSideStart,
+        waypoints(
+            kSideStart,
             Pose2d(7.74.feet, 4.708.feet, (-20).degree),
-            org.ghrobotics.frc2019.auto.Trajectories.kNearRocketHatch
+            kNearRocketHatch
         ).generateTrajectory(false)
 
-    val nearRocketHatchToLoadingStation = org.ghrobotics.frc2019.auto.Trajectories.waypoints(
-        org.ghrobotics.frc2019.auto.Trajectories.kNearRocketHatch,
-        org.ghrobotics.frc2019.auto.Trajectories.kLoadingStation
+    val nearRocketHatchToLoadingStation = waypoints(
+        kNearRocketHatch,
+        kLoadingStation
     ).generateTrajectory(true)
 
     val loadingStationToFarRocketHatch =
-        org.ghrobotics.frc2019.auto.Trajectories.waypoints(
-            org.ghrobotics.frc2019.auto.Trajectories.kLoadingStation,
+        waypoints(
+            kLoadingStation,
             Pose2d(19.805.feet, 6.378.feet, 9.degree),
-            org.ghrobotics.frc2019.auto.Trajectories.kFarRocketHatch
+            kFarRocketHatch
         ).generateTrajectory(false)
 
-    val farRocketHatchToCargoBall1 = org.ghrobotics.frc2019.auto.Trajectories.waypoints(
-        org.ghrobotics.frc2019.auto.Trajectories.kFarRocketHatch,
+    val farRocketHatchToCargoBall1 = waypoints(
+        kFarRocketHatch,
         Pose2d(19.216.feet, 5.345.feet, 5.degree),
-        org.ghrobotics.frc2019.auto.Trajectories.kBottomRightDepotBall
+        kBottomRightDepotBall
     ).generateTrajectory(true)
 
-    val centerStartToLeftForwardCargoShip = org.ghrobotics.frc2019.auto.Trajectories.waypoints(
-        org.ghrobotics.frc2019.auto.Trajectories.kCenterStart,
-        org.ghrobotics.frc2019.auto.Trajectories.kLeftForwardCargoShip
+    val centerStartToLeftForwardCargoShip = waypoints(
+        kCenterStart,
+        kLeftForwardCargoShip
     ).generateTrajectory(false)
 
-    val leftForwardCargoShipToLoadingStation = org.ghrobotics.frc2019.auto.Trajectories.waypoints(
-        org.ghrobotics.frc2019.auto.Trajectories.kLeftForwardCargoShip,
+    val leftForwardCargoShipToLoadingStation = waypoints(
+        kLeftForwardCargoShip,
         Pose2d(10.6.feet, 6.614.feet, 69.degree),
-        org.ghrobotics.frc2019.auto.Trajectories.kLoadingStation
+        kLoadingStation
     ).generateTrajectory(true)
 
-    val loadingStationToRightForwardCargoShip = org.ghrobotics.frc2019.auto.Trajectories.waypoints(
-        org.ghrobotics.frc2019.auto.Trajectories.kLoadingStation,
+    val loadingStationToRightForwardCargoShip = waypoints(
+        kLoadingStation,
         Pose2d(10.6.feet, 6.614.feet, 69.degree),
-        org.ghrobotics.frc2019.auto.Trajectories.kRightForwardCargoShip
+        kRightForwardCargoShip
     ).generateTrajectory(false)
 
 
@@ -167,9 +167,9 @@ object Trajectories {
     private fun waypoints(vararg points: Pose2d) = points.toList()
 
     private fun List<Pose2d>.generateTrajectory(reversed: Boolean) = DefaultTrajectoryGenerator.generateTrajectory(
-        wayPoints = this, constraints = org.ghrobotics.frc2019.auto.Trajectories.kConstraints,
+        wayPoints = this, constraints = kConstraints,
         startVelocity = 0.0.meter.velocity, endVelocity = 0.0.meter.velocity,
-        maxVelocity = org.ghrobotics.frc2019.auto.Trajectories.kMaxVelocity, maxAcceleration = org.ghrobotics.frc2019.auto.Trajectories.kMaxAcceleration, reversed = reversed
+        maxVelocity = kMaxVelocity, maxAcceleration = kMaxAcceleration, reversed = reversed
     )
 
 }

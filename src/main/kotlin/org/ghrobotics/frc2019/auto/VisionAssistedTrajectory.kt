@@ -1,6 +1,6 @@
 package org.ghrobotics.frc2019.auto
 
-import org.ghrobotics.frc2019.robot.vision.DynamicObject
+import org.ghrobotics.frc2019.vision.DynamicObject
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d

@@ -1,7 +1,7 @@
 package org.ghrobotics.frc2019.vision
 
 import org.ghrobotics.frc2019.Constants
-import org.ghrobotics.frc2019.robot.subsystems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.degree
@@ -33,7 +33,7 @@ object TargetTracker {
                 it.averagePose.distance(targetPose)
             }
             if (closestTarget == null
-                || closestTarget.averagePose.distance(targetPose) > org.ghrobotics.frc2019.Constants.kMaxTargetTrackingDistance.value
+                || closestTarget.averagePose.distance(targetPose) > Constants.kMaxTargetTrackingDistance.value
             ) {
                 // Create a new target if none is close enough
                 _trackedTargets += TrackedTarget(time, targetPose)
@@ -57,7 +57,7 @@ class TrackedTarget(creationTime: Time, initialPose: Pose2d) {
     var lastUpdated = creationTime
         private set
 
-    val isAlive get() = (System.currentTimeMillis().millisecond - lastUpdated) < org.ghrobotics.frc2019.Constants.kMaxTargetTrackingLifetime
+    val isAlive get() = (System.currentTimeMillis().millisecond - lastUpdated) < Constants.kMaxTargetTrackingLifetime
 
     fun update(time: Time, newPose: Pose2d) {
         targetSamples += time to newPose
@@ -66,7 +66,7 @@ class TrackedTarget(creationTime: Time, initialPose: Pose2d) {
         val currentTime = System.currentTimeMillis().millisecond
 
         targetSamples.removeIf {
-            (currentTime - it.first) > org.ghrobotics.frc2019.Constants.kMaxTargetTrackingLifetime
+            (currentTime - it.first) > Constants.kMaxTargetTrackingLifetime
         }
     }
 
