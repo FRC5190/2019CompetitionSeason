@@ -14,6 +14,7 @@ import org.ghrobotics.frc2019.robot.auto.Trajectories
 import org.ghrobotics.frc2019.robot.auto.VisionAssistedTrajectory
 import org.ghrobotics.frc2019.robot.vision.DynamicObject
 import org.ghrobotics.lib.localization.TankEncoderLocalization
+import org.ghrobotics.lib.mathematics.kEpsilon
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
@@ -88,8 +89,10 @@ object DriveSubsystem : TankDriveSubsystem() {
         defaultCommand = ManualDriveCommand()
     }
 
-    fun voltageToSIVelocity(voltage: Double): Double {
-        return ((voltage - Constants.kStaticFrictionVoltage) / Constants.kVDrive) * Constants.kWheelRadius.value
+    fun voltageToSIVelocity(voltage: Double): Double = when {
+        voltage > kEpsilon -> Math.max(0.0, voltage - Constants.kStaticFrictionVoltage) / Constants.kVDrive
+        voltage < -kEpsilon -> Math.min(0.0, voltage + Constants.kStaticFrictionVoltage) / Constants.kVDrive
+        else -> 0.0
     }
 
     fun followVisionAssistedTrajectory(

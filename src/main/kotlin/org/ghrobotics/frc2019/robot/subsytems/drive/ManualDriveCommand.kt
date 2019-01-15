@@ -7,6 +7,7 @@ package org.ghrobotics.frc2019.robot.subsytems.drive
 
 import com.team254.lib.physics.DifferentialDrive
 import edu.wpi.first.wpilibj.GenericHID
+import org.ghrobotics.frc2019.robot.Constants
 import org.ghrobotics.frc2019.robot.Controls
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
@@ -98,8 +99,8 @@ class ManualDriveCommand : FalconCommand(DriveSubsystem) {
         }
 
         val velocity = DifferentialDrive.WheelState(
-            DriveSubsystem.voltageToSIVelocity(leftMotorOutput * 12.0),
-            DriveSubsystem.voltageToSIVelocity(rightMotorOutput * 12.0)
+            DriveSubsystem.voltageToSIVelocity(leftMotorOutput * 12.0) / Constants.kWheelRadius.value,
+            DriveSubsystem.voltageToSIVelocity(rightMotorOutput * 12.0) / Constants.kWheelRadius.value
         )
         val acceleration = DifferentialDrive.WheelState(
             (velocity.left - prevVelocity.left) * executeFrequency,
