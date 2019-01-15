@@ -93,8 +93,8 @@ object DriveSubsystem : TankDriveSubsystem() {
     }
 
     fun voltageToSIVelocity(voltage: Double): Double = when {
-        voltage > kEpsilon -> Math.max(0.0, voltage - Constants.kStaticFrictionVoltage) / Constants.kVDrive
-        voltage < -kEpsilon -> Math.min(0.0, voltage + Constants.kStaticFrictionVoltage) / Constants.kVDrive
+        voltage > kEpsilon -> Math.max(0.0, voltage - Constants.kStaticFrictionVoltage) / Constants.kDriveKv
+        voltage < -kEpsilon -> Math.min(0.0, voltage + Constants.kStaticFrictionVoltage) / Constants.kDriveKv
         else -> 0.0
     }
 

@@ -28,8 +28,8 @@ object Trajectories {
 
     // DC Motor Transmission for the DriveSubsystem
     private val dcTransmission = DCMotorTransmission(
-        1 / Constants.kVDrive,
-        Constants.kWheelRadius.value.pow(2) * Constants.kRobotMass / (2.0 * Constants.kADrive),
+        1 / Constants.kDriveKv,
+        Constants.kWheelRadius.value.pow(2) * Constants.kRobotMass / (2.0 * Constants.kDriveKa),
         Constants.kStaticFrictionVoltage
     )
 

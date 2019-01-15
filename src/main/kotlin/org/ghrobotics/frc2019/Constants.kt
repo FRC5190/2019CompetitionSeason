@@ -62,7 +62,6 @@ object Constants {
     val kFrontBumperToCenter = Pose2d(-(kRobotLength / 2.0) - kBumperLength, 0.meter, 0.degree)
     val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeLength, 0.meter, 0.degree)
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeLength, 0.meter, 0.degree)
-    // val kCenterToCamera = Pose2d(6.0.inch, 5.5.inch, 0.degree)
     val kCenterToCamera = Pose2d(7.inch, (-5.0).inch, 0.degree)
     val kGroundToCamera = 0.meter
 
@@ -79,12 +78,12 @@ object Constants {
         kWheelRadius
     )
 
-    const val kPDrive = 1.2 // Talon SRX Units
-    const val kDDrive = 0.0
+    const val kDriveKp = 1.2 // Talon SRX Units
+    const val kDriveKd = 0.0
 
     const val kStaticFrictionVoltage = 0.8 // Volts
-    const val kVDrive = 0.135 // Volts per radians per second // TODO Find Actual Value
-    const val kADrive = 0.012 // Volts per radians per second per second // TODO Find Actual Value
+    const val kDriveKv = 0.135 // Volts per radians per second // TODO Find Actual Value
+    const val kDriveKa = 0.012 // Volts per radians per second per second // TODO Find Actual Value
 
     const val kDriveBeta = 2.0 // Inverse meters squared
     const val kDriveZeta = 0.7 // Unitless dampening co-efficient
