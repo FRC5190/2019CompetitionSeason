@@ -15,12 +15,9 @@ import org.ghrobotics.lib.mathematics.twodim.trajectory.types.DistanceIterator
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.DistanceTrajectory
 import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.degree
-import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
-import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.utils.withDeadband
 import org.ghrobotics.lib.wrappers.hid.getY
-import kotlin.math.absoluteValue
 import kotlin.math.sin
 import kotlin.math.sqrt
 
@@ -85,8 +82,17 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
         val reference = iterator.advance(dx)
 
         // Find Reference
-        // TODO Figure out best way to get vd
-        val vd = -Controls.mainXbox.getY(GenericHID.Hand.kLeft).withDeadband(0.02)() * 17.feet.velocity.value
+        val voltage = -Controls.mainXbox.getY(GenericHID.Hand.kLeft).withDeadband(0.02)() * 12
+        val predictedAcceleration = DriveSubsystem.differentialDrive.solveForwardDynamics(
+            DifferentialDrive.WheelState(
+                DriveSubsystem.leftMotor.velocity.value,
+                DriveSubsystem.rightMotor.velocity.value
+            ),
+            DifferentialDrive.WheelState(voltage, voltage)
+        ).chassisAcceleration
+
+        val vd = DriveSubsystem.velocity.value + predictedAcceleration.linear * executeFrequency
+
         val wd = vd * reference.state.curvature.curvature.value
 
         // Compute Ramsete Error and Gains
@@ -108,7 +114,8 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
 
         // Set outputs
         val dynamics = DriveSubsystem.differentialDrive.solveInverseDynamics(velocity, acceleration)
-        DriveSubsystem.setOutput(dynamics.wheelVelocity, dynamics.voltage)
+        DriveSubsystem.leftMotor.percentOutput = dynamics.voltage.left / 12.0
+        DriveSubsystem.rightMotor.percentOutput = dynamics.voltage.right / 12.0
     }
 
     companion object {
