@@ -47,8 +47,8 @@ object VisionProcessing {
                 currentBestTarget = currentlyTrackedObjects.minBy {
                     val translation = (it inFrameOfReferenceOf robotPose).translation
                     Math.atan2(
-                        translation.x.value,
-                        translation.y.value
+                        translation.y.value,
+                        translation.x.value
                     ).absoluteValue
                 }
             }
@@ -61,7 +61,10 @@ object VisionProcessing {
         val angleH = data["angleH"].asDouble.degree
         val distance = data["distance"].asDouble.inch
 
-        return Constants.kCenterToCamera +Pose2d(Translation2d(distance, angleH))
+        val leftDistance = data["leftDist"].asDouble.inch
+        val rightDistance = data["rightDist"].asDouble.inch
+
+        return Constants.kCenterToCamera + Pose2d(Translation2d(distance, angleH))
     }
 
     private fun processWhiteTape(data: JsonObject): Pose2d? {

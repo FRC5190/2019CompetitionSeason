@@ -43,6 +43,7 @@ class JeVois(
             try {
                 val serialPort = SerialPort(115200, port)
                 serialPort.setTimeout(0.5)
+                println("[JeVois-${port.name}] Serial port created!")
                 return serialPort
             } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
                 e.printStackTrace()
@@ -82,13 +83,17 @@ class JeVois(
     private fun SerialPort.readLine(): String {
         tempStringBuilder.clear()
         while (true) {
-            val nextChar = read(1).first().toChar()
-            if (nextChar == '\n') {
-                val result = tempStringBuilder.toString()
-                tempStringBuilder.clear()
-                return result
+            val nextChar = read(1).firstOrNull()?.toChar()
+            if(nextChar != null) {
+                if (nextChar == '\n') {
+                    val result = tempStringBuilder.toString()
+                    tempStringBuilder.clear()
+                    return result
+                }
+                tempStringBuilder.append(nextChar)
+            }else {
+                Thread.sleep(1)
             }
-            tempStringBuilder.append(nextChar)
         }
     }
 
