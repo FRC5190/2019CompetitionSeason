@@ -88,6 +88,10 @@ object DriveSubsystem : TankDriveSubsystem() {
         defaultCommand = ManualDriveCommand()
     }
 
+    fun voltageToSIVelocity(voltage: Double): Double {
+        return ((voltage - Constants.kStaticFrictionVoltage) / Constants.kVDrive) * Constants.kWheelRadius.value
+    }
+
     fun followVisionAssistedTrajectory(
         trajectory: TimedTrajectory<Pose2dWithCurvature>,
         mirrored: Source<Boolean>,
