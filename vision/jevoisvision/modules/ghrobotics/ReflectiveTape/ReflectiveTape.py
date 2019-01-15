@@ -38,36 +38,56 @@ class ReflectiveTape:
             pair.angleH = -norm_center_x * hfov / 2
             pair.angleV = -norm_center_y * vfov / 2
 
-            cAH = np.arctan2(y + h / 2 - height / 2, self.focalLengthH)
-            cDH = self.actualDimensionH * self.focalLengthH / h
+            lx, ly, lw, lh = pair.left.bounding_rect
+            rx, ry, rw, rh = pair.right.bounding_rect
 
-            angleH = np.arctan2(cDH * np.sin(cAH), cDH * np.cos(cAH))
-            pair.distance = cDH * np.cos(cAH) / np.cos(angleH)
+            pair.distance = self.calcDistance(height, y, h)
+
+            leftDistance = self.calcDistance(height, ly, lh)
+            rightDistance = self.calcDistance(height, ry, rh)
+            leftAngle = -(((lx + lw / 2) * 2 - width) / width) * hfov / 2
+            rightAngle = -(((rx + rw / 2) * 2 - width) / width) * hfov / 2
+
+            leftX = math.cos(leftAngle) * leftDistance
+            leftY = math.sin(leftAngle) * leftDistance
+            rightX = math.cos(rightAngle) * rightDistance
+            rightY = math.sin(rightAngle) * rightDistance
+
+            rotation = math.atan2(
+                leftX - rightX,
+                leftY - rightY
+            )
 
             json_pair_list.append({
-                "angleH": pair.angleH,
-                "angleV": pair.angleV,
+                "angle": pair.angleH,
+                "rotation": rotation,
                 "distance": pair.distance
             })
         jevois.sendSerial(json.dumps({"Epoch Time": timestamp, "Targets": json_pair_list}))
 
+    def calcDistance(self, height, y, h):
+        cAH = np.arctan2(y + h / 2 - height / 2, self.focalLengthH)
+        cDH = self.actualDimensionH * self.focalLengthH / h
+        angleH = np.arctan2(cDH * np.sin(cAH), cDH * np.cos(cAH))
+        return cDH * np.cos(cAH) / np.cos(angleH)
+
     def undistort(self, inimg):
-        if not hasattr(self, 'fisheye_maps'):
+        if not hasattr(self, 'distCoeff') or not hasattr(self, 'cam'):
             width = inimg.shape[1]
             height = inimg.shape[0]
 
             distCoeff = np.zeros((4, 1), np.float64)
 
             # TODO: add your coefficients here!
-            k1 = -2.2e-3;  # negative to remove barrel distortion
-            k2 = 0.0;
-            p1 = 0.0;
-            p2 = 0.0;
+            k1 = -2.2e-3  # negative to remove barrel distortion
+            k2 = 0.0
+            p1 = 0.0
+            p2 = 0.0
 
-            distCoeff[0, 0] = k1;
-            distCoeff[1, 0] = k2;
-            distCoeff[2, 0] = p1;
-            distCoeff[3, 0] = p2;
+            distCoeff[0, 0] = k1
+            distCoeff[1, 0] = k2
+            distCoeff[2, 0] = p1
+            distCoeff[3, 0] = p2
             self.distCoeff = distCoeff
 
             # assume unit matrix for camera
@@ -79,7 +99,7 @@ class ReflectiveTape:
             cam[1, 1] = 40.  # define focal length y
             self.cam = cam
 
-        return cv2.undistort(inimg,self.cam,self.distCoeff)
+        return cv2.undistort(inimg, self.cam, self.distCoeff)
 
     # Process function with no USB output
     def processNoUSB(self, inframe):
@@ -212,16 +232,17 @@ class TapePair:
         self.center_y = self.cY + self.cH / 2
 
         self.imagePoints = np.array([(lx, ly),
-                                        (lx, ly + lh),
-                                        (rx + rw, ry + rh),
-                                        (rx + rw, ry)], dtype=np.int32).reshape((-1, 1, 2))
+                                     (lx, ly + lh),
+                                     (rx + rw, ry + rh),
+                                     (rx + rw, ry)], dtype=np.int32).reshape((-1, 1, 2))
 
     def draw(self, img):
         x, y, w, h = self.bounding_rect
         cv2.polylines(img, [self.imagePoints], True, (128, 128, 128))
         cv2.putText(img, "W: " + str(self.cH) + "px " + str(self.distance) + "in", (x, y - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255))
-        cv2.putText(img, "H: " + str(int(self.angleH)) + " V: " + str(int(self.angleV)), (x, y - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255))
+        cv2.putText(img, "H: " + str(int(self.angleH)) + " V: " + str(int(self.angleV)), (x, y - 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255))
 
 
 class GripPipeline:
