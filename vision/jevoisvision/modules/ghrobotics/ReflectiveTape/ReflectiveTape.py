@@ -3,20 +3,17 @@ import json
 import time
 import cv2
 import math
-import numpy
+import numpy as np
 
 
 class ReflectiveTape:
 
     def __init__(self):
-        fov_norm_x = 0.42
-        fov_distance_a = 65.0
-        fov_distance_o = 27.0
-        self.FOV = math.degrees(math.atan2(fov_distance_o, fov_distance_a)) / fov_norm_x
+        self.FOV = 120.0
 
         self.actualDimensionH = 5.75
-        self.actualDistanceH = 67.0
-        self.pixelDimensionH = 32.0
+        self.actualDistanceH = 80.0
+        self.pixelDimensionH = 26.5
         self.focalLengthH = self.pixelDimensionH * self.actualDistanceH / self.actualDimensionH
 
         self.reflectiveVision = ReflectiveTapeProcess()
@@ -27,23 +24,29 @@ class ReflectiveTape:
         self.reflectiveVision.process(source0)
         height, width, _ = source0.shape
 
+        hfov = self.FOV
+        vfov = self.FOV / width * height
+
         json_pair_list = []
         for pair in self.reflectiveVision.pairs:
             y = pair.cY
             h = pair.cH
 
-            pair.norm_center_x = (pair.center_x * 2 - width) / width
+            norm_center_x = (pair.center_x * 2 - width) / width
+            norm_center_y = (pair.center_y * 2 - height) / height
 
-            pair.angle = pair.norm_center_x * self.FOV
+            pair.angleH = -norm_center_x * hfov / 2
+            pair.angleV = -norm_center_y * vfov / 2
 
-            cAH = numpy.arctan2(y + h / 2 - height / 2, self.focalLengthH)
+            cAH = np.arctan2(y + h / 2 - height / 2, self.focalLengthH)
             cDH = self.actualDimensionH * self.focalLengthH / h
 
-            angleH = numpy.arctan2(cDH * numpy.sin(cAH), cDH * numpy.cos(cAH))
-            pair.distance = cDH * numpy.cos(cAH) / numpy.cos(angleH)
+            angleH = np.arctan2(cDH * np.sin(cAH), cDH * np.cos(cAH))
+            pair.distance = cDH * np.cos(cAH) / np.cos(angleH)
 
             json_pair_list.append({
-                "angle": pair.angle,
+                "angleH": pair.angleH,
+                "angleV": pair.angleV,
                 "distance": pair.distance
             })
         jevois.sendSerial(json.dumps({"Epoch Time": timestamp, "Targets": json_pair_list}))
@@ -167,7 +170,7 @@ class Tape:
 
     def draw(self, img):
         box = cv2.boxPoints(self.rotated_rect)
-        box = numpy.int0(box)
+        box = np.int0(box)
         cv2.drawContours(img, [box], 0, (64, 64, 64), 2)
 
     def bounds(self, other_tape):
@@ -194,7 +197,8 @@ class TapePair:
         self.right = right
         self.bounding_rect = self.left.bounds(self.right)
         self.distance = None
-        self.angle = None
+        self.angleH = None
+        self.angleV = None
         x, y, w, h = self.bounding_rect
         lx, ly, lw, lh = self.left.bounding_rect
         rx, ry, rw, rh = self.right.bounding_rect
@@ -205,20 +209,19 @@ class TapePair:
         self.cH = ((ly + lh) + (ry + rh)) / 2.0 - self.cY
 
         self.center_x = self.cX + self.cW / 2
-        self.norm_center_x = None
+        self.center_y = self.cY + self.cH / 2
 
-        self.imagePoints = numpy.array([(lx, ly),
+        self.imagePoints = np.array([(lx, ly),
                                         (lx, ly + lh),
                                         (rx + rw, ry + rh),
-                                        (rx + rw, ry)], dtype=numpy.int32).reshape((-1, 1, 2))
+                                        (rx + rw, ry)], dtype=np.int32).reshape((-1, 1, 2))
 
     def draw(self, img):
         x, y, w, h = self.bounding_rect
         cv2.polylines(img, [self.imagePoints], True, (128, 128, 128))
         cv2.putText(img, "W: " + str(self.cH) + "px " + str(self.distance) + "in", (x, y - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255))
-        cv2.putText(img, str(round(self.norm_center_x * 1000.0) / 1000.0) + " norm " + str(int(self.angle)) +
-                    " deg", (x, y - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255))
+        cv2.putText(img, "H: " + str(int(self.angleH)) + " V: " + str(int(self.angleV)), (x, y - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255))
 
 
 class GripPipeline:

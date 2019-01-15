@@ -10,6 +10,9 @@
       <property name="path[3]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoLine36in.jpg"/>
       <property name="path[4]" value="C:\Projects\FRC\2019CompetitionSeason\vision\images\CargoLine48in.jpg"/>
     </grip:MultiImageFile>
+    <grip:Camera>
+      <property name="deviceNumber" value="0"/>
+    </grip:Camera>
   </sources>
   <steps>
     <grip:Step name="HSL Threshold">
@@ -23,12 +26,12 @@
       <grip:Input step="0" socket="2">
         <value>
           <double>0.0</double>
-          <double>255.0</double>
+          <double>157.0904436860068</double>
         </value>
       </grip:Input>
       <grip:Input step="0" socket="3">
         <value>
-          <double>133.00359712230215</double>
+          <double>158.22841726618702</double>
           <double>255.0</double>
         </value>
       </grip:Input>
@@ -50,20 +53,20 @@
         <value>0.0</value>
       </grip:Input>
       <grip:Input step="2" socket="3">
-        <value>16.0</value>
+        <value>30.0</value>
       </grip:Input>
       <grip:Input step="2" socket="4">
-        <value>1000.0</value>
+        <value>100.0</value>
       </grip:Input>
       <grip:Input step="2" socket="5">
-        <value>0.0</value>
+        <value>30.0</value>
       </grip:Input>
       <grip:Input step="2" socket="6">
-        <value>1000.0</value>
+        <value>500.0</value>
       </grip:Input>
       <grip:Input step="2" socket="7">
         <value>
-          <double>90.10791366906474</double>
+          <double>0.0</double>
           <int>100</int>
         </value>
       </grip:Input>
@@ -83,24 +86,24 @@
     </grip:Step>
     <grip:Step name="Convex Hulls">
       <grip:Input step="3" socket="0"/>
-      <grip:Output step="3" socket="0" previewed="true"/>
+      <grip:Output step="3" socket="0" previewed="false"/>
     </grip:Step>
   </steps>
   <connections>
     <grip:Connection>
-      <grip:Output step="2" socket="0" previewed="true"/>
-      <grip:Input step="3" socket="0"/>
+      <grip:Output step="1" socket="0" previewed="false"/>
+      <grip:Input step="2" socket="0"/>
     </grip:Connection>
     <grip:Connection>
       <grip:Output step="0" socket="0" previewed="true"/>
       <grip:Input step="1" socket="0"/>
     </grip:Connection>
     <grip:Connection>
-      <grip:Output step="1" socket="0" previewed="false"/>
-      <grip:Input step="2" socket="0"/>
+      <grip:Output step="2" socket="0" previewed="true"/>
+      <grip:Input step="3" socket="0"/>
     </grip:Connection>
     <grip:Connection>
-      <grip:Output source="0" socket="0" previewed="true"/>
+      <grip:Output source="1" socket="0" previewed="false"/>
       <grip:Input step="0" socket="0"/>
     </grip:Connection>
   </connections>

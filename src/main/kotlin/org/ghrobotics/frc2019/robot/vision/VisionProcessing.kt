@@ -12,6 +12,7 @@ import org.ghrobotics.frc2019.robot.subsytems.drive.DriveSubsystem
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.degree
+import org.ghrobotics.lib.mathematics.units.inch
 import kotlin.math.absoluteValue
 
 object VisionProcessing {
@@ -39,7 +40,7 @@ object VisionProcessing {
 
                 currentlyTrackedObjects = visionData.targets
                     .asSequence()
-                    .mapNotNull(::processWhiteTape)
+                    .mapNotNull(::processReflectiveTape)
                     .map { robotPose + it }
                     .toList()
 
@@ -52,6 +53,15 @@ object VisionProcessing {
                 }
             }
         }
+    }
+
+    private fun processReflectiveTape(data: JsonObject): Pose2d? {
+        // {"angleH": -8.53125, "angleV": 13.031250000000002, "distance": 78.51851851851852}
+
+        val angleH = data["angleH"].asDouble.degree
+        val distance = data["distance"].asDouble.inch
+
+        return Constants.kCenterToCamera +Pose2d(Translation2d(distance, angleH))
     }
 
     private fun processWhiteTape(data: JsonObject): Pose2d? {

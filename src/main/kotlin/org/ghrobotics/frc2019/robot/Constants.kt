@@ -57,7 +57,8 @@ object Constants {
     val kFrontBumperToCenter = Pose2d(-(kRobotLength / 2.0) - kBumperLength, 0.meter, 0.degree)
     val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeLength, 0.meter, 0.degree)
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeLength, 0.meter, 0.degree)
-    val kCenterToCamera = Pose2d(6.0.inch, 5.5.inch, 0.degree)
+    // val kCenterToCamera = Pose2d(6.0.inch, 5.5.inch, 0.degree)
+    val kCenterToCamera = Pose2d(7.inch, (-5.0).inch, 0.degree)
     const val kCameraYaw = 0.0
     val kGroundToCamera = 0.meter
 
