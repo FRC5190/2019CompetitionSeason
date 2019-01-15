@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.3.11"
-    id("edu.wpi.first.GradleRIO") version "2019.1.1"
+    id("edu.wpi.first.GradleRIO") version "2019.2.1"
     id("io.gitlab.arturbosch.detekt") version "1.0.0-RC12"
 }
 
@@ -81,7 +81,7 @@ dependencies {
     compile("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.1.0")
 
     // FalconLibrary
-    compile("org.ghrobotics", "FalconLibrary", "2019.1.14")
+    compile("org.ghrobotics", "FalconLibrary", "2019.1.15")
 
     // WPILib and Vendors
     wpi.deps.wpilib().forEach { compile(it) }
