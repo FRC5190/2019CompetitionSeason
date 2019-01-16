@@ -9,7 +9,6 @@ import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.mathematics.units.millisecond
-import org.ghrobotics.lib.mathematics.units.nativeunits.fromModel
 import org.ghrobotics.lib.wrappers.ctre.FalconSRX
 
 object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
@@ -25,7 +24,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         get() = elevatorMaster.sensorPosition
         set(value) {
             elevatorMaster.set(
-                ControlMode.MotionMagic, value.fromModel(Constants.kElevatorNativeUnitModel).value,
+                ControlMode.MotionMagic, value,
                 DemandType.ArbitraryFeedForward, Constants.kElevatorKg
             )
             elevatorMaster.closedLoopError
