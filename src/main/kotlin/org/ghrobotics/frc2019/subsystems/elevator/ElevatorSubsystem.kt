@@ -37,6 +37,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
             motor.continuousCurrentLimit = 15.amp // TODO Find Actual Value
             motor.currentLimitingEnabled = true
         }
+        setClosedLoopGains()
         createEmergencyReadySystem()
     }
 
