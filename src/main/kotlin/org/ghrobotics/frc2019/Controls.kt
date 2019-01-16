@@ -6,13 +6,19 @@
 package org.ghrobotics.frc2019
 
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
-import org.ghrobotics.lib.wrappers.hid.button
-import org.ghrobotics.lib.wrappers.hid.kA
-import org.ghrobotics.lib.wrappers.hid.xboxController
+import org.ghrobotics.lib.wrappers.hid.*
 
 object Controls {
+
     val mainXbox = xboxController(0) {
         button(kA).change(VisionDriveCommand())
+
+        button(kBack).changeOn {
+            Robot.emergencyReadySystems.forEach { system -> system.activateEmergency() }
+        }
+        button(kStart).changeOn {
+            Robot.emergencyReadySystems.forEach { system -> system.recoverFromEmergency() }
+        }
     }
 
     fun update() {

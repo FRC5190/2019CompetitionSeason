@@ -2,6 +2,7 @@ package org.ghrobotics.frc2019.subsystems.drive
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import com.ctre.phoenix.motorcontrol.NeutralMode
+import com.ctre.phoenix.motorcontrol.StatusFrame
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
@@ -47,8 +48,23 @@ class DriveGearbox(
             motor.continuousCurrentLimit = 40.amp // TODO Find Actual Value
             motor.currentLimitingEnabled = true
 
+            motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10)
+        }
+
+        setClosedLoopGains()
+    }
+
+    fun setClosedLoopGains() {
+        allMotors.forEach { motor ->
             motor.kP = Constants.kDriveKp
             motor.kD = Constants.kDriveKd
+        }
+    }
+
+    fun zeroClosedLoopGains() {
+        allMotors.forEach { motor ->
+            motor.kP = 0.0
+            motor.kD = 0.0
         }
     }
 }
