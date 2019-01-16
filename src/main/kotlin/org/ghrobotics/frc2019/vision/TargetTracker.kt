@@ -42,7 +42,7 @@ object TargetTracker {
                 closestTarget.update(time, targetPose)
             }
         }
-        _trackedTargets.removeIf { !it.isAlive }
+       // _trackedTargets.removeIf { !it.isAlive }
     }
 
 }

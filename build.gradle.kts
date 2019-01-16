@@ -11,7 +11,7 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.0.0-RC12"
 }
 
-val kMainRobotClass = "org.ghrobotics.frc2019.robot.Robot"
+val kMainRobotClass = "org.ghrobotics.frc2019.Robot"
 
 val roborioTargetName = "roborio"
 

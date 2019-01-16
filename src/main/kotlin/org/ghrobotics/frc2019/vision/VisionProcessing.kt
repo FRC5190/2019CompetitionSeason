@@ -37,8 +37,7 @@ object VisionProcessing {
                     visionData.targets
                         .asSequence()
                         .mapNotNull(::processReflectiveTape)
-                        .map { robotPose + it }
-                        .toList()
+                        .map { robotPose + it }.toList()
                 )
             }
         }
@@ -48,7 +47,7 @@ object VisionProcessing {
         // {"angleH": -8.53125, "angleV": 13.031250000000002, "distance": 78.51851851851852}
 
         val angle = data["angle"].asDouble.degree
-        val rotation = data["rotation"].asDouble.degree
+        val rotation = -data["rotation"].asDouble.degree
         val distance = data["distance"].asDouble.inch
 
         return Constants.kCenterToCamera + Pose2d(Translation2d(distance, angle), rotation)

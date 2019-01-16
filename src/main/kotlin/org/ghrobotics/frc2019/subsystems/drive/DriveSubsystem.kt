@@ -49,10 +49,11 @@ object DriveSubsystem : TankDriveSubsystem() {
     override val leftMotor get() = leftGearbox.master
     override val rightMotor get() = rightGearbox.master
 
-    private val allMasters get() = listOf(
-        leftMotor,
-        rightMotor
-    )
+    private val allMasters
+        get() = listOf(
+            leftMotor,
+            rightMotor
+        )
 
     // Shifter for two-speed gearbox
     private val shifter = Solenoid(Constants.kPCMId, Constants.kDriveSolenoidId)
@@ -90,12 +91,6 @@ object DriveSubsystem : TankDriveSubsystem() {
     init {
         lowGear = false
         defaultCommand = ManualDriveCommand()
-    }
-
-    fun voltageToSIVelocity(voltage: Double): Double = when {
-        voltage > kEpsilon -> Math.max(0.0, voltage - Constants.kStaticFrictionVoltage) / Constants.kDriveKv
-        voltage < -kEpsilon -> Math.min(0.0, voltage + Constants.kStaticFrictionVoltage) / Constants.kDriveKv
-        else -> 0.0
     }
 
     fun followVisionAssistedTrajectory(
