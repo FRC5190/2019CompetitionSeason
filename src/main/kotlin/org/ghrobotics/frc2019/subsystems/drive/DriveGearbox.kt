@@ -45,7 +45,7 @@ class DriveGearbox(
 
             motor.peakCurrentLimit = 0.amp
             motor.peakCurrentLimitDuration = 0.millisecond
-            motor.continuousCurrentLimit = 40.amp // TODO Find Actual Value
+            motor.continuousCurrentLimit = Constants.kDriveCurrentLimit
             motor.currentLimitingEnabled = true
 
             motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10)

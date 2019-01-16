@@ -78,6 +78,8 @@ object Constants {
         kWheelRadius
     )
 
+    val kDriveCurrentLimit = 40.amp
+
     const val kDriveKp = 1.2 // Talon SRX Units
     const val kDriveKd = 0.0
 
@@ -97,5 +99,10 @@ object Constants {
         kElevatorWinchRadius
     )
 
+    val kElevatorCurrentLimit = 15.amp
+
+    val kElevatorClosedLoopTolerance = 1.inch
+
     const val kElevatorKp = 0.3 // TODO Tune me
+    const val kElevatorKg = 0.05 // Percent required to counteract gravity // TODO Tune me
 }
