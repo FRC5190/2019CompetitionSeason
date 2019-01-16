@@ -93,7 +93,7 @@ object Constants {
 
     // ELEVATOR
     val kElevatorSensorUnitsPerRotaton = 1440.STU
-    val kElevatorWinchRadius = 1.25.inch / 2
+    val kElevatorWinchRadius = 1.25.inch
     val kElevatorNativeUnitModel = NativeUnitLengthModel(
         kDriveSensorUnitsPerRotation,
         kElevatorWinchRadius
