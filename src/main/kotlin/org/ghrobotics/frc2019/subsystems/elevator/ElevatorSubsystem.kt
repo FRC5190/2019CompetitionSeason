@@ -27,7 +27,6 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
                 ControlMode.MotionMagic, value,
                 DemandType.ArbitraryFeedForward, Constants.kElevatorKg
             )
-            elevatorMaster.closedLoopError
         }
 
     var percentOutput
