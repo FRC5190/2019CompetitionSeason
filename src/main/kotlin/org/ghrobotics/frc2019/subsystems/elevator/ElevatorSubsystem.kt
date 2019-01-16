@@ -71,7 +71,6 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         }
 
         setClosedLoopGains()
-        createEmergencyReadySystem()
     }
 
     private fun setClosedLoopGains() {

@@ -81,7 +81,7 @@ dependencies {
     compile("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.1.0")
 
     // FalconLibrary
-    compile("org.ghrobotics", "FalconLibrary", "263f7a9")
+    compile("org.ghrobotics", "FalconLibrary", "cf70974")
 
     // WPILib and Vendors
     wpi.deps.wpilib().forEach { compile(it) }

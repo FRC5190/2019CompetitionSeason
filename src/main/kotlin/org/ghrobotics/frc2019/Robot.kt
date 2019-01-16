@@ -14,6 +14,7 @@ import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.vision.VisionProcessing
+import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.wrappers.FalconRobotBase
 
 object Robot : FalconRobotBase(), CoroutineScope {
@@ -37,6 +38,13 @@ object Robot : FalconRobotBase(), CoroutineScope {
         Controls.update()
         Network.update()
         Autonomous.update()
+    }
+
+    override operator fun FalconSubsystem.unaryPlus() {
+        addToSubsystemHandler(this)
+        if (this is EmergencyHandleable) {
+            emergencyReadySystems.add(this)
+        }
     }
 
     @JvmStatic

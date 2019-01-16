@@ -62,7 +62,6 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     init {
         lowGear = false
         defaultCommand = ManualDriveCommand()
-        createEmergencyReadySystem()
     }
 
     override fun activateEmergency() {
