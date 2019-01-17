@@ -72,7 +72,7 @@ class TrackedTarget(creationTime: Time, initialPose: Pose2d) {
             (currentTime - it.first) > Constants.kMaxTargetTrackingLifetime
         }
 
-        if(isAlive){
+        if (isAlive) {
             updateAverage()
         }
     }

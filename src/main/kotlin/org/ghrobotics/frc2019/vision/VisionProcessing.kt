@@ -1,12 +1,7 @@
 package org.ghrobotics.frc2019.vision
 
 import com.google.gson.JsonObject
-import edu.wpi.cscore.VideoMode
-import edu.wpi.cscore.VideoSource
-import edu.wpi.first.cameraserver.CameraServer
 import edu.wpi.first.wpilibj.SerialPort
-import edu.wpi.first.wpilibj.Timer
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.Robot
@@ -15,7 +10,6 @@ import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.inch
-import org.ghrobotics.lib.mathematics.units.second
 
 object VisionProcessing {
 
