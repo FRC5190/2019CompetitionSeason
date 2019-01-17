@@ -66,7 +66,7 @@ object Constants {
     val kGroundToCamera = 0.meter
 
     val kMaxTargetTrackingDistance = 2.feet
-    val kMaxTargetTrackingLifetime = 5.second
+    val kMaxTargetTrackingLifetime = 1.second
 
     // DRIVE
     val kDriveSensorUnitsPerRotation = 1440.STU
