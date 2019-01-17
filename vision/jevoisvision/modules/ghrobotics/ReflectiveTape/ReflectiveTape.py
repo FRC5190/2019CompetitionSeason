@@ -98,7 +98,7 @@ class ReflectiveTape:
 
         angle2 = math.atan2(pzero_world[0][0], pzero_world[2][0])
 
-        return distance, math.degrees(angle1), math.degrees(angle2)
+        return distance, math.degrees(angle1), math.degrees(angle1 + angle2)
 
     # Process function with no USB output
     def processNoUSB(self, inframe):
