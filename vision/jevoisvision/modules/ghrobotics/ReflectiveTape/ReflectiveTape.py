@@ -9,12 +9,9 @@ import numpy as np
 class ReflectiveTape:
 
     def __init__(self):
-        self.FOV = 60.0
-
-        self.actualDimensionH = 5.75
-        self.actualDistanceH = 79.0
-        self.pixelDimensionH = 54.0
-        self.focalLengthH = self.pixelDimensionH * self.actualDistanceH / self.actualDimensionH
+        # Load this later when we know the frame dimensions
+        self.cameraMatrix = None
+        self.distortionMatrix = None
 
         self.reflectiveVision = ReflectiveTapeProcess()
 
@@ -31,10 +28,10 @@ class ReflectiveTape:
                                        [self.TARGET_WIDTH / 2.0, self.TARGET_HEIGHT / 2.0, 0.0]],
                                       dtype=np.float)
 
-    def loadCameraCalibration(self, w, h):
+    def load_camera_calibration(self, w, h):
         cpf = "/jevois/share/camera/calibration{}x{}.yaml".format(w, h)
         fs = cv2.FileStorage(cpf, cv2.FILE_STORAGE_READ)
-        if (fs.isOpened()):
+        if fs.isOpened():
             self.cameraMatrix = fs.getNode("camera_matrix").mat()
             self.distortionMatrix = fs.getNode("distortion_coefficients").mat()
             jevois.LINFO("Loaded camera calibration from {}".format(cpf))
@@ -47,8 +44,8 @@ class ReflectiveTape:
         self.reflectiveVision.process(source0)
         height, width, _ = source0.shape
 
-        if not hasattr(self, 'camMatrix'):
-            self.loadCameraCalibration(width, height)
+        if self.cameraMatrix is None or self.distortionMatrix is None:
+            self.load_camera_calibration(width, height)
 
         json_pair_list = []
         for pair in self.reflectiveVision.pairs:
@@ -77,7 +74,7 @@ class ReflectiveTape:
         jevois.sendSerial(json.dumps({"Epoch Time": timestamp, "Targets": json_pair_list}))
 
     def compute_output_values(self, rvec, tvec):
-        '''Compute the necessary output distance and angles'''
+        # Compute the necessary output distance and angles
 
         # The tilt angle only affects the distance and angle1 calcs
 
@@ -92,20 +89,16 @@ class ReflectiveTape:
 
         rot, _ = cv2.Rodrigues(rvec)
         rot_inv = rot.transpose()
-        B = np.mat(rot_inv)  # cast as matrix
+        # This should be pzero_world = numpy.matmul(rot_inv, -tvec)
+        B = np.mat(rot_inv)
         C = np.mat(-tvec)
 
         A = B * C
         pzero_world = A
+
         angle2 = math.atan2(pzero_world[0][0], pzero_world[2][0])
 
         return distance, math.degrees(angle1), math.degrees(angle2)
-
-    def calcDistance(self, height, y, h):
-        cAH = np.arctan2(y + h / 2 - height / 2, self.focalLengthH)
-        cDH = self.actualDimensionH * self.focalLengthH / h
-        angleH = np.arctan2(cDH * np.sin(cAH), cDH * np.cos(cAH))
-        return cDH * np.cos(cAH) / np.cos(angleH)
 
     # Process function with no USB output
     def processNoUSB(self, inframe):
@@ -119,8 +112,12 @@ class ReflectiveTape:
 
         outimg = inimg.copy()
 
-        axis = np.float32([[-self.TARGET_WIDTH / 2, -self.TARGET_HEIGHT / 2, 0], [-self.TARGET_WIDTH / 2, self.TARGET_HEIGHT / 2, 0], [self.TARGET_WIDTH / 2, self.TARGET_HEIGHT / 2, 0], [self.TARGET_WIDTH / 2, -self.TARGET_HEIGHT / 2, 0],
-                           [-self.TARGET_WIDTH / 2, -self.TARGET_HEIGHT / 2, -3], [-self.TARGET_WIDTH / 2, self.TARGET_HEIGHT / 2, -3], [self.TARGET_WIDTH / 2, self.TARGET_HEIGHT / 2, -3], [self.TARGET_WIDTH / 2, -self.TARGET_HEIGHT / 2, -3]])
+        axis = np.float32(
+            [[-self.TARGET_WIDTH / 2, -self.TARGET_HEIGHT / 2, 0], [-self.TARGET_WIDTH / 2, self.TARGET_HEIGHT / 2, 0],
+             [self.TARGET_WIDTH / 2, self.TARGET_HEIGHT / 2, 0], [self.TARGET_WIDTH / 2, -self.TARGET_HEIGHT / 2, 0],
+             [-self.TARGET_WIDTH / 2, -self.TARGET_HEIGHT / 2, -3],
+             [-self.TARGET_WIDTH / 2, self.TARGET_HEIGHT / 2, -3], [self.TARGET_WIDTH / 2, self.TARGET_HEIGHT / 2, -3],
+             [self.TARGET_WIDTH / 2, -self.TARGET_HEIGHT / 2, -3]])
 
         for tape in self.reflectiveVision.tapes:
             tape.draw(outimg)
@@ -136,35 +133,11 @@ class ReflectiveTape:
                 cv2.drawContours(outimg, [imgpts[:4]], -1, (0, 255, 0), -3)
                 # draw pillars in blue color
                 for i, j in zip(range(4), range(4, 8)):
-                    cv2.line(outimg, tuple(imgpts[i]), tuple(imgpts[j]), (255), 3)
+                    cv2.line(outimg, tuple(imgpts[i]), tuple(imgpts[j]), (255, 0, 0), 3)
                 # draw top layer in red color
                 cv2.drawContours(outimg, [imgpts[4:]], -1, (0, 0, 255), 3)
 
         outframe.sendCv(outimg)
-
-
-class TapePair:
-
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-        self.bounding_rect = self.left.bounds(self.right)
-        self.distance = None
-        self.angleH = None
-        self.angleV = None
-        x, y, w, h = self.bounding_rect
-        lx, ly, lw, lh = self.left.bounding_rect
-        rx, ry, rw, rh = self.right.bounding_rect
-
-        self.cX = x
-        self.cY = (ly + ly) / 2.0
-        self.cW = w
-        self.cH = ((ly + lh) + (ry + rh)) / 2.0 - self.cY
-
-        self.center_x = self.cX + self.cW / 2
-        self.center_y = self.cY + self.cH / 2
-
-        self.solvePnPData = None
 
 
 class ReflectiveTapeProcess:
@@ -224,6 +197,14 @@ class ReflectiveTapeProcess:
                 right_tapes.remove(best_match)
 
 
+class TapePair:
+
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+        self.solvePnPData = None
+
+
 class Tape:
 
     def __init__(self, contour):
@@ -237,22 +218,6 @@ class Tape:
         box = cv2.boxPoints(self.rotated_rect)
         box = np.int0(box)
         cv2.drawContours(img, [box], 0, (64, 64, 64), 2)
-
-    def bounds(self, other_tape):
-        min_x1, min_y1, w1, h1 = self.bounding_rect
-        min_x2, min_y2, w2, h2 = other_tape.bounding_rect
-
-        max_x1 = min_x1 + w1
-        max_y1 = min_y1 + h1
-        max_x2 = min_x2 + w2
-        max_y2 = min_y2 + h2
-
-        x = min(min_x1, min_x2)
-        y = min(min_y1, min_y2)
-        w = max(max_x1, max_x2) - x
-        h = max(max_y1, max_y2) - y
-
-        return x, y, w, h
 
 
 class GripPipeline:
