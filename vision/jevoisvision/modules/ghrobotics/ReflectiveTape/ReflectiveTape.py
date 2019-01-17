@@ -9,14 +9,37 @@ import numpy as np
 class ReflectiveTape:
 
     def __init__(self):
-        self.FOV = 120.0
+        self.FOV = 60.0
 
         self.actualDimensionH = 5.75
-        self.actualDistanceH = 80.0
-        self.pixelDimensionH = 26.5
+        self.actualDistanceH = 79.0
+        self.pixelDimensionH = 54.0
         self.focalLengthH = self.pixelDimensionH * self.actualDistanceH / self.actualDimensionH
 
         self.reflectiveVision = ReflectiveTapeProcess()
+
+        self.TARGET_WIDTH = 14.5
+        self.TARGET_HEIGHT = 6.0
+
+        # camera mount angle (radians)
+        # NOTE: not sure if this should be positive or negative
+        self.tilt_angle = math.radians(0.0)
+
+        self.target_coords = np.array([[-self.TARGET_WIDTH / 2.0, self.TARGET_HEIGHT / 2.0, 0.0],
+                                       [-self.TARGET_WIDTH / 2.0, -self.TARGET_HEIGHT / 2.0, 0.0],
+                                       [self.TARGET_WIDTH / 2.0, -self.TARGET_HEIGHT / 2.0, 0.0],
+                                       [self.TARGET_WIDTH / 2.0, self.TARGET_HEIGHT / 2.0, 0.0]],
+                                      dtype=np.float)
+
+    def loadCameraCalibration(self, w, h):
+        cpf = "/jevois/share/camera/calibration{}x{}.yaml".format(w, h)
+        fs = cv2.FileStorage(cpf, cv2.FILE_STORAGE_READ)
+        if (fs.isOpened()):
+            self.cameraMatrix = fs.getNode("camera_matrix").mat()
+            self.distortionMatrix = fs.getNode("distortion_coefficients").mat()
+            jevois.LINFO("Loaded camera calibration from {}".format(cpf))
+        else:
+            jevois.LFATAL("Failed to read camera parameters from file [{}]".format(cpf))
 
     def processAndSend(self, source0):
         timestamp = time.time()
@@ -24,46 +47,59 @@ class ReflectiveTape:
         self.reflectiveVision.process(source0)
         height, width, _ = source0.shape
 
-        hfov = self.FOV
-        vfov = self.FOV / width * height
+        if not hasattr(self, 'camMatrix'):
+            self.loadCameraCalibration(width, height)
 
         json_pair_list = []
         for pair in self.reflectiveVision.pairs:
-            y = pair.cY
-            h = pair.cH
-
-            norm_center_x = (pair.center_x * 2 - width) / width
-            norm_center_y = (pair.center_y * 2 - height) / height
-
-            pair.angleH = -norm_center_x * hfov / 2
-            pair.angleV = -norm_center_y * vfov / 2
-
             lx, ly, lw, lh = pair.left.bounding_rect
             rx, ry, rw, rh = pair.right.bounding_rect
 
-            pair.distance = self.calcDistance(height, y, h)
+            image_corners = np.array([[lx, ly + lh],
+                                      [lx, ly],
+                                      [rx + rw, ry],
+                                      [rx + rw, ry + rh]],
+                                     dtype=np.float)
 
-            leftDistance = self.calcDistance(height, ly, lh)
-            rightDistance = self.calcDistance(height, ry, rh)
-            leftAngle = -(((lx + lw / 2) * 2 - width) / width) * hfov / 2
-            rightAngle = -(((rx + rw / 2) * 2 - width) / width) * hfov / 2
+            pair.solvePnPData = cv2.solvePnP(self.target_coords, image_corners,
+                                             self.cameraMatrix, self.distortionMatrix)
 
-            leftX = math.cos(math.radians(leftAngle)) * leftDistance
-            leftY = math.sin(math.radians(leftAngle)) * leftDistance
-            rightX = math.cos(math.radians(rightAngle)) * rightDistance
-            rightY = math.sin(math.radians(rightAngle)) * rightDistance
+            retval, rvec, tvec = pair.solvePnPData
 
-            rotation = math.atan2(
-                leftX - rightX,
-                leftY - rightY
-            )
+            if retval:
+                output = self.compute_output_values(rvec, tvec)
+                json_pair_list.append({
+                    "angle": -output[1],
+                    "rotation": -output[2],
+                    "distance": output[0]
+                })
 
-            json_pair_list.append({
-                "angle": pair.angleH,
-                "rotation": math.degrees(rotation),
-                "distance": pair.distance
-            })
         jevois.sendSerial(json.dumps({"Epoch Time": timestamp, "Targets": json_pair_list}))
+
+    def compute_output_values(self, rvec, tvec):
+        '''Compute the necessary output distance and angles'''
+
+        # The tilt angle only affects the distance and angle1 calcs
+
+        x = tvec[0][0]
+        z = math.sin(self.tilt_angle) * tvec[1][0] + math.cos(self.tilt_angle) * tvec[2][0]
+
+        # distance in the horizontal plane between camera and target
+        distance = math.sqrt(x ** 2 + z ** 2)
+
+        # horizontal angle between camera center line and target
+        angle1 = math.atan2(x, z)
+
+        rot, _ = cv2.Rodrigues(rvec)
+        rot_inv = rot.transpose()
+        B = np.mat(rot_inv)  # cast as matrix
+        C = np.mat(-tvec)
+
+        A = B * C
+        pzero_world = A
+        angle2 = math.atan2(pzero_world[0][0], pzero_world[2][0])
+
+        return distance, math.degrees(angle1), math.degrees(angle2)
 
     def calcDistance(self, height, y, h):
         cAH = np.arctan2(y + h / 2 - height / 2, self.focalLengthH)
@@ -71,55 +107,64 @@ class ReflectiveTape:
         angleH = np.arctan2(cDH * np.sin(cAH), cDH * np.cos(cAH))
         return cDH * np.cos(cAH) / np.cos(angleH)
 
-    def undistort(self, inimg):
-        if not hasattr(self, 'distCoeff') or not hasattr(self, 'cam'):
-            width = inimg.shape[1]
-            height = inimg.shape[0]
-
-            distCoeff = np.zeros((4, 1), np.float64)
-
-            # TODO: add your coefficients here!
-            k1 = -2.2e-3  # negative to remove barrel distortion
-            k2 = 0.0
-            p1 = 0.0
-            p2 = 0.0
-
-            distCoeff[0, 0] = k1
-            distCoeff[1, 0] = k2
-            distCoeff[2, 0] = p1
-            distCoeff[3, 0] = p2
-            self.distCoeff = distCoeff
-
-            # assume unit matrix for camera
-            cam = np.eye(3, dtype=np.float32)
-
-            cam[0, 2] = width / 2.0  # define center x
-            cam[1, 2] = height / 2.0  # define center y
-            cam[0, 0] = 40.  # define focal length x
-            cam[1, 1] = 40.  # define focal length y
-            self.cam = cam
-
-        return cv2.undistort(inimg, self.cam, self.distCoeff)
-
     # Process function with no USB output
     def processNoUSB(self, inframe):
-        self.processAndSend(self.undistort(inframe.getCvBGR()))
+        self.processAndSend(inframe.getCvBGR())
 
     # Process function with USB output
     def process(self, inframe, outframe):
-        inimg = self.undistort(inframe.getCvBGR())
+        inimg = inframe.getCvBGR()
         inframe.done()
         self.processAndSend(inimg)
 
         outimg = inimg.copy()
 
+        axis = np.float32([[-self.TARGET_WIDTH / 2, -self.TARGET_HEIGHT / 2, 0], [-self.TARGET_WIDTH / 2, self.TARGET_HEIGHT / 2, 0], [self.TARGET_WIDTH / 2, self.TARGET_HEIGHT / 2, 0], [self.TARGET_WIDTH / 2, -self.TARGET_HEIGHT / 2, 0],
+                           [-self.TARGET_WIDTH / 2, -self.TARGET_HEIGHT / 2, -3], [-self.TARGET_WIDTH / 2, self.TARGET_HEIGHT / 2, -3], [self.TARGET_WIDTH / 2, self.TARGET_HEIGHT / 2, -3], [self.TARGET_WIDTH / 2, -self.TARGET_HEIGHT / 2, -3]])
+
         for tape in self.reflectiveVision.tapes:
             tape.draw(outimg)
 
         for pair in self.reflectiveVision.pairs:
-            pair.draw(outimg)
+            retval, rvec, tvec = pair.solvePnPData
+            if retval:
+                # project 3D points to image plane
+                imgpts, jac = cv2.projectPoints(axis, rvec, tvec, self.cameraMatrix, self.distortionMatrix)
+
+                imgpts = np.int32(imgpts).reshape(-1, 2)
+                # draw ground floor in green
+                cv2.drawContours(outimg, [imgpts[:4]], -1, (0, 255, 0), -3)
+                # draw pillars in blue color
+                for i, j in zip(range(4), range(4, 8)):
+                    cv2.line(outimg, tuple(imgpts[i]), tuple(imgpts[j]), (255), 3)
+                # draw top layer in red color
+                cv2.drawContours(outimg, [imgpts[4:]], -1, (0, 0, 255), 3)
 
         outframe.sendCv(outimg)
+
+
+class TapePair:
+
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+        self.bounding_rect = self.left.bounds(self.right)
+        self.distance = None
+        self.angleH = None
+        self.angleV = None
+        x, y, w, h = self.bounding_rect
+        lx, ly, lw, lh = self.left.bounding_rect
+        rx, ry, rw, rh = self.right.bounding_rect
+
+        self.cX = x
+        self.cY = (ly + ly) / 2.0
+        self.cW = w
+        self.cH = ((ly + lh) + (ry + rh)) / 2.0 - self.cY
+
+        self.center_x = self.cX + self.cW / 2
+        self.center_y = self.cY + self.cH / 2
+
+        self.solvePnPData = None
 
 
 class ReflectiveTapeProcess:
@@ -208,41 +253,6 @@ class Tape:
         h = max(max_y1, max_y2) - y
 
         return x, y, w, h
-
-
-class TapePair:
-
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-        self.bounding_rect = self.left.bounds(self.right)
-        self.distance = None
-        self.angleH = None
-        self.angleV = None
-        x, y, w, h = self.bounding_rect
-        lx, ly, lw, lh = self.left.bounding_rect
-        rx, ry, rw, rh = self.right.bounding_rect
-
-        self.cX = x
-        self.cY = (ly + ly) / 2.0
-        self.cW = w
-        self.cH = ((ly + lh) + (ry + rh)) / 2.0 - self.cY
-
-        self.center_x = self.cX + self.cW / 2
-        self.center_y = self.cY + self.cH / 2
-
-        self.imagePoints = np.array([(lx, ly),
-                                     (lx, ly + lh),
-                                     (rx + rw, ry + rh),
-                                     (rx + rw, ry)], dtype=np.int32).reshape((-1, 1, 2))
-
-    def draw(self, img):
-        x, y, w, h = self.bounding_rect
-        cv2.polylines(img, [self.imagePoints], True, (128, 128, 128))
-        cv2.putText(img, "W: " + str(self.cH) + "px " + str(self.distance) + "in", (x, y - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255))
-        cv2.putText(img, "H: " + str(int(self.angleH)) + " V: " + str(int(self.angleV)), (x, y - 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255))
 
 
 class GripPipeline:
