@@ -28,7 +28,7 @@ class ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
             var effectiveValue = value.fromModel(Constants.kArmNativeUnitModel).value
             if (effectiveValue < 0) effectiveValue += Constants.kArmSensorUnitsPerRotation.value
 
-            val experiencedAcceleration = 9.81 - ElevatorSubsystem.acceleration.value
+            val experiencedAcceleration = 9.81 + ElevatorSubsystem.acceleration.value
 
             val feedforward =
                 Constants.kArmKg * armPosition.cos * experiencedAcceleration + Constants.kArmKa * acceleration.value
