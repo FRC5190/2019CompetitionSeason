@@ -15,6 +15,7 @@ import org.ghrobotics.lib.mathematics.units.meter
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+@Suppress("LateinitUsage")
 class VisionDriveCommand2 : FalconCommand(DriveSubsystem) {
 
     lateinit var target: TrackedTarget
@@ -52,7 +53,7 @@ class VisionDriveCommand2 : FalconCommand(DriveSubsystem) {
         ).iterator()
 
         val distanceTraveled =
-            ((DriveSubsystem.leftMotor.sensorPosition + DriveSubsystem.rightMotor.sensorPosition) / 2.0)
+            (DriveSubsystem.leftMotor.sensorPosition + DriveSubsystem.rightMotor.sensorPosition) / 2.0
 
         val reference = iterator.advance(distanceTraveled - previousDistance)
         previousDistance = distanceTraveled

@@ -5,7 +5,7 @@ import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.mathematics.units.Length
 
 class ClosedLoopElevatorCommand(private val target: Length) : FalconCommand(ElevatorSubsystem) {
-    
+
     init {
         finishCondition += {
             (ElevatorSubsystem.elevatorPosition - target).absoluteValue < Constants.kElevatorClosedLoopTolerance

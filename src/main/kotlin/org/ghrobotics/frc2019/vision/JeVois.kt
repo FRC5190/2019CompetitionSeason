@@ -8,8 +8,6 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import edu.wpi.first.wpilibj.SerialPort
 import edu.wpi.first.wpilibj.Timer
-import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.channels.sendBlocking
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.second
 import java.util.concurrent.TimeUnit
@@ -68,7 +66,7 @@ class JeVois(
             try {
                 val jsonData = kJevoisGson.fromJson<JsonObject>(line)
 
-                val timestamp = (jsonData["Epoch Time"].asDouble.second + fpgaOffset)
+                val timestamp = jsonData["Epoch Time"].asDouble.second + fpgaOffset
                 val contours = jsonData["Targets"].asJsonArray
                     .filterIsInstance<JsonObject>()
 
@@ -85,14 +83,14 @@ class JeVois(
         tempStringBuilder.clear()
         while (true) {
             val nextChar = read(1).firstOrNull()?.toChar()
-            if(nextChar != null) {
+            if (nextChar != null) {
                 if (nextChar == '\n') {
                     val result = tempStringBuilder.toString()
                     tempStringBuilder.clear()
                     return result
                 }
                 tempStringBuilder.append(nextChar)
-            }else {
+            } else {
                 Thread.sleep(1)
             }
         }

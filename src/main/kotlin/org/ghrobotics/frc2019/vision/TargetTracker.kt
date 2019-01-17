@@ -69,7 +69,7 @@ class TrackedTarget(creationTime: Time, initialPose: Pose2d) {
         val currentTime = Timer.getFPGATimestamp().second
 
         targetSamples.removeIf {
-            (currentTime - it.first) > Constants.kMaxTargetTrackingLifetime
+            currentTime - it.first > Constants.kMaxTargetTrackingLifetime
         }
 
         if (isAlive) {

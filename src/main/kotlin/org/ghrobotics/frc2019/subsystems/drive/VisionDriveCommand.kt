@@ -6,6 +6,7 @@ import org.ghrobotics.frc2019.vision.TrackedTarget
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.mathematics.units.Rotation2d
 
+@Suppress("LateinitUsage")
 class VisionDriveCommand : FalconCommand(DriveSubsystem) {
 
     lateinit var target: TrackedTarget

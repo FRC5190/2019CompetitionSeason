@@ -5,10 +5,15 @@ import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
+import org.ghrobotics.lib.mathematics.epsilonEquals
 import org.ghrobotics.lib.mathematics.units.amp
+import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.inch
+import org.ghrobotics.lib.mathematics.units.meter
 import org.ghrobotics.lib.mathematics.units.millisecond
+import org.ghrobotics.lib.mathematics.units.nativeunits.STUPer100ms
+import org.ghrobotics.lib.mathematics.units.nativeunits.fromModel
 import org.ghrobotics.lib.wrappers.ctre.FalconSRX
 
 object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
@@ -34,6 +39,11 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         set(value) {
             elevatorMaster.percentOutput = value
         }
+
+    var acceleration = 0.inch.acceleration
+        private set
+
+    private var previousTrajectoryVelocity = 0.0
 
     init {
         elevatorSlave1.follow(elevatorMaster)
@@ -90,6 +100,20 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     override fun periodic() {
         if (elevatorMaster.sensorCollection.isRevLimitSwitchClosed) elevatorMaster.sensorPosition = 0.inch
+
+        val cruiseVelocity =
+            Constants.kElevatorCruiseVelocity.fromModel(Constants.kElevatorNativeUnitModel).STUPer100ms
+
+        val currentVelocity =
+            elevatorMaster.activeTrajectoryVelocity.toDouble()
+
+        acceleration = when {
+            currentVelocity epsilonEquals cruiseVelocity -> 0.meter.acceleration
+            currentVelocity > previousTrajectoryVelocity -> Constants.kElevatorAcceleration
+            else -> -Constants.kElevatorAcceleration
+        }
+
+        previousTrajectoryVelocity = currentVelocity
     }
 
     override fun activateEmergency() = zeroClosedLoopGains()

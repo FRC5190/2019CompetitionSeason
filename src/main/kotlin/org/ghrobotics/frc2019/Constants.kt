@@ -9,7 +9,10 @@ import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Rectangle2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.*
+import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
+import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitLengthModel
+import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitRotationModel
 import org.ghrobotics.lib.mathematics.units.nativeunits.STU
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
@@ -31,6 +34,8 @@ object Constants {
     const val kElevatorSlave1Id = 6
     const val kElevatorSlave2Id = 7
     const val kElevatorSlave3Id = 8
+
+    const val kArmId = 9
 
     // GYROS
     const val kPigeonIMUId = 17
@@ -102,7 +107,27 @@ object Constants {
     val kElevatorCurrentLimit = 15.amp
 
     val kElevatorClosedLoopTolerance = 1.inch
+    val kElevatorAcceleration = 90.inch.acceleration
+    val kElevatorCruiseVelocity = 90.inch.velocity
 
     const val kElevatorKp = 0.3 // TODO Tune me
     const val kElevatorKg = 0.05 // Percent required to counteract gravity // TODO Tune me
+
+
+    // ARM
+    val kArmSensorUnitsPerRotation = 1024.STU
+    val kArmNativeUnitModel = NativeUnitRotationModel(
+        kArmSensorUnitsPerRotation
+    )
+
+    val kArmCurrentLimit = 15.amp
+
+    val kArmAcceleration = 0.1.radian.acceleration
+    val kArmCruiseVelocity = 1.5.radian.velocity
+
+    const val kArmKp = 1.0 // TODO Tune me
+    const val kArmKa = 0.005 // Volts per radians per second squared
+
+    const val kArmKg = 0.05
+
 }

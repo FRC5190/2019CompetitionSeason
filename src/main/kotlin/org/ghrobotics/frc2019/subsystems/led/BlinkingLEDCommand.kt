@@ -16,7 +16,7 @@ class BlinkingLEDCommand(
     }
 
     override suspend fun execute() {
-        if ((System.currentTimeMillis() - startTime) % blinkIntervalMs > (blinkIntervalMs / 2)) {
+        if ((System.currentTimeMillis() - startTime) % blinkIntervalMs > blinkIntervalMs / 2) {
             LEDSubsystem.set(Color.BLACK)
         } else {
             LEDSubsystem.set(color)
