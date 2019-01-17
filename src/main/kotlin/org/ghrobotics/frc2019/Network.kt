@@ -5,7 +5,7 @@
 
 package org.ghrobotics.frc2019
 
-import edu.wpi.first.networktables.NetworkTableEntry
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
 import org.ghrobotics.frc2019.auto.AutoMode
@@ -19,28 +19,52 @@ object Network {
     val startingPositionChooser = enumSendableChooser<StartingPositions>()
     val autoModeChooser = enumSendableChooser<AutoMode>()
 
-    private val mainShuffleboardDisplay: ShuffleboardTab = Shuffleboard.getTab("Main Display")
+    private val mainShuffleboardDisplay: ShuffleboardTab = Shuffleboard.getTab("5190")
 
-    private val globalXEntry: NetworkTableEntry = mainShuffleboardDisplay.add("Robot X", 0.0).entry
-    private val globalYEntry: NetworkTableEntry = mainShuffleboardDisplay.add("Robot Y", 0.0).entry
-    private val globalAEntry: NetworkTableEntry = mainShuffleboardDisplay.add("Robot Angle", 0.0).entry
+    private val autoLayout = mainShuffleboardDisplay.getLayout("Autonomous", BuiltInLayouts.kList)
+        .withSize(2, 2)
+        .withPosition(0, 0)
 
-    private val leftPositionEntry: NetworkTableEntry = mainShuffleboardDisplay.add("Left Encoder", 0.0).entry
-    private val rightPositionEntry: NetworkTableEntry = mainShuffleboardDisplay.add("Right Encoder", 0.0).entry
+    private val localizationLayout = mainShuffleboardDisplay.getLayout("Localization", BuiltInLayouts.kList)
+        .withSize(2, 2)
+        .withPosition(2, 0)
 
-    private val visionTargetX: NetworkTableEntry = mainShuffleboardDisplay.add("Vision Target X", 0.0).entry
-    private val visionTargetY: NetworkTableEntry = mainShuffleboardDisplay.add("Vision Target Y", 0.0).entry
-    private val visionTargetRotation: NetworkTableEntry =
-        mainShuffleboardDisplay.add("Vision Target Rotation", 0.0).entry
+    private val visionLayout = mainShuffleboardDisplay.getLayout("Vision", BuiltInLayouts.kGrid)
+        .withSize(3, 3)
+        .withPosition(0, 2)
+
+    private val driveSubsystemLayout = mainShuffleboardDisplay.getLayout("Drive", BuiltInLayouts.kGrid)
+        .withSize(2, 2)
+        .withPosition(4, 0)
+
+    private val globalXEntry = localizationLayout.add("Robot X", 0.0).entry
+    private val globalYEntry = localizationLayout.add("Robot Y", 0.0).entry
+    private val globalAEntry = localizationLayout.add("Robot Angle", 0.0).entry
+
+    private val leftPositionEntry = driveSubsystemLayout.add("Left Encoder", 0.0).entry
+    private val rightPositionEntry = driveSubsystemLayout.add("Right Encoder", 0.0).entry
+    private val leftAmperageEntry = driveSubsystemLayout.add("Left Current", 0.0).entry
+    private val rightAmperageEntry = driveSubsystemLayout.add("Right Current", 0.0).entry
+
+    private val visionTargetX = visionLayout.add("Vision Target X", 0.0).entry
+    private val visionTargetY = visionLayout.add("Vision Target Y", 0.0).entry
+    private val visionTargetRotation = visionLayout.add("Vision Target Rotation", 0.0).entry
+
+    val visionDriveAngle = visionLayout.add("Vision Drive Angle", 0.0).entry
+    val visionDriveActive = visionLayout.add("Vision Drive Active", false).entry
 
     init {
         // Put choosers on dashboard
-        mainShuffleboardDisplay.add("Auto Mode",
+        autoLayout.add(
+            "Auto Mode",
             autoModeChooser
         )
-        mainShuffleboardDisplay.add("Starting Position",
+        autoLayout.add(
+            "Starting Position",
             startingPositionChooser
         )
+
+        //mainShuffleboardDisplay.add(VisionProcessing.cameraSource).withPosition(3, 2).withSize(3, 3)
     }
 
     fun update() {
@@ -50,6 +74,9 @@ object Network {
 
         leftPositionEntry.setDouble(DriveSubsystem.leftMotor.getSelectedSensorPosition(0).toDouble())
         rightPositionEntry.setDouble(DriveSubsystem.rightMotor.getSelectedSensorPosition(0).toDouble())
+
+        leftAmperageEntry.setDouble(DriveSubsystem.leftMotor.outputCurrent)
+        rightAmperageEntry.setDouble(DriveSubsystem.rightMotor.outputCurrent)
 
         val trackedObject = TargetTracker.bestTarget
         if (trackedObject != null) {

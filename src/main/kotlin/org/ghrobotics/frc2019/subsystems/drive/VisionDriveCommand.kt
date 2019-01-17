@@ -1,5 +1,6 @@
 package org.ghrobotics.frc2019.subsystems.drive
 
+import org.ghrobotics.frc2019.Network
 import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.frc2019.vision.TrackedTarget
 import org.ghrobotics.lib.commands.FalconCommand
@@ -11,7 +12,7 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
     private var foundTarget = false
 
     init {
-        finishCondition += ::foundTarget
+        finishCondition += { !foundTarget }
     }
 
     override suspend fun initialize() {
@@ -30,12 +31,19 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
         val transform = target.averagePose inFrameOfReferenceOf DriveSubsystem.localization()
         val angle = Rotation2d(transform.translation.x.value, transform.translation.y.value, true)
 
+        Network.visionDriveAngle.setDouble(angle.degree)
+        Network.visionDriveActive.setBoolean(true)
+
         val turn = kCorrectionKp * angle.radian
         val source = -ManualDriveCommand.speedSource()
         DriveSubsystem.tankDrive(source - turn, source + turn)
     }
 
+    override suspend fun dispose() {
+        Network.visionDriveActive.setBoolean(false)
+    }
+
     companion object {
-        const val kCorrectionKp = 0.3
+        const val kCorrectionKp = 1.0
     }
 }

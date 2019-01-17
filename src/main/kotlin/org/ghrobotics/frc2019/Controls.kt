@@ -6,6 +6,7 @@
 package org.ghrobotics.frc2019
 
 import edu.wpi.first.wpilibj.GenericHID
+import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
 import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
 import org.ghrobotics.lib.wrappers.hid.*
@@ -15,7 +16,7 @@ object Controls {
     val mainXbox = xboxController(0) {
 
         // Align with Vision Target
-        button(kA).change(VisionDriveCommand())
+        triggerAxisButton(GenericHID.Hand.kLeft).change(VisionDriveCommand())
 
         // Emergency Mode
         button(kBack).changeOn {
@@ -31,6 +32,9 @@ object Controls {
 
         triggerAxisButton(GenericHID.Hand.kRight, 0.2).change(elevatorUpCommand)
         button(kBumperRight).change(elevatorDownCommand)
+
+        button(kA).changeOn { DriveSubsystem.lowGear = true }
+        button(kA).changeOff { DriveSubsystem.lowGear = false }
     }
 
     fun update() {

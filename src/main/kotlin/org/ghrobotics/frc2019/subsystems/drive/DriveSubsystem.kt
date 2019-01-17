@@ -7,6 +7,7 @@ package org.ghrobotics.frc2019.subsystems.drive
 
 import com.ctre.phoenix.sensors.PigeonIMU
 import edu.wpi.first.wpilibj.Solenoid
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.auto.Trajectories
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable

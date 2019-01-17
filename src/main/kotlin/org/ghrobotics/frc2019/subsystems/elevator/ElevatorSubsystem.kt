@@ -24,7 +24,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         get() = elevatorMaster.sensorPosition
         set(value) {
             elevatorMaster.set(
-                ControlMode.MotionMagic, value,
+                ControlMode.Disabled, value,
                 DemandType.ArbitraryFeedForward, Constants.kElevatorKg
             )
         }

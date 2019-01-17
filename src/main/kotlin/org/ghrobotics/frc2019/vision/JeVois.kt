@@ -17,7 +17,7 @@ import kotlin.concurrent.thread
 
 class JeVois(
     private val port: SerialPort.Port,
-    private val visionDataChannel: SendChannel<VisionData>
+    private val processData: (VisionData) -> Unit
 ) {
 
     private var fpgaOffset = 0.second
@@ -56,6 +56,7 @@ class JeVois(
         serialPort.writeString("setpar serout USB\n")
 
         serialPort.writeString("date 0101000070\n")
+        serialPort.writeString("streamon\n")
         fpgaOffset = Timer.getFPGATimestamp().second
     }
 
@@ -71,7 +72,7 @@ class JeVois(
                 val contours = jsonData["Targets"].asJsonArray
                     .filterIsInstance<JsonObject>()
 
-                visionDataChannel.sendBlocking(VisionData(timestamp, contours))
+                processData(VisionData(timestamp, contours))
             } catch (e: JsonParseException) {
                 e.printStackTrace()
                 println("[JeVois-${port.name}] Got Invalid Data: $line")

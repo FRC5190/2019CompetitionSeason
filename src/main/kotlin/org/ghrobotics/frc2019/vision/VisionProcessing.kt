@@ -2,8 +2,10 @@ package org.ghrobotics.frc2019.vision
 
 import com.google.gson.JsonObject
 import edu.wpi.cscore.VideoMode
+import edu.wpi.cscore.VideoSource
 import edu.wpi.first.cameraserver.CameraServer
 import edu.wpi.first.wpilibj.SerialPort
+import edu.wpi.first.wpilibj.Timer
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.ghrobotics.frc2019.Constants
@@ -13,23 +15,13 @@ import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.inch
+import org.ghrobotics.lib.mathematics.units.second
 
 object VisionProcessing {
 
     init {
-        CameraServer.getInstance()
-            .startAutomaticCapture()
-            .apply {
-                setPixelFormat(VideoMode.PixelFormat.kYUYV)
-                setResolution(640, 480)
-            }
-
-        val visionDataChannel = Channel<VisionData>(Channel.CONFLATED)
-
         Robot.launch {
-            JeVois(SerialPort.Port.kUSB1, visionDataChannel)
-
-            for (visionData in visionDataChannel) {
+            JeVois(SerialPort.Port.kUSB1) { visionData ->
                 val robotPose = DriveSubsystem.localization[visionData.timestamp]
 
                 TargetTracker.addSamples(
@@ -47,7 +39,7 @@ object VisionProcessing {
         // {"angleH": -8.53125, "angleV": 13.031250000000002, "distance": 78.51851851851852}
 
         val angle = data["angle"].asDouble.degree
-        val rotation = -data["rotation"].asDouble.degree
+        val rotation = data["rotation"].asDouble.degree
         val distance = data["distance"].asDouble.inch
 
         return Constants.kCenterToCamera + Pose2d(Translation2d(distance, angle), rotation)

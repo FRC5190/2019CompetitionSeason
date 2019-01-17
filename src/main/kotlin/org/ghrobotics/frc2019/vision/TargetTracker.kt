@@ -1,12 +1,13 @@
 package org.ghrobotics.frc2019.vision
 
+import edu.wpi.first.wpilibj.Timer
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.meter
-import org.ghrobotics.lib.mathematics.units.millisecond
+import org.ghrobotics.lib.mathematics.units.second
 import kotlin.math.absoluteValue
 
 object TargetTracker {
@@ -14,18 +15,8 @@ object TargetTracker {
     private val _trackedTargets = mutableListOf<TrackedTarget>()
     val trackedTargets: List<TrackedTarget> = _trackedTargets
 
-    val bestTarget: TrackedTarget?
-        get() {
-            val robotPose = DriveSubsystem.localization()
-
-            return _trackedTargets.minBy {
-                val translation = (it.averagePose inFrameOfReferenceOf robotPose).translation
-                Math.atan2(
-                    translation.y.value,
-                    translation.x.value
-                ).absoluteValue
-            }
-        }
+    var bestTarget: TrackedTarget? = null
+        private set
 
     fun addSamples(time: Time, targets: List<Pose2d>) {
         for (targetPose in targets) {
@@ -42,7 +33,19 @@ object TargetTracker {
                 closestTarget.update(time, targetPose)
             }
         }
-       // _trackedTargets.removeIf { !it.isAlive }
+        _trackedTargets.removeIf { !it.isAlive }
+
+        val robotPose = DriveSubsystem.localization()
+
+        bestTarget = _trackedTargets.minBy {
+            val translation = (it.averagePose inFrameOfReferenceOf robotPose).translation
+            Math.atan2(
+                translation.y.value,
+                translation.x.value
+            ).absoluteValue
+        }
+
+        // println(_trackedTargets.joinToString { it.averagePose.toString() })
     }
 
 }
@@ -57,16 +60,20 @@ class TrackedTarget(creationTime: Time, initialPose: Pose2d) {
     var lastUpdated = creationTime
         private set
 
-    val isAlive get() = (System.currentTimeMillis().millisecond - lastUpdated) < Constants.kMaxTargetTrackingLifetime
+    val isAlive get() = targetSamples.isNotEmpty()
 
     fun update(time: Time, newPose: Pose2d) {
         targetSamples += time to newPose
         lastUpdated = time
 
-        val currentTime = System.currentTimeMillis().millisecond
+        val currentTime = Timer.getFPGATimestamp().second
 
         targetSamples.removeIf {
             (currentTime - it.first) > Constants.kMaxTargetTrackingLifetime
+        }
+
+        if(isAlive){
+            updateAverage()
         }
     }
 
