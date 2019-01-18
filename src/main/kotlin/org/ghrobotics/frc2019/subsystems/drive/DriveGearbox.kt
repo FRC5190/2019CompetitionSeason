@@ -28,7 +28,7 @@ class DriveGearbox(
 
         // Configure Encoder
         master.feedbackSensor = FeedbackDevice.QuadEncoder
-        master.encoderPhase = inverted
+        master.encoderPhase = false
         master.sensorPosition = 0.meter
 
         allMotors.forEach { motor ->

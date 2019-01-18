@@ -30,10 +30,8 @@ object VisionProcessing {
     }
 
     private fun processReflectiveTape(data: JsonObject): Pose2d? {
-        // {"angleH": -8.53125, "angleV": 13.031250000000002, "distance": 78.51851851851852}
-
         val angle = data["angle"].asDouble.degree
-        val rotation = data["rotation"].asDouble.degree
+        val rotation = -data["rotation"].asDouble.degree + angle + 180.degree
         val distance = data["distance"].asDouble.inch
 
         return Constants.kCenterToCamera + Pose2d(Translation2d(distance, angle), rotation)

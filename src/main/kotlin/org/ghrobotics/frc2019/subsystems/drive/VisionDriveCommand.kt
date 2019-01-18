@@ -1,5 +1,6 @@
 package org.ghrobotics.frc2019.subsystems.drive
 
+import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.Network
 import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.frc2019.vision.TrackedTarget
@@ -23,13 +24,16 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
         } else {
             this.target = target
             foundTarget = true
+            isActive = true
         }
     }
 
     override suspend fun execute() {
+        if (!target.isAlive) foundTarget = false
         if (!foundTarget) return
 
-        val transform = target.averagePose inFrameOfReferenceOf DriveSubsystem.localization()
+        val transform =
+            (target.averagePose) inFrameOfReferenceOf DriveSubsystem.localization()
         val angle = Rotation2d(transform.translation.x.value, transform.translation.y.value, true)
 
         Network.visionDriveAngle.setDouble(angle.degree)
@@ -42,9 +46,11 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
 
     override suspend fun dispose() {
         Network.visionDriveActive.setBoolean(false)
+        isActive = false
     }
 
     companion object {
         const val kCorrectionKp = 1.0
+        var isActive = false
     }
 }

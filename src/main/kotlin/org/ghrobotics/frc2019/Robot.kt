@@ -28,7 +28,6 @@ object Robot : FalconRobotBase(), CoroutineScope {
     // Initialize all systems.
     override fun initialize() {
         +DriveSubsystem
-        +ElevatorSubsystem
         +LEDSubsystem
 
         Network

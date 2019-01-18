@@ -3,12 +3,12 @@ package org.ghrobotics.frc2019.vision
 import edu.wpi.first.wpilibj.Timer
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
+import org.ghrobotics.lib.debug.LiveDashboard
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.meter
 import org.ghrobotics.lib.mathematics.units.second
-import kotlin.math.absoluteValue
 
 object TargetTracker {
 
@@ -19,6 +19,9 @@ object TargetTracker {
         private set
 
     fun addSamples(time: Time, targets: List<Pose2d>) {
+        val current = Timer.getFPGATimestamp().second
+        if (time >= current) return
+
         for (targetPose in targets) {
             val closestTarget = _trackedTargets.minBy {
                 it.averagePose.distance(targetPose)
@@ -30,19 +33,20 @@ object TargetTracker {
                 _trackedTargets += TrackedTarget(time, targetPose)
             } else {
                 // Update target location
-                closestTarget.update(time, targetPose)
+                closestTarget.addSample(time, targetPose)
             }
         }
+        _trackedTargets.forEach { it.update() }
         _trackedTargets.removeIf { !it.isAlive }
 
         val robotPose = DriveSubsystem.localization()
 
         bestTarget = _trackedTargets.minBy {
-            val translation = (it.averagePose inFrameOfReferenceOf robotPose).translation
-            Math.atan2(
-                translation.y.value,
-                translation.x.value
-            ).absoluteValue
+            it.averagePose.rotation - robotPose.rotation
+        }
+
+        LiveDashboard.visionTargets = _trackedTargets.map {
+            it.averagePose
         }
 
         // println(_trackedTargets.joinToString { it.averagePose.toString() })
@@ -62,10 +66,7 @@ class TrackedTarget(creationTime: Time, initialPose: Pose2d) {
 
     val isAlive get() = targetSamples.isNotEmpty()
 
-    fun update(time: Time, newPose: Pose2d) {
-        targetSamples += time to newPose
-        lastUpdated = time
-
+    fun update() {
         val currentTime = Timer.getFPGATimestamp().second
 
         targetSamples.removeIf {
@@ -75,6 +76,11 @@ class TrackedTarget(creationTime: Time, initialPose: Pose2d) {
         if (isAlive) {
             updateAverage()
         }
+    }
+
+    fun addSample(time: Time, newPose: Pose2d) {
+        targetSamples += time to newPose
+        lastUpdated = time
     }
 
     private fun updateAverage() {

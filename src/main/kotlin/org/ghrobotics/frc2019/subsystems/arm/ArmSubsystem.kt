@@ -34,7 +34,7 @@ class ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
                 Constants.kArmKg * armPosition.cos * experiencedAcceleration + Constants.kArmKa * acceleration.value
 
             armMaster.set(
-                ControlMode.MotionMagic, effectiveValue,
+                ControlMode.Disabled, effectiveValue,
                 DemandType.ArbitraryFeedForward, feedforward
             )
         }

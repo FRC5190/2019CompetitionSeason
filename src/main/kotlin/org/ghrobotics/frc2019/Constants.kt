@@ -32,16 +32,24 @@ object Constants {
 
     const val kElevatorMasterId = 5
     const val kElevatorSlave1Id = 6
-    const val kElevatorSlave2Id = 7
+    const val kElevatorSlave2Id = 75
     const val kElevatorSlave3Id = 8
 
+    const val kIntakeLeftId = 7
+    const val kIntakeRightId = 9
+
     const val kArmId = 9
+
+    // ANALOG INPUT
+    const val kLeftBallSensorId = 2
+    const val kRightBallSensorId = 3
 
     // GYROS
     const val kPigeonIMUId = 17
 
     // PNEUMATICS
     const val kPCMId = 41
+    const val kIntakeSolenoidId = 2
     const val kDriveSolenoidId = 3
 
     // FIELD
@@ -70,7 +78,7 @@ object Constants {
     val kCenterToCamera = Pose2d(7.inch, (-5.0).inch, 0.degree)
     val kGroundToCamera = 0.meter
 
-    val kMaxTargetTrackingDistance = 2.feet
+    val kMaxTargetTrackingDistance = 10.inch
     val kMaxTargetTrackingLifetime = 1.second
 
     // DRIVE
@@ -129,5 +137,4 @@ object Constants {
     const val kArmKa = 0.005 // Volts per radians per second squared
 
     const val kArmKg = 0.05
-
 }

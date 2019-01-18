@@ -107,16 +107,17 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         val cruiseVelocity =
             Constants.kElevatorCruiseVelocity.fromModel(Constants.kElevatorNativeUnitModel).STUPer100ms
 
-        val currentVelocity =
-            elevatorMaster.activeTrajectoryVelocity.toDouble()
-
-        acceleration = when {
-            currentVelocity epsilonEquals cruiseVelocity -> 0.meter.acceleration
-            currentVelocity > previousTrajectoryVelocity -> Constants.kElevatorAcceleration
-            else -> -Constants.kElevatorAcceleration
+        acceleration = if (elevatorMaster.controlMode == ControlMode.MotionMagic) {
+            val currentVelocity =
+                elevatorMaster.activeTrajectoryVelocity.toDouble()
+            when {
+                currentVelocity epsilonEquals cruiseVelocity -> 0.meter.acceleration
+                currentVelocity > previousTrajectoryVelocity -> Constants.kElevatorAcceleration
+                else -> -Constants.kElevatorAcceleration
+            }.also { previousTrajectoryVelocity = currentVelocity }
+        } else {
+            0.meter.acceleration
         }
-
-        previousTrajectoryVelocity = currentVelocity
     }
 
     override fun activateEmergency() = zeroClosedLoopGains()
