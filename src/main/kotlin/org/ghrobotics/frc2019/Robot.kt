@@ -23,6 +23,8 @@ object Robot : FalconRobotBase(), CoroutineScope {
     override val coroutineContext = Job()
     val emergencyReadySystems = ArrayList<EmergencyHandleable>()
 
+    var emergencyActive = false
+
     // Initialize all systems.
     override fun initialize() {
         +DriveSubsystem

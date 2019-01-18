@@ -72,6 +72,11 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
             )
 
             motor.overrideLimitSwitchesEnable = true
+
+            motor.motionCruiseVelocity = Constants.kElevatorCruiseVelocity
+            motor.motionAcceleration = Constants.kElevatorAcceleration
+
+            motor.configClearPositionOnLimitR(true, Constants.kCTRETimeout)
         }
 
         defaultCommand = object : FalconCommand(this@ElevatorSubsystem) {
@@ -99,8 +104,6 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
     }
 
     override fun periodic() {
-        if (elevatorMaster.sensorCollection.isRevLimitSwitchClosed) elevatorMaster.sensorPosition = 0.inch
-
         val cruiseVelocity =
             Constants.kElevatorCruiseVelocity.fromModel(Constants.kElevatorNativeUnitModel).STUPer100ms
 

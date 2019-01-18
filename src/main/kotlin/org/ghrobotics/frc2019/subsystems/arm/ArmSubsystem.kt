@@ -56,6 +56,11 @@ class ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
             peakCurrentLimitDuration = 0.millisecond
             continuousCurrentLimit = Constants.kArmCurrentLimit
             currentLimitingEnabled = true
+
+            motionCruiseVelocity = Constants.kArmCruiseVelocity
+            motionAcceleration = Constants.kArmAcceleration
+
+            configFeedbackNotContinuous(true, Constants.kCTRETimeout)
         }
         setClosedLoopGains()
     }
