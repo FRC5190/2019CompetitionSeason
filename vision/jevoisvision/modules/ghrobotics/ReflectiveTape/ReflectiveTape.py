@@ -98,7 +98,7 @@ class ReflectiveTape:
 
         angle2 = math.atan2(pzero_world[0][0], pzero_world[2][0])
 
-        return distance, math.degrees(angle1), math.degrees(angle1 + angle2)
+        return distance, math.degrees(angle1), math.degrees(angle2)
 
     # Process function with no USB output
     def processNoUSB(self, inframe):
@@ -130,7 +130,7 @@ class ReflectiveTape:
 
                 imgpts = np.int32(imgpts).reshape(-1, 2)
                 # draw ground floor in green
-                cv2.drawContours(outimg, [imgpts[:4]], -1, (0, 255, 0), -3)
+                cv2.drawContours(outimg, [imgpts[:4]], -1, (0, 255, 0), 3)
                 # draw pillars in blue color
                 for i, j in zip(range(4), range(4, 8)):
                     cv2.line(outimg, tuple(imgpts[i]), tuple(imgpts[j]), (255, 0, 0), 3)
