@@ -14,6 +14,7 @@ import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
+import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.frc2019.subsystems.led.LEDSubsystem
 import org.ghrobotics.frc2019.vision.VisionProcessing
 import org.ghrobotics.lib.commands.FalconSubsystem
@@ -24,14 +25,19 @@ object Robot : FalconRobotBase(), CoroutineScope {
     override val coroutineContext = Job()
     val emergencyReadySystems = ArrayList<EmergencyHandleable>()
 
+    val superstructureHeightAboveGround
+        get() = Constants.kElevatorHeightFromGround + ElevatorSubsystem.elevatorPosition +
+            (Constants.kArmLength * ArmSubsystem.armPosition.sin)
+
     var emergencyActive = false
 
     // Initialize all systems.
     override fun initialize() {
         +DriveSubsystem
-        +LEDSubsystem
         +ElevatorSubsystem
         +ArmSubsystem
+        +IntakeSubsystem
+        +LEDSubsystem
 
         Network
         Autonomous

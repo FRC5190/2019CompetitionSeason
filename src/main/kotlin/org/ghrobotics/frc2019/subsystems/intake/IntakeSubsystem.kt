@@ -14,6 +14,7 @@ object IntakeSubsystem : FalconSubsystem() {
     private val intakeSlave = NativeFalconSRX(Constants.kIntakeRightId)
 
     val solenoid = Solenoid(Constants.kPCMId, Constants.kIntakeSolenoidId)
+    val plungerSolenoid = Solenoid(Constants.kPCMId, Constants.kIntakePlungerSolenoidId)
 
     init {
 

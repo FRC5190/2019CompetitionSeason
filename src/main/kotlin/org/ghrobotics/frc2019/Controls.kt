@@ -5,15 +5,24 @@
 
 package org.ghrobotics.frc2019
 
+import edu.wpi.first.wpilibj.GenericHID
+import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
+import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
+import org.ghrobotics.frc2019.subsystems.intake.IntakePneumaticCommand
+import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
+import org.ghrobotics.frc2019.subsystems.intake.IntakeWheelCommand
+import org.ghrobotics.lib.utils.map
 import org.ghrobotics.lib.wrappers.hid.*
+import kotlin.math.pow
+import kotlin.math.withSign
 
 object Controls {
 
     var isClimbing = false
         private set
 
-    val mainXbox = xboxController(0) {
+    val driverXbox = xboxController(0) {
         state({ !isClimbing }) {
             // Align with Vision Target
             button(kB).change(VisionDriveCommand())
@@ -28,10 +37,28 @@ object Controls {
                 Robot.emergencyActive = false
             }
             button(kBumperRight).change(VisionDriveCommand())
+
+            triggerAxisButton(GenericHID.Hand.kRight) {
+                change(IntakeWheelCommand(IntakeSubsystem.Direction.IN))
+            }
+            triggerAxisButton(GenericHID.Hand.kLeft) {
+                change(IntakeWheelCommand(IntakeSubsystem.Direction.OUT))
+            }
+            button(kX).change(IntakePneumaticCommand { !IntakeSubsystem.solenoid.get() })
+        }
+    }
+
+    val operatorXbox = xboxController(1) {
+        axisButton(1) {
+            change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * .5 }))
+        }
+        axisButton(2) {
+            change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * .5 }))
         }
     }
 
     fun update() {
-        mainXbox.update()
+        driverXbox.update()
+        operatorXbox.update()
     }
 }

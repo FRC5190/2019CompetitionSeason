@@ -21,17 +21,23 @@ class ManualDriveCommand : FalconCommand(DriveSubsystem) {
     }
 
     override suspend fun execute() {
-        DriveSubsystem.curvatureDrive(
-            -speedSource(),
-            rotationSource(),
-            quickTurnSource()
+        DriveSubsystem.tankDrive(
+            -leftSource(),
+            -rightSource()
         )
+//        DriveSubsystem.curvatureDrive(
+//            -speedSource(),
+//            rotationSource(),
+//            quickTurnSource()
+//        )
     }
 
     companion object {
         private const val kDeadband = 0.02
-        val speedSource = Controls.mainXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband)
-        private val rotationSource = Controls.mainXbox.getX(GenericHID.Hand.kLeft).withDeadband(kDeadband)
-        private val quickTurnSource = Controls.mainXbox.getRawButton(kX)
+        val speedSource = Controls.driverXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband)
+        val rightSource = Controls.driverXbox.getY(GenericHID.Hand.kRight).withDeadband(kDeadband)
+        val leftSource = Controls.driverXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband)
+        private val rotationSource = Controls.driverXbox.getX(GenericHID.Hand.kLeft).withDeadband(kDeadband)
+        private val quickTurnSource = Controls.driverXbox.getRawButton(kX)
     }
 }
