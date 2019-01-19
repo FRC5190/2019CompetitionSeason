@@ -49,10 +49,10 @@ object Controls {
     }
 
     val operatorXbox = xboxController(1) {
-        axisButton(1) {
-            change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * .5 }))
+        axisButton(1, 0.05) {
+            change(OpenLoopElevatorCommand(source.map { -it * 0.5 }))
         }
-        axisButton(2) {
+        axisButton(2, 0.05) {
             change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * .5 }))
         }
     }

@@ -68,9 +68,9 @@ class SuperstructureCommand(
     }
 
     companion object {
-        val kFrontHighRocketHatch = SuperstructureCommand(76.inch, 0.degree)
-        val kFrontHighRocketCargo = SuperstructureCommand(80.inch, 45.degree)
-        val kBackLoadingStation = SuperstructureCommand(21.inch, 180.degree)
-        val kFrontLoadingStation = SuperstructureCommand(21.inch, 0.degree)
+        val kFrontHighRocketHatch = { SuperstructureCommand(76.inch, 0.degree) }
+        val kFrontHighRocketCargo = { SuperstructureCommand(80.inch, 45.degree) }
+        val kBackLoadingStation = { SuperstructureCommand(21.inch, 180.degree) }
+        val kFrontLoadingStation = { SuperstructureCommand(21.inch, 0.degree) }
     }
 }

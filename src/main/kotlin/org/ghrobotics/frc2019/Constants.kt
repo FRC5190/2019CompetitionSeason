@@ -29,10 +29,10 @@ object Constants {
     const val kRightMasterId = 3
     const val kRightSlaveId1 = 4
 
-    const val kElevatorMasterId = 50
-    const val kElevatorSlave1Id = 60
-    const val kElevatorSlave2Id = 70
-    const val kElevatorSlave3Id = 80
+    const val kElevatorMasterId = 5
+    const val kElevatorSlave1Id = 6
+    const val kElevatorSlave2Id = 7
+    const val kElevatorSlave3Id = 8
 
     const val kArmId = 90
 
@@ -135,7 +135,7 @@ object Constants {
     val kElevatorCruiseVelocity = 90.inch.velocity
 
     const val kElevatorKp = 0.3 // TODO Tune me
-    const val kElevatorKg = 0.05 // Percent required to counteract gravity // TODO Tune me
+    const val kElevatorKg = 1.65 / 12.0 // Percent required to counteract gravity // TODO Tune me
 
 
     // ARM
