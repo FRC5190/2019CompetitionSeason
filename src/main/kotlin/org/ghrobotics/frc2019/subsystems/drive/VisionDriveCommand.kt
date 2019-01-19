@@ -7,33 +7,51 @@ import org.ghrobotics.frc2019.vision.TrackedTarget
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.mathematics.units.Rotation2d
 
-@Suppress("LateinitUsage")
 class VisionDriveCommand : FalconCommand(DriveSubsystem) {
 
-    lateinit var target: TrackedTarget
-    private var foundTarget = false
+    private var currentTarget: TrackedTarget? = null
 
     init {
-        finishCondition += { !foundTarget }
+        finishCondition += { currentTarget == null }
     }
 
     override suspend fun initialize() {
-        val target = TargetTracker.bestTarget
-        if (target == null) {
-            foundTarget = false
+        findNewTarget()
+        isActive = true
+    }
+
+    private fun updateTarget() {
+        val currentTarget = this.currentTarget ?: return
+        if (!currentTarget.isAlive) {
+            this.currentTarget = null
+            findNewTarget()
+        }
+    }
+
+    private fun findNewTarget() {
+        val currentTarget = this.currentTarget
+        // find new target
+        if (currentTarget != null) {
+            val newTarget = TargetTracker.trackedTargets.minBy {
+                it.averagePose.translation.distance(currentTarget.averagePose.translation)
+            } ?: return
+
+            // switch over to new target if its close enough to original
+            if (newTarget.averagePose.translation.distance(currentTarget.averagePose.translation)
+                < Constants.kMaxTargetTrackingDistance.value * 2
+            ) {
+                this.currentTarget = newTarget
+            }
         } else {
-            this.target = target
-            foundTarget = true
-            isActive = true
+            this.currentTarget = TargetTracker.bestTarget
         }
     }
 
     override suspend fun execute() {
-        if (!target.isAlive) foundTarget = false
-        if (!foundTarget) return
+        updateTarget()
+        val currentTarget = this.currentTarget ?: return
 
-        val transform =
-            (target.averagePose) inFrameOfReferenceOf DriveSubsystem.localization()
+        val transform = currentTarget.averagePose inFrameOfReferenceOf DriveSubsystem.localization()
         val angle = Rotation2d(transform.translation.x.value, transform.translation.y.value, true)
 
         Network.visionDriveAngle.setDouble(angle.degree)
@@ -46,11 +64,13 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
 
     override suspend fun dispose() {
         Network.visionDriveActive.setBoolean(false)
+        this.currentTarget = null
         isActive = false
     }
 
     companion object {
-        const val kCorrectionKp = 1.0
+        const val kCorrectionKp = 0.5
         var isActive = false
+            private set
     }
 }

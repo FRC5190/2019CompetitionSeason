@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
 import org.ghrobotics.frc2019.auto.AutoMode
 import org.ghrobotics.frc2019.auto.StartingPositions
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.lib.wrappers.networktables.enumSendableChooser
 
@@ -37,6 +38,10 @@ object Network {
         .withSize(2, 2)
         .withPosition(4, 0)
 
+    private val elevatorSubsystemLayout = mainShuffleboardDisplay.getLayout("Elevator", BuiltInLayouts.kGrid)
+        .withSize(2, 2)
+        .withPosition(6, 0)
+
     private val globalXEntry = localizationLayout.add("Robot X", 0.0).entry
     private val globalYEntry = localizationLayout.add("Robot Y", 0.0).entry
     private val globalAEntry = localizationLayout.add("Robot Angle", 0.0).entry
@@ -47,8 +52,14 @@ object Network {
     private val rightAmperageEntry = driveSubsystemLayout.add("Right Current", 0.0).entry
 
     private val visionTargetX = visionLayout.add("Vision Target X", 0.0).entry
+    val visionLastUpdate = visionLayout.add("Vision Last Update", 0.0).entry
     private val visionTargetY = visionLayout.add("Vision Target Y", 0.0).entry
     private val visionTargetRotation = visionLayout.add("Vision Target Rotation", 0.0).entry
+
+    private val elevatorRawPosition = elevatorSubsystemLayout.add("Raw Position", 0.0).entry
+    private val elevatorPosition = elevatorSubsystemLayout.add("Position (in)", 0.0).entry
+    private val elevatorCurrent = elevatorSubsystemLayout.add("Current", 0.0).entry
+    private val elevatorVoltage = elevatorSubsystemLayout.add("Voltage", 0.0).entry
 
     val visionDriveAngle = visionLayout.add("Vision Drive Angle", 0.0).entry
     val visionDriveActive = visionLayout.add("Vision Drive Active", false).entry
@@ -77,6 +88,12 @@ object Network {
 
         leftAmperageEntry.setDouble(DriveSubsystem.leftMotor.outputCurrent)
         rightAmperageEntry.setDouble(DriveSubsystem.rightMotor.outputCurrent)
+
+        elevatorRawPosition.setDouble(ElevatorSubsystem.rawEncoder.toDouble())
+        elevatorPosition.setDouble(ElevatorSubsystem.elevatorPosition.inch)
+        elevatorCurrent.setDouble(ElevatorSubsystem.current)
+        elevatorVoltage.setDouble(ElevatorSubsystem.voltage)
+
 
         val trackedObject = TargetTracker.bestTarget
         if (trackedObject != null) {

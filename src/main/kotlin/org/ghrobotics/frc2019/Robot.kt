@@ -11,6 +11,7 @@ import kotlinx.coroutines.Job
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.auto.Trajectories
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
+import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.led.LEDSubsystem
@@ -29,6 +30,8 @@ object Robot : FalconRobotBase(), CoroutineScope {
     override fun initialize() {
         +DriveSubsystem
         +LEDSubsystem
+        +ElevatorSubsystem
+        +ArmSubsystem
 
         Network
         Autonomous

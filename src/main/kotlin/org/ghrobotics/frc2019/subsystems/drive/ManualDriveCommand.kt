@@ -5,7 +5,6 @@
 
 package org.ghrobotics.frc2019.subsystems.drive
 
-import com.team254.lib.physics.DifferentialDrive
 import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.Controls
 import org.ghrobotics.lib.commands.FalconCommand
@@ -17,15 +16,8 @@ import org.ghrobotics.lib.wrappers.hid.kX
 
 class ManualDriveCommand : FalconCommand(DriveSubsystem) {
 
-    private var quickStopAccumulator = 0.0
-    private var prevVelocity = DifferentialDrive.WheelState(0.0, 0.0)
-
     init {
         executeFrequency = 50
-    }
-
-    override suspend fun initialize() {
-        prevVelocity = DifferentialDrive.WheelState(0.0, 0.0)
     }
 
     override suspend fun execute() {
