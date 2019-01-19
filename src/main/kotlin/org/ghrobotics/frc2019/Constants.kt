@@ -29,21 +29,21 @@ object Constants {
     const val kRightMasterId = 3
     const val kRightSlaveId1 = 4
 
-    const val kElevatorMasterId = 5
-    const val kElevatorSlave1Id = 6
-    const val kElevatorSlave2Id = 7
-    const val kElevatorSlave3Id = 8
+    const val kElevatorMasterId = 50
+    const val kElevatorSlave1Id = 60
+    const val kElevatorSlave2Id = 70
+    const val kElevatorSlave3Id = 80
 
-    const val kArmId = 9
+    const val kArmId = 90
 
-    const val kIntakeLeftId = 10
-    const val kIntakeRightId = 11
+    const val kIntakeLeftId = 7
+    const val kIntakeRightId = 9
 
-    const val kFrontClimberMasterId = 12
-    const val kFrontClimberSlaveId = 13
+    const val kFrontClimberMasterId = 120
+    const val kFrontClimberSlaveId = 130
 
-    const val kBackClimberMasterId = 14
-    const val kBackClimberSlaveId = 15
+    const val kBackClimberMasterId = 140
+    const val kBackClimberSlaveId = 150
 
 
     // ANALOG INPUT
@@ -58,6 +58,7 @@ object Constants {
     // PNEUMATICS
     const val kPCMId = 41
     const val kIntakeSolenoidId = 2
+    const val kIntakePlungerSolenoidId = 0
     const val kDriveSolenoidId = 3
 
 
@@ -104,7 +105,7 @@ object Constants {
         kWheelRadius
     )
 
-    val kDriveCurrentLimit = 40.amp
+    val kDriveCurrentLimit = 38.amp
 
     const val kDriveKp = 1.2 // Talon SRX Units
     const val kDriveKd = 0.0
@@ -125,6 +126,7 @@ object Constants {
     )
 
     val kElevatorHeightFromGround = 7.inch
+    val kMaxElevatorHeightFromZero = 80.inch
 
     val kElevatorCurrentLimit = 15.amp
 

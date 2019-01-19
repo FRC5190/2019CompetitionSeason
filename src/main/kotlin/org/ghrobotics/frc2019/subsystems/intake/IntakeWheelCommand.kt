@@ -26,7 +26,14 @@ class IntakeWheelCommand(
 
     init {
         if (direction == IntakeSubsystem.Direction.IN) finishCondition += BallSensors.ballIn
-}
+    }
+
+    override suspend fun initialize() {
+        if(direction == IntakeSubsystem.Direction.OUT) {
+            IntakeSubsystem.solenoid.set(true)
+            IntakeSubsystem.plungerSolenoid.set(true)
+        }
+    }
 
     override suspend fun execute() {
         if (!BallSensors.ballIn()) {
@@ -38,5 +45,6 @@ class IntakeWheelCommand(
 
     override suspend fun dispose() {
         IntakeSubsystem.zeroOutputs()
+        IntakeSubsystem.plungerSolenoid.set(false)
     }
 }
