@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
 import org.ghrobotics.frc2019.auto.AutoMode
 import org.ghrobotics.frc2019.auto.StartingPositions
+import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.vision.TargetTracker
@@ -43,6 +44,10 @@ object Network {
         .withSize(2, 2)
         .withPosition(6, 0)
 
+    private val armSubsystemLayout = mainShuffleboardDisplay.getLayout("Arm", BuiltInLayouts.kGrid)
+        .withSize(2, 2)
+        .withPosition(8, 0)
+
     private val globalXEntry = localizationLayout.add("Robot X", 0.0).entry
     private val globalYEntry = localizationLayout.add("Robot Y", 0.0).entry
     private val globalAEntry = localizationLayout.add("Robot Angle", 0.0).entry
@@ -62,6 +67,12 @@ object Network {
     private val elevatorCurrent = elevatorSubsystemLayout.add("Current", 0.0).entry
     private val elevatorVoltage = elevatorSubsystemLayout.add("Voltage", 0.0).entry
     private val elevatorVelocity = elevatorSubsystemLayout.add("Velocity (ips)", 0.0).entry
+
+    private val armRawPosition = armSubsystemLayout.add("Raw Position", 0.0).entry
+    private val armPosition = armSubsystemLayout.add("Position (deg)", 0.0).entry
+    private val armCurrent = armSubsystemLayout.add("Current", 0.0).entry
+    private val armVoltage = armSubsystemLayout.add("Voltage", 0.0).entry
+    private val armVelocity = armSubsystemLayout.add("Velocity (dps)", 0.0).entry
 
     val visionDriveAngle = visionLayout.add("Vision Drive Angle", 0.0).entry
     val visionDriveActive = visionLayout.add("Vision Drive Active", false).entry
@@ -97,6 +108,11 @@ object Network {
         elevatorVoltage.setDouble(ElevatorSubsystem.voltage)
         elevatorVelocity.setDouble(ElevatorSubsystem.velocity.inchesPerSecond)
 
+        armRawPosition.setDouble(ArmSubsystem.rawEncoder.toDouble())
+        armPosition.setDouble(ArmSubsystem.armPosition.degree)
+        armCurrent.setDouble(ArmSubsystem.current)
+        armVoltage.setDouble(ArmSubsystem.voltage)
+        armVelocity.setDouble(ArmSubsystem.velocity.value * 180 / Math.PI)
 
         val trackedObject = TargetTracker.bestTarget
         if (trackedObject != null) {

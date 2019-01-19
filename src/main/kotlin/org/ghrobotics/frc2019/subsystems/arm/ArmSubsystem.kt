@@ -44,6 +44,22 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
             )
         }
 
+    // Current draw per motor.
+    val current
+        get() = armMaster.outputCurrent
+
+    // Raw encoder value.
+    val rawEncoder
+        get() = armMaster.getSelectedSensorPosition(0)
+
+    // Voltage draw per motor.
+    val voltage
+        get() = armMaster.motorOutputPercent * 12.0
+
+    // Velocity of the arm.
+    val velocity
+        get() = armMaster.sensorVelocity
+
     // Used to retrieve the percent output of each motor and to set the desired percent output.
     var percentOutput
         get() = armMaster.percentOutput
@@ -56,7 +72,6 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     // Used as a storage variable to compute acceleration.
     private var previousTrajectoryVelocity = 0.0
-
 
     init {
         // Configure feedback sensor and sensor phase

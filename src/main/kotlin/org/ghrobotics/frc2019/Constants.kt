@@ -116,7 +116,6 @@ object Constants {
     const val kDriveBeta = 2.0 // Inverse meters squared
     const val kDriveZeta = 0.7 // Unitless dampening co-efficient
 
-
     // ELEVATOR
     val kElevatorSensorUnitsPerRotaton = 1440.STU
     val kElevatorWinchRadius = 1.25.inch
@@ -124,6 +123,8 @@ object Constants {
         kDriveSensorUnitsPerRotation,
         kElevatorWinchRadius
     )
+
+    val kElevatorHeightFromGround = 7.inch
 
     val kElevatorCurrentLimit = 15.amp
 
@@ -140,6 +141,8 @@ object Constants {
     val kArmNativeUnitModel = NativeUnitRotationModel(
         kArmSensorUnitsPerRotation
     )
+
+    val kArmLength = 30.inch
 
     val kArmCurrentLimit = 15.amp
 

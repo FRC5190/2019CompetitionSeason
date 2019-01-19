@@ -163,5 +163,6 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     // Emergency Management
     override fun activateEmergency() = zeroClosedLoopGains()
+
     override fun recoverFromEmergency() = setClosedLoopGains()
 }
