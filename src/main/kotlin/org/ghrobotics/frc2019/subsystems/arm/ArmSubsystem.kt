@@ -18,10 +18,15 @@ import org.ghrobotics.lib.mathematics.units.nativeunits.fromModel
 import org.ghrobotics.lib.mathematics.units.radian
 import org.ghrobotics.lib.wrappers.ctre.FalconSRX
 
+/**
+ * Represents the arm of the robot.
+ */
 object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
 
+    // One arm motors rotates the arm
     private val armMaster = FalconSRX(Constants.kArmId, Constants.kArmNativeUnitModel)
 
+    // Used to retrieve the current arm position and to set the arm elevator position.
     var armPosition
         get() = armMaster.sensorPosition
         set(value) {
@@ -39,32 +44,53 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
             )
         }
 
-    private var previousTrajectoryVelocity = 0.0
+    // Used to retrieve the percent output of each motor and to set the desired percent output.
+    var percentOutput
+        get() = armMaster.percentOutput
+        set(value) {
+            armMaster.percentOutput = value
+        }
+
+    // Acceleration of the elevator.
     private var acceleration = 0.radian.acceleration
 
+    // Used as a storage variable to compute acceleration.
+    private var previousTrajectoryVelocity = 0.0
+
+
     init {
+        // Configure feedback sensor and sensor phase
         armMaster.feedbackSensor = FeedbackDevice.Analog
         armMaster.encoderPhase = false
 
+        // Configure startup settings
         armMaster.run {
+            // Brake mode
             brakeMode = NeutralMode.Brake
 
+            // Voltage compensation
             voltageCompensationSaturation = 12.volt
             voltageCompensationEnabled = true
 
+            // Current limiting
             peakCurrentLimit = 0.amp
             peakCurrentLimitDuration = 0.millisecond
             continuousCurrentLimit = Constants.kArmCurrentLimit
             currentLimitingEnabled = true
 
+            // Motion magic
             motionCruiseVelocity = Constants.kArmCruiseVelocity
             motionAcceleration = Constants.kArmAcceleration
 
+            // Analog encoder hackery
             configFeedbackNotContinuous(true, Constants.kCTRETimeout)
         }
         setClosedLoopGains()
     }
 
+    /**
+     * Configures closed loop gains for the arm.
+     */
     private fun setClosedLoopGains() {
         // Uncomment when phases are tested.
         /*
@@ -74,28 +100,37 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
         */
     }
 
+    /**
+     * Zeros all feedback gains for the arm.
+     */
     private fun zeroClosedLoopGains() {
         armMaster.run {
             kP = 0.0
         }
     }
 
+    /**
+     * Runs periodically.
+     * Used to calculate the acceleration of the arm.
+     */
     override fun periodic() {
         val cruiseVelocity =
             Constants.kArmCruiseVelocity.fromModel(Constants.kArmNativeUnitModel).STUPer100ms
 
-        val currentVelocity =
-            armMaster.activeTrajectoryVelocity.toDouble()
-
-        acceleration = when {
-            currentVelocity epsilonEquals cruiseVelocity -> 0.radian.acceleration
-            currentVelocity > previousTrajectoryVelocity -> Constants.kArmAcceleration
-            else -> -Constants.kArmAcceleration
+        acceleration = if (armMaster.controlMode == ControlMode.MotionMagic) {
+            val currentVelocity = armMaster.activeTrajectoryVelocity.toDouble()
+            when {
+                currentVelocity epsilonEquals cruiseVelocity -> 0.radian.acceleration
+                currentVelocity > previousTrajectoryVelocity -> Constants.kArmAcceleration
+                else -> -Constants.kArmAcceleration
+            }.also { previousTrajectoryVelocity = currentVelocity }
+        } else {
+            0.radian.acceleration
         }
-
-        previousTrajectoryVelocity = currentVelocity
     }
 
+    // Emergency Management
     override fun activateEmergency() = zeroClosedLoopGains()
+
     override fun recoverFromEmergency() = setClosedLoopGains()
 }

@@ -143,6 +143,7 @@ object Constants {
 
     val kArmCurrentLimit = 15.amp
 
+    val kArmClosedLoopTolerance = 5.degree
     val kArmAcceleration = 0.1.radian.acceleration
     val kArmCruiseVelocity = 1.5.radian.velocity
 
