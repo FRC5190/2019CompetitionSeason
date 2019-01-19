@@ -18,39 +18,48 @@ import org.ghrobotics.lib.mathematics.units.nativeunits.STU
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 object Constants {
 
-    /* TODO ALL CONSTANTS MARKED WITH THE FLAG ARE FALCON HEAVY 2018'S CONSTANTS */
-
     // GLOBAL CTRE TIMEOUT
     const val kCTRETimeout = 10
 
-    // MOTOR IDS
-    const val kLeftMasterId = 2
-    const val kLeftSlaveId1 = 1
 
-    const val kRightMasterId = 4
-    const val kRightSlaveId1 = 3
+    // MOTOR IDS
+    const val kLeftMasterId = 1
+    const val kLeftSlaveId1 = 2
+
+    const val kRightMasterId = 3
+    const val kRightSlaveId1 = 4
 
     const val kElevatorMasterId = 5
     const val kElevatorSlave1Id = 6
-    const val kElevatorSlave2Id = 75
+    const val kElevatorSlave2Id = 7
     const val kElevatorSlave3Id = 8
 
-    const val kIntakeLeftId = 7
-    const val kIntakeRightId = 9
+    const val kArmId = 9
 
-    const val kArmId = 8
+    const val kIntakeLeftId = 10
+    const val kIntakeRightId = 11
+
+    const val kFrontClimberMasterId = 12
+    const val kFrontClimberSlaveId = 13
+
+    const val kBackClimberMasterId = 14
+    const val kBackClimberSlaveId = 15
+
 
     // ANALOG INPUT
     const val kLeftBallSensorId = 2
     const val kRightBallSensorId = 3
 
+
     // GYROS
     const val kPigeonIMUId = 17
+
 
     // PNEUMATICS
     const val kPCMId = 41
     const val kIntakeSolenoidId = 2
     const val kDriveSolenoidId = 3
+
 
     // FIELD
     val kLevel2RightX = 4.feet
@@ -60,16 +69,17 @@ object Constants {
 
     val kHypotenuseDifferenceForRamp = 0.433.inch
 
+
     // ROBOT
     val kRobotWidth = 29.inch
     val kRobotLength = 30.inch
     val kBumperLength = 4.5.inch
     val kIntakeLength = 10.inch
 
-
     const val kRobotMass = 27.2 // kg
     const val kRobotMomentOfInertia = 9.0 // kg m^2
     const val kRobotAngularDrag = 6.0
+
 
     // TRANSFORMATIONS
     val kFrontBumperToCenter = Pose2d(-(kRobotLength / 2.0) - kBumperLength, 0.meter, 0.degree)
@@ -78,8 +88,11 @@ object Constants {
     val kCenterToCamera = Pose2d(1.inch, -(17).inch, 0.degree)
     val kGroundToCamera = 0.meter
 
+
+    // VISION
     val kMaxTargetTrackingDistance = 10.inch
     val kMaxTargetTrackingLifetime = 1.second
+
 
     // DRIVE
     val kDriveSensorUnitsPerRotation = 1440.STU
@@ -136,5 +149,5 @@ object Constants {
     const val kArmKp = 1.0 // TODO Tune me
     const val kArmKa = 0.005 // Volts per radians per second squared
 
-    const val kArmKg = 0.05
+    const val kArmKg = 0.005
 }

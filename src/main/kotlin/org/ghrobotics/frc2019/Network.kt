@@ -13,6 +13,7 @@ import org.ghrobotics.frc2019.auto.StartingPositions
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.vision.TargetTracker
+import org.ghrobotics.lib.mathematics.units.derivedunits.inchesPerSecond
 import org.ghrobotics.lib.wrappers.networktables.enumSendableChooser
 
 object Network {
@@ -60,6 +61,7 @@ object Network {
     private val elevatorPosition = elevatorSubsystemLayout.add("Position (in)", 0.0).entry
     private val elevatorCurrent = elevatorSubsystemLayout.add("Current", 0.0).entry
     private val elevatorVoltage = elevatorSubsystemLayout.add("Voltage", 0.0).entry
+    private val elevatorVelocity = elevatorSubsystemLayout.add("Velocity (ips)", 0.0).entry
 
     val visionDriveAngle = visionLayout.add("Vision Drive Angle", 0.0).entry
     val visionDriveActive = visionLayout.add("Vision Drive Active", false).entry
@@ -93,6 +95,7 @@ object Network {
         elevatorPosition.setDouble(ElevatorSubsystem.elevatorPosition.inch)
         elevatorCurrent.setDouble(ElevatorSubsystem.current)
         elevatorVoltage.setDouble(ElevatorSubsystem.voltage)
+        elevatorVelocity.setDouble(ElevatorSubsystem.velocity.inchesPerSecond)
 
 
         val trackedObject = TargetTracker.bestTarget

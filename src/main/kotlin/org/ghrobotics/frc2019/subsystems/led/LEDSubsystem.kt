@@ -1,6 +1,5 @@
 package org.ghrobotics.frc2019.subsystems.led
 
-import com.ctre.phoenix.CANifier
 import kotlinx.coroutines.GlobalScope
 import org.ghrobotics.frc2019.Controls
 import org.ghrobotics.frc2019.Robot
@@ -10,12 +9,9 @@ import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.utils.launchFrequency
 import org.ghrobotics.lib.utils.monitor
-import org.ghrobotics.lib.utils.setLEDOutput
 import java.awt.Color
 
 object LEDSubsystem : FalconSubsystem(), EmergencyHandleable {
-
-    private val canifier = CANifier(16)
 
     private val fault = BlinkingLEDCommand(Color.RED, 500.millisecond)
     private val climb = BlinkingLEDCommand(Color.ORANGE, 500.millisecond)
@@ -42,7 +38,7 @@ object LEDSubsystem : FalconSubsystem(), EmergencyHandleable {
     }
 
     fun set(color: Color) {
-        canifier.setLEDOutput(color)
+        // TODO
     }
 
     override fun activateEmergency() = fault.start()
