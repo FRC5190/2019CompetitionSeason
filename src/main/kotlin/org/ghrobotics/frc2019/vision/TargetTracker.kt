@@ -37,7 +37,7 @@ object TargetTracker {
             }
         }
         _trackedTargets.forEach { it.update() }
-        _trackedTargets.removeIf { !it.isAlive }
+        _trackedTargets.removeIf { !it.isAlive; }
 
         val robotPose = DriveSubsystem.localization()
 

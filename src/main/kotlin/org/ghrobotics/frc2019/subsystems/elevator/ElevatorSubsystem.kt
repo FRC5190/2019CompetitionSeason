@@ -34,6 +34,15 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
             )
         }
 
+    val current
+        get() = elevatorMaster.outputCurrent
+
+    val rawEncoder
+        get() = elevatorMaster.getSelectedSensorPosition(0)
+
+    val voltage
+        get() = elevatorMaster.motorOutputPercent * 12.0
+
     var percentOutput
         get() = elevatorMaster.percentOutput
         set(value) {

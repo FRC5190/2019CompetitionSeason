@@ -52,9 +52,9 @@ class JeVois(
 
     private fun initPort(serialPort: SerialPort) {
         serialPort.writeString("setpar serout USB\n")
-
         serialPort.writeString("date 0101000070\n")
         serialPort.writeString("streamon\n")
+
         fpgaOffset = Timer.getFPGATimestamp().second
     }
 

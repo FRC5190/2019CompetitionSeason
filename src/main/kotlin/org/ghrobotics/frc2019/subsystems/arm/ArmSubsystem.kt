@@ -18,7 +18,7 @@ import org.ghrobotics.lib.mathematics.units.nativeunits.fromModel
 import org.ghrobotics.lib.mathematics.units.radian
 import org.ghrobotics.lib.wrappers.ctre.FalconSRX
 
-class ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
+object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     private val armMaster = FalconSRX(Constants.kArmId, Constants.kArmNativeUnitModel)
 

@@ -24,11 +24,11 @@ object Constants {
     const val kCTRETimeout = 10
 
     // MOTOR IDS
-    const val kLeftMasterId = 1
-    const val kLeftSlaveId1 = 2
+    const val kLeftMasterId = 2
+    const val kLeftSlaveId1 = 1
 
-    const val kRightMasterId = 3
-    const val kRightSlaveId1 = 4
+    const val kRightMasterId = 4
+    const val kRightSlaveId1 = 3
 
     const val kElevatorMasterId = 5
     const val kElevatorSlave1Id = 6
@@ -38,7 +38,7 @@ object Constants {
     const val kIntakeLeftId = 7
     const val kIntakeRightId = 9
 
-    const val kArmId = 9
+    const val kArmId = 8
 
     // ANALOG INPUT
     const val kLeftBallSensorId = 2
@@ -67,7 +67,7 @@ object Constants {
     val kIntakeLength = 10.inch
 
 
-    const val kRobotMass = 18.0 // kg
+    const val kRobotMass = 27.2 // kg
     const val kRobotMomentOfInertia = 9.0 // kg m^2
     const val kRobotAngularDrag = 6.0
 
@@ -75,7 +75,7 @@ object Constants {
     val kFrontBumperToCenter = Pose2d(-(kRobotLength / 2.0) - kBumperLength, 0.meter, 0.degree)
     val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeLength, 0.meter, 0.degree)
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeLength, 0.meter, 0.degree)
-    val kCenterToCamera = Pose2d(7.inch, (-5.0).inch, 0.degree)
+    val kCenterToCamera = Pose2d(1.inch, -(17).inch, 0.degree)
     val kGroundToCamera = 0.meter
 
     val kMaxTargetTrackingDistance = 10.inch
@@ -83,7 +83,7 @@ object Constants {
 
     // DRIVE
     val kDriveSensorUnitsPerRotation = 1440.STU
-    val kWheelRadius = 3.0856025633758268193941419970783.inch
+    val kWheelRadius = 3.11.inch
     val kTrackWidth = 27.75.inch
 
     val kDriveNativeUnitModel = NativeUnitLengthModel(
