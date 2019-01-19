@@ -17,6 +17,8 @@ class ReflectiveTape:
 
         self.TARGET_WIDTH = 14.5
         self.TARGET_HEIGHT = 6.0
+        # self.TARGET_WIDTH = 14.627
+        # self.TARGET_HEIGHT = 5.826
 
         # camera mount angle (radians)
         # NOTE: not sure if this should be positive or negative
@@ -250,8 +252,8 @@ class GripPipeline:
         self.__filter_contours_solidity = [80.03597122302158, 100]
         self.__filter_contours_max_vertices = 1000000.0
         self.__filter_contours_min_vertices = 0.0
-        self.__filter_contours_min_ratio = 0.0
-        self.__filter_contours_max_ratio = 1000.0
+        self.__filter_contours_min_ratio = 0.2
+        self.__filter_contours_max_ratio = 1.0
 
         self.filter_contours_output = None
 
