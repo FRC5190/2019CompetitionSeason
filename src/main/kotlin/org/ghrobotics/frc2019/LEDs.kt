@@ -1,12 +1,10 @@
-package org.ghrobotics.frc2019.subsystems.led
+package org.ghrobotics.frc2019
 
 import edu.wpi.first.wpilibj.SerialPort
-import org.ghrobotics.frc2019.Controls
-import org.ghrobotics.frc2019.Robot
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
 import kotlin.concurrent.thread
 
-object LEDSubsystem {
+object LEDs {
 
     private var wantedLEDMode = Mode.NONE
 
@@ -15,7 +13,7 @@ object LEDSubsystem {
             while (true) {
                 try {
                     val port = SerialPort(9600, SerialPort.Port.kMXP)
-                    port.setTimeout(0.5)
+                    port.setTimeout(0.5190)
                     var currentLEDMode: Mode? = null
                     @Suppress("ConvertTryFinallyToUseCall")
                     try {

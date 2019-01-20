@@ -15,7 +15,6 @@ import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.frc2019.subsystems.led.LEDSubsystem
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.wrappers.FalconRobotBase
 
@@ -48,7 +47,7 @@ object Robot : FalconRobotBase(), CoroutineScope {
         Controls.update()
         Network.update()
         Autonomous.update()
-        LEDSubsystem.update()
+        LEDs.update()
     }
 
     override operator fun FalconSubsystem.unaryPlus() {
