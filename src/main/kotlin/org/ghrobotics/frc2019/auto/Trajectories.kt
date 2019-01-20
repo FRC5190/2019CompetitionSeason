@@ -35,21 +35,17 @@ object Trajectories {
 
     /************************************ STARTING LOCATIONS ************************************/
 
-    private val kRobotSideStartX =
-        Constants.kLevel1RightX - Constants.kBumperLength - Constants.kRobotWidth / 2.0
-
-    private val kRobotCenterStartX =
-        Constants.kLevel2RightX + Constants.kBumperLength + Constants.kRobotLength / 2.0
+    private val kStartX =
+        Constants.kLevel2RightX + Constants.kBumperLength + Constants.kRobotLength / 2.0 -
+            Constants.kHypotenuseDifferenceForRamp
 
     val kSideStart =
         Pose2d(
-            kRobotSideStartX,
-            Constants.kLevel2BottomY + Constants.kBumperLength + Constants.kRobotLength / 2.0 +
-                Constants.kHypotenuseDifferenceForRamp,
-            (-90).degree
+            kStartX,
+            Constants.kLevel2BottomY + Constants.kBumperLength + Constants.kRobotWidth / 2.0
         )
 
-    val kCenterStart = Pose2d(kRobotCenterStartX, 13.5.feet, 0.degree)
+    val kCenterStart = Pose2d(kStartX, 13.5.feet, 0.degree)
 
     /************************************ FIELD ELEMENTS ************************************/
 
@@ -110,7 +106,7 @@ object Trajectories {
     val sideStartToNearRocketHatch =
         waypoints(
             kSideStart,
-            Pose2d(7.74.feet, 4.708.feet, (-20).degree),
+            Pose2d(11.179.feet, 7.496.feet, (-55).degree),
             kNearRocketHatch
         ).generateTrajectory(false)
 

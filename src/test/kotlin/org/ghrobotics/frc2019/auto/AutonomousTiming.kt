@@ -9,7 +9,7 @@ class AutonomousTiming {
             Trajectories.nearRocketHatchToLoadingStation.lastState.t.second +
             Trajectories.loadingStationToFarRocketHatch.lastState.t.second +
             Trajectories.farRocketHatchToCargoBall.lastState.t.second
-        println("Double Hatch Rocket Execution Time: $time")
+        println("High Hatches Rocket Execution Time: $time")
     }
 
     @Test
