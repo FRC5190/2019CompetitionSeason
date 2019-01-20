@@ -67,11 +67,15 @@ void loop() {
   EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
 }
 
+String serialBuffer = "";
+
 void serialEvent() {
   while (Serial.available()) {
-    int data = Serial.read(); 
-    if(isDigit(data)) {
-      ledmode = data - '0';
+    char readChar = Serial.read();
+    serialBuffer += readChar; 
+    if(readChar == '\n') {
+      ledmode = serialBuffer.toInt();
+      serialBuffer = "";
       Serial.println("Ok");
     }
   }
