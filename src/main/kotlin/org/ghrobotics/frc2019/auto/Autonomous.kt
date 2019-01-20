@@ -18,15 +18,26 @@ import org.ghrobotics.lib.utils.monitor
 import org.ghrobotics.lib.utils.onChangeToTrue
 import org.ghrobotics.lib.wrappers.FalconRobotBase
 
+/**
+ * Manages the autonomous mode of the game.
+ */
 object Autonomous {
 
+    // Auto mode to run
     private val autoMode = { Network.autoModeChooser.selected }
+
+    // Starting position of the robot
     val startingPosition = { Network.startingPositionChooser.selected }
 
+    // Stores whether the current config is valid.
     private var configValid = Source(true)
+
+    // Stores if we are ready to send it.
     private val isReady = { Robot.isAutonomous && Robot.isEnabled } and configValid
 
-
+    /**
+     * Routine that gets executed if an invalid starting position + routine is selected.
+     */
     private val invalidOptionRoutine
         get() = sequential {
             +InstantRunnableCommand {
@@ -34,6 +45,20 @@ object Autonomous {
             }
             +baselineRoutine()
         }
+
+    // Updates the monitors and starts the autonomous routine if everything is ready.
+    fun update() {
+        // Just send it when everything is ready.
+        isReadyMonitor.onChangeToTrue {
+            JUST S3ND IT
+        }
+        // Update localization.
+        startingPositionMonitor.onChange { DriveSubsystem.localization.reset(it.pose) }
+        // Stop the auto routine when we are not in autonomous anymore.
+        modeMonitor.onChange { newValue ->
+            if (newValue != FalconRobotBase.Mode.AUTONOMOUS) JUST.stop()
+        }
+    }
 
     // Autonomous Master Group
     private val JUST = stateCommandGroup(startingPosition) {
@@ -70,13 +95,7 @@ object Autonomous {
     private val isReadyMonitor = isReady.monitor
     private val modeMonitor = { Robot.currentMode }.monitor
 
-    fun update() {
-        startingPositionMonitor.onChange { DriveSubsystem.localization.reset(it.pose) }
-        isReadyMonitor.onChangeToTrue { JUST S3ND IT }
-        modeMonitor.onChange { newValue ->
-            if (newValue != FalconRobotBase.Mode.AUTONOMOUS) JUST.stop()
-        }
-    }
+
 }
 
 enum class StartingPositions(val pose: Pose2d) {

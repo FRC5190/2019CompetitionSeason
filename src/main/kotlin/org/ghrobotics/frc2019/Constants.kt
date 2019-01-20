@@ -145,6 +145,7 @@ object Constants {
     )
 
     val kArmLength = 30.inch
+    val kArmFlipTolerance = 5.degree
 
     val kArmCurrentLimit = 15.amp
 
@@ -156,4 +157,5 @@ object Constants {
     const val kArmKa = 0.005 // Volts per radians per second squared
 
     const val kArmKg = 0.005
+
 }
