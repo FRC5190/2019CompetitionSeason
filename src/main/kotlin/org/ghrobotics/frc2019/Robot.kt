@@ -36,7 +36,6 @@ object Robot : FalconRobotBase(), CoroutineScope {
         +ElevatorSubsystem
         +ArmSubsystem
         +IntakeSubsystem
-        +LEDSubsystem
 
         Network
         Autonomous
@@ -49,6 +48,7 @@ object Robot : FalconRobotBase(), CoroutineScope {
         Controls.update()
         Network.update()
         Autonomous.update()
+        LEDSubsystem.update()
     }
 
     override operator fun FalconSubsystem.unaryPlus() {
