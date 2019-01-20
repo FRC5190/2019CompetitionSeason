@@ -3,7 +3,7 @@ package org.ghrobotics.frc2019.auto.routines
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.auto.StartingPositions
 import org.ghrobotics.frc2019.auto.Trajectories
-import org.ghrobotics.frc2019.subsystems.SuperstructureCommand
+import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.commands.DelayCommand
 import org.ghrobotics.lib.commands.parallel
@@ -25,7 +25,7 @@ fun highHatchesRocketRoutine() = autoRoutine {
             // Wait until the path is 1 second from completion
             +DelayCommand(Trajectories.sideStartToNearRocketHatch.lastState.t - 1.second)
             // Take superstructure to place hatch
-            +SuperstructureCommand.kFrontHighRocketHatch
+            +Superstructure.kFrontHighRocketHatch
         }
     }
 
@@ -39,7 +39,7 @@ fun highHatchesRocketRoutine() = autoRoutine {
             dt = DriveSubsystem.kPathFollowingDt
         )
         // Take superstructure to pickup hatch
-        +SuperstructureCommand.kBackLoadingStation
+        +Superstructure.kBackLoadingStation
     }
 
     // Place hatch on far side of rocket
@@ -53,11 +53,11 @@ fun highHatchesRocketRoutine() = autoRoutine {
         +sequential {
             // Take the superstructure to a good state to minimize the time it takes to go up later on.
             +sequential {
-                +SuperstructureCommand.kFrontLoadingStation
+                +Superstructure.kFrontLoadingStation
                 +DelayCommand(100.second)
             }.withTimeout(Trajectories.loadingStationToFarRocketHatch.lastState.t - 1.second)
             // Take superstructure to full height.
-            +SuperstructureCommand.kFrontHighRocketHatch
+            +Superstructure.kFrontHighRocketHatch
         }
     }
 
@@ -70,7 +70,7 @@ fun highHatchesRocketRoutine() = autoRoutine {
             dt = DriveSubsystem.kPathFollowingDt
         )
         // Take superstructure to intaking position.
-        +SuperstructureCommand.kBackLoadingStation
+        +Superstructure.kBackLoadingStation
     }
 
 }

@@ -35,18 +35,21 @@ object Trajectories {
 
     /************************************ STARTING LOCATIONS ************************************/
 
-    private val kRobotStartX =
+    private val kRobotSideStartX =
         Constants.kLevel1RightX - Constants.kBumperLength - Constants.kRobotWidth / 2.0
+
+    private val kRobotCenterStartX =
+        Constants.kLevel2RightX + Constants.kBumperLength + Constants.kRobotLength / 2.0
 
     val kSideStart =
         Pose2d(
-            kRobotStartX,
+            kRobotSideStartX,
             Constants.kLevel2BottomY + Constants.kBumperLength + Constants.kRobotLength / 2.0 +
                 Constants.kHypotenuseDifferenceForRamp,
             (-90).degree
         )
 
-    val kCenterStart = Pose2d(kRobotStartX, 13.5.feet, 0.degree)
+    val kCenterStart = Pose2d(kRobotSideStartX, 13.5.feet, 0.degree)
 
     /************************************ FIELD ELEMENTS ************************************/
 
