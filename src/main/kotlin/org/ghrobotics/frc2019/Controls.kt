@@ -49,6 +49,16 @@ object Controls {
     }
 
     val operatorXbox = xboxController(1) {
+        // Emergency Mode
+        button(kBack).changeOn {
+            Robot.emergencyReadySystems.forEach { system -> system.activateEmergency() }
+            Robot.emergencyActive = true
+        }
+        button(kStart).changeOn {
+            Robot.emergencyReadySystems.forEach { system -> system.recoverFromEmergency() }
+            Robot.emergencyActive = false
+        }
+
         axisButton(1, 0.05) {
             change(OpenLoopElevatorCommand(source.map { -it * 0.5 }))
         }
