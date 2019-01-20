@@ -5,6 +5,8 @@
 
 package org.ghrobotics.frc2019
 
+import com.team254.lib.physics.DCMotorTransmission
+import com.team254.lib.physics.DifferentialDrive
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Rectangle2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
@@ -14,6 +16,7 @@ import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitLengthModel
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitRotationModel
 import org.ghrobotics.lib.mathematics.units.nativeunits.STU
+import kotlin.math.pow
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 object Constants {
@@ -116,6 +119,23 @@ object Constants {
 
     const val kDriveBeta = 2.0 // Inverse meters squared
     const val kDriveZeta = 0.7 // Unitless dampening co-efficient
+
+    private val kDriveDCTransmission = DCMotorTransmission(
+        1 / kDriveKv,
+        kWheelRadius.value.pow(2) * kRobotMass / (2.0 * kDriveKa),
+        kStaticFrictionVoltage
+    )
+
+    val kDriveModel = DifferentialDrive(
+        kRobotMass,
+        kRobotMomentOfInertia,
+        kRobotAngularDrag,
+        kWheelRadius.value,
+        kTrackWidth.value / 2.0,
+        kDriveDCTransmission,
+        kDriveDCTransmission
+    )
+
 
     // ELEVATOR
     val kElevatorSensorUnitsPerRotaton = 1440.STU

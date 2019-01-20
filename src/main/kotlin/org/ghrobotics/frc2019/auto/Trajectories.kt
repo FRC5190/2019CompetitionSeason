@@ -5,8 +5,6 @@
 
 package org.ghrobotics.frc2019.auto
 
-import com.team254.lib.physics.DCMotorTransmission
-import com.team254.lib.physics.DifferentialDrive
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.trajectory.DefaultTrajectoryGenerator
@@ -20,30 +18,10 @@ import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.mathematics.units.meter
-import kotlin.math.pow
 
 object Trajectories {
 
     /************************************ CONSTRAINTS ************************************/
-
-    // DC Motor Transmission for the DriveSubsystem
-    private val dcTransmission = DCMotorTransmission(
-        1 / Constants.kDriveKv,
-        Constants.kWheelRadius.value.pow(2) * Constants.kRobotMass / (2.0 * Constants.kDriveKa),
-        Constants.kStaticFrictionVoltage
-    )
-
-    // Differential Drive. We are defining this here so that this class can be accessed by tests
-    // without having to initialize WPILib.
-    val differentialDrive = DifferentialDrive(
-        Constants.kRobotMass,
-        Constants.kRobotMomentOfInertia,
-        Constants.kRobotAngularDrag,
-        Constants.kWheelRadius.value,
-        Constants.kTrackWidth.value / 2.0,
-        dcTransmission,
-        dcTransmission
-    )
 
     private val kMaxVelocity = 12.0.feet.velocity
     private val kMaxAcceleration = 12.0.feet.acceleration
@@ -51,7 +29,7 @@ object Trajectories {
 
     private val kConstraints = listOf(
         CentripetalAccelerationConstraint(kMaxCentripetalAcceleration),
-        DifferentialDriveDynamicsConstraint(differentialDrive, 10.0.volt),
+        DifferentialDriveDynamicsConstraint(Constants.kDriveModel, 10.0.volt),
         VelocityLimitRegionConstraint(Constants.kLevel1Platform, 3.feet.velocity)
     )
 
@@ -89,7 +67,8 @@ object Trajectories {
     val kNearRocketHatch =
         Pose2d(
             kRocketCenterlineX - kRocketHatchXOffset,
-            kRocketHatchY, (-30).degree) + Constants.kForwardIntakeToCenter
+            kRocketHatchY, (-30).degree
+        ) + Constants.kForwardIntakeToCenter
 
     val kFarRocketHatch =
         Pose2d(
@@ -100,7 +79,8 @@ object Trajectories {
 
     val kRocketBay = Pose2d(
         kRocketCenterlineX,
-        kRocketBayY, (-90).degree) + Constants.kForwardIntakeToCenter
+        kRocketBayY, (-90).degree
+    ) + Constants.kForwardIntakeToCenter
 
     val kLeftForwardCargoShip =
         Pose2d(

@@ -2,10 +2,7 @@ package org.ghrobotics.frc2019.auto
 
 import org.ghrobotics.frc2019.Network
 import org.ghrobotics.frc2019.Robot
-import org.ghrobotics.frc2019.auto.routines.baselineRoutine
-import org.ghrobotics.frc2019.auto.routines.characterizationRoutine
-import org.ghrobotics.frc2019.auto.routines.doubleHatchRocketRoutine
-import org.ghrobotics.frc2019.auto.routines.forwardCargoShipRoutine
+import org.ghrobotics.frc2019.auto.routines.*
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.commands.InstantRunnableCommand
 import org.ghrobotics.lib.commands.S3ND
@@ -64,14 +61,12 @@ object Autonomous {
     private val JUST = stateCommandGroup(startingPosition) {
         state(StartingPositions.LEFT, StartingPositions.RIGHT) {
             stateCommandGroup(autoMode) {
-                state(AutoMode.DOUBLE_HATCH_ROCKET, doubleHatchRocketRoutine())
+                state(AutoMode.HIGH_HATCHES_ROCKET, highHatchesRocketRoutine())
+                state(AutoMode.HATCH_AND_CARGO_ROCKET, hatchAndCargoRocketRoutine())
                 state(AutoMode.BASELINE, baselineRoutine())
                 state(AutoMode.CHARACTERIZE, characterizationRoutine())
 
-                state(
-                    AutoMode.FORWARD_CARGO_SHIP,
-                    invalidOptionRoutine
-                )
+                state(AutoMode.FORWARD_CARGO_SHIP, invalidOptionRoutine)
             }
         }
         state(StartingPositions.CENTER) {
@@ -80,10 +75,8 @@ object Autonomous {
                 state(AutoMode.BASELINE, baselineRoutine())
                 state(AutoMode.CHARACTERIZE, characterizationRoutine())
 
-                state(
-                    AutoMode.DOUBLE_HATCH_ROCKET,
-                    invalidOptionRoutine
-                )
+                state(AutoMode.HIGH_HATCHES_ROCKET, invalidOptionRoutine)
+                state(AutoMode.HATCH_AND_CARGO_ROCKET, invalidOptionRoutine)
             }
         }
     }
@@ -94,8 +87,6 @@ object Autonomous {
     private val startingPositionMonitor = startingPosition.monitor
     private val isReadyMonitor = isReady.monitor
     private val modeMonitor = { Robot.currentMode }.monitor
-
-
 }
 
 enum class StartingPositions(val pose: Pose2d) {
@@ -104,4 +95,4 @@ enum class StartingPositions(val pose: Pose2d) {
     RIGHT(Trajectories.kSideStart)
 }
 
-enum class AutoMode { CHARACTERIZE, DOUBLE_HATCH_ROCKET, FORWARD_CARGO_SHIP, BASELINE }
+enum class AutoMode { CHARACTERIZE, HIGH_HATCHES_ROCKET, HATCH_AND_CARGO_ROCKET, FORWARD_CARGO_SHIP, BASELINE }

@@ -56,7 +56,7 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
 
     val kPathFollowingDt = 10.millisecond
 
-    override val differentialDrive = Trajectories.differentialDrive
+    override val differentialDrive = Constants.kDriveModel
     override val trajectoryTracker = RamseteTracker(Constants.kDriveBeta, Constants.kDriveZeta)
 
     init {

@@ -11,7 +11,7 @@ import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.withEquals
 
-fun doubleHatchRocketRoutine() = autoRoutine {
+fun highHatchesRocketRoutine() = autoRoutine {
 
     // Place hatch on near side of rocket
     +parallel {
