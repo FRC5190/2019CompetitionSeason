@@ -14,15 +14,17 @@ class SuperstructureCommand(
     private val armAngle: Rotation2d
 ) : FalconCommand(ElevatorSubsystem, ArmSubsystem) {
 
-    private var currentState = State.GO_TO_HEIGHT
-    private val elevatorHeightWanted = (heightAboveGround - Constants.kElevatorHeightFromGround -
-        (Constants.kArmLength * armAngle.sin)).coerceIn(0.inch, Constants.kMaxElevatorHeightFromZero)
+    private val elevatorHeightWanted =
+        (heightAboveGround - Constants.kElevatorHeightFromGround - (Constants.kArmLength * armAngle.sin))
+            .coerceIn(0.inch, Constants.kMaxElevatorHeightFromZero)
 
-    val isFrontWanted = armAngle < 90.degree
+    private val isFrontWanted = armAngle < 90.degree
+    private val isFrontCurrent = ArmSubsystem.armPosition < 90.degree
+
+    private var currentState = State.GO_TO_HEIGHT
 
     init {
-        require(armAngle.degree !in 85.0..95.0)
-        require(armAngle.degree in 0.0..180.0)
+        require(armAngle !in (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance))
         finishCondition += {
             (ElevatorSubsystem.elevatorPosition - elevatorHeightWanted).absoluteValue < Constants.kElevatorClosedLoopTolerance
                 && (ArmSubsystem.armPosition - armAngle).absoluteValue < Constants.kArmClosedLoopTolerance
@@ -30,7 +32,6 @@ class SuperstructureCommand(
     }
 
     override suspend fun initialize() {
-        val isFrontCurrent = ArmSubsystem.armPosition < 90.degree
         currentState = when {
             isFrontWanted != isFrontCurrent -> State.FLIP_ARM_ELEVATOR_DOWN
             else -> State.GO_TO_HEIGHT
@@ -40,6 +41,7 @@ class SuperstructureCommand(
     override suspend fun execute() {
 
         when (currentState) {
+            // Zero elevator and move arm close to elevator
             State.FLIP_ARM_ELEVATOR_DOWN -> {
                 ElevatorSubsystem.elevatorPosition = 0.inch
                 ArmSubsystem.armPosition = if (isFrontWanted) 95.degree else 85.degree
@@ -47,6 +49,7 @@ class SuperstructureCommand(
                     currentState = State.FLIP_ARM
                 }
             }
+            // Flip arm
             State.FLIP_ARM -> {
                 ArmSubsystem.armPosition = armAngle
 
@@ -60,6 +63,7 @@ class SuperstructureCommand(
                     }
                 }
             }
+            // Go to elevator height
             State.GO_TO_HEIGHT -> ElevatorSubsystem.elevatorPosition = elevatorHeightWanted
         }
     }
@@ -71,9 +75,9 @@ class SuperstructureCommand(
     }
 
     companion object {
-        val kFrontHighRocketHatch = { SuperstructureCommand(76.inch, 0.degree) }
-        val kFrontHighRocketCargo = { SuperstructureCommand(80.inch, 45.degree) }
-        val kBackLoadingStation = { SuperstructureCommand(21.inch, 180.degree) }
-        val kFrontLoadingStation = { SuperstructureCommand(21.inch, 0.degree) }
+        val kFrontHighRocketHatch get() = SuperstructureCommand(76.inch, 0.degree)
+        val kFrontHighRocketCargo get() = SuperstructureCommand(80.inch, 45.degree)
+        val kBackLoadingStation get() = SuperstructureCommand(21.inch, 180.degree)
+        val kFrontLoadingStation get() = SuperstructureCommand(21.inch, 0.degree)
     }
 }
