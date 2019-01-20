@@ -56,7 +56,7 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
                 +DelayCommand(100.second)
             }.withTimeout(Trajectories.loadingStationToNearRocketHatch.lastState.t - 1.second)
             // Take superstructure to full height.
-            +Superstructure.kFrontHighRocketHatch
+            +Superstructure.kFrontMiddleRocketHatch
         }
     }
 
