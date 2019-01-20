@@ -67,6 +67,7 @@ object Network {
     private val elevatorCurrent = elevatorSubsystemLayout.add("Current", 0.0).entry
     private val elevatorVoltage = elevatorSubsystemLayout.add("Voltage", 0.0).entry
     private val elevatorVelocity = elevatorSubsystemLayout.add("Velocity (ips)", 0.0).entry
+    private val elevatorLimitSwitch = elevatorSubsystemLayout.add("Rev Limit Switch", false).entry
 
     private val armRawPosition = armSubsystemLayout.add("Raw Position", 0.0).entry
     private val armPosition = armSubsystemLayout.add("Position (deg)", 0.0).entry
@@ -106,7 +107,8 @@ object Network {
         elevatorPosition.setDouble(ElevatorSubsystem.elevatorPosition.inch)
         elevatorCurrent.setDouble(ElevatorSubsystem.current)
         elevatorVoltage.setDouble(ElevatorSubsystem.voltage)
-        elevatorVelocity.setDouble(ElevatorSubsystem.velocity.inchesPerSecond)
+//        elevatorVelocity.setDouble(ElevatorSubsystem.velocity.inchesPerSecond)
+        elevatorLimitSwitch.setBoolean(ElevatorSubsystem.limitSwitch)
 
         armRawPosition.setDouble(ArmSubsystem.rawEncoder.toDouble())
         armPosition.setDouble(ArmSubsystem.armPosition.degree)

@@ -21,11 +21,17 @@ object Superstructure {
             (Constants.kArmLength * ArmSubsystem.armPosition.sin)
 
 
-    val kFrontHighRocketHatch get() = goToHeightWithAngle(76.inch, 0.degree)
-    val kFrontHighRocketCargo get() = goToHeightWithAngle(80.inch, 45.degree)
-    val kFrontMiddleRocketHatch get() = goToHeightWithAngle(60.inch, 0.degree) // TODO MEASURE
-    val kBackLoadingStation get() = goToHeightWithAngle(21.inch, 180.degree)
-    val kFrontLoadingStation get() = goToHeightWithAngle(21.inch, 0.degree)
+//    val kFrontHighRocketHatch get() = goToHeightWithAngle(76.inch, 0.degree)
+//    val kFrontHighRocketCargo get() = goToHeightWithAngle(80.inch, 45.degree)
+//    val kFrontMiddleRocketHatch get() = goToHeightWithAngle(60.inch, 0.degree) // TODO MEASURE
+//    val kBackLoadingStation get() = goToHeightWithAngle(21.inch, 180.degree)
+//    val kFrontLoadingStation get() = goToHeightWithAngle(21.inch, 0.degree)
+
+    val kFrontHighRocketHatch get() = ClosedLoopElevatorCommand(65.inch)
+    val kFrontHighRocketCargo get() = ClosedLoopElevatorCommand(65.inch)
+    val kFrontMiddleRocketHatch get() = ClosedLoopElevatorCommand(47.inch - Constants.kElevatorHeightFromGround) // TODO MEASURE
+    val kBackLoadingStation get() = ClosedLoopElevatorCommand(21.inch)
+    val kFrontLoadingStation get() = ClosedLoopElevatorCommand(21.inch)
 
     fun goToHeightWithAngle(
         heightAboveGround: Length,

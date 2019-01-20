@@ -24,7 +24,7 @@ object Trajectories {
     /************************************ CONSTRAINTS ************************************/
 
     private val kMaxVelocity = 12.0.feet.velocity
-    private val kMaxAcceleration = 12.0.feet.acceleration
+    private val kMaxAcceleration = 10.0.feet.acceleration
     private val kMaxCentripetalAcceleration = 9.0.feet.acceleration
 
     private val kConstraints = listOf(
@@ -42,7 +42,7 @@ object Trajectories {
     val kSideStart =
         Pose2d(
             kStartX,
-            Constants.kLevel2BottomY + Constants.kBumperLength + Constants.kRobotWidth / 2.0
+            Constants.kLevel2BottomY + Constants.kBumperLength + Constants.kRobotWidth / 2.0 + 5.inch
         )
 
     val kCenterStart = Pose2d(kStartX, 13.5.feet, 0.degree)
@@ -72,7 +72,7 @@ object Trajectories {
     val kFarRocketHatch =
         Pose2d(
             kRocketCenterlineX + kRocketHatchXOffset + 4.inch,
-            kRocketHatchY - 15.inch,
+            kRocketHatchY - 17.inch,
             (-150).degree
         ) + Constants.kForwardIntakeToCenter
 

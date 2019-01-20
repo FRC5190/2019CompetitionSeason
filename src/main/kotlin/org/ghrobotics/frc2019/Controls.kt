@@ -6,12 +6,15 @@
 package org.ghrobotics.frc2019
 
 import edu.wpi.first.wpilibj.GenericHID
+import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
+import org.ghrobotics.frc2019.subsystems.elevator.ClosedLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakePneumaticCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeWheelCommand
+import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.utils.map
 import org.ghrobotics.lib.wrappers.hid.*
 import kotlin.math.pow
@@ -65,6 +68,11 @@ object Controls {
         axisButton(2, 0.05) {
             change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * .5 }))
         }
+
+        pov(0).changeOn(Superstructure.kFrontHighRocketHatch)
+        pov(90).changeOn(Superstructure.kFrontMiddleRocketHatch)
+        pov(180).changeOn(ClosedLoopElevatorCommand(0.inch))
+
     }
 
     fun update() {

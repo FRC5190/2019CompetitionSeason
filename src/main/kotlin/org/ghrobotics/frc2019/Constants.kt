@@ -7,6 +7,7 @@ package org.ghrobotics.frc2019
 
 import com.team254.lib.physics.DCMotorTransmission
 import com.team254.lib.physics.DifferentialDrive
+import org.ghrobotics.frc2019.subsystems.elevator.CascadingElevatorHelper
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Rectangle2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
@@ -37,10 +38,10 @@ object Constants {
     const val kElevatorSlave2Id = 7
     const val kElevatorSlave3Id = 8
 
-    const val kArmId = 90
+    const val kArmId = 9
 
-    const val kIntakeLeftId = 7
-    const val kIntakeRightId = 9
+    const val kIntakeLeftId = 10
+    const val kIntakeRightId = 11
 
     const val kFrontClimberMasterId = 120
     const val kFrontClimberSlaveId = 130
@@ -145,17 +146,23 @@ object Constants {
         kElevatorWinchRadius
     )
 
-    val kElevatorHeightFromGround = 7.inch
+    // from elevator zero
+    val kHeightOfCascadingSwitch = 8.inch
+    val kNativeUnitOfCascadingSwitch = 2310.STU
+
+    val kElevatorHeightFromGround = 6.inch
     val kMaxElevatorHeightFromZero = 80.inch
 
-    val kElevatorCurrentLimit = 15.amp
+    val kElevatorCurrentLimit = 25.amp
 
+    val kElevatorClosedLoopVelocityTolerance = CascadingElevatorHelper.getNativeUnitsFromHeight(1.inch).velocity
     val kElevatorClosedLoopTolerance = 1.inch
-    val kElevatorAcceleration = 90.inch.acceleration
-    val kElevatorCruiseVelocity = 90.inch.velocity
+    val kElevatorAcceleration = CascadingElevatorHelper.getNativeUnitsFromHeight(125.inch).acceleration
+    val kElevatorCruiseVelocity = CascadingElevatorHelper.getNativeUnitsFromHeight(200.inch).velocity
 
-    const val kElevatorKp = 0.3 // TODO Tune me
-    const val kElevatorKg = 1.65 / 12.0 // Percent required to counteract gravity // TODO Tune me
+    const val kElevatorKp = 0.5
+    const val kElevatorKf = 0.864 / 2.0
+    const val kElevatorKg = 0.0 // Percent required to counteract gravity // TODO Tune me
 
 
     // ARM
@@ -163,6 +170,8 @@ object Constants {
     val kArmNativeUnitModel = NativeUnitRotationModel(
         kArmSensorUnitsPerRotation
     )
+
+    val kArmUpTicks = 512.STU
 
     val kArmLength = 30.inch
     val kArmFlipTolerance = 5.degree

@@ -10,6 +10,7 @@ import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.epsilonEquals
 import org.ghrobotics.lib.mathematics.units.amp
+import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.millisecond
@@ -28,10 +29,9 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     // Used to retrieve the current arm position and to set the arm elevator position.
     var armPosition
-        get() = armMaster.sensorPosition
+        get() = armMaster.sensorPosition + 90.degree
         set(value) {
-            var effectiveValue = value.fromModel(Constants.kArmNativeUnitModel).value
-            if (effectiveValue < 0) effectiveValue += Constants.kArmSensorUnitsPerRotation.value
+            val effectiveValue = (value - 90.degree).fromModel(Constants.kArmNativeUnitModel).value
 
             val experiencedAcceleration = 9.81 + ElevatorSubsystem.acceleration.value
 

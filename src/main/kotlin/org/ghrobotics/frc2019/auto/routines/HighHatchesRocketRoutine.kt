@@ -23,9 +23,9 @@ fun highHatchesRocketRoutine() = autoRoutine {
         )
         +sequential {
             // Wait until the path is 1 second from completion
-            +DelayCommand(Trajectories.sideStartToNearRocketHatch.lastState.t - 1.second)
+            +DelayCommand(Trajectories.sideStartToNearRocketHatch.lastState.t - 1.5.second)
             // Take superstructure to place hatch
-            +Superstructure.kFrontHighRocketHatch
+            +Superstructure.kFrontHighRocketHatch.withTimeout(1.5.second)
         }
     }
 
@@ -39,7 +39,7 @@ fun highHatchesRocketRoutine() = autoRoutine {
             dt = DriveSubsystem.kPathFollowingDt
         )
         // Take superstructure to pickup hatch
-        +Superstructure.kBackLoadingStation
+        +Superstructure.kBackLoadingStation.withTimeout(1.5.second)
     }
 
     // Place hatch on far side of rocket
@@ -53,11 +53,11 @@ fun highHatchesRocketRoutine() = autoRoutine {
         +sequential {
             // Take the superstructure to a good state to minimize the time it takes to go up later on.
             +sequential {
-                +Superstructure.kFrontLoadingStation
+                +Superstructure.kFrontLoadingStation.withTimeout(1.5.second)
                 +DelayCommand(100.second)
             }.withTimeout(Trajectories.loadingStationToFarRocketHatch.lastState.t - 1.second)
             // Take superstructure to full height.
-            +Superstructure.kFrontHighRocketHatch
+            +Superstructure.kFrontHighRocketHatch.withTimeout(1.5.second)
         }
     }
 
@@ -70,6 +70,6 @@ fun highHatchesRocketRoutine() = autoRoutine {
             dt = DriveSubsystem.kPathFollowingDt
         )
         // Take superstructure to intaking position.
-        +Superstructure.kBackLoadingStation
+        +Superstructure.kBackLoadingStation.withTimeout(1.5.second)
     }
 }
