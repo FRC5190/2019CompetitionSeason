@@ -4,6 +4,7 @@ import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.elevator.ClosedLoopElevatorCommand
+import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.lib.commands.ConditionCommand
 import org.ghrobotics.lib.commands.ConditionalCommand
 import org.ghrobotics.lib.commands.parallel
@@ -15,8 +16,14 @@ import org.ghrobotics.lib.mathematics.units.inch
 
 object Superstructure {
 
+    val heightAboveGround
+        get() = Constants.kElevatorHeightFromGround + ElevatorSubsystem.elevatorPosition +
+            (Constants.kArmLength * ArmSubsystem.armPosition.sin)
+
+
     val kFrontHighRocketHatch get() = goToHeightWithAngle(76.inch, 0.degree)
     val kFrontHighRocketCargo get() = goToHeightWithAngle(80.inch, 45.degree)
+    val kFrontMiddleRocketHatch get() = goToHeightWithAngle(60.inch, 0.degree) // TODO MEASURE
     val kBackLoadingStation get() = goToHeightWithAngle(21.inch, 180.degree)
     val kFrontLoadingStation get() = goToHeightWithAngle(21.inch, 0.degree)
 

@@ -23,10 +23,6 @@ object Robot : FalconRobotBase(), CoroutineScope {
     override val coroutineContext = Job()
     val emergencyReadySystems = ArrayList<EmergencyHandleable>()
 
-    val superstructureHeightAboveGround
-        get() = Constants.kElevatorHeightFromGround + ElevatorSubsystem.elevatorPosition +
-            (Constants.kArmLength * ArmSubsystem.armPosition.sin)
-
     var emergencyActive = false
 
     // Initialize all systems.

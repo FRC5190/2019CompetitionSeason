@@ -8,7 +8,7 @@ class AutonomousTiming {
         val time = Trajectories.sideStartToNearRocketHatch.lastState.t.second +
             Trajectories.nearRocketHatchToLoadingStation.lastState.t.second +
             Trajectories.loadingStationToFarRocketHatch.lastState.t.second +
-            Trajectories.farRocketHatchToCargoBall1.lastState.t.second
+            Trajectories.farRocketHatchToCargoBall.lastState.t.second
         println("Double Hatch Rocket Execution Time: $time")
     }
 
@@ -18,5 +18,16 @@ class AutonomousTiming {
             Trajectories.leftForwardCargoShipToLoadingStation.lastState.t.second +
             Trajectories.loadingStationToRightForwardCargoShip.lastState.t.second
         println("Forward Cargo Ship Execution Time: $time")
+    }
+
+    @Test
+    fun hatchAndCargoRocketAutoTimer() {
+        val time = Trajectories.sideStartToNearRocketHatch.lastState.t.second +
+            Trajectories.nearRocketHatchToLoadingStation.lastState.t.second +
+            Trajectories.loadingStationToNearRocketHatch.lastState.t.second +
+            Trajectories.nearRocketHatchToCargoBall.lastState.t.second +
+            Trajectories.cargoBallToForcedNearSideRocketBay.lastState.t.second
+
+        println("Hatch and Cargo Rocket Execution Time: $time")
     }
 }

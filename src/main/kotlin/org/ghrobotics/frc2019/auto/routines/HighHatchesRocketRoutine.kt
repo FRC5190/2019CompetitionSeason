@@ -57,20 +57,7 @@ fun highHatchesRocketRoutine() = autoRoutine {
                 +DelayCommand(100.second)
             }.withTimeout(Trajectories.loadingStationToFarRocketHatch.lastState.t - 1.second)
             // Take superstructure to full height.
-            +Superstructure.kFrontHighRocketHatch
+            +Superstructure.kFrontMiddleRocketHatch
         }
     }
-
-    // Get ready to pickup cargo
-    +parallel {
-        // Drive to cargo depot.
-        +DriveSubsystem.followTrajectory(
-            trajectory = Trajectories.farRocketHatchToCargoBall1,
-            pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
-            dt = DriveSubsystem.kPathFollowingDt
-        )
-        // Take superstructure to intaking position.
-        +Superstructure.kBackLoadingStation
-    }
-
 }

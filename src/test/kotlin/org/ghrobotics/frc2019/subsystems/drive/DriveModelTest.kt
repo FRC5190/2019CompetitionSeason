@@ -22,7 +22,7 @@ class DriveModelTest {
             time.add(t)
 
             val predictedAcceleration =
-                Trajectories.differentialDrive.solveForwardDynamics(velocity, voltage).wheelAcceleration
+                Constants.kDriveModel.solveForwardDynamics(velocity, voltage).wheelAcceleration
             velocity = DifferentialDrive.WheelState(
                 velocity.left + predictedAcceleration.left * dt,
                 velocity.right + predictedAcceleration.right * dt
