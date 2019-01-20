@@ -18,6 +18,8 @@ class SuperstructureCommand(
     private val elevatorHeightWanted = (heightAboveGround - Constants.kElevatorHeightFromGround -
         (Constants.kArmLength * armAngle.sin)).coerceIn(0.inch, Constants.kMaxElevatorHeightFromZero)
 
+    val isFrontWanted = armAngle < 90.degree
+
     init {
         require(armAngle.degree !in 85.0..95.0)
         require(armAngle.degree in 0.0..180.0)
@@ -28,7 +30,6 @@ class SuperstructureCommand(
     }
 
     override suspend fun initialize() {
-        val isFrontWanted = armAngle < 90.degree
         val isFrontCurrent = ArmSubsystem.armPosition < 90.degree
         currentState = when {
             isFrontWanted != isFrontCurrent -> State.FLIP_ARM_ELEVATOR_DOWN
@@ -37,16 +38,18 @@ class SuperstructureCommand(
     }
 
     override suspend fun execute() {
+
         when (currentState) {
             State.FLIP_ARM_ELEVATOR_DOWN -> {
                 ElevatorSubsystem.elevatorPosition = 0.inch
+                ArmSubsystem.armPosition = if (isFrontWanted) 95.degree else 85.degree
                 if (ElevatorSubsystem.elevatorPosition < 2.inch) {
                     currentState = State.FLIP_ARM
                 }
             }
             State.FLIP_ARM -> {
                 ArmSubsystem.armPosition = armAngle
-                val isFrontWanted = armAngle < 90.degree
+
                 if (isFrontWanted) {
                     if (ArmSubsystem.armPosition < 85.degree) {
                         currentState = State.GO_TO_HEIGHT
