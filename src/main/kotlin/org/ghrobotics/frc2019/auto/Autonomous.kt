@@ -45,12 +45,14 @@ object Autonomous {
 
     // Updates the monitors and starts the autonomous routine if everything is ready.
     fun update() {
+        // Update localization.
+        startingPositionMonitor.onChange { DriveSubsystem.localization.reset(it.pose) }
+        
         // Just send it when everything is ready.
         isReadyMonitor.onChangeToTrue {
             JUST S3ND IT
         }
-        // Update localization.
-        startingPositionMonitor.onChange { DriveSubsystem.localization.reset(it.pose) }
+        
         // Stop the auto routine when we are not in autonomous anymore.
         modeMonitor.onChange { newValue ->
             if (newValue != FalconRobotBase.Mode.AUTONOMOUS) JUST.stop()
