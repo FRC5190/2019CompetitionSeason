@@ -8,7 +8,7 @@ package org.ghrobotics.frc2019
 import com.team254.lib.physics.DCMotorTransmission
 import com.team254.lib.physics.DifferentialDrive
 import org.ghrobotics.frc2019.subsystems.arm.ArmNativeUnitModel
-import org.ghrobotics.frc2019.subsystems.elevator.SpringCascadingNativeUnitModel
+import org.ghrobotics.frc2019.subsystems.elevator.SpringCascadeNativeUnitModel
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Rectangle2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
@@ -145,7 +145,7 @@ object Constants {
     val kElevatorAfterSwitchHeightSample = 40.inch // TODO Find me
     val kElevatorAfterSwitchNativeUnitSample = 6930.STU // TODO Find me
 
-    val kElevatorNativeUnitModel = SpringCascadingNativeUnitModel(
+    val kElevatorNativeUnitModel = SpringCascadeNativeUnitModel(
         switchHeight = kElevatorSwitchHeight,
         switchNativeUnit = kElevatorSwitchNativeUnit,
         afterSwitchHeightSample = kElevatorAfterSwitchHeightSample,

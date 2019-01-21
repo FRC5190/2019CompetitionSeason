@@ -22,7 +22,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     // 4 motors that move the elevator up and down.
     private val elevatorMaster =
-        SpringCascadingFalconSRX(Constants.kElevatorMasterId, Constants.kElevatorNativeUnitModel)
+        SpringCascadeFalconSRX(Constants.kElevatorMasterId, Constants.kElevatorNativeUnitModel)
     private val elevatorSlave1 = NativeFalconSRX(Constants.kElevatorSlave1Id)
     private val elevatorSlave2 = NativeFalconSRX(Constants.kElevatorSlave2Id)
     private val elevatorSlave3 = NativeFalconSRX(Constants.kElevatorSlave3Id)

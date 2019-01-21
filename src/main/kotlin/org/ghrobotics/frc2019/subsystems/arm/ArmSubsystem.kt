@@ -8,14 +8,13 @@ import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.lib.commands.FalconSubsystem
-import org.ghrobotics.lib.mathematics.epsilonEquals
 import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
+import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.mathematics.units.nativeunits.STUPer100ms
-import org.ghrobotics.lib.mathematics.units.nativeunits.fromModel
 import org.ghrobotics.lib.mathematics.units.radian
 import org.ghrobotics.lib.wrappers.ctre.FalconSRX
 
@@ -31,15 +30,13 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     var armPosition
         get() = armMaster.sensorPosition + 90.degree
         set(value) {
-            val effectiveValue = (value - 90.degree).fromModel(Constants.kArmNativeUnitModel).value
-
             val experiencedAcceleration = 9.81 + ElevatorSubsystem.acceleration.value
 
             val feedforward =
                 Constants.kArmKg * armPosition.cos * experiencedAcceleration + Constants.kArmKa * acceleration.value
 
             armMaster.set(
-                ControlMode.Disabled, effectiveValue,
+                ControlMode.Disabled, value,
                 DemandType.ArbitraryFeedForward, feedforward
             )
         }
@@ -71,7 +68,7 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     private var acceleration = 0.radian.acceleration
 
     // Used as a storage variable to compute acceleration.
-    private var previousTrajectoryVelocity = 0.0
+    private var previousTrajectoryVelocity = 0.radian.velocity
 
     init {
         // Configure feedback sensor and sensor phase
@@ -129,11 +126,11 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
      * Used to calculate the acceleration of the arm.
      */
     override fun periodic() {
-        val cruiseVelocity =
-            Constants.kArmCruiseVelocity.fromModel(Constants.kArmNativeUnitModel).STUPer100ms
+        val cruiseVelocity = Constants.kArmCruiseVelocity
 
         acceleration = if (armMaster.controlMode == ControlMode.MotionMagic) {
-            val currentVelocity = armMaster.activeTrajectoryVelocity.toDouble()
+            val currentVelocity =
+                Constants.kArmNativeUnitModel.fromNativeUnitVelocity(armMaster.activeTrajectoryVelocity.STUPer100ms)
             when {
                 currentVelocity epsilonEquals cruiseVelocity -> 0.radian.acceleration
                 currentVelocity > previousTrajectoryVelocity -> Constants.kArmAcceleration

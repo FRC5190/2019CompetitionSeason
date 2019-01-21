@@ -3,29 +3,33 @@ package org.ghrobotics.frc2019.subsystems.arm
 import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnit
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitModel
-import org.ghrobotics.lib.mathematics.units.radian
 
 class ArmNativeUnitModel(
     armOffsetNativeUnits: NativeUnit,
     armOffsetAngle: Rotation2d,
     sensorUnitsPerRotation: NativeUnit
-) : NativeUnitModel<Rotation2d>(sensorUnitsPerRotation) {
+) : NativeUnitModel<Rotation2d>(Rotation2d(0.0)) {
 
     private val armOffsetNativeUnits = armOffsetNativeUnits.value
     private val armOffsetAngle = armOffsetAngle.radian
+    private val nativeUnitsPerRotation = sensorUnitsPerRotation.value
 
-    override fun createNew(newValue: Double) = newValue.radian
-
-    override fun toModel(value: Double): Double {
-        val valueFromOffset = value - armOffsetNativeUnits
-        val angleFromOffset = 2.0 * Math.PI * (valueFromOffset / _sensorUnitsPerRotation)
+    override fun fromNativeUnit(nativeUnits: Double): Double {
+        val valueFromOffset = nativeUnits - armOffsetNativeUnits
+        val angleFromOffset = 2.0 * Math.PI * (valueFromOffset / nativeUnitsPerRotation)
         return angleFromOffset + armOffsetAngle
     }
 
-    override fun fromModel(value: Double): Double {
-        val valueFromOffset = value - armOffsetAngle
-        val nativeUnitsFromOffset = (valueFromOffset / (2.0 * Math.PI)) * _sensorUnitsPerRotation
+    override fun toNativeUnit(modelledUnit: Double): Double {
+        val valueFromOffset = modelledUnit - armOffsetAngle
+        val nativeUnitsFromOffset = (valueFromOffset / (2.0 * Math.PI)) * nativeUnitsPerRotation
         return nativeUnitsFromOffset + armOffsetNativeUnits
     }
+
+    override fun fromNativeUnitVelocity(nativeUnitVelocity: Double): Double =
+        (nativeUnitVelocity / nativeUnitsPerRotation) * (Math.PI * 2.0)
+
+    override fun toNativeUnitVelocity(modelledUnitVelocity: Double): Double =
+        (modelledUnitVelocity / (Math.PI * 2.0)) * nativeUnitsPerRotation
 
 }

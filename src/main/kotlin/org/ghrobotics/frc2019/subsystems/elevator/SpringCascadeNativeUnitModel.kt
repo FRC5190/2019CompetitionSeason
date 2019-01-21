@@ -3,14 +3,13 @@ package org.ghrobotics.frc2019.subsystems.elevator
 import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnit
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitModel
-import org.ghrobotics.lib.mathematics.units.nativeunits.STU
 
-class SpringCascadingNativeUnitModel(
+class SpringCascadeNativeUnitModel(
     switchHeight: Length,
     switchNativeUnit: NativeUnit,
     afterSwitchHeightSample: Length,
     afterSwitchNativeUnitSample: NativeUnit
-) : NativeUnitModel<Length>(0.STU) {
+) : NativeUnitModel<Length>(Length(0.0)) {
 
     private val switchHeight = switchHeight.value
     private val switchNativeUnit = switchNativeUnit.value
@@ -18,29 +17,30 @@ class SpringCascadingNativeUnitModel(
     private val afterSwitchSlope = (afterSwitchNativeUnitSample.value - switchNativeUnit.value) /
         (afterSwitchHeightSample.value - switchHeight.value)
 
-    override fun createNew(newValue: Double) = Length(newValue)
-
-    override fun toModel(value: Double): Double =
+    override fun fromNativeUnit(nativeUnits: Double): Double =
         when {
-            value < switchNativeUnit -> value / beforeSwitchSlope
+            nativeUnits < switchNativeUnit -> nativeUnits / beforeSwitchSlope
             else -> {
-                val afterSwitchNativeUnits = value - switchNativeUnit
+                val afterSwitchNativeUnits = nativeUnits - switchNativeUnit
                 val afterSwitchHeight = afterSwitchNativeUnits / afterSwitchSlope
                 switchHeight + afterSwitchHeight
             }
         }
 
-    override fun fromModel(value: Double): Double =
+    override fun toNativeUnit(modelledUnit: Double): Double =
         when {
-            value < switchHeight -> value * beforeSwitchSlope
+            modelledUnit < switchHeight -> modelledUnit * beforeSwitchSlope
             else -> {
-                val afterSwitchHeight = value - switchHeight
+                val afterSwitchHeight = modelledUnit - switchHeight
                 val afterSwitchNativeUnits = afterSwitchHeight * afterSwitchSlope
                 switchNativeUnit + afterSwitchNativeUnits
             }
         }
 
-    fun toOverallModel(value: Double) = value / afterSwitchSlope
-    fun fromOverallModel(value: Double) = value * afterSwitchSlope
+    override fun fromNativeUnitVelocity(nativeUnitVelocity: Double): Double =
+        nativeUnitVelocity / afterSwitchSlope
+
+    override fun toNativeUnitVelocity(modelledUnitVelocity: Double): Double =
+        modelledUnitVelocity * afterSwitchSlope
 
 }
