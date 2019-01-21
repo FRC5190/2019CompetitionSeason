@@ -5,7 +5,6 @@ import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
-import org.ghrobotics.lib.mathematics.epsilonEquals
 import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
@@ -14,9 +13,6 @@ import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.mathematics.units.meter
 import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.mathematics.units.nativeunits.STU
-import org.ghrobotics.lib.mathematics.units.nativeunits.STUPer100ms
-import org.ghrobotics.lib.mathematics.units.nativeunits.fromModel
-import org.ghrobotics.lib.wrappers.ctre.FalconSRX
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 
 /**
@@ -25,7 +21,8 @@ import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     // 4 motors that move the elevator up and down.
-    private val elevatorMaster = NativeFalconSRX(Constants.kElevatorMasterId)
+    private val elevatorMaster =
+        SpringCascadingFalconSRX(Constants.kElevatorMasterId, Constants.kElevatorNativeUnitModel)
     private val elevatorSlave1 = NativeFalconSRX(Constants.kElevatorSlave1Id)
     private val elevatorSlave2 = NativeFalconSRX(Constants.kElevatorSlave2Id)
     private val elevatorSlave3 = NativeFalconSRX(Constants.kElevatorSlave3Id)
@@ -35,12 +32,10 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     // Used to retrieve the current elevator position and to set the desired elevator position.
     var elevatorPosition
-        get() = CascadingElevatorHelper.getHeightFromNativeUnit(elevatorMaster.sensorPosition)
+        get() = elevatorMaster.sensorPosition
         set(value) {
-            val nativeUnits = CascadingElevatorHelper.getNativeUnitsFromHeight(value).value
-            println("Elevator set to ${value.inch} -> $nativeUnits")
             elevatorMaster.set(
-                ControlMode.MotionMagic, nativeUnits,
+                ControlMode.MotionMagic, value,
                 DemandType.ArbitraryFeedForward, Constants.kElevatorKg
             )
         }
@@ -77,7 +72,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         private set
 
     // Used as a storage variable to compute acceleration.
-    private var previousTrajectoryVelocity = 0.0
+    private var previousTrajectoryVelocity = 0.meter.velocity
 
     init {
         // Set slaves to follow master
@@ -89,7 +84,6 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         elevatorMaster.feedbackSensor = FeedbackDevice.QuadEncoder
         elevatorMaster.encoderPhase = false
 
-        // Configure startup settings
         allMotors.forEach { motor ->
             // Brake mode
             motor.brakeMode = NeutralMode.Brake
@@ -103,7 +97,10 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
             motor.peakCurrentLimitDuration = 0.millisecond
             motor.continuousCurrentLimit = Constants.kElevatorCurrentLimit
             motor.currentLimitingEnabled = true
+        }
 
+        // Configure startup settings
+        elevatorMaster.also { motor ->
             // Limit switches
             motor.forwardLimitSwitchSource = LimitSwitchSource.FeedbackConnector to LimitSwitchNormal.NormallyOpen
             motor.reverseLimitSwitchSource = LimitSwitchSource.FeedbackConnector to LimitSwitchNormal.NormallyOpen
@@ -162,23 +159,21 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
     override fun periodic() {
 
         if (limitSwitch) {
-            elevatorMaster.sensorPosition = 0.STU
+            elevatorMaster.sensorPosition = 0.meter
         }
 
-//        val cruiseVelocity =
-//            Constants.kElevatorCruiseVelocity.fromModel(Constants.kElevatorNativeUnitModel).STUPer100ms
-//
-//        acceleration = if (elevatorMaster.controlMode == ControlMode.MotionMagic) {
-//            val currentVelocity =
-//                elevatorMaster.activeTrajectoryVelocity.toDouble()
-//            when {
-//                currentVelocity epsilonEquals cruiseVelocity -> 0.meter.acceleration
-//                currentVelocity > previousTrajectoryVelocity -> Constants.kElevatorAcceleration
-//                else -> -Constants.kElevatorAcceleration
-//            }.also { previousTrajectoryVelocity = currentVelocity }
-//        } else {
-//            0.meter.acceleration
-//        }
+        val cruiseVelocity = Constants.kElevatorCruiseVelocity
+
+        acceleration = if (elevatorMaster.controlMode == ControlMode.MotionMagic) {
+            val currentVelocity = elevatorMaster.activeTrajectoryVelocity
+            when {
+                currentVelocity epsilonEquals cruiseVelocity -> 0.meter.acceleration
+                currentVelocity > previousTrajectoryVelocity -> Constants.kElevatorAcceleration
+                else -> -Constants.kElevatorAcceleration
+            }.also { previousTrajectoryVelocity = currentVelocity }
+        } else {
+            0.meter.acceleration
+        }
     }
 
     // Emergency Management

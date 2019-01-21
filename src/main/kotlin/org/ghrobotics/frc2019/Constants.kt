@@ -8,7 +8,7 @@ package org.ghrobotics.frc2019
 import com.team254.lib.physics.DCMotorTransmission
 import com.team254.lib.physics.DifferentialDrive
 import org.ghrobotics.frc2019.subsystems.arm.ArmNativeUnitModel
-import org.ghrobotics.frc2019.subsystems.elevator.CascadingElevatorHelper
+import org.ghrobotics.frc2019.subsystems.elevator.SpringCascadingNativeUnitModel
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Rectangle2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
@@ -139,26 +139,28 @@ object Constants {
 
 
     // ELEVATOR
-    val kElevatorSensorUnitsPerRotaton = 1440.STU
-    val kElevatorWinchRadius = 1.25.inch
-    val kElevatorNativeUnitModel = NativeUnitLengthModel(
-        kDriveSensorUnitsPerRotation,
-        kElevatorWinchRadius
-    )
-
     // from elevator zero
-    val kHeightOfCascadingSwitch = 8.inch
-    val kNativeUnitOfCascadingSwitch = 2310.STU
+    val kElevatorSwitchHeight = 8.inch
+    val kElevatorSwitchNativeUnit = 2310.STU
+    val kElevatorAfterSwitchHeightSample = 40.inch // TODO Find me
+    val kElevatorAfterSwitchNativeUnitSample = 6930.STU // TODO Find me
+
+    val kElevatorNativeUnitModel = SpringCascadingNativeUnitModel(
+        switchHeight = kElevatorSwitchHeight,
+        switchNativeUnit = kElevatorSwitchNativeUnit,
+        afterSwitchHeightSample = kElevatorAfterSwitchHeightSample,
+        afterSwitchNativeUnitSample = kElevatorAfterSwitchNativeUnitSample
+    )
 
     val kElevatorHeightFromGround = 6.inch
     val kMaxElevatorHeightFromZero = 80.inch
 
     val kElevatorCurrentLimit = 25.amp
 
-    val kElevatorClosedLoopVelocityTolerance = CascadingElevatorHelper.getNativeUnitsFromHeight(1.inch).velocity
+    val kElevatorClosedLoopVelocityTolerance = 1.inch.velocity
     val kElevatorClosedLoopTolerance = 1.inch
-    val kElevatorAcceleration = CascadingElevatorHelper.getNativeUnitsFromHeight(125.inch).acceleration
-    val kElevatorCruiseVelocity = CascadingElevatorHelper.getNativeUnitsFromHeight(200.inch).velocity
+    val kElevatorAcceleration = 125.inch.acceleration
+    val kElevatorCruiseVelocity = 200.inch.velocity
 
     const val kElevatorKp = 0.5
     const val kElevatorKf = 0.864 / 2.0
