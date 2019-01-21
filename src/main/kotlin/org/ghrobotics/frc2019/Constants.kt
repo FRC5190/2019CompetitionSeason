@@ -7,6 +7,7 @@ package org.ghrobotics.frc2019
 
 import com.team254.lib.physics.DCMotorTransmission
 import com.team254.lib.physics.DifferentialDrive
+import org.ghrobotics.frc2019.subsystems.arm.ArmNativeUnitModel
 import org.ghrobotics.frc2019.subsystems.elevator.CascadingElevatorHelper
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Rectangle2d
@@ -15,7 +16,6 @@ import org.ghrobotics.lib.mathematics.units.*
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitLengthModel
-import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitRotationModel
 import org.ghrobotics.lib.mathematics.units.nativeunits.STU
 import kotlin.math.pow
 
@@ -167,11 +167,13 @@ object Constants {
 
     // ARM
     val kArmSensorUnitsPerRotation = 1024.STU
-    val kArmNativeUnitModel = NativeUnitRotationModel(
+    val kArmUpTicks = 512.STU
+
+    val kArmNativeUnitModel = ArmNativeUnitModel(
+        kArmUpTicks,
+        90.degree,
         kArmSensorUnitsPerRotation
     )
-
-    val kArmUpTicks = 512.STU
 
     val kArmLength = 30.inch
     val kArmFlipTolerance = 5.degree
