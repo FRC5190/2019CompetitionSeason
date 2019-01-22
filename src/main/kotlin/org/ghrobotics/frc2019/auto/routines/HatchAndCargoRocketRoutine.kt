@@ -24,7 +24,7 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
             // Wait until the path is 1 second from completion
             +DelayCommand(Trajectories.sideStartToNearRocketHatch.lastState.t - 1.second)
             // Take superstructure to place hatch
-            +Superstructure.kFrontHighRocketHatch
+            +Superstructure.kFrontHighRocketHatch.withTimeout(1.5.second)
         }
     }
 
@@ -38,7 +38,7 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
             dt = DriveSubsystem.kPathFollowingDt
         )
         // Take superstructure to pickup hatch
-        +Superstructure.kBackLoadingStation
+        +Superstructure.kBackLoadingStation.withTimeout(1.5.second)
     }
 
     // Place hatch on near rocket
@@ -56,7 +56,7 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
                 +DelayCommand(100.second)
             }.withTimeout(Trajectories.loadingStationToNearRocketHatch.lastState.t - 1.second)
             // Take superstructure to full height.
-            +Superstructure.kFrontMiddleRocketHatch
+            +Superstructure.kFrontMiddleRocketHatch.withTimeout(1.5.second)
         }
     }
 
@@ -69,7 +69,7 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
             dt = DriveSubsystem.kPathFollowingDt
         )
         // Take superstructure to pickup ball
-        +Superstructure.kBackLoadingStation
+        +Superstructure.kBackLoadingStation.withTimeout(1.5.second)
     }
 
     // Place ball on rocket bay
@@ -87,7 +87,7 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
                 +DelayCommand(100.second)
             }.withTimeout(Trajectories.cargoBallToForcedNearSideRocketBay.lastState.t - 1.second)
             // Take superstructure to full height.
-            +Superstructure.kFrontHighRocketCargo
+            +Superstructure.kFrontHighRocketCargo.withTimeout(1.5.second)
         }
     }
 }

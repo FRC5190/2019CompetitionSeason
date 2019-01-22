@@ -23,15 +23,15 @@ object Superstructure {
 
 //    val kFrontHighRocketHatch get() = goToHeightWithAngle(76.inch, 0.degree)
 //    val kFrontHighRocketCargo get() = goToHeightWithAngle(80.inch, 45.degree)
-//    val kFrontMiddleRocketHatch get() = goToHeightWithAngle(60.inch, 0.degree) // TODO MEASURE
+//    val kFrontMiddleRocketHatch get() = goToHeightWithAngle(60.inch, 0.degree)
 //    val kBackLoadingStation get() = goToHeightWithAngle(21.inch, 180.degree)
 //    val kFrontLoadingStation get() = goToHeightWithAngle(21.inch, 0.degree)
 
-    val kFrontHighRocketHatch get() = ClosedLoopElevatorCommand(65.inch)
+    val kFrontHighRocketHatch get() = ClosedLoopElevatorCommand(75.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft)
     val kFrontHighRocketCargo get() = ClosedLoopElevatorCommand(65.inch)
-    val kFrontMiddleRocketHatch get() = ClosedLoopElevatorCommand(47.inch - Constants.kElevatorHeightFromGround) // TODO MEASURE
-    val kBackLoadingStation get() = ClosedLoopElevatorCommand(21.inch)
-    val kFrontLoadingStation get() = ClosedLoopElevatorCommand(21.inch)
+    val kFrontMiddleRocketHatch get() = ClosedLoopElevatorCommand(47.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft)
+    val kBackLoadingStation get() = ClosedLoopElevatorCommand(20.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft)
+    val kFrontLoadingStation get() = ClosedLoopElevatorCommand(20.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft)
 
     fun goToHeightWithAngle(
         heightAboveGround: Length,
@@ -40,8 +40,9 @@ object Superstructure {
 
         require(armAngle !in 85.degree..95.degree)
 
-        val elevatorHeightWanted = (heightAboveGround - Constants.kElevatorHeightFromGround -
-            (Constants.kArmLength * armAngle.sin)).coerceIn(0.inch, Constants.kMaxElevatorHeightFromZero)
+        val elevatorHeightWanted =
+            (heightAboveGround - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft -
+                (Constants.kArmLength * armAngle.sin)).coerceIn(0.inch, Constants.kMaxElevatorHeightFromZero)
 
         val isFrontWanted = armAngle < 90.degree
         val isFrontCurrent = ArmSubsystem.armPosition < 90.degree

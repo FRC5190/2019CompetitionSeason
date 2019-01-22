@@ -6,15 +6,16 @@
 package org.ghrobotics.frc2019.subsystems.drive
 
 import com.ctre.phoenix.sensors.PigeonIMU
+import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
-import org.ghrobotics.frc2019.auto.Trajectories
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
+import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.millisecond
-import org.ghrobotics.lib.sensors.asSource
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
+import kotlin.concurrent.thread
 import kotlin.properties.Delegates.observable
 
 object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
@@ -40,7 +41,17 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
 
     // Type of localization to determine position on the field
     override val localization = TankEncoderLocalization(
-        PigeonIMU(Constants.kPigeonIMUId).asSource(),
+        PigeonIMU(Constants.kPigeonIMUId).run {
+            setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10)
+            val ypr = DoubleArray(3)
+            thread {
+                while (true) {
+                    getYawPitchRoll(ypr)
+                    Thread.sleep(1000 / 100)
+                }
+            }
+            return@run { ypr[0].degree }
+        },
         leftMotor::sensorPosition,
         rightMotor::sensorPosition
     )

@@ -42,7 +42,7 @@ object Trajectories {
     val kSideStart =
         Pose2d(
             kStartX,
-            Constants.kLevel2BottomY + Constants.kBumperLength + Constants.kRobotWidth / 2.0 + 5.inch
+            Constants.kLevel2BottomY + Constants.kBumperLength + Constants.kRobotWidth / 2.0
         )
 
     val kCenterStart = Pose2d(kStartX, 13.5.feet, 0.degree)
@@ -51,7 +51,7 @@ object Trajectories {
 
     private val kRocketCenterlineX = 19.feet
     private val kRocketHatchXOffset = 1.254.feet
-    private val kRocketHatchY = 16.inch
+    private val kRocketHatchY = 9.75.inch
 
     private val kRocketBayY = 2.35.feet
 
@@ -71,8 +71,8 @@ object Trajectories {
 
     val kFarRocketHatch =
         Pose2d(
-            kRocketCenterlineX + kRocketHatchXOffset + 4.inch,
-            kRocketHatchY - 17.inch,
+            kRocketCenterlineX + kRocketHatchXOffset,
+            kRocketHatchY,
             (-150).degree
         ) + Constants.kForwardIntakeToCenter
 
@@ -106,7 +106,7 @@ object Trajectories {
     val sideStartToNearRocketHatch =
         waypoints(
             kSideStart,
-            Pose2d(11.179.feet, 7.496.feet, (-55).degree),
+            Pose2d(12.0.feet, 7.496.feet, (-55).degree),
             kNearRocketHatch
         ).generateTrajectory(false)
 

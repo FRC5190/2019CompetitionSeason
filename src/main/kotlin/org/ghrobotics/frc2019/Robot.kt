@@ -5,6 +5,7 @@
 
 package org.ghrobotics.frc2019
 
+import edu.wpi.first.wpilibj.Compressor
 import edu.wpi.first.wpilibj.RobotBase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -38,6 +39,8 @@ object Robot : FalconRobotBase(), CoroutineScope {
         Trajectories
 
         VisionProcessing
+
+        Compressor(Constants.kPCMId).start()
     }
 
     override fun periodic() {

@@ -35,8 +35,8 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         get() = elevatorMaster.sensorPosition
         set(value) {
             elevatorMaster.set(
-                ControlMode.MotionMagic, value,
-                DemandType.ArbitraryFeedForward, Constants.kElevatorKg
+                ControlMode.Disabled, value,
+                DemandType.ArbitraryFeedForward, Constants.kElevatorBelowSwitchKg
             )
         }
 
@@ -64,7 +64,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
     var percentOutput
         get() = elevatorMaster.percentOutput
         set(value) {
-            elevatorMaster.percentOutput = value
+            elevatorMaster.percentOutput = 0.0
         }
 
     // Acceleration of the elevator.

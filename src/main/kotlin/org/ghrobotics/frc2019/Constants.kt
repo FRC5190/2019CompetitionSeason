@@ -79,7 +79,7 @@ object Constants {
     val kRobotWidth = 29.inch
     val kRobotLength = 30.inch
     val kBumperLength = 4.5.inch
-    val kIntakeLength = 10.inch
+    val kIntakeLength = 15.inch
 
     const val kRobotMass = 27.2 // kg
     const val kRobotMomentOfInertia = 9.0 // kg m^2
@@ -101,7 +101,7 @@ object Constants {
 
     // DRIVE
     val kDriveSensorUnitsPerRotation = 1440.STU
-    val kWheelRadius = 3.11.inch
+    val kWheelRadius = 2.998657.inch
     val kTrackWidth = 27.75.inch
 
     val kDriveNativeUnitModel = NativeUnitLengthModel(
@@ -139,11 +139,11 @@ object Constants {
 
 
     // ELEVATOR
-    // from elevator zero
+    // from elevator zero (measured from bottom of second stage)
     val kElevatorSwitchHeight = 8.inch
     val kElevatorSwitchNativeUnit = 2310.STU
-    val kElevatorAfterSwitchHeightSample = 40.inch // TODO Find me
-    val kElevatorAfterSwitchNativeUnitSample = 6930.STU // TODO Find me
+    val kElevatorAfterSwitchHeightSample = 63.inch
+    val kElevatorAfterSwitchNativeUnitSample = 10845.STU
 
     val kElevatorNativeUnitModel = SpringCascadeNativeUnitModel(
         switchHeight = kElevatorSwitchHeight,
@@ -152,19 +152,22 @@ object Constants {
         afterSwitchNativeUnitSample = kElevatorAfterSwitchNativeUnitSample
     )
 
-    val kElevatorHeightFromGround = 6.inch
     val kMaxElevatorHeightFromZero = 80.inch
+    val kElevatorSecondStageToArmShaft = 8.inch
+    val kElevatorHeightFromGround = 6.inch
 
     val kElevatorCurrentLimit = 25.amp
 
     val kElevatorClosedLoopVelocityTolerance = 1.inch.velocity
     val kElevatorClosedLoopTolerance = 1.inch
-    val kElevatorAcceleration = 125.inch.acceleration
+    val kElevatorAcceleration = 175.inch.acceleration
     val kElevatorCruiseVelocity = 200.inch.velocity
 
-    const val kElevatorKp = 0.5
+
+    const val kElevatorKp = 1.0
     const val kElevatorKf = 0.864 / 2.0
-    const val kElevatorKg = 0.0 // Percent required to counteract gravity // TODO Tune me
+    const val kElevatorBelowSwitchKg = 0.7 / 12
+    const val kElevatorAfterSwitchKg = 1.4 / 12
 
 
     // ARM

@@ -21,15 +21,15 @@ class ManualDriveCommand : FalconCommand(DriveSubsystem) {
     }
 
     override suspend fun execute() {
-        DriveSubsystem.tankDrive(
-            -leftSource(),
-            -rightSource()
-        )
-//        DriveSubsystem.curvatureDrive(
-//            -speedSource(),
-//            rotationSource(),
-//            quickTurnSource()
+//        DriveSubsystem.tankDrive(
+//            -leftSource(),
+//            -rightSource()
 //        )
+        DriveSubsystem.curvatureDrive(
+            -speedSource(),
+            rotationSource(),
+            quickTurnSource()
+        )
     }
 
     companion object {

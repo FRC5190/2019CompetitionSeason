@@ -71,7 +71,8 @@ object Controls {
 
         pov(0).changeOn(Superstructure.kFrontHighRocketHatch)
         pov(90).changeOn(Superstructure.kFrontMiddleRocketHatch)
-        pov(180).changeOn(ClosedLoopElevatorCommand(0.inch))
+        pov(180).changeOn(Superstructure.kFrontLoadingStation)
+        pov(270).changeOn(ClosedLoopElevatorCommand(0.inch))
 
     }
 

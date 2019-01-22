@@ -25,7 +25,7 @@ fun highHatchesRocketRoutine() = autoRoutine {
             // Wait until the path is 1 second from completion
             +DelayCommand(Trajectories.sideStartToNearRocketHatch.lastState.t - 1.5.second)
             // Take superstructure to place hatch
-            +Superstructure.kFrontHighRocketHatch.withTimeout(1.5.second)
+            +Superstructure.kFrontMiddleRocketHatch.withTimeout(1.5.second)
         }
     }
 
@@ -57,7 +57,7 @@ fun highHatchesRocketRoutine() = autoRoutine {
                 +DelayCommand(100.second)
             }.withTimeout(Trajectories.loadingStationToFarRocketHatch.lastState.t - 1.second)
             // Take superstructure to full height.
-            +Superstructure.kFrontHighRocketHatch.withTimeout(1.5.second)
+            +Superstructure.kFrontMiddleRocketHatch.withTimeout(1.5.second)
         }
     }
 
