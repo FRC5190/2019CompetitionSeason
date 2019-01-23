@@ -28,7 +28,7 @@ object LEDs {
                     } finally {
                         port.close()
                     }
-                } catch (e: Throwable) {
+                } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
                     e.printStackTrace()
                     Thread.sleep(5000)
                 }

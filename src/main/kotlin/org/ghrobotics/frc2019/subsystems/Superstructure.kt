@@ -27,11 +27,27 @@ object Superstructure {
 //    val kBackLoadingStation get() = goToHeightWithAngle(21.inch, 180.degree)
 //    val kFrontLoadingStation get() = goToHeightWithAngle(21.inch, 0.degree)
 
-    val kFrontHighRocketHatch get() = ClosedLoopElevatorCommand(75.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft)
+    val kFrontHighRocketHatch
+        get() = ClosedLoopElevatorCommand(
+            75.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft
+        )
+
     val kFrontHighRocketCargo get() = ClosedLoopElevatorCommand(65.inch)
-    val kFrontMiddleRocketHatch get() = ClosedLoopElevatorCommand(47.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft)
-    val kBackLoadingStation get() = ClosedLoopElevatorCommand(20.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft)
-    val kFrontLoadingStation get() = ClosedLoopElevatorCommand(20.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft)
+
+    val kFrontMiddleRocketHatch
+        get() = ClosedLoopElevatorCommand(
+            47.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft
+        )
+
+    val kBackLoadingStation
+        get() = ClosedLoopElevatorCommand(
+            20.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft
+        )
+
+    val kFrontLoadingStation
+        get() = ClosedLoopElevatorCommand(
+            20.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft
+        )
 
     fun goToHeightWithAngle(
         heightAboveGround: Length,
@@ -61,7 +77,12 @@ object Superstructure {
                     +ClosedLoopArmCommand(armAngle)
                     +sequential {
                         +ConditionCommand {
-                            if (isFrontWanted) ArmSubsystem.armPosition < 85.degree else ArmSubsystem.armPosition > 95.degree
+                            if (isFrontWanted) {
+                                ArmSubsystem.armPosition < 85.degree
+                            }
+                            else {
+                                ArmSubsystem.armPosition > 95.degree
+                            }
                         }
                         +ClosedLoopElevatorCommand(elevatorHeightWanted)
                     }

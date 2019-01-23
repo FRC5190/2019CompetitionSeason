@@ -14,7 +14,6 @@ import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.vision.TargetTracker
-import org.ghrobotics.lib.mathematics.units.derivedunits.inchesPerSecond
 import org.ghrobotics.lib.wrappers.networktables.enumSendableChooser
 
 object Network {
