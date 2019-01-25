@@ -107,7 +107,7 @@ object Network {
         elevatorCurrent.setDouble(ElevatorSubsystem.current)
         elevatorVoltage.setDouble(ElevatorSubsystem.voltage)
 //        elevatorVelocity.setDouble(ElevatorSubsystem.velocity.inchesPerSecond)
-        elevatorLimitSwitch.setBoolean(ElevatorSubsystem.limitSwitch)
+        elevatorLimitSwitch.setBoolean(ElevatorSubsystem.isBottomLimitSwitchPressed)
 
         armRawPosition.setDouble(ArmSubsystem.rawEncoder.toDouble())
         armPosition.setDouble(ArmSubsystem.armPosition.degree)

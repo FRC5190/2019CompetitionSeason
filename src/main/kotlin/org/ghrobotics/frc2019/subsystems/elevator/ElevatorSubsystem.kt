@@ -5,15 +5,15 @@ import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
-import org.ghrobotics.lib.mathematics.units.amp
+import org.ghrobotics.lib.mathematics.units.*
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
-import org.ghrobotics.lib.mathematics.units.inch
-import org.ghrobotics.lib.mathematics.units.meter
-import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.mathematics.units.nativeunits.STU
+import org.ghrobotics.lib.utils.DeltaTime
+import org.ghrobotics.lib.wrappers.ctre.AbstractFalconSRX
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
+import kotlin.concurrent.fixedRateTimer
 
 /**
  * Represents the elevator of the robot.
@@ -21,60 +21,61 @@ import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     // 4 motors that move the elevator up and down.
-    private val elevatorMaster =
-        SpringCascadeFalconSRX(Constants.kElevatorMasterId, Constants.kElevatorNativeUnitModel)
-    private val elevatorSlave1 = NativeFalconSRX(Constants.kElevatorSlave1Id)
-    private val elevatorSlave2 = NativeFalconSRX(Constants.kElevatorSlave2Id)
-    private val elevatorSlave3 = NativeFalconSRX(Constants.kElevatorSlave3Id)
+    private val elevatorMaster = SpringCascadeFalconSRX(
+        Constants.kElevatorMasterId,
+        Constants.kElevatorNativeUnitModel
+    )
 
     // List of all motors.
-    private val allMotors = listOf(elevatorMaster, elevatorSlave1, elevatorSlave2, elevatorSlave3)
+    private val allMotors: List<AbstractFalconSRX<*>>
+
+    // Store the state so we can dynamically update the feedforward
+    private val closedLoopSync = Any()
+    private var isClosedLoop = false
+    private var closedLoopGoal = Length(0.0)
 
     // Used to retrieve the current elevator position and to set the desired elevator position.
     var elevatorPosition
         get() = elevatorMaster.sensorPosition
-        set(value) {
-            elevatorMaster.set(
-                ControlMode.Disabled, value,
-                DemandType.ArbitraryFeedForward, Constants.kElevatorBelowSwitchKg
-            )
+        set(value) = synchronized(closedLoopSync) {
+            closedLoopGoal = value
+            isClosedLoop = true
         }
 
     // Current draw per motor.
-    val current
-        get() = elevatorMaster.outputCurrent
+    val current get() = elevatorMaster.outputCurrent
 
     // Raw encoder value.
-    val rawEncoder
-        get() = elevatorMaster.getSelectedSensorPosition(0)
+    val rawEncoder get() = elevatorMaster.getSelectedSensorPosition(0)
 
     // Voltage draw per motor.
-    val voltage
-        get() = elevatorMaster.motorOutputPercent * 12.0
+    val voltage get() = elevatorMaster.motorOutputPercent * 12.0
 
     // Velocity of the elevator.
-    val velocity
-        get() = elevatorMaster.sensorVelocity
+    val velocity get() = elevatorMaster.sensorVelocity
 
     // Checks if the limit switch is engaged
-    val limitSwitch
-        get() = elevatorMaster.sensorCollection.isRevLimitSwitchClosed
+    val isBottomLimitSwitchPressed get() = elevatorMaster.sensorCollection.isRevLimitSwitchClosed
 
     // Used to retrieve the percent output of each motor and to set the desired percent output.
     var percentOutput
         get() = elevatorMaster.percentOutput
-        set(value) {
-            elevatorMaster.percentOutput = 0.0
+        set(value) = synchronized(closedLoopSync) {
+            isClosedLoop = false
+            elevatorMaster.percentOutput = value
         }
 
     // Acceleration of the elevator.
-    var acceleration = 0.inch.acceleration
+    var actualAcceleration = 0.inch.acceleration
         private set
 
-    // Used as a storage variable to compute acceleration.
-    private var previousTrajectoryVelocity = 0.meter.velocity
-
     init {
+        val elevatorSlave1 = NativeFalconSRX(Constants.kElevatorSlave1Id)
+        val elevatorSlave2 = NativeFalconSRX(Constants.kElevatorSlave2Id)
+        val elevatorSlave3 = NativeFalconSRX(Constants.kElevatorSlave3Id)
+
+        allMotors = listOf(elevatorMaster, elevatorSlave1, elevatorSlave2, elevatorSlave3)
+
         // Set slaves to follow master
         elevatorSlave1.follow(elevatorMaster)
         elevatorSlave2.follow(elevatorMaster)
@@ -117,6 +118,8 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
             motor.motionAcceleration = Constants.kElevatorAcceleration
 
             motor.kF = Constants.kElevatorKf
+
+            motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 1000 / 20)
         }
 
         // Default command to hold the current position
@@ -128,6 +131,17 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
 
         // Set closed loop gains
         setClosedLoopGains()
+
+        var previousVelocity = 0.meter.velocity
+        val deltaTime = DeltaTime()
+        fixedRateTimer(period = 1000 / 10) {
+            val dt = deltaTime.updateTime(System.currentTimeMillis().millisecond)
+            val newVelocity = elevatorMaster.sensorVelocity
+            if (dt.value > 0) {
+                actualAcceleration = (newVelocity - previousVelocity) / dt
+            }
+            previousVelocity = newVelocity
+        }
     }
 
     /**
@@ -149,30 +163,30 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
     }
 
     override fun zeroOutputs() {
-        elevatorMaster.set(ControlMode.PercentOutput, 0.0)
+        percentOutput = 0.0
     }
 
     /**
      * Runs periodically.
-     * Used to calculate the acceleration of the elevator.
+     * Used to calculate the actualAcceleration of the elevator.
      */
     override fun periodic() {
-
-        if (limitSwitch) {
+        if (isBottomLimitSwitchPressed) {
             elevatorMaster.sensorPosition = 0.meter
         }
 
-        val cruiseVelocity = Constants.kElevatorCruiseVelocity
-
-        acceleration = if (elevatorMaster.controlMode == ControlMode.MotionMagic) {
-            val currentVelocity = elevatorMaster.activeTrajectoryVelocity
-            when {
-                currentVelocity epsilonEquals cruiseVelocity -> 0.meter.acceleration
-                currentVelocity > previousTrajectoryVelocity -> Constants.kElevatorAcceleration
-                else -> -Constants.kElevatorAcceleration
-            }.also { previousTrajectoryVelocity = currentVelocity }
-        } else {
-            0.meter.acceleration
+        synchronized(closedLoopSync) {
+            if (isClosedLoop) {
+                val feedforward = if (elevatorPosition < Constants.kElevatorSwitchHeight) {
+                    Constants.kElevatorBelowSwitchKg
+                } else {
+                    Constants.kElevatorBelowSwitchKg
+                }
+                elevatorMaster.set(
+                    ControlMode.MotionMagic, closedLoopGoal,
+                    DemandType.ArbitraryFeedForward, feedforward
+                )
+            }
         }
     }
 

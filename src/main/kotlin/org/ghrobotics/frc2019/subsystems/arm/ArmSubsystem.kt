@@ -8,14 +8,10 @@ import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.lib.commands.FalconSubsystem
+import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.amp
-import org.ghrobotics.lib.mathematics.units.degree
-import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
-import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.millisecond
-import org.ghrobotics.lib.mathematics.units.nativeunits.STUPer100ms
-import org.ghrobotics.lib.mathematics.units.radian
 import org.ghrobotics.lib.wrappers.ctre.FalconSRX
 
 /**
@@ -26,49 +22,38 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     // One arm motors rotates the arm
     private val armMaster = FalconSRX(Constants.kArmId, Constants.kArmNativeUnitModel)
 
+    // Store the state so we can dynamically update the feedforward
+    private val closedLoopSync = Any()
+    private var isClosedLoop = false
+    private var closedLoopGoal = Rotation2d(0.0)
+
     // Used to retrieve the current arm position and to set the arm elevator position.
     var armPosition
-        get() = armMaster.sensorPosition + 90.degree
-        set(value) {
-            val experiencedAcceleration = 9.81 + ElevatorSubsystem.acceleration.value
-
-            val feedforward =
-                Constants.kArmKg * armPosition.cos * experiencedAcceleration + Constants.kArmKa * acceleration.value
-
-            armMaster.set(
-                ControlMode.Disabled, value,
-                DemandType.ArbitraryFeedForward, feedforward
-            )
+        get() = armMaster.sensorPosition
+        set(value) = synchronized(closedLoopSync) {
+            isClosedLoop = true
+            closedLoopGoal = value
         }
 
     // Current draw per motor.
-    val current
-        get() = armMaster.outputCurrent
+    val current get() = armMaster.outputCurrent
 
     // Raw encoder value.
-    val rawEncoder
-        get() = armMaster.getSelectedSensorPosition(0)
+    val rawEncoder get() = armMaster.getSelectedSensorPosition(0)
 
     // Voltage draw per motor.
-    val voltage
-        get() = armMaster.motorOutputPercent * 12.0
+    val voltage get() = armMaster.motorOutputPercent * 12.0
 
     // Velocity of the arm.
-    val velocity
-        get() = armMaster.sensorVelocity
+    val velocity get() = armMaster.sensorVelocity
 
     // Used to retrieve the percent output of each motor and to set the desired percent output.
     var percentOutput
         get() = armMaster.percentOutput
-        set(value) {
+        set(value) = synchronized(closedLoopSync) {
+            isClosedLoop = false
             armMaster.percentOutput = value
         }
-
-    // Acceleration of the elevator.
-    private var acceleration = 0.radian.acceleration
-
-    // Used as a storage variable to compute acceleration.
-    private var previousTrajectoryVelocity = 0.radian.velocity
 
     init {
         // Configure feedback sensor and sensor phase
@@ -123,21 +108,20 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     /**
      * Runs periodically.
-     * Used to calculate the acceleration of the arm.
+     * Used to calculate the actualAcceleration of the arm.
      */
     override fun periodic() {
-        val cruiseVelocity = Constants.kArmCruiseVelocity
+        synchronized(closedLoopSync) {
+            if (isClosedLoop) {
+                val experiencedAcceleration = 9.81 + ElevatorSubsystem.actualAcceleration.value
 
-        acceleration = if (armMaster.controlMode == ControlMode.MotionMagic) {
-            val currentVelocity =
-                Constants.kArmNativeUnitModel.fromNativeUnitVelocity(armMaster.activeTrajectoryVelocity.STUPer100ms)
-            when {
-                currentVelocity epsilonEquals cruiseVelocity -> 0.radian.acceleration
-                currentVelocity > previousTrajectoryVelocity -> Constants.kArmAcceleration
-                else -> -Constants.kArmAcceleration
-            }.also { previousTrajectoryVelocity = currentVelocity }
-        } else {
-            0.radian.acceleration
+                val feedforward = Constants.kArmKg * armPosition.cos * experiencedAcceleration
+
+                armMaster.set(
+                    ControlMode.Disabled, closedLoopGoal,
+                    DemandType.ArbitraryFeedForward, feedforward
+                )
+            }
         }
     }
 
