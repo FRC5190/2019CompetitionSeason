@@ -71,7 +71,7 @@ object Superstructure {
                 +parallel {
                     +zeroElevator
                     +ClosedLoopArmCommand(if (isFrontWanted) 95.degree else 85.degree)
-                }.withExit { zeroElevator.wrappedValue.isCompleted }
+                }.overrideExit { ElevatorSubsystem.reverseLimitSwitch }
 
                 +parallel {
                     +ClosedLoopArmCommand(armAngle)

@@ -57,7 +57,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         get() = elevatorMaster.sensorVelocity
 
     // Checks if the limit switch is engaged
-    val limitSwitch
+    val reverseLimitSwitch
         get() = elevatorMaster.sensorCollection.isRevLimitSwitchClosed
 
     // Used to retrieve the percent output of each motor and to set the desired percent output.
@@ -158,7 +158,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
      */
     override fun periodic() {
 
-        if (limitSwitch) {
+        if (reverseLimitSwitch) {
             elevatorMaster.sensorPosition = 0.meter
         }
 
