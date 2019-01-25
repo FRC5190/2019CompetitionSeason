@@ -22,9 +22,9 @@ class SpringCascadeNativeUnitModelTest {
         val two = 40.inch
         val three = 30.inch
 
-        val oneNativeUnits = model.toNativeUnit(one)
-        val twoNativeUnits = model.toNativeUnit(two)
-        val threeNativeUnits = model.toNativeUnit(three)
+        val oneNativeUnits = model.toNativeUnitPosition(one)
+        val twoNativeUnits = model.toNativeUnitPosition(two)
+        val threeNativeUnits = model.toNativeUnitPosition(three)
 
         assert(oneNativeUnits.value epsilonEquals 1443.75)
         assert(twoNativeUnits.value epsilonEquals 6930.0)
@@ -37,9 +37,9 @@ class SpringCascadeNativeUnitModelTest {
         val two = 6930.STU
         val three = 5486.25.STU
 
-        val oneLength = model.fromNativeUnit(one)
-        val twoLength = model.fromNativeUnit(two)
-        val threeLength = model.fromNativeUnit(three)
+        val oneLength = model.fromNativeUnitPosition(one)
+        val twoLength = model.fromNativeUnitPosition(two)
+        val threeLength = model.fromNativeUnitPosition(three)
 
         assert(oneLength.inch epsilonEquals 5.0)
         assert(twoLength.inch epsilonEquals 40.0)

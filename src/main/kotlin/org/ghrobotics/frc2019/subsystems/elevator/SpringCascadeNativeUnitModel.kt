@@ -17,7 +17,7 @@ class SpringCascadeNativeUnitModel(
     private val afterSwitchSlope = (afterSwitchNativeUnitSample.value - switchNativeUnit.value) /
         (afterSwitchHeightSample.value - switchHeight.value)
 
-    override fun fromNativeUnit(nativeUnits: Double): Double =
+    override fun fromNativeUnitPosition(nativeUnits: Double): Double =
         when {
             nativeUnits < switchNativeUnit -> nativeUnits / beforeSwitchSlope
             else -> {
@@ -27,7 +27,7 @@ class SpringCascadeNativeUnitModel(
             }
         }
 
-    override fun toNativeUnit(modelledUnit: Double): Double =
+    override fun toNativeUnitPosition(modelledUnit: Double): Double =
         when {
             modelledUnit < switchHeight -> modelledUnit * beforeSwitchSlope
             else -> {
@@ -36,6 +36,9 @@ class SpringCascadeNativeUnitModel(
                 switchNativeUnit + afterSwitchNativeUnits
             }
         }
+
+    override fun toNativeUnitError(modelledUnit: Double): Double =
+        modelledUnit * afterSwitchSlope
 
     override fun fromNativeUnitVelocity(nativeUnitVelocity: Double): Double =
         nativeUnitVelocity / afterSwitchSlope

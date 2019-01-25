@@ -26,9 +26,9 @@ class ArmNativeUnitModelTest {
         val two = 90.degree
         val three = 180.degree
 
-        val oneNativeUnit = model1.toNativeUnit(one)
-        val twoNativeUnit = model1.toNativeUnit(two)
-        val threeNativeUnit = model1.toNativeUnit(three)
+        val oneNativeUnit = model1.toNativeUnitPosition(one)
+        val twoNativeUnit = model1.toNativeUnitPosition(two)
+        val threeNativeUnit = model1.toNativeUnitPosition(three)
 
         assert(oneNativeUnit.value epsilonEquals 256.0)
         assert(twoNativeUnit.value epsilonEquals 512.0)
@@ -56,9 +56,9 @@ class ArmNativeUnitModelTest {
         val two = 90.degree
         val three = 180.degree
 
-        val oneNativeUnit = model2.toNativeUnit(one)
-        val twoNativeUnit = model2.toNativeUnit(two)
-        val threeNativeUnit = model2.toNativeUnit(three)
+        val oneNativeUnit = model2.toNativeUnitPosition(one)
+        val twoNativeUnit = model2.toNativeUnitPosition(two)
+        val threeNativeUnit = model2.toNativeUnitPosition(three)
 
         assert(oneNativeUnit.value epsilonEquals 244.0)
         assert(twoNativeUnit.value epsilonEquals 500.0)
@@ -71,9 +71,9 @@ class ArmNativeUnitModelTest {
         val two = 512.STU
         val three = 768.STU
 
-        val oneAngle = model1.fromNativeUnit(one)
-        val twoAngle = model1.fromNativeUnit(two)
-        val threeAngle = model1.fromNativeUnit(three)
+        val oneAngle = model1.fromNativeUnitPosition(one)
+        val twoAngle = model1.fromNativeUnitPosition(two)
+        val threeAngle = model1.fromNativeUnitPosition(three)
 
         assert(oneAngle.degree epsilonEquals 0.0)
         assert(twoAngle.degree epsilonEquals 90.0)
@@ -101,9 +101,9 @@ class ArmNativeUnitModelTest {
         val two = 500.STU
         val three = 756.STU
 
-        val oneAngle = model2.fromNativeUnit(one)
-        val twoAngle = model2.fromNativeUnit(two)
-        val threeAngle = model2.fromNativeUnit(three)
+        val oneAngle = model2.fromNativeUnitPosition(one)
+        val twoAngle = model2.fromNativeUnitPosition(two)
+        val threeAngle = model2.fromNativeUnitPosition(three)
 
         assert(oneAngle.degree epsilonEquals 0.0)
         assert(twoAngle.degree epsilonEquals 90.0)

@@ -14,17 +14,20 @@ class ArmNativeUnitModel(
     private val armOffsetAngle = armOffsetAngle.radian
     private val nativeUnitsPerRotation = sensorUnitsPerRotation.value
 
-    override fun fromNativeUnit(nativeUnits: Double): Double {
+    override fun fromNativeUnitPosition(nativeUnits: Double): Double {
         val valueFromOffset = nativeUnits - armOffsetNativeUnits
         val angleFromOffset = 2.0 * Math.PI * (valueFromOffset / nativeUnitsPerRotation)
         return angleFromOffset + armOffsetAngle
     }
 
-    override fun toNativeUnit(modelledUnit: Double): Double {
+    override fun toNativeUnitPosition(modelledUnit: Double): Double {
         val valueFromOffset = modelledUnit - armOffsetAngle
         val nativeUnitsFromOffset = (valueFromOffset / (2.0 * Math.PI)) * nativeUnitsPerRotation
         return nativeUnitsFromOffset + armOffsetNativeUnits
     }
+
+    override fun toNativeUnitError(modelledUnit: Double): Double =
+        (modelledUnit / (Math.PI * 2.0)) * nativeUnitsPerRotation
 
     override fun fromNativeUnitVelocity(nativeUnitVelocity: Double): Double =
         (nativeUnitVelocity / nativeUnitsPerRotation) * (Math.PI * 2.0)

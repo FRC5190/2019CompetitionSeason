@@ -12,6 +12,7 @@ import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.nativeunits.STU
 import org.ghrobotics.lib.utils.DeltaTime
 import org.ghrobotics.lib.wrappers.ctre.AbstractFalconSRX
+import org.ghrobotics.lib.wrappers.ctre.LinearFalconSRX
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 import kotlin.concurrent.fixedRateTimer
 
@@ -21,7 +22,7 @@ import kotlin.concurrent.fixedRateTimer
 object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     // 4 motors that move the elevator up and down.
-    private val elevatorMaster = SpringCascadeFalconSRX(
+    private val elevatorMaster = LinearFalconSRX(
         Constants.kElevatorMasterId,
         Constants.kElevatorNativeUnitModel
     )
