@@ -2,7 +2,6 @@ package org.ghrobotics.frc2019.subsystems.drive
 
 import com.team254.lib.physics.DifferentialDrive
 import org.ghrobotics.frc2019.Constants
-import org.ghrobotics.frc2019.auto.Trajectories
 import org.junit.Test
 
 class DriveModelTest {
@@ -18,7 +17,7 @@ class DriveModelTest {
         val speed = ArrayList<Double>()
 
         for (i in 0..500) {
-            speed.add(velocity.left * Constants.kWheelRadius.value)
+            speed.add(velocity.left * Constants.kDriveWheelRadius.value)
             time.add(t)
 
             val predictedAcceleration =

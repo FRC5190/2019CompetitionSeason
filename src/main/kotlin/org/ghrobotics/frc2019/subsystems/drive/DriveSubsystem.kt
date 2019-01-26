@@ -22,13 +22,13 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
 
     // Gearboxes
     private val leftGearbox = DriveGearbox(
-        Constants.kLeftMasterId,
-        Constants.kLeftSlaveId1,
+        Constants.kDriveLeftMasterId,
+        Constants.kDriveLeftSlaveId,
         false
     )
     private val rightGearbox = DriveGearbox(
-        Constants.kRightMasterId,
-        Constants.kRightSlaveId1,
+        Constants.kDriveRightMasterId,
+        Constants.kDriveRightSlaveId,
         true
     )
 

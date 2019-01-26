@@ -29,19 +29,19 @@ object Trajectories {
     private val kConstraints = listOf(
         CentripetalAccelerationConstraint(kMaxCentripetalAcceleration),
         DifferentialDriveDynamicsConstraint(Constants.kDriveModel, 10.0.volt),
-        VelocityLimitRegionConstraint(Constants.kLevel1Platform, 3.feet.velocity)
+        VelocityLimitRegionConstraint(Constants.kLevel1HabitatPlatform, 3.feet.velocity)
     )
 
     /************************************ STARTING LOCATIONS ************************************/
 
     private val kStartX =
-        Constants.kLevel2RightX + Constants.kBumperLength + Constants.kRobotLength / 2.0 -
+        Constants.kLevel2HabitatRightX + Constants.kBumperThickness + Constants.kRobotLength / 2.0 -
             Constants.kHypotenuseDifferenceForRamp
 
     val kSideStart =
         Pose2d(
             kStartX,
-            Constants.kLevel2BottomY + Constants.kBumperLength + Constants.kRobotWidth / 2.0
+            Constants.kLevel2HabitatBottomY + Constants.kBumperThickness + Constants.kRobotWidth / 2.0
         )
 
     val kCenterStart = Pose2d(kStartX, 13.5.feet, 0.degree)
