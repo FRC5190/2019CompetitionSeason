@@ -126,10 +126,10 @@ object Network {
         armVoltage.setDouble(ArmSubsystem.voltage)
         armVelocity.setDouble(ArmSubsystem.velocity.value * 180 / Math.PI)
 
-        frontClimbWinchPosition.setDouble(ClimbSubsystem.frontPosition.inch)
-        backClimbWinchPosition.setDouble(ClimbSubsystem.backPosition.inch)
-        frontClimbWinchCurrent.setDouble(ClimbSubsystem.frontCurrent)
-        backClimbWinchCurrent.setDouble(ClimbSubsystem.backCurrent)
+        frontClimbWinchPosition.setDouble(ClimbSubsystem.frontWinchPosition.inch)
+        backClimbWinchPosition.setDouble(ClimbSubsystem.backWinchPosition.inch)
+        frontClimbWinchCurrent.setDouble(ClimbSubsystem.frontWinchCurrent)
+        backClimbWinchCurrent.setDouble(ClimbSubsystem.backWinchCurrent)
 
         val trackedObject = TargetTracker.bestTarget
         if (trackedObject != null) {

@@ -2,6 +2,7 @@ package org.ghrobotics.frc2019.subsystems.climb
 
 import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.NeutralMode
+import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.lib.commands.FalconSubsystem
@@ -11,6 +12,7 @@ import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.wrappers.ctre.AbstractFalconSRX
 import org.ghrobotics.lib.wrappers.ctre.FalconSRX
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
+import kotlin.properties.Delegates
 
 object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
 
@@ -20,38 +22,44 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     private val backWinchMaster =
         FalconSRX(Constants.kClimbBackWinchMasterId, Constants.kClimbWinchNativeUnitModel)
 
+    private val rampsSolenoid = Solenoid(Constants.kPCMId, Constants.kRampsSolenoidId)
+    private val wheelSolenoid = Solenoid(Constants.kPCMId, Constants.kClimberWheelSolenoidId)
+
     private val allMotors: List<AbstractFalconSRX<*>>
     private val allMasters = listOf(frontWinchMaster, backWinchMaster)
 
-    var frontPercentOutput: Double
+    var frontWinchPercentOutput: Double
         get() = frontWinchMaster.percentOutput
         set(value) {
             frontWinchMaster.percentOutput = value
         }
 
-    var backPercentOutput: Double
+    var backWinchPercentOutput: Double
         get() = backWinchMaster.percentOutput
         set(value) {
             backWinchMaster.percentOutput = value
         }
 
-    var frontPosition
+    var frontWinchPosition
         get() = frontWinchMaster.sensorPosition
         set(value) {
             frontWinchMaster.set(ControlMode.MotionMagic, value)
         }
 
-    var backPosition
+    var backWinchPosition
         get() = backWinchMaster.sensorPosition
         set(value) {
             backWinchMaster.set(ControlMode.MotionMagic, value)
         }
 
-    val frontCurrent get() = frontWinchMaster.outputCurrent
-    val backCurrent get() = backWinchMaster.outputCurrent
+    var ramps by Delegates.observable(false) { _, _, newValue -> rampsSolenoid.set(newValue) }
+    var wheel by Delegates.observable(false) { _, _, newValue -> wheelSolenoid.set(newValue) }
 
-    val frontVelocity get() = frontWinchMaster.sensorVelocity
-    val backVelocity get() = backWinchMaster.sensorVelocity
+    val frontWinchCurrent get() = frontWinchMaster.outputCurrent
+    val backWinchCurrent get() = backWinchMaster.outputCurrent
+
+    val frontWinchVelocity get() = frontWinchMaster.sensorVelocity
+    val backWinchVelocity get() = backWinchMaster.sensorVelocity
 
     init {
         val frontWinchSlave = NativeFalconSRX(Constants.kClimbFrontWinchSlaveId)
@@ -81,7 +89,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
             master.motionAcceleration = Constants.kClimbWinchAcceleration
         }
 
-        defaultCommand = OpenLoopClimbCommand(0.0, 0.0)
+        defaultCommand = ManualClimbCommand()
 
         setClosedLoopGains()
     }

@@ -9,16 +9,16 @@ class ClosedLoopClimbCommand(private val frontTarget: Length, private val backTa
 
     init {
         finishCondition += {
-            (ClimbSubsystem.frontPosition - frontTarget).absoluteValue < Constants.kClimbWinchClosedLoopTolerance &&
-                ClimbSubsystem.frontVelocity < Constants.kClimbWinchClosedLoopVelocityTolerance &&
-                (ClimbSubsystem.backPosition - backTarget).absoluteValue < Constants.kClimbWinchClosedLoopTolerance &&
-                ClimbSubsystem.backVelocity < Constants.kClimbWinchClosedLoopVelocityTolerance
+            (ClimbSubsystem.frontWinchPosition - frontTarget).absoluteValue < Constants.kClimbWinchClosedLoopTolerance &&
+                ClimbSubsystem.frontWinchVelocity < Constants.kClimbWinchClosedLoopVelocityTolerance &&
+                (ClimbSubsystem.backWinchPosition - backTarget).absoluteValue < Constants.kClimbWinchClosedLoopTolerance &&
+                ClimbSubsystem.backWinchVelocity < Constants.kClimbWinchClosedLoopVelocityTolerance
 
         }
     }
 
     override suspend fun initialize() {
-        ClimbSubsystem.frontPosition = frontTarget
-        ClimbSubsystem.backPosition = backTarget
+        ClimbSubsystem.frontWinchPosition = frontTarget
+        ClimbSubsystem.backWinchPosition = backTarget
     }
 }
