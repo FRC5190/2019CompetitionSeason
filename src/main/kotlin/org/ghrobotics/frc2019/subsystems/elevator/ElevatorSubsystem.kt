@@ -181,7 +181,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
                 val feedforward = if (elevatorPosition < Constants.kElevatorSwitchHeight) {
                     Constants.kElevatorBelowSwitchKg
                 } else {
-                    Constants.kElevatorBelowSwitchKg
+                    Constants.kElevatorAfterSwitchKg
                 }
                 elevatorMaster.set(
                     ControlMode.MotionMagic, closedLoopGoal,
