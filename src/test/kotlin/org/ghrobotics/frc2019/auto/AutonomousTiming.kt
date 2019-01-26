@@ -1,4 +1,4 @@
-package org.ghrobotics.frc2019.auto
+ package org.ghrobotics.frc2019.auto
 
 import org.junit.Test
 
@@ -8,7 +8,8 @@ class AutonomousTiming {
         val time = Trajectories.sideStartToNearRocketHatch.lastState.t.second +
             Trajectories.nearRocketHatchToLoadingStation.lastState.t.second +
             Trajectories.loadingStationToFarRocketHatch.lastState.t.second +
-            Trajectories.farRocketHatchToCargoBall.lastState.t.second
+            Trajectories.farRocketHatchToCargoBall.lastState.t.second +
+            Trajectories.cargoBallToRocketBay.lastState.t.second
         println("High Hatches Rocket Execution Time: $time")
     }
 

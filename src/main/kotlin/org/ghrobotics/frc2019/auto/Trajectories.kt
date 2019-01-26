@@ -23,8 +23,8 @@ object Trajectories {
     /************************************ CONSTRAINTS ************************************/
 
     private val kMaxVelocity = 12.0.feet.velocity
-    private val kMaxAcceleration = 10.0.feet.acceleration
-    private val kMaxCentripetalAcceleration = 9.0.feet.acceleration
+    private val kMaxAcceleration = 12.0.feet.acceleration
+    private val kMaxCentripetalAcceleration = 10.0.feet.acceleration
 
     private val kConstraints = listOf(
         CentripetalAccelerationConstraint(kMaxCentripetalAcceleration),
@@ -48,8 +48,8 @@ object Trajectories {
 
     /************************************ FIELD POSES ************************************/
 
-    private val kNearRocketHatch = Pose2d(19.feet - 1.254.feet, 1.63.feet, (-30).degree)
-    private val kFarRocketHatch = Pose2d(19.feet + 1.254.feet, 1.63.feet, (-150).degree)
+    private val kNearRocketHatch = Pose2d(19.feet - 1.254.feet, 1.6.feet, (-30).degree)
+    private val kFarRocketHatch = Pose2d(19.feet + 1.254.feet, 1.6.feet, (-150).degree)
     private val kRocketBay = Pose2d(19.feet, 2.35.feet, (-90).degree)
     private val kForceToNearSideRocketBay = Pose2d(19.feet, 2.35.feet, (-100).degree)
 
@@ -102,6 +102,11 @@ object Trajectories {
     val cargoBallToForcedNearSideRocketBay = waypoints(
         kDepotCargoAdjusted,
         kForceToNearSideRocketBayAdjusted
+    ).generateTrajectory(false)
+
+    val cargoBallToRocketBay = waypoints(
+        kDepotCargoAdjusted,
+        kRocketBayAdjusted
     ).generateTrajectory(false)
 
     val farRocketHatchToCargoBall = waypoints(

@@ -42,6 +42,7 @@ object Constants {
     const val kClimbFrontWinchSlaveId   = 13
     const val kClimbBackWinchMasterId   = 14
     const val kClimbBackWinchSlaveId    = 15
+    const val kClimbWheelId             = 16
 
 
     // ANALOG INPUT
@@ -54,12 +55,12 @@ object Constants {
 
 
     // PNEUMATICS
-    const val kPCMId                    = 41
-    const val kIntakeSolenoidId         = 2
-    const val kIntakePlungerSolenoidId  = 0
-    const val kDriveSolenoidId          = 3
-    const val kRampsSolenoidId          = 1
-    const val kClimberWheelSolenoidId   = 5
+    const val kPCMId                        = 41
+    const val kIntakeExtensionSolenoidId    = 2
+    const val kIntakeLauncherSolenoidId     = 0
+    const val kDriveSolenoidId              = 3
+    const val kRampsSolenoidId              = 1
+    const val kClimberWheelSolenoidId       = 5
 
 
     // FIELD
@@ -71,9 +72,9 @@ object Constants {
 
 
     // ROBOT
-    const val kRobotMass            = 27.2 // kg
+    val kRobotMass                  = 123.lb
     const val kRobotMomentOfInertia = 9.0 // kg m^2
-    const val kRobotAngularDrag     = 6.0
+    const val kRobotAngularDrag     = 6.0 // Nm per rad/s
 
     val kRobotWidth         = 29.inch
     val kRobotLength        = 30.inch
@@ -118,12 +119,12 @@ object Constants {
 
     private val kDriveDCTransmission = DCMotorTransmission(
         1 / kDriveKv,
-        kDriveWheelRadius.value.pow(2) * kRobotMass / (2.0 * kDriveKa),
+        kDriveWheelRadius.value.pow(2) * kRobotMass.value / (2.0 * kDriveKa),
         kStaticFrictionVoltage
     )
 
     val kDriveModel = DifferentialDrive(
-        kRobotMass,
+        kRobotMass.value,
         kRobotMomentOfInertia,
         kRobotAngularDrag,
         kDriveWheelRadius.value,
@@ -175,7 +176,7 @@ object Constants {
     )
 
     val kArmLength          = 30.inch
-    val kArmFlipTolerance   = 20.degree
+    val kArmFlipTolerance   = 40.degree
 
     val kArmCurrentLimit = 15.amp
 

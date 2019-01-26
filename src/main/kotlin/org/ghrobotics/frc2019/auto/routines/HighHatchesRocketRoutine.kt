@@ -4,14 +4,22 @@ import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.auto.StartingPositions
 import org.ghrobotics.frc2019.auto.Trajectories
 import org.ghrobotics.frc2019.subsystems.Superstructure
+import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
+import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
+import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
+import org.ghrobotics.lib.commands.ConditionCommand
 import org.ghrobotics.lib.commands.DelayCommand
 import org.ghrobotics.lib.commands.parallel
 import org.ghrobotics.lib.commands.sequential
+import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.withEquals
 
 fun highHatchesRocketRoutine() = autoRoutine {
+
+    +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
 
     // Place hatch on near side of rocket
     +parallel {
@@ -29,6 +37,7 @@ fun highHatchesRocketRoutine() = autoRoutine {
         }
     }
 
+    +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
 
     // Pickup hatch from loading station
     +parallel {
@@ -41,6 +50,8 @@ fun highHatchesRocketRoutine() = autoRoutine {
         // Take superstructure to pickup hatch
         +Superstructure.kBackLoadingStation.withTimeout(1.5.second)
     }
+
+    +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
 
     // Place hatch on far side of rocket
     +parallel {
@@ -61,6 +72,8 @@ fun highHatchesRocketRoutine() = autoRoutine {
         }
     }
 
+    +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+
     // Get ready to pickup cargo
     +parallel {
         // Drive to cargo depot.
@@ -71,5 +84,10 @@ fun highHatchesRocketRoutine() = autoRoutine {
         )
         // Take superstructure to intaking position.
         +Superstructure.kBackLoadingStation.withTimeout(1.5.second)
+
+        +sequential {
+            +ConditionCommand { ArmSubsystem.armPosition > 150.degree}
+            +IntakeCargoCommand(IntakeSubsystem.Direction.HOLD)
+        }
     }
 }

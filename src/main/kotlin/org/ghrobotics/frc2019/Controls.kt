@@ -9,12 +9,13 @@ import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.climb.ClimbSubsystem
+import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
 import org.ghrobotics.frc2019.subsystems.elevator.ClosedLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
-import org.ghrobotics.frc2019.subsystems.intake.IntakePneumaticCommand
+import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
+import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.frc2019.subsystems.intake.IntakeWheelCommand
 import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.utils.map
@@ -32,16 +33,18 @@ object Controls {
 
         state({ !isClimbing }) {
             // Vision align
-            button(kBumperRight).change(VisionDriveCommand())
+            button(kY).change(VisionDriveCommand())
+
+            // Shifting
+            button(kA).changeOn { DriveSubsystem.lowGear = true }
+            button(kA).changeOff { DriveSubsystem.lowGear = false }
 
             // Intake
-            triggerAxisButton(GenericHID.Hand.kRight) {
-                change(IntakeWheelCommand(IntakeSubsystem.Direction.IN))
-            }
-            triggerAxisButton(GenericHID.Hand.kLeft) {
-                change(IntakeWheelCommand(IntakeSubsystem.Direction.OUT))
-            }
-            button(kX).change(IntakePneumaticCommand { !IntakeSubsystem.solenoid.get() })
+            triggerAxisButton(GenericHID.Hand.kLeft).change(IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE))
+            button(kBumperLeft).change(IntakeHatchCommand(IntakeSubsystem.Direction.HOLD))
+
+            triggerAxisButton(GenericHID.Hand.kRight).change(IntakeCargoCommand(IntakeSubsystem.Direction.RELEASE))
+            button(kBumperRight).change(IntakeCargoCommand(IntakeSubsystem.Direction.HOLD))
         }
     }
 

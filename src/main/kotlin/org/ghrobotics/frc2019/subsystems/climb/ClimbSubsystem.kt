@@ -1,6 +1,7 @@
 package org.ghrobotics.frc2019.subsystems.climb
 
 import com.ctre.phoenix.motorcontrol.ControlMode
+import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import com.ctre.phoenix.motorcontrol.NeutralMode
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
@@ -16,17 +17,21 @@ import kotlin.properties.Delegates
 
 object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
 
-    private val frontWinchMaster =
-        FalconSRX(Constants.kClimbFrontWinchMasterId, Constants.kClimbWinchNativeUnitModel)
-
-    private val backWinchMaster =
-        FalconSRX(Constants.kClimbBackWinchMasterId, Constants.kClimbWinchNativeUnitModel)
+    private val frontWinchMaster = FalconSRX(Constants.kClimbFrontWinchMasterId, Constants.kClimbWinchNativeUnitModel)
+    private val backWinchMaster = FalconSRX(Constants.kClimbBackWinchMasterId, Constants.kClimbWinchNativeUnitModel)
+    private val wheelMaster = NativeFalconSRX(Constants.kClimbWheelId)
 
     private val rampsSolenoid = Solenoid(Constants.kPCMId, Constants.kRampsSolenoidId)
     private val wheelSolenoid = Solenoid(Constants.kPCMId, Constants.kClimberWheelSolenoidId)
 
     private val allMotors: List<AbstractFalconSRX<*>>
     private val allMasters = listOf(frontWinchMaster, backWinchMaster)
+
+    var wheelPercent
+        get() = wheelMaster.percentOutput
+        set(value) {
+            wheelMaster.percentOutput = value
+        }
 
     var frontWinchPercentOutput: Double
         get() = frontWinchMaster.percentOutput
@@ -84,6 +89,8 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
 
         allMasters.forEach { master ->
             // Soft Limits
+
+            master.feedbackSensor = FeedbackDevice.CTRE_MagEncoder_Relative
 
             master.motionCruiseVelocity = Constants.kClimbWinchCruiseVelocity
             master.motionAcceleration = Constants.kClimbWinchAcceleration
