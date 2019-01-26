@@ -43,11 +43,11 @@ object Constants {
     const val kIntakeLeftId = 10
     const val kIntakeRightId = 11
 
-    const val kFrontClimberMasterId = 120
-    const val kFrontClimberSlaveId = 130
+    const val kClimbFrontWinchMasterId = 120
+    const val kClimbFrontWinchSlaveId = 130
 
-    const val kBackClimberMasterId = 140
-    const val kBackClimberSlaveId = 150
+    const val kClimbBackWinchMasterId = 140
+    const val kClimbBackWinchSlaveId = 150
 
 
     // ANALOG INPUT
@@ -193,5 +193,20 @@ object Constants {
     const val kArmKa = 0.005 // Volts per radians per second squared
 
     const val kArmKg = 0.005
+
+
+    // CLIMBER
+    val kClimbWinchRadius = 1.25.inch / 2.0
+    val kClimbWinchNativeUnitsPerRotation = 4096.STU
+    val kClimbWinchNativeUnitModel = NativeUnitLengthModel(kClimbWinchNativeUnitsPerRotation, kClimbWinchRadius)
+
+    val kClimbWinchCurrentLimit = 20.amp
+
+    val kClimbWinchCruiseVelocity = 1.5.feet.velocity
+    val kClimbWinchAcceleration = 1.5.feet.acceleration
+
+    val kClimbWinchClosedLoopTolerance = 2.inch
+    val kClimbWinchClosedLoopVelocityTolerance = 1.inch.velocity
+    val kClimbWinchKp = 0.3
 
 }

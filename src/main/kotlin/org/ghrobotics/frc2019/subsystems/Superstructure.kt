@@ -79,8 +79,7 @@ object Superstructure {
                         +ConditionCommand {
                             if (isFrontWanted) {
                                 ArmSubsystem.armPosition < 85.degree
-                            }
-                            else {
+                            } else {
                                 ArmSubsystem.armPosition > 95.degree
                             }
                         }

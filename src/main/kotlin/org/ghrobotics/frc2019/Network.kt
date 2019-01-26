@@ -11,9 +11,11 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
 import org.ghrobotics.frc2019.auto.AutoMode
 import org.ghrobotics.frc2019.auto.StartingPositions
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
+import org.ghrobotics.frc2019.subsystems.climb.ClimbSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.vision.TargetTracker
+import org.ghrobotics.lib.mathematics.units.derivedunits.inchesPerSecond
 import org.ghrobotics.lib.wrappers.networktables.enumSendableChooser
 
 object Network {
@@ -47,6 +49,10 @@ object Network {
         .withSize(2, 2)
         .withPosition(8, 0)
 
+    private val climbSubsystemLayout = mainShuffleboardDisplay.getLayout("Climb", BuiltInLayouts.kGrid)
+        .withSize(2, 2)
+        .withPosition(10, 0)
+
     private val globalXEntry = localizationLayout.add("Robot X", 0.0).entry
     private val globalYEntry = localizationLayout.add("Robot Y", 0.0).entry
     private val globalAEntry = localizationLayout.add("Robot Angle", 0.0).entry
@@ -73,6 +79,11 @@ object Network {
     private val armCurrent = armSubsystemLayout.add("Current", 0.0).entry
     private val armVoltage = armSubsystemLayout.add("Voltage", 0.0).entry
     private val armVelocity = armSubsystemLayout.add("Velocity (dps)", 0.0).entry
+
+    private val frontClimbWinchPosition = climbSubsystemLayout.add("Front Winch Position (in)", 0.0).entry
+    private val backClimbWinchPosition = climbSubsystemLayout.add("Back Winch Position (in)", 0.0).entry
+    private val frontClimbWinchCurrent = climbSubsystemLayout.add("Front Winch Current", 0.0).entry
+    private val backClimbWinchCurrent = climbSubsystemLayout.add("Back Winch Current", 0.0).entry
 
     val visionDriveAngle = visionLayout.add("Vision Drive Angle", 0.0).entry
     val visionDriveActive = visionLayout.add("Vision Drive Active", false).entry
@@ -106,7 +117,7 @@ object Network {
         elevatorPosition.setDouble(ElevatorSubsystem.elevatorPosition.inch)
         elevatorCurrent.setDouble(ElevatorSubsystem.current)
         elevatorVoltage.setDouble(ElevatorSubsystem.voltage)
-//        elevatorVelocity.setDouble(ElevatorSubsystem.velocity.inchesPerSecond)
+        elevatorVelocity.setDouble(ElevatorSubsystem.velocity.inchesPerSecond)
         elevatorLimitSwitch.setBoolean(ElevatorSubsystem.isBottomLimitSwitchPressed)
 
         armRawPosition.setDouble(ArmSubsystem.rawEncoder.toDouble())
@@ -114,6 +125,11 @@ object Network {
         armCurrent.setDouble(ArmSubsystem.current)
         armVoltage.setDouble(ArmSubsystem.voltage)
         armVelocity.setDouble(ArmSubsystem.velocity.value * 180 / Math.PI)
+
+        frontClimbWinchPosition.setDouble(ClimbSubsystem.frontPosition.inch)
+        backClimbWinchPosition.setDouble(ClimbSubsystem.backPosition.inch)
+        frontClimbWinchCurrent.setDouble(ClimbSubsystem.frontCurrent)
+        backClimbWinchCurrent.setDouble(ClimbSubsystem.backCurrent)
 
         val trackedObject = TargetTracker.bestTarget
         if (trackedObject != null) {
