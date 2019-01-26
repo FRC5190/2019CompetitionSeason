@@ -54,7 +54,7 @@ object Superstructure {
         armAngle: Rotation2d
     ) = sequential {
 
-        require(armAngle !in 85.degree..95.degree)
+        require(armAngle !in (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance))
 
         val elevatorHeightWanted =
             (heightAboveGround - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft -
@@ -70,7 +70,12 @@ object Superstructure {
 
                 +parallel {
                     +zeroElevator
-                    +ClosedLoopArmCommand(if (isFrontWanted) 95.degree else 85.degree)
+                    +ClosedLoopArmCommand(
+                        if (isFrontWanted)
+                            90.degree + Constants.kArmFlipTolerance
+                        else
+                            90.degree - Constants.kArmFlipTolerance
+                    )
                 }.overrideExit { ElevatorSubsystem.isBottomLimitSwitchPressed }
 
                 +parallel {
@@ -78,9 +83,9 @@ object Superstructure {
                     +sequential {
                         +ConditionCommand {
                             if (isFrontWanted) {
-                                ArmSubsystem.armPosition < 85.degree
+                                ArmSubsystem.armPosition < 90.degree - Constants.kArmFlipTolerance
                             } else {
-                                ArmSubsystem.armPosition > 95.degree
+                                ArmSubsystem.armPosition > 90.degree + Constants.kArmFlipTolerance
                             }
                         }
                         +ClosedLoopElevatorCommand(elevatorHeightWanted)

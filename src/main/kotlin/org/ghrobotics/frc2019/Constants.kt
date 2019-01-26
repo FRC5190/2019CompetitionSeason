@@ -175,7 +175,7 @@ object Constants {
     )
 
     val kArmLength          = 30.inch
-    val kArmFlipTolerance   = 5.degree
+    val kArmFlipTolerance   = 20.degree
 
     val kArmCurrentLimit = 15.amp
 
