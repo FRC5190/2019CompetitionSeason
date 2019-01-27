@@ -57,7 +57,7 @@ object Controls {
         state({ !isClimbing }) {
             // Elevator
             axisButton(1, 0.05) {
-                change(OpenLoopElevatorCommand(source.map {  it.pow(2).withSign(-it) * .5 }))
+                change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * .5 }))
             }
             // Arm
             axisButton(2, 0.05) {
@@ -77,6 +77,7 @@ object Controls {
 
             // Nihar xd
             button(kY).changeOn { ClimbSubsystem.ramps = true }
+            button(kX).changeOn { ClimbSubsystem.wheel = true }
         }
     }
 

@@ -22,9 +22,11 @@ import kotlin.math.pow
 @Suppress("MemberVisibilityCanBePrivate")
 object Constants {
 
+    // PHSYICS
+    const val kAccelerationDueToGravity = 9.80665
+
     // GLOBAL CTRE TIMEOUT
     const val kCTRETimeout = 10
-
 
     // MOTOR IDS
     const val kDriveLeftMasterId        = 1
@@ -161,8 +163,8 @@ object Constants {
 
     const val kElevatorKp               = 1.0
     const val kElevatorKf               = 0.864 / 2.0
-    const val kElevatorBelowSwitchKg    = 0.7 / 12
-    const val kElevatorAfterSwitchKg    = 1.4 / 12
+    const val kElevatorBelowSwitchKg    = 0.35 / 12
+    const val kElevatorAfterSwitchKg    = 0.7 / 12
 
 
     // ARM

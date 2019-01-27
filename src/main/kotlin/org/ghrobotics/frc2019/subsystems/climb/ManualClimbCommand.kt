@@ -9,16 +9,19 @@ class ManualClimbCommand : FalconCommand(ClimbSubsystem) {
 
     override suspend fun execute() {
         if (Controls.isClimbing) {
-            ClimbSubsystem.frontWinchPercentOutput = frontWinchSource()
-            ClimbSubsystem.backWinchPercentOutput = backWinchSource()
+            ClimbSubsystem.frontWinchPercentOutput = -frontWinchSource()
+            ClimbSubsystem.backWinchPercentOutput = -backWinchSource()
+            ClimbSubsystem.wheelPercentOutput = -wheelSource()
         } else {
             ClimbSubsystem.frontWinchPercentOutput = 0.0
             ClimbSubsystem.backWinchPercentOutput = 0.0
+            ClimbSubsystem.wheelPercentOutput = 0.0
         }
     }
 
     private companion object {
         val frontWinchSource = Controls.operatorXbox.getY(GenericHID.Hand.kLeft)
         val backWinchSource = Controls.operatorXbox.getY(GenericHID.Hand.kRight)
+        val wheelSource = Controls.driverXbox.getY(GenericHID.Hand.kRight)
     }
 }

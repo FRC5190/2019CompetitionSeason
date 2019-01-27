@@ -113,7 +113,7 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     override fun periodic() {
         synchronized(closedLoopSync) {
             if (isClosedLoop) {
-                val experiencedAcceleration = 9.81 + ElevatorSubsystem.actualAcceleration.value
+                val experiencedAcceleration = Constants.kAccelerationDueToGravity + ElevatorSubsystem.actualAcceleration.value
 
                 val feedforward = Constants.kArmKg * armPosition.cos * experiencedAcceleration
 

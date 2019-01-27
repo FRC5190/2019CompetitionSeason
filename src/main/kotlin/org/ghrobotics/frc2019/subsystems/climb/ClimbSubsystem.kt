@@ -27,7 +27,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     private val allMotors: List<AbstractFalconSRX<*>>
     private val allMasters = listOf(frontWinchMaster, backWinchMaster)
 
-    var wheelPercent
+    var wheelPercentOutput
         get() = wheelMaster.percentOutput
         set(value) {
             wheelMaster.percentOutput = value
