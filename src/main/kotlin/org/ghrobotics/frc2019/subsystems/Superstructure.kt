@@ -5,10 +5,8 @@ import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.elevator.ClosedLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
-import org.ghrobotics.lib.commands.ConditionCommand
-import org.ghrobotics.lib.commands.ConditionalCommand
-import org.ghrobotics.lib.commands.parallel
-import org.ghrobotics.lib.commands.sequential
+import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
+import org.ghrobotics.lib.commands.*
 import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.degree
@@ -21,11 +19,11 @@ object Superstructure {
             (Constants.kArmLength * ArmSubsystem.armPosition.sin)
 
 
-//    val kFrontHighRocketHatch get() = goToHeightWithAngle(76.inch, 0.degree)
-//    val kFrontHighRocketCargo get() = goToHeightWithAngle(80.inch, 45.degree)
-//    val kFrontMiddleRocketHatch get() = goToHeightWithAngle(60.inch, 0.degree)
-//    val kBackLoadingStation get() = goToHeightWithAngle(21.inch, 180.degree)
-//    val kFrontLoadingStation get() = goToHeightWithAngle(21.inch, 0.degree)
+//    val kFrontHighRocketHatch get() = goToHeightWithAngle(75.inch, 0.degree)
+//    val kFrontHighRocketCargo get() = goToHeightWithAngle(84.inch, 45.degree)
+//    val kFrontMiddleRocketHatch get() = goToHeightWithAngle(47.inch, 0.degree)
+//    val kBackLoadingStation get() = goToHeightWithAngle(20.inch, 180.degree)
+//    val kFrontLoadingStation get() = goToHeightWithAngle(20.inch, 0.degree)
 
     val kFrontHighRocketHatch
         get() = ClosedLoopElevatorCommand(
@@ -64,6 +62,10 @@ object Superstructure {
         val isFrontCurrent = ArmSubsystem.armPosition < 90.degree
 
         +ConditionalCommand(
+            IntakeSubsystem.isFullyExtended,
+            InstantRunnableCommand { IntakeSubsystem.extensionSolenoid.set(false) })
+
+        +ConditionalCommand(
             { isFrontWanted != isFrontCurrent },
             sequential {
                 val zeroElevator = ClosedLoopElevatorCommand(0.inch)
@@ -71,10 +73,11 @@ object Superstructure {
                 +parallel {
                     +zeroElevator
                     +ClosedLoopArmCommand(
-                        if (isFrontWanted)
+                        if (isFrontWanted) {
                             90.degree + Constants.kArmFlipTolerance
-                        else
+                        } else {
                             90.degree - Constants.kArmFlipTolerance
+                        }
                     )
                 }.overrideExit { ElevatorSubsystem.isBottomLimitSwitchPressed }
 

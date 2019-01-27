@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
+import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.amp
@@ -58,10 +59,14 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     init {
         // Configure feedback sensor and sensor phase
         armMaster.feedbackSensor = FeedbackDevice.Analog
-        armMaster.encoderPhase = false
+        armMaster.encoderPhase = true
 
         // Configure startup settings
         armMaster.run {
+
+            peakForwardOutput = 0.5
+            peakReverseOutput = -0.5
+
             // Brake mode
             brakeMode = NeutralMode.Brake
 
@@ -81,6 +86,13 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
 
             // Analog encoder hackery
             configFeedbackNotContinuous(true, Constants.kCTRETimeout)
+
+            kF = Constants.kArmKf
+        }
+        defaultCommand = object : FalconCommand(this@ArmSubsystem) {
+            override suspend fun initialize() {
+                armPosition = armPosition
+            }
         }
         setClosedLoopGains()
     }
@@ -89,12 +101,10 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
      * Configures closed loop gains for the arm.
      */
     private fun setClosedLoopGains() {
-        // Uncomment when phases are tested.
-        /*
         armMaster.run {
             kP = Constants.kArmKp
         }
-        */
+
     }
 
     /**
@@ -113,12 +123,13 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     override fun periodic() {
         synchronized(closedLoopSync) {
             if (isClosedLoop) {
-                val experiencedAcceleration = Constants.kAccelerationDueToGravity + ElevatorSubsystem.actualAcceleration.value
+                val experiencedAcceleration = Constants.kAccelerationDueToGravity +
+                    ElevatorSubsystem.actualAcceleration.value
 
                 val feedforward = Constants.kArmKg * armPosition.cos * experiencedAcceleration
 
                 armMaster.set(
-                    ControlMode.Disabled, closedLoopGoal,
+                    ControlMode.MotionMagic, closedLoopGoal,
                     DemandType.ArbitraryFeedForward, feedforward
                 )
             }

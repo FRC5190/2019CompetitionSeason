@@ -5,7 +5,6 @@
 
 package org.ghrobotics.frc2019
 
-import edu.wpi.first.wpilibj.Compressor
 import edu.wpi.first.wpilibj.RobotBase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -17,7 +16,6 @@ import org.ghrobotics.frc2019.subsystems.climb.ClimbSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.frc2019.vision.VisionProcessing
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.wrappers.FalconRobotBase
 
@@ -40,9 +38,7 @@ object Robot : FalconRobotBase(), CoroutineScope {
         Autonomous
         Trajectories
 
-        VisionProcessing
-
-        Compressor(Constants.kPCMId).start()
+//        VisionProcessing
     }
 
     override fun periodic() {
@@ -58,9 +54,8 @@ object Robot : FalconRobotBase(), CoroutineScope {
             emergencyReadySystems.add(this)
         }
     }
+}
 
-    @JvmStatic
-    fun main(args: Array<String>) {
-        RobotBase.startRobot { Robot }
-    }
+fun main() {
+    RobotBase.startRobot { Robot }
 }

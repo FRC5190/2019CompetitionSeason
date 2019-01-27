@@ -2,6 +2,7 @@ package org.ghrobotics.frc2019.subsystems.intake
 
 import com.ctre.phoenix.motorcontrol.NeutralMode
 import edu.wpi.first.wpilibj.AnalogInput
+import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.lib.commands.FalconSubsystem
@@ -19,6 +20,8 @@ object IntakeSubsystem : FalconSubsystem() {
 
     val isHoldingCargo = AnalogInput(Constants.kLeftBallSensorId)::getAverageVoltage.greaterThan(0.9) and
         AnalogInput(Constants.kRightBallSensorId)::getAverageVoltage.greaterThan(0.9)
+
+    val isFullyExtended = DigitalInput(Constants.kIntakeExtensionLimitSwitch)::get
 
     var percentOutput
         get() = intakeMaster.percentOutput

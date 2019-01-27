@@ -60,7 +60,7 @@ object Controls {
                 change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * .5 }))
             }
             // Arm
-            axisButton(2, 0.05) {
+            axisButton(5, 0.1) {
                 change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * .5 }))
             }
 

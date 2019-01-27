@@ -48,8 +48,11 @@ object Constants {
 
 
     // ANALOG INPUT
-    const val kLeftBallSensorId     = 2
-    const val kRightBallSensorId    = 3
+    const val kLeftBallSensorId     = 0
+    const val kRightBallSensorId    = 1
+
+    // DIGITAL INPUT
+    const val kIntakeExtensionLimitSwitch = 0
 
 
     // GYROS
@@ -58,11 +61,11 @@ object Constants {
 
     // PNEUMATICS
     const val kPCMId                        = 41
-    const val kIntakeExtensionSolenoidId    = 2
-    const val kIntakeLauncherSolenoidId     = 0
-    const val kDriveSolenoidId              = 3
-    const val kRampsSolenoidId              = 1
-    const val kClimberWheelSolenoidId       = 5
+    const val kIntakeExtensionSolenoidId    = 1
+    const val kIntakeLauncherSolenoidId     = 5
+    const val kDriveSolenoidId              = 2
+    const val kRampsSolenoidId              = 0
+    const val kClimberWheelSolenoidId       = 3
 
 
     // FIELD
@@ -88,7 +91,7 @@ object Constants {
     val kFrontBumperToCenter        = Pose2d(-(kRobotLength / 2.0) - kBumperThickness, 0.meter, 0.degree)
     val kForwardIntakeToCenter      = Pose2d(-(kRobotLength / 2.0) - kIntakeProtrusion, 0.meter, 0.degree)
     val kBackwardIntakeToCenter     = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, 0.meter, 0.degree)
-    val kCenterToCamera             = Pose2d(1.inch, -(17).inch, 0.degree)
+    val kCenterToCamera             = Pose2d(1.inch, 17.inch, 0.degree)
     val kGroundToCamera             = 30.inch
 
 
@@ -154,7 +157,7 @@ object Constants {
     val kElevatorSecondStageToArmShaft  = 8.inch
     val kElevatorHeightFromGround       = 6.inch
 
-    val kElevatorCurrentLimit = 25.amp
+    val kElevatorCurrentLimit = 15.amp
 
     val kElevatorClosedLoopVelocityTolerance    = 1.inch.velocity
     val kElevatorClosedLoopTolerance            = 1.inch
@@ -169,7 +172,7 @@ object Constants {
 
     // ARM
     val kArmSensorUnitsPerRotation  = 1024.STU
-    val kArmUpTicks                 = 512.STU
+    val kArmUpTicks                 = (-547).STU
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,
@@ -187,7 +190,8 @@ object Constants {
     val kArmCruiseVelocity      = 1.5.radian.velocity
 
     const val kArmKp = 1.0
-    const val kArmKg = 0.005
+    const val kArmKg = 0.014
+    const val kArmKf = 11.98
 
 
     // CLIMB
@@ -206,5 +210,5 @@ object Constants {
     val kClimbWinchCruiseVelocity               = 1.5.feet.velocity
     val kClimbWinchAcceleration                 = 1.5.feet.acceleration
 
-    val kClimbWinchKp = 0.3
+    const val kClimbWinchKp = 0.3
 }

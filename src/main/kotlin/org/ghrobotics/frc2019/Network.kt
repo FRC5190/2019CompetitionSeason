@@ -102,6 +102,7 @@ object Network {
         //mainShuffleboardDisplay.add(VisionProcessing.cameraSource).withPosition(3, 2).withSize(3, 3)
     }
 
+    @Suppress("LongMethod")
     fun update() {
         globalXEntry.setDouble(DriveSubsystem.localization().translation.x.feet)
         globalYEntry.setDouble(DriveSubsystem.localization().translation.y.feet)
