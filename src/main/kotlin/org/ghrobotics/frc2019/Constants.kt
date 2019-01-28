@@ -8,6 +8,8 @@ package org.ghrobotics.frc2019
 import com.team254.lib.physics.DCMotorTransmission
 import com.team254.lib.physics.DifferentialDrive
 import org.ghrobotics.frc2019.subsystems.arm.ArmNativeUnitModel
+import org.ghrobotics.frc2019.subsystems.drive.SlopeNativeUnitModel
+import org.ghrobotics.frc2019.subsystems.drive.wheelRadius
 import org.ghrobotics.frc2019.subsystems.elevator.SpringCascadeNativeUnitModel
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Rectangle2d
@@ -104,14 +106,14 @@ object Constants {
 
 
     // DRIVE
-    val kDriveSensorUnitsPerRotation    = 1440.STU
-    val kDriveWheelRadius               = 2.998657.inch
-    val kDriveTrackWidth                = 27.75.inch
-
-    val kDriveNativeUnitModel = NativeUnitLengthModel(
-        kDriveSensorUnitsPerRotation,
-        kDriveWheelRadius
+    val kDriveNativeUnitModel = SlopeNativeUnitModel(
+        1.57.feet,
+        1440.STU
     )
+
+    val kDriveSensorUnitsPerRotation    = 1440.STU
+    val kDriveWheelRadius               = kDriveNativeUnitModel.wheelRadius(kDriveSensorUnitsPerRotation)
+    val kDriveTrackWidth                = 27.75.inch
 
     val kDriveCurrentLimit = 38.amp
 
