@@ -22,7 +22,7 @@ import kotlin.math.pow
 @Suppress("MemberVisibilityCanBePrivate")
 object Constants {
 
-    // PHSYICS
+    // PHYSICS
     const val kAccelerationDueToGravity = 9.80665
 
     // GLOBAL CTRE TIMEOUT
@@ -76,15 +76,18 @@ object Constants {
     val kHypotenuseDifferenceForRamp    = 0.433.inch
 
 
-    // ROBOT
+    // ROBOT AND MECHANISM DIMENSIONS
     val kRobotMass                  = 123.lb
     const val kRobotMomentOfInertia = 9.0 // kg m^2
     const val kRobotAngularDrag     = 6.0 // Nm per rad/s
 
-    val kRobotWidth         = 29.inch
-    val kRobotLength        = 30.inch
-    val kBumperThickness    = 4.5.inch
-    val kIntakeProtrusion   = 15.inch       // Out of frame protrusion.
+    val kRobotWidth                         = 29.inch
+    val kRobotLength                        = 30.inch
+    val kBumperThickness                    = 4.5.inch
+    val kIntakeProtrusion                   = 15.inch       // Out of frame protrusion.
+    val kElevatorCrossbarHeightFromGround   = 46.inch
+    val kIntakeCradleHeight                 = 6.inch
+    val kArmLength                          = 30.inch
 
 
     // TRANSFORMATIONS
@@ -180,7 +183,6 @@ object Constants {
         kArmSensorUnitsPerRotation
     )
 
-    val kArmLength          = 30.inch
     val kArmFlipTolerance   = 40.degree
 
     val kArmCurrentLimit = 15.amp

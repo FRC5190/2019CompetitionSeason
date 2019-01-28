@@ -1,5 +1,6 @@
 package org.ghrobotics.frc2019.subsystems
 
+import edu.wpi.first.wpilibj.DriverStation
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
@@ -11,6 +12,7 @@ import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.inch
+import org.ghrobotics.lib.utils.Source
 
 object Superstructure {
 
@@ -19,86 +21,89 @@ object Superstructure {
             (Constants.kArmLength * ArmSubsystem.armPosition.sin)
 
 
-//    val kFrontHighRocketHatch get() = goToHeightWithAngle(75.inch, 0.degree)
-//    val kFrontHighRocketCargo get() = goToHeightWithAngle(84.inch, 45.degree)
-//    val kFrontMiddleRocketHatch get() = goToHeightWithAngle(47.inch, 0.degree)
-//    val kBackLoadingStation get() = goToHeightWithAngle(20.inch, 180.degree)
-//    val kFrontLoadingStation get() = goToHeightWithAngle(20.inch, 0.degree)
+    val kFrontHighRocketHatch get() = goToHeightWithAngle(75.inch, 0.degree)
+    val kFrontHighRocketCargo get() = goToHeightWithAngle(84.inch, 45.degree)
+    val kFrontMiddleRocketHatch get() = goToHeightWithAngle(47.inch, 0.degree)
+    val kBackLoadingStation get() = goToHeightWithAngle(20.inch, 180.degree)
+    val kFrontLoadingStation get() = goToHeightWithAngle(20.inch, 0.degree)
 
-    val kFrontHighRocketHatch
-        get() = ClosedLoopElevatorCommand(
-            75.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft
-        )
-
-    val kFrontHighRocketCargo get() = ClosedLoopElevatorCommand(65.inch)
-
-    val kFrontMiddleRocketHatch
-        get() = ClosedLoopElevatorCommand(
-            47.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft
-        )
-
-    val kBackLoadingStation
-        get() = ClosedLoopElevatorCommand(
-            20.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft
-        )
-
-    val kFrontLoadingStation
-        get() = ClosedLoopElevatorCommand(
-            20.inch - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft
-        )
-
-    fun goToHeightWithAngle(
+    private fun goToHeightWithAngle(
         heightAboveGround: Length,
         armAngle: Rotation2d
-    ) = sequential {
+    ): FalconCommand {
 
-        require(armAngle !in (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance))
-
+        // Calculates the wanted elevator height.
         val elevatorHeightWanted =
             (heightAboveGround - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft -
                 (Constants.kArmLength * armAngle.sin)).coerceIn(0.inch, Constants.kMaxElevatorHeightFromZero)
 
+        // Values that store the side of the robot the arm is currently in and the side of the robot that the arm
+        // wants to be in.
         val isFrontWanted = armAngle < 90.degree
         val isFrontCurrent = ArmSubsystem.armPosition < 90.degree
 
-        +ConditionalCommand(
-            IntakeSubsystem.isFullyExtended,
-            InstantRunnableCommand { IntakeSubsystem.extensionSolenoid.set(false) })
+        // Check if the configuration is valid.
+        return ConditionalCommand(Source(checkIfConfigValid(heightAboveGround, armAngle)), sequential {
 
-        +ConditionalCommand(
-            { isFrontWanted != isFrontCurrent },
-            sequential {
-                val zeroElevator = ClosedLoopElevatorCommand(0.inch)
+            // Closes the intake.
+            +ConditionalCommand(
+                IntakeSubsystem.isFullyExtended,
+                InstantRunnableCommand { IntakeSubsystem.extensionSolenoid.set(false) })
 
-                +parallel {
-                    +zeroElevator
-                    +ClosedLoopArmCommand(
-                        if (isFrontWanted) {
-                            90.degree + Constants.kArmFlipTolerance
-                        } else {
-                            90.degree - Constants.kArmFlipTolerance
-                        }
-                    )
-                }.overrideExit { ElevatorSubsystem.isBottomLimitSwitchPressed }
+            // Flip arm vs. don't flip arm.
+            +ConditionalCommand(
+                Source(isFrontWanted != isFrontCurrent),
 
-                +parallel {
-                    +ClosedLoopArmCommand(armAngle)
-                    +sequential {
-                        +ConditionCommand {
+                // We now need to flip the arm
+                sequential {
+                    // Zero the elevator
+                    val zeroElevator = ClosedLoopElevatorCommand(0.inch)
+
+                    // Bring elevator down while moving the arm to a position where it is safe.
+                    +parallel {
+                        +zeroElevator
+                        +ClosedLoopArmCommand(
                             if (isFrontWanted) {
-                                ArmSubsystem.armPosition < 90.degree - Constants.kArmFlipTolerance
+                                90.degree + Constants.kArmFlipTolerance
                             } else {
-                                ArmSubsystem.armPosition > 90.degree + Constants.kArmFlipTolerance
+                                90.degree - Constants.kArmFlipTolerance
                             }
+                        )
+                    }.overrideExit { ElevatorSubsystem.isBottomLimitSwitchPressed }
+
+                    // Flip the arm. Take the elevator up to final position once the arm is out of the way.
+                    +parallel {
+                        +ClosedLoopArmCommand(armAngle)
+                        +sequential {
+                            +ConditionCommand {
+                                if (isFrontWanted) {
+                                    ArmSubsystem.armPosition < 90.degree - Constants.kArmFlipTolerance
+                                } else {
+                                    ArmSubsystem.armPosition > 90.degree + Constants.kArmFlipTolerance
+                                }
+                            }
+                            +ClosedLoopElevatorCommand(elevatorHeightWanted)
                         }
-                        +ClosedLoopElevatorCommand(elevatorHeightWanted)
                     }
+                },
+
+                // We don't need to flip the arm. Take the elevator and arm to desired locations.
+                parallel {
+                    +ClosedLoopElevatorCommand(elevatorHeightWanted)
+                    +ClosedLoopArmCommand(armAngle)
                 }
-            },
-            parallel {
-                +ClosedLoopElevatorCommand(elevatorHeightWanted)
-                +ClosedLoopArmCommand(armAngle)
-            }
-        )
+            )
+        }, InstantRunnableCommand { DriverStation.reportError("Desired Superstructure State is Invalid.", false) })
+    }
+
+    private fun checkIfConfigValid(heightAboveGround: Length, armAngle: Rotation2d) =
+        (armAngle in (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)) ||
+            (armAngle > 90.degree
+                && heightAboveGround + Constants.kIntakeCradleHeight <= Constants.kElevatorCrossbarHeightFromGround)
+
+    private fun enforceSoftLimits(armPosition: Rotation2d) {
+        // TODO
     }
 }
+
+
