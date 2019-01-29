@@ -1,7 +1,7 @@
 #include <FastLED.h>
 
 #define LED_PIN     7
-#define NUM_LEDS    20
+#define NUM_LEDS    40
 
 CRGB leds[NUM_LEDS];
 
@@ -10,13 +10,20 @@ byte ledmode = 0;
 uint8_t gHue = 0;
 
 void setup() {
-  FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
+  FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
   
   // initialize serial:
   Serial.begin(9600);
 }
 
 void loop() {
+
+  if(ledmode == 1) {
+    FastLED.setBrightness(255 / 2);
+  }else {
+    FastLED.setBrightness(255);
+  }
+  
   unsigned long currentMillis = millis();
   switch(ledmode) {
     case 0:
@@ -37,18 +44,33 @@ void loop() {
       break;
     case 3: {
       // vision
-      int i = ((currentMillis % 2000) / 1000.0) * NUM_LEDS / 2;
+      int s = 1500;
+      int i = ((currentMillis % s) / (s / 2.0)) * NUM_LEDS / 2;
       if(i > NUM_LEDS / 2) {
         i = NUM_LEDS / 2 - (i - NUM_LEDS / 2);
       }
-      for (int k=0; k<NUM_LEDS; k++) {
-        leds[k].r = 0;
-        if(k == i || k - NUM_LEDS / 2 == i) {
-          leds[k].g = 255;
-        }else{
-          leds[k].g = 128;
+      for (int k=0; k<NUM_LEDS / 2; k++) {
+        if(k == i || k == i - 1 || k == i + 1) {
+          leds[k].r = 255;
+          leds[k].g = 0;
+          leds[k].b = 0;
+        }else{ 
+          leds[k].r = 0;
+          leds[k].g = 0;
+          leds[k].b = 0;
         }
-        leds[k].b = 0;
+      }
+      
+      for (int k=NUM_LEDS / 2; k<NUM_LEDS; k++) {
+        if(k - NUM_LEDS / 2 == i || k - NUM_LEDS / 2 == i - 1 || k - NUM_LEDS / 2 == i + 1) {
+          leds[k].r = 255;
+          leds[k].g = 0;
+          leds[k].b = 0;
+        }else{ 
+          leds[k].r = 0;
+          leds[k].g = 0;
+          leds[k].b = 0;
+        }
       }
       break;
     }
