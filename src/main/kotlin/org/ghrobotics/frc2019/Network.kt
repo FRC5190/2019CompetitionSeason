@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
 import org.ghrobotics.frc2019.auto.AutoMode
 import org.ghrobotics.frc2019.auto.StartingPositions
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
-import org.ghrobotics.frc2019.subsystems.climb.ClimbSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.vision.TargetTracker
@@ -127,10 +126,10 @@ object Network {
         armVoltage.setDouble(ArmSubsystem.voltage)
         armVelocity.setDouble(ArmSubsystem.velocity.value * 180 / Math.PI)
 
-        frontClimbWinchPosition.setDouble(ClimbSubsystem.frontWinchPosition.inch)
-        backClimbWinchPosition.setDouble(ClimbSubsystem.backWinchPosition.inch)
-        frontClimbWinchCurrent.setDouble(ClimbSubsystem.frontWinchCurrent)
-        backClimbWinchCurrent.setDouble(ClimbSubsystem.backWinchCurrent)
+//        frontClimbWinchPosition.setDouble(ClimbSubsystem.frontWinchPosition.inch)
+//        backClimbWinchPosition.setDouble(ClimbSubsystem.backWinchPosition.inch)
+//        frontClimbWinchCurrent.setDouble(ClimbSubsystem.frontWinchCurrent)
+//        backClimbWinchCurrent.setDouble(ClimbSubsystem.backWinchCurrent)
 
         val trackedObject = TargetTracker.bestTarget
         if (trackedObject != null) {

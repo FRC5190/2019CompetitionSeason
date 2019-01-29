@@ -1,3 +1,4 @@
+/*
 package org.ghrobotics.frc2019.subsystems.climb
 
 import org.ghrobotics.frc2019.Constants
@@ -21,4 +22,4 @@ class ClosedLoopClimbCommand(private val frontTarget: Length, private val backTa
         ClimbSubsystem.frontWinchPosition = frontTarget
         ClimbSubsystem.backWinchPosition = backTarget
     }
-}
+}*/

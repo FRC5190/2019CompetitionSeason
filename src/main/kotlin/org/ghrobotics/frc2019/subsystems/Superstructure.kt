@@ -40,7 +40,6 @@ object Superstructure {
         // Values that store the side of the robot the arm is currently in and the side of the robot that the arm
         // wants to be in.
         val isFrontWanted = armAngle < 90.degree
-        val isFrontCurrent = ArmSubsystem.armPosition < 90.degree
 
         // Check if the configuration is valid.
         return ConditionalCommand(Source(checkIfConfigValid(heightAboveGround, armAngle)), sequential {
@@ -52,7 +51,10 @@ object Superstructure {
 
             // Flip arm vs. don't flip arm.
             +ConditionalCommand(
-                Source(isFrontWanted != isFrontCurrent),
+                {
+                    val isFrontCurrent = ArmSubsystem.armPosition < 90.degree
+                    isFrontWanted != isFrontCurrent
+                },
 
                 // We now need to flip the arm
                 sequential {
@@ -77,9 +79,9 @@ object Superstructure {
                         +sequential {
                             +ConditionCommand {
                                 if (isFrontWanted) {
-                                    ArmSubsystem.armPosition < 90.degree - Constants.kArmFlipTolerance
+                                    ArmSubsystem.armPosition <= 90.degree - Constants.kArmFlipTolerance
                                 } else {
-                                    ArmSubsystem.armPosition > 90.degree + Constants.kArmFlipTolerance
+                                    ArmSubsystem.armPosition >= 90.degree + Constants.kArmFlipTolerance
                                 }
                             }
                             +ClosedLoopElevatorCommand(elevatorHeightWanted)

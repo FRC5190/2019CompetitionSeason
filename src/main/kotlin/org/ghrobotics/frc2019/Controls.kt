@@ -6,18 +6,16 @@
 package org.ghrobotics.frc2019
 
 import edu.wpi.first.wpilibj.GenericHID
-import org.ghrobotics.frc2019.subsystems.Superstructure
+import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
-import org.ghrobotics.frc2019.subsystems.climb.ClimbSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
-import org.ghrobotics.frc2019.subsystems.elevator.ClosedLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.sequential
-import org.ghrobotics.lib.mathematics.units.inch
+import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.utils.map
 import org.ghrobotics.lib.wrappers.hid.*
 import kotlin.math.pow
@@ -65,19 +63,18 @@ object Controls {
             }
 
             // Superstructure
-            pov(0).changeOn(Superstructure.kFrontHighRocketHatch)
-            pov(90).changeOn(Superstructure.kFrontMiddleRocketHatch)
-            pov(180).changeOn(Superstructure.kFrontLoadingStation)
-            pov(270).changeOn(ClosedLoopElevatorCommand(0.inch))
+            pov(0).changeOn(ClosedLoopArmCommand(90.degree))
+            pov(90).changeOn(ClosedLoopArmCommand(0.degree))
+            pov(270).changeOn(ClosedLoopArmCommand(180.degree))
         }
         state({ isClimbing }) {
             button(kA).change(sequential {
                 // Auto climbing logic here
             })
 
-            // Nihar xd
-            button(kY).changeOn { ClimbSubsystem.ramps = true }
-            button(kX).changeOn { ClimbSubsystem.wheel = true }
+//            // Nihar xd
+//            button(kY).changeOn { ClimbSubsystem.ramps = true }
+//            button(kX).changeOn { ClimbSubsystem.wheel = true }
         }
     }
 

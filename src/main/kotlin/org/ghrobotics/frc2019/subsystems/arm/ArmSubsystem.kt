@@ -13,6 +13,7 @@ import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.millisecond
+import org.ghrobotics.lib.mathematics.units.nativeunits.toNativeUnitPosition
 import org.ghrobotics.lib.wrappers.ctre.FalconSRX
 
 /**
@@ -63,10 +64,6 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
 
         // Configure startup settings
         armMaster.run {
-
-            peakForwardOutput = 0.5
-            peakReverseOutput = -0.5
-
             // Brake mode
             brakeMode = NeutralMode.Brake
 
@@ -103,6 +100,7 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     private fun setClosedLoopGains() {
         armMaster.run {
             kP = Constants.kArmKp
+            kD = Constants.kArmKd
         }
 
     }
@@ -113,6 +111,7 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     private fun zeroClosedLoopGains() {
         armMaster.run {
             kP = 0.0
+            kD = 0.0
         }
     }
 

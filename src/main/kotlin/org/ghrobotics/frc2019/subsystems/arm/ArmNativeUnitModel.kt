@@ -5,10 +5,14 @@ import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnit
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitModel
 import kotlin.math.withSign
 
+/**
+ * @param flipArm make front the back and the back the front :D
+ */
 class ArmNativeUnitModel(
     armOffsetNativeUnits: NativeUnit,
     armOffsetAngle: Rotation2d,
-    sensorResolution: NativeUnit
+    sensorResolution: NativeUnit,
+    private val flipArm: Boolean
 ) : NativeUnitModel<Rotation2d>(Rotation2d(0.0)) {
 
     private val armOffsetNativeUnits = armOffsetNativeUnits.value
@@ -29,8 +33,9 @@ class ArmNativeUnitModel(
 
     private fun boundNativeUnit(nativeUnit: Double): Double {
         var boundNativeUnit = nativeUnit
-        while(boundNativeUnit < 0) boundNativeUnit += sensorResolution
-        while(boundNativeUnit > sensorResolution) boundNativeUnit -= sensorResolution
+        if (armOffsetNativeUnits < 0) boundNativeUnit = -boundNativeUnit
+        while (boundNativeUnit < 0) boundNativeUnit += sensorResolution
+        while (boundNativeUnit > sensorResolution) boundNativeUnit -= sensorResolution
         return boundNativeUnit.withSign(armOffsetNativeUnits)
     }
 

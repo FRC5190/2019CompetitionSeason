@@ -87,10 +87,6 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         elevatorMaster.encoderPhase = false
 
         allMotors.forEach { motor ->
-
-            motor.peakForwardOutput = 0.4
-            motor.peakReverseOutput = -0.2
-
             // Brake mode
             motor.brakeMode = NeutralMode.Brake
 
@@ -182,12 +178,12 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
 
         synchronized(closedLoopSync) {
             if (isClosedLoop) {
-                val feedforward = 0.0
-//                    if (elevatorPosition < Constants.kElevatorSwitchHeight) {
-//                        Constants.kElevatorBelowSwitchKg
-//                    } else {
-//                        Constants.kElevatorAfterSwitchKg
-//                    }
+                val feedforward =
+                    if (elevatorPosition < Constants.kElevatorSwitchHeight) {
+                        Constants.kElevatorBelowSwitchKg
+                    } else {
+                        Constants.kElevatorAfterSwitchKg
+                    }
                 elevatorMaster.set(
                     ControlMode.MotionMagic, closedLoopGoal,
                     DemandType.ArbitraryFeedForward, feedforward
