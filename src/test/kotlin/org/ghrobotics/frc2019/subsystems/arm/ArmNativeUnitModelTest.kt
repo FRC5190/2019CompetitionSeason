@@ -1,47 +1,43 @@
 package org.ghrobotics.frc2019.subsystems.arm
 
 import org.ghrobotics.lib.mathematics.epsilonEquals
+import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
+import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnit
 import org.ghrobotics.lib.mathematics.units.nativeunits.STU
+import org.ghrobotics.lib.mathematics.units.nativeunits.nativeUnits
 import org.junit.Test
 
 class ArmNativeUnitModelTest {
 
     private val model1 = ArmNativeUnitModel(
-        armOffsetNativeUnits = 512.STU,
-        armOffsetAngle = 90.degree,
-        sensorResolution = 1024.STU,
-        flipArm = false
+        armSampleNativeUnit = 512.nativeUnits,
+        armSampleAngle = 90.degree,
+        sensorResolution = 1024.nativeUnits,
+        invertPhase = false
     )
 
     private val model2 = ArmNativeUnitModel(
-        armOffsetNativeUnits = (-512).STU,
-        armOffsetAngle = 90.degree,
-        sensorResolution = 1024.STU,
-        flipArm = true
+        armSampleNativeUnit = (-512).nativeUnits,
+        armSampleAngle = 90.degree,
+        sensorResolution = 1024.nativeUnits,
+        invertPhase = true
     )
 
-    @Test
-    fun testToNativeUnit1() {
-        val one = (-225).degree
-        val two = (-180).degree
-        val three = 0.degree
-        val four = 180.degree
-        val five = 225.degree
+    private val model3 = ArmNativeUnitModel(
+        armSampleNativeUnit = (-500).nativeUnits,
+        armSampleAngle = 90.degree,
+        sensorResolution = 1024.nativeUnits,
+        invertPhase = true
+    )
 
-        val oneNativeUnit = model1.toNativeUnitPosition(one)
-        val twoNativeUnit = model1.toNativeUnitPosition(two)
-        val threeNativeUnit = model1.toNativeUnitPosition(three)
-        val fourNativeUnit = model1.toNativeUnitPosition(four)
-        val fiveNativeUnit = model1.toNativeUnitPosition(five)
-
-        assert(oneNativeUnit.value epsilonEquals 640.0)
-        assert(twoNativeUnit.value epsilonEquals 768.0)
-        assert(threeNativeUnit.value epsilonEquals 256.0)
-        assert(fourNativeUnit.value epsilonEquals 768.0)
-        assert(fiveNativeUnit.value epsilonEquals 896.0)
-    }
+    private val model4 = ArmNativeUnitModel(
+        armSampleNativeUnit = 500.nativeUnits,
+        armSampleAngle = 90.degree,
+        sensorResolution = 1024.nativeUnits,
+        invertPhase = false
+    )
 
     @Test
     fun testToNativeUnitVelocity1() {
@@ -59,39 +55,40 @@ class ArmNativeUnitModelTest {
     }
 
     @Test
-    fun testToNativeUnit2() {
-        val one = (180 - -225).degree
-        val two = (180 - -180).degree
-        val three = (180 - 0).degree
-        val four = (180 - 180).degree
-        val five = (180 - 225).degree
+    fun testToNativeUnit() {
+        fun test(model: ArmNativeUnitModel, angle: Rotation2d, expected: NativeUnit) {
+            val actual = model.toNativeUnitPosition(angle)
+            println("ARM MODEL: ${angle.degree} deg -> ${actual.value} native units")
+            assert(actual epsilonEquals expected)
+        }
 
-        val oneNativeUnit = model2.toNativeUnitPosition(one)
-        val twoNativeUnit = model2.toNativeUnitPosition(two)
-        val threeNativeUnit = model2.toNativeUnitPosition(three)
-        val fourNativeUnit = model2.toNativeUnitPosition(four)
-        val fiveNativeUnit = model2.toNativeUnitPosition(five)
+        println("MODEL 1")
+        test(model1, (-180).degree, 768.nativeUnits)
+        test(model1, (-90).degree, 0.nativeUnits)
+        test(model1, (0).degree, 256.nativeUnits)
+        test(model1, (90).degree, 512.nativeUnits)
+        test(model1, (180).degree, 768.nativeUnits)
 
-        assert(oneNativeUnit.value epsilonEquals -640.0)
-        assert(twoNativeUnit.value epsilonEquals -768.0)
-        assert(threeNativeUnit.value epsilonEquals -256.0)
-        assert(fourNativeUnit.value epsilonEquals -768.0)
-        assert(fiveNativeUnit.value epsilonEquals -896.0)
-    }
+        println("MODEL 2")
+        test(model2, (-180).degree, (-256).nativeUnits)
+        test(model2, (-90).degree, 0.nativeUnits)
+        test(model2, (0).degree, (-768).nativeUnits)
+        test(model2, (90).degree, (-512).nativeUnits)
+        test(model2, (180).degree, (-256).nativeUnits)
 
-    @Test
-    fun testFromNativeUnit1() {
-        val one = 256.STU
-        val two = 512.STU
-        val three = 768.STU
+        println("MODEL 3")
+        test(model3, (-180).degree, (-268).nativeUnits)
+        test(model3, (-90).degree, (-12).nativeUnits)
+        test(model3, (0).degree, (-780).nativeUnits)
+        test(model3, (90).degree, (-524).nativeUnits)
+        test(model3, (180).degree, (-268).nativeUnits)
 
-        val oneAngle = model1.fromNativeUnitPosition(one)
-        val twoAngle = model1.fromNativeUnitPosition(two)
-        val threeAngle = model1.fromNativeUnitPosition(three)
-
-        assert(oneAngle.degree epsilonEquals 0.0)
-        assert(twoAngle.degree epsilonEquals 90.0)
-        assert(threeAngle.degree epsilonEquals 180.0)
+        println("MODEL 4")
+        test(model4, (-180).degree, 756.nativeUnits)
+        test(model4, (-90).degree, 1012.nativeUnits)
+        test(model4, (0).degree, 244.nativeUnits)
+        test(model4, (90).degree, 500.nativeUnits)
+        test(model4, (180).degree, 756.nativeUnits)
     }
 
     @Test
@@ -110,23 +107,40 @@ class ArmNativeUnitModelTest {
     }
 
     @Test
-    fun testFromNativeUnit2() {
-        val one = ( -640).STU
-        val two = (-768).STU
-        val three = (-256).STU
-        val four = (-896.0).STU
+    fun testFromNativeUnit() {
+        fun test(model: ArmNativeUnitModel, nativeUnits: NativeUnit, expected: Rotation2d) {
+            val actual = model.fromNativeUnitPosition(nativeUnits)
+            println("ARM MODEL: ${nativeUnits.value} native units -> ${actual.degree} deg")
+            assert(actual epsilonEquals expected)
+        }
 
-        val oneAngle = model2.fromNativeUnitPosition(one)
-        val twoAngle = model2.fromNativeUnitPosition(two)
-        val threeAngle = model2.fromNativeUnitPosition(three)
-        val fourAngle = model2.fromNativeUnitPosition(four)
+        println("MODEL 1")
+        test(model1, 0.nativeUnits, (-90).degree)
+        test(model1, 256.nativeUnits, 0.degree)
+        test(model1, 512.nativeUnits, 90.degree)
+        test(model1, 768.nativeUnits, 180.degree)
+        test(model1, 1024.nativeUnits, 270.degree)
 
-        println(oneAngle.degree)
+        println("MODEL 2")
+        test(model2, 0.nativeUnits, (-90).degree)
+        test(model2, (-256).nativeUnits, (-180).degree)
+        test(model2, (-512).nativeUnits, 90.degree)
+        test(model2, (-768).nativeUnits, 0.degree)
+        test(model2, (-1024).nativeUnits, 270.degree)
 
-        assert(oneAngle epsilonEquals (180 -225).degree)
-        assert(twoAngle epsilonEquals (180 -180).degree)
-        assert(threeAngle epsilonEquals (180 - 0).degree)
-        assert(fourAngle epsilonEquals (180 - 225).degree)
+        println("MODEL 3")
+        test(model3, (-12).nativeUnits, (-90).degree)
+        test(model3, (-268).nativeUnits, (-180).degree)
+        test(model3, (-524).nativeUnits, 90.degree)
+        test(model3, (-780).nativeUnits, 0.degree)
+        test(model3, (-1036).nativeUnits, 270.degree)
+
+        println("MODEL 4")
+        test(model4, (-12).nativeUnits, (-90).degree)
+        test(model4, 244.nativeUnits, 0.degree)
+        test(model4, 500.nativeUnits, 90.degree)
+        test(model4, 756.nativeUnits, 180.degree)
+        test(model4, 1012.nativeUnits, 270.degree)
     }
 
 }

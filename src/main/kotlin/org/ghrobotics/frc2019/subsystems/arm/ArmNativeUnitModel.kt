@@ -3,40 +3,68 @@ package org.ghrobotics.frc2019.subsystems.arm
 import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnit
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitModel
-import kotlin.math.withSign
 
 /**
- * @param flipArm make front the back and the back the front :D
+ * @param invertPhase When you invert a absolute encoder on a TalonSRX this value may become negative
  */
 class ArmNativeUnitModel(
-    armOffsetNativeUnits: NativeUnit,
-    armOffsetAngle: Rotation2d,
+    armSampleNativeUnit: NativeUnit,
+    armSampleAngle: Rotation2d,
     sensorResolution: NativeUnit,
-    private val flipArm: Boolean
+    private val invertPhase: Boolean
 ) : NativeUnitModel<Rotation2d>(Rotation2d(0.0)) {
 
-    private val armOffsetNativeUnits = armOffsetNativeUnits.value
-    private val armOffsetAngle = armOffsetAngle.radian
+    private val armZero: Double
+    private val armMinAngle: Double
+    private val armMaxAngle: Double
     private val sensorResolution = sensorResolution.value
 
-    override fun fromNativeUnitPosition(nativeUnits: Double): Double {
-        val valueFromOffset = boundNativeUnit(nativeUnits - armOffsetNativeUnits)
-        val angleFromOffset = 2.0 * Math.PI * (valueFromOffset / sensorResolution)
-        return angleFromOffset + armOffsetAngle
+    init {
+        val nativeUnitOffset = (armSampleAngle.degree / 360.0 * sensorResolution.value)
+        armZero = if (invertPhase) {
+            // neg + neg
+            armSampleNativeUnit.value + nativeUnitOffset
+        } else {
+            // pos - pos
+            armSampleNativeUnit.value - nativeUnitOffset
+        }
+        armMinAngle = -armZero / sensorResolution.value * 2.0 * Math.PI
+        armMaxAngle = 2.0 * Math.PI + armMinAngle
     }
 
+    override fun fromNativeUnitPosition(nativeUnits: Double): Double {
+        var validNativeUnit = nativeUnits
+        // flip phase if needed
+        if (invertPhase) validNativeUnit = sensorResolution - validNativeUnit
+        validNativeUnit = boundNativeUnit(validNativeUnit)
+        val result = boundArmAngle((validNativeUnit - armZero) / sensorResolution * 2.0 * Math.PI)
+        // flip phase back if needed
+        return if (invertPhase) -result else result
+    }
+
+
     override fun toNativeUnitPosition(modelledUnit: Double): Double {
-        val valueFromOffset = modelledUnit - armOffsetAngle
-        val nativeUnitsFromOffset = (valueFromOffset / (2.0 * Math.PI)) * sensorResolution
-        return boundNativeUnit(nativeUnitsFromOffset + armOffsetNativeUnits)
+        var validAngle = modelledUnit
+        // flip phase if needed
+        if (invertPhase) validAngle = 2.0 * Math.PI - validAngle
+        validAngle = boundArmAngle(validAngle)
+        val result = boundNativeUnit((validAngle / 2.0 / Math.PI * sensorResolution) + armZero)
+        // flip phase back if needed
+        return if (invertPhase) -result else result
     }
 
     private fun boundNativeUnit(nativeUnit: Double): Double {
         var boundNativeUnit = nativeUnit
-        if (armOffsetNativeUnits < 0) boundNativeUnit = -boundNativeUnit
         while (boundNativeUnit < 0) boundNativeUnit += sensorResolution
-        while (boundNativeUnit > sensorResolution) boundNativeUnit -= sensorResolution
-        return boundNativeUnit.withSign(armOffsetNativeUnits)
+        while (boundNativeUnit >= sensorResolution) boundNativeUnit -= sensorResolution
+        return boundNativeUnit
+    }
+
+    private fun boundArmAngle(angle: Double): Double {
+        var boundArmAngle = angle
+        if (boundArmAngle > armMaxAngle) boundArmAngle -= 2.0 * Math.PI
+        if (boundArmAngle < armMinAngle) boundArmAngle += 2.0 * Math.PI
+        return boundArmAngle
     }
 
     override fun toNativeUnitError(modelledUnit: Double): Double =
