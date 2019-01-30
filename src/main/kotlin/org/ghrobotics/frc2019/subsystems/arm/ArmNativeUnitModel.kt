@@ -21,13 +21,7 @@ class ArmNativeUnitModel(
 
     init {
         val nativeUnitOffset = (armSampleAngle.degree / 360.0 * sensorResolution.value)
-        armZero = if (invertPhase) {
-            // neg + neg
-            armSampleNativeUnit.value + nativeUnitOffset
-        } else {
-            // pos - pos
-            armSampleNativeUnit.value - nativeUnitOffset
-        }
+        armZero = armSampleNativeUnit.value - nativeUnitOffset
         armMinAngle = -armZero / sensorResolution.value * 2.0 * Math.PI
         armMaxAngle = 2.0 * Math.PI + armMinAngle
     }
@@ -35,22 +29,20 @@ class ArmNativeUnitModel(
     override fun fromNativeUnitPosition(nativeUnits: Double): Double {
         var validNativeUnit = nativeUnits
         // flip phase if needed
-        if (invertPhase) validNativeUnit = sensorResolution - validNativeUnit
         validNativeUnit = boundNativeUnit(validNativeUnit)
         val result = boundArmAngle((validNativeUnit - armZero) / sensorResolution * 2.0 * Math.PI)
         // flip phase back if needed
-        return if (invertPhase) -result else result
+        return if (invertPhase) result - 2 * Math.PI else result
     }
 
 
     override fun toNativeUnitPosition(modelledUnit: Double): Double {
         var validAngle = modelledUnit
         // flip phase if needed
-        if (invertPhase) validAngle = 2.0 * Math.PI - validAngle
         validAngle = boundArmAngle(validAngle)
         val result = boundNativeUnit((validAngle / 2.0 / Math.PI * sensorResolution) + armZero)
         // flip phase back if needed
-        return if (invertPhase) -result else result
+        return if (invertPhase) result - sensorResolution else result
     }
 
     private fun boundNativeUnit(nativeUnit: Double): Double {

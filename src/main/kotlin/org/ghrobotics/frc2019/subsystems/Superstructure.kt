@@ -6,7 +6,6 @@ import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.elevator.ClosedLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
-import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.*
 import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.Rotation2d
@@ -39,51 +38,49 @@ object Superstructure {
 
         // Values that store the side of the robot the arm is currently in and the side of the robot that the arm
         // wants to be in.
-        val isFrontWanted = armAngle < 90.degree
+        val isFrontWanted = armAngle - 90.degree < 0.degree
 
         // Check if the configuration is valid.
         return ConditionalCommand(Source(checkIfConfigValid(heightAboveGround, armAngle)), sequential {
 
-            // Closes the intake.
-            +ConditionalCommand(
-                IntakeSubsystem.isFullyExtended,
-                InstantRunnableCommand { IntakeSubsystem.extensionSolenoid.set(false) })
 
             // Flip arm vs. don't flip arm.
             +ConditionalCommand(
                 {
-                    val isFrontCurrent = ArmSubsystem.armPosition < 90.degree
+                    val isFrontCurrent = ArmSubsystem.armPosition - 90.degree < 0.degree
                     isFrontWanted != isFrontCurrent
                 },
 
                 // We now need to flip the arm
                 sequential {
+                    +InstantRunnableCommand { println("FLIPPING") }
+
                     // Zero the elevator
                     val zeroElevator = ClosedLoopElevatorCommand(0.inch)
 
                     // Bring elevator down while moving the arm to a position where it is safe.
                     +parallel {
                         +zeroElevator
-                        +ClosedLoopArmCommand(
-                            if (isFrontWanted) {
-                                90.degree + Constants.kArmFlipTolerance
-                            } else {
-                                90.degree - Constants.kArmFlipTolerance
-                            }
-                        )
+//                        +ClosedLoopArmCommand(
+//                            if (isFrontWanted) {
+//                                90.degree + Constants.kArmFlipTolerance
+//                            } else {
+//                                90.degree - Constants.kArmFlipTolerance
+//                            }
+//                        )
                     }.overrideExit { ElevatorSubsystem.isBottomLimitSwitchPressed }
 
                     // Flip the arm. Take the elevator up to final position once the arm is out of the way.
-                    +parallel {
+                    +sequential {
                         +ClosedLoopArmCommand(armAngle)
                         +sequential {
-                            +ConditionCommand {
-                                if (isFrontWanted) {
-                                    ArmSubsystem.armPosition <= 90.degree - Constants.kArmFlipTolerance
-                                } else {
-                                    ArmSubsystem.armPosition >= 90.degree + Constants.kArmFlipTolerance
-                                }
-                            }
+//                            +ConditionCommand {
+//                                if (isFrontWanted) {
+//                                    ArmSubsystem.armPosition <= 90.degree - Constants.kArmFlipTolerance
+//                                } else {
+//                                    ArmSubsystem.armPosition >= 90.degree + Constants.kArmFlipTolerance
+//                                }
+//                            }
                             +ClosedLoopElevatorCommand(elevatorHeightWanted)
                         }
                     }
@@ -99,7 +96,7 @@ object Superstructure {
     }
 
     private fun checkIfConfigValid(heightAboveGround: Length, armAngle: Rotation2d) =
-        (armAngle in (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)) ||
+        (armAngle !in (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)) ||
             (armAngle > 90.degree
                 && heightAboveGround + Constants.kIntakeCradleHeight <= Constants.kElevatorCrossbarHeightFromGround)
 

@@ -191,14 +191,13 @@ object Constants {
     val kArmCurrentLimit = 15.amp
 
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
-    val kArmClosedLoopTolerance         = 2.degree
-    val kArmAcceleration                = 3 * 1.0.radian.acceleration
-    val kArmCruiseVelocity              = 3 * 1.0.radian.velocity
+    val kArmClosedLoopTolerance         = 10.degree
+    val kArmCruiseVelocity              = 5 * 1.0.radian.velocity
 
-    const val kArmKp = 3.0
-    const val kArmKd = 20.0
+    const val kArmKp = 2.0
+    const val kArmKd = 0.0
     const val kArmKg = 0.014
-    const val kArmKf = 11.98
+    const val kArmKf = 0.0 // 7.566
 
 
     // CLIMB
