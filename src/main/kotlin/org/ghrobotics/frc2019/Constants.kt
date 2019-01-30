@@ -193,6 +193,7 @@ object Constants {
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
     val kArmClosedLoopTolerance         = 10.degree
     val kArmCruiseVelocity              = 5 * 1.0.radian.velocity
+    val kArmAcceleration                = 5 * 1.0.radian.acceleration
 
     const val kArmKp = 2.0
     const val kArmKd = 0.0

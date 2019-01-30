@@ -38,7 +38,7 @@ object Superstructure {
 
         // Values that store the side of the robot the arm is currently in and the side of the robot that the arm
         // wants to be in.
-        val isFrontWanted = armAngle - 90.degree < 0.degree
+        val isFrontWanted = armAngle.cos >= 0
 
         // Check if the configuration is valid.
         return ConditionalCommand(Source(checkIfConfigValid(heightAboveGround, armAngle)), sequential {
@@ -47,7 +47,7 @@ object Superstructure {
             // Flip arm vs. don't flip arm.
             +ConditionalCommand(
                 {
-                    val isFrontCurrent = ArmSubsystem.armPosition - 90.degree < 0.degree
+                    val isFrontCurrent = ArmSubsystem.armPosition.cos >= 0
                     isFrontWanted != isFrontCurrent
                 },
 
@@ -61,26 +61,28 @@ object Superstructure {
                     // Bring elevator down while moving the arm to a position where it is safe.
                     +parallel {
                         +zeroElevator
-//                        +ClosedLoopArmCommand(
-//                            if (isFrontWanted) {
-//                                90.degree + Constants.kArmFlipTolerance
-//                            } else {
-//                                90.degree - Constants.kArmFlipTolerance
-//                            }
-//                        )
+                        +ClosedLoopArmCommand(
+                            if (isFrontWanted) {
+                                90.degree + Constants.kArmFlipTolerance
+                            } else {
+                                90.degree - Constants.kArmFlipTolerance
+                            }
+                        )
                     }.overrideExit { ElevatorSubsystem.isBottomLimitSwitchPressed }
 
                     // Flip the arm. Take the elevator up to final position once the arm is out of the way.
-                    +sequential {
+                    +parallel {
                         +ClosedLoopArmCommand(armAngle)
                         +sequential {
-//                            +ConditionCommand {
-//                                if (isFrontWanted) {
-//                                    ArmSubsystem.armPosition <= 90.degree - Constants.kArmFlipTolerance
-//                                } else {
-//                                    ArmSubsystem.armPosition >= 90.degree + Constants.kArmFlipTolerance
-//                                }
-//                            }
+                            +ConditionCommand {
+                                if (isFrontWanted) {
+                                    ArmSubsystem.armPosition <= 90.degree - Constants.kArmFlipTolerance &&
+                                        ArmSubsystem.armPosition.cos > 0
+                                } else {
+                                    ArmSubsystem.armPosition >= 90.degree + Constants.kArmFlipTolerance &&
+                                        ArmSubsystem.armPosition.cos < 0
+                                }
+                            }
                             +ClosedLoopElevatorCommand(elevatorHeightWanted)
                         }
                     }

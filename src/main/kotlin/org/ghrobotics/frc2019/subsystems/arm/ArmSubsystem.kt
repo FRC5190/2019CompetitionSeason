@@ -11,6 +11,7 @@ import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.amp
+import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.mathematics.units.nativeunits.toNativeUnitPosition
@@ -83,6 +84,12 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
 
             // Analog encoder hackery
             configFeedbackNotContinuous(true, Constants.kCTRETimeout)
+
+            softLimitForward = 200.degree.toNativeUnitPosition(Constants.kArmNativeUnitModel)
+            softLimitForwardEnabled = true
+
+            softLimitReverse = (-20).degree.toNativeUnitPosition(Constants.kArmNativeUnitModel)
+            softLimitReverseEnabled = true
 
             kF = Constants.kArmKf
         }
