@@ -198,7 +198,7 @@ object Constants {
     const val kArmKp = 2.0
     const val kArmKd = 0.0
     const val kArmKg = 0.014
-    const val kArmKv = 2.865 / 12.0
+    const val kArmKv = 1.4 / 12.0
     const val kArmKf = 0.0 // 7.566
 
 
