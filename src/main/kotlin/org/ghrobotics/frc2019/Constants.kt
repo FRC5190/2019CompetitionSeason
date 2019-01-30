@@ -171,8 +171,8 @@ object Constants {
 
     const val kElevatorKp               = 1.0
     const val kElevatorKf               = 0.864 / 2.0
-    const val kElevatorBelowSwitchKg    = 0.35 / 12
-    const val kElevatorAfterSwitchKg    = 0.7 / 12
+    const val kElevatorBelowSwitchKg    = 0.0 / 12
+    const val kElevatorAfterSwitchKg    = 0.77 / 12
 
 
     // ARM
@@ -198,6 +198,7 @@ object Constants {
     const val kArmKp = 2.0
     const val kArmKd = 0.0
     const val kArmKg = 0.014
+    const val kArmKv = 2.865
     const val kArmKf = 0.0 // 7.566
 
 
