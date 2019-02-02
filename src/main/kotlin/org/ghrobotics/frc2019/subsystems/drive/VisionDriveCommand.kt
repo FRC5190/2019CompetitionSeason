@@ -45,6 +45,7 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
         } else {
             this.currentTarget = TargetTracker.bestTarget
         }
+
     }
 
     override suspend fun execute() {

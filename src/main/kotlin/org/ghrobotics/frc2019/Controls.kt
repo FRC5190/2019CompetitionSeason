@@ -6,6 +6,7 @@
 package org.ghrobotics.frc2019
 
 import edu.wpi.first.wpilibj.GenericHID
+import org.ghrobotics.frc2019.auto.routines.executeFor
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
@@ -14,7 +15,9 @@ import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
+import org.ghrobotics.lib.commands.InstantRunnableCommand
 import org.ghrobotics.lib.commands.sequential
+import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.map
 import org.ghrobotics.lib.wrappers.hid.*
 import kotlin.math.pow
@@ -42,6 +45,12 @@ object Controls {
 
             triggerAxisButton(GenericHID.Hand.kRight).change(IntakeCargoCommand(IntakeSubsystem.Direction.RELEASE))
             button(kBumperRight).change(IntakeCargoCommand(IntakeSubsystem.Direction.HOLD))
+            button(kBumperRight).changeOff {
+                sequential {
+                    +executeFor(0.5.second, InstantRunnableCommand { IntakeSubsystem.percentOutput = 1.0 })
+                    +InstantRunnableCommand { IntakeSubsystem.percentOutput = 0.0 }
+                }
+            }
         }
     }
 
@@ -63,7 +72,7 @@ object Controls {
             }
 
             // Superstructure
-            pov(0).changeOn(Superstructure.kFrontHighRocketHatch)
+            pov(0).changeOn(Superstructure.kFrontHighRocketCargo)
             pov(90).changeOn(Superstructure.kFrontLoadingStation)
             pov(180).changeOn(Superstructure.kFrontMiddleRocketHatch)
             pov(270).changeOn(Superstructure.kBackLoadingStation)

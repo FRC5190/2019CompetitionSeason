@@ -1,5 +1,6 @@
 package org.ghrobotics.frc2019.subsystems.intake
 
+import com.ctre.phoenix.motorcontrol.ControlMode
 import org.ghrobotics.lib.commands.FalconCommand
 
 class IntakeCargoCommand(
@@ -24,14 +25,14 @@ class IntakeCargoCommand(
         } else {
             IntakeSubsystem.launcherSolenoid.set(false)
             IntakeSubsystem.extensionSolenoid.set(true)
-//            IntakeSubsystem.set(ControlMode.PercentOutput, -0.5)
+            IntakeSubsystem.percentOutput = -1.0
         }
     }
 
     override suspend fun execute() {
         if (direction == IntakeSubsystem.Direction.RELEASE) {
             if (
-                System.currentTimeMillis() - startTime > 250
+                System.currentTimeMillis() - startTime > 500
                 && !IntakeSubsystem.launcherSolenoid.get()
             ) {
                 IntakeSubsystem.launcherSolenoid.set(true)
