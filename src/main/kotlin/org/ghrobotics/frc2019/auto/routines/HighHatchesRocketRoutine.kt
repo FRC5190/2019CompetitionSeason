@@ -17,8 +17,8 @@ import org.ghrobotics.lib.utils.withEquals
 
 fun highHatchesRocketRoutine() = autoRoutine {
 
-    +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
-    +ClosedLoopArmCommand(30.degree).withTimeout(2.second)
+//    +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+//    +ClosedLoopArmCommand(30.degree).withTimeout(2.second)
 
     // Place hatch on near side of rocket
     +parallel {
@@ -29,10 +29,10 @@ fun highHatchesRocketRoutine() = autoRoutine {
             dt = DriveSubsystem.kPathFollowingDt
         )
 
-        +sequential {
-            +DelayCommand(Trajectories.sideStartToNearRocketHatch.lastState.t - 2.25.second)
-            +Superstructure.kFrontHighRocketHatch.withTimeout(2.25.second)
-        }
+//        +sequential {
+//            +DelayCommand(Trajectories.sideStartToNearRocketHatch.lastState.t - 2.25.second)
+//            +Superstructure.kFrontHighRocketHatch.withTimeout(2.25.second)
+//        }
     }
 
     /*

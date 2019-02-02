@@ -117,20 +117,32 @@ object Constants {
 
     val kDriveCurrentLimit = 38.amp
 
-    const val kDriveKp = 1.5 // Talon SRX Units
+    const val kDriveKp = 0.0 // Talon SRX Units
     const val kDriveKd = 0.0
 
     const val kStaticFrictionVoltage    = 1.2 // Volts
-    const val kDriveKv                  = 0.135 // Volts per radians per second
-    const val kDriveKa                  = 0.012 // Volts per radians per second per second
+
+    const val kDriveLeftKv = 0.1689
+    const val kDriveLeftKa = 0.0816
+    const val kDriveLeftKs = 1.5423
+
+    const val kDriveRightKv = 0.1875
+    const val kDriveRightKa = 0.1103
+    const val kDriveRightKs = 1.4468
 
     const val kDriveBeta = 2.0 // Inverse meters squared
     const val kDriveZeta = 0.7 // Unitless dampening co-efficient
 
-    private val kDriveDCTransmission = DCMotorTransmission(
-        1 / kDriveKv,
-        kDriveWheelRadius.value.pow(2) * kRobotMass.value / (2.0 * kDriveKa),
-        kStaticFrictionVoltage
+    private val kDriveLeftDCTransmission = DCMotorTransmission(
+        1 / kDriveLeftKv,
+        kDriveWheelRadius.value.pow(2) * kRobotMass.value / (2.0 * kDriveLeftKa),
+        kDriveLeftKs
+    )
+
+    private val kDriveRightDCTransmission = DCMotorTransmission(
+        1 / kDriveRightKv,
+        kDriveWheelRadius.value.pow(2) * kRobotMass.value / (2.0 * kDriveRightKa),
+        kDriveRightKs
     )
 
     val kDriveModel = DifferentialDrive(
@@ -139,8 +151,8 @@ object Constants {
         kRobotAngularDrag,
         kDriveWheelRadius.value,
         kDriveTrackWidth.value / 2.0,
-        kDriveDCTransmission,
-        kDriveDCTransmission
+        kDriveLeftDCTransmission,
+        kDriveLeftDCTransmission
     )
 
 
