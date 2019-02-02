@@ -39,7 +39,7 @@ class ArmNativeUnitModelTest {
         invertPhase = false
     )
 
-    @Test
+    /*@Test
     fun testToNativeUnitVelocity1() {
         val one = 0.degree.velocity
         val two = 90.degree.velocity
@@ -141,6 +141,6 @@ class ArmNativeUnitModelTest {
         test(model4, 500.nativeUnits, 90.degree)
         test(model4, 756.nativeUnits, 180.degree)
         test(model4, 1012.nativeUnits, 270.degree)
-    }
+    }*/
 
 }
