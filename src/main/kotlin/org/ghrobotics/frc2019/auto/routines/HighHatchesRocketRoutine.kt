@@ -8,17 +8,15 @@ import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.lib.commands.DelayCommand
 import org.ghrobotics.lib.commands.parallel
 import org.ghrobotics.lib.commands.sequential
+import org.ghrobotics.lib.mathematics.twodim.trajectory.types.duration
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.withEquals
 
 fun highHatchesRocketRoutine() = autoRoutine {
 
-//    +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
-//    +ClosedLoopArmCommand(30.degree).withTimeout(2.second)
 
     // Place hatch on near side of rocket
     +parallel {
@@ -29,10 +27,11 @@ fun highHatchesRocketRoutine() = autoRoutine {
             dt = DriveSubsystem.kPathFollowingDt
         )
 
-//        +sequential {
-//            +DelayCommand(Trajectories.sideStartToNearRocketHatch.lastState.t - 2.25.second)
-//            +Superstructure.kFrontHighRocketHatch.withTimeout(2.25.second)
-//        }
+        +sequential {
+            +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+            +executeFor(Trajectories.sideStartToNearRocketHatch.duration - 2.25.second, ClosedLoopArmCommand(30.degree))
+            +Superstructure.kFrontHighRocketHatch
+        }
     }
 
     /*

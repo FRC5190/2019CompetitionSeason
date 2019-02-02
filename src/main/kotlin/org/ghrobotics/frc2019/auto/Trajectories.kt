@@ -48,8 +48,8 @@ object Trajectories {
 
     /************************************ FIELD POSES ************************************/
 
-    private val kNearRocketHatch = Pose2d(19.feet - 1.254.feet, 1.6.feet, (-30).degree)
-    private val kFarRocketHatch = Pose2d(19.feet + 1.254.feet, 1.6.feet, (-150).degree)
+    private val kNearRocketHatch = Pose2d(19.feet - 1.254.feet, 1.6.feet, (-33).degree)
+    private val kFarRocketHatch = Pose2d(19.feet + 1.254.feet, 1.6.feet, (-147).degree)
     private val kRocketBay = Pose2d(19.feet, 2.35.feet, (-90).degree)
     private val kForceToNearSideRocketBay = Pose2d(19.feet, 2.35.feet, (-100).degree)
 
@@ -72,11 +72,18 @@ object Trajectories {
 
     /************************************ TRAJECTORIES ************************************/
 
+//    val sideStartToNearRocketHatch = waypoints(
+//        kSideStart,
+//        Pose2d(11.5.feet, 6.494.feet, (-48).degree),
+//        kNearRocketHatchAdjusted
+//    ).generateTrajectory(false)
+
     val sideStartToNearRocketHatch = waypoints(
         kSideStart,
-        Pose2d(11.5.feet, 6.494.feet, (-48).degree),
+        Pose2d(9.168.feet, 9.664.feet, 0.degree),
+        Pose2d(12.605.feet, 6.848.feet, (-66).degree),
         kNearRocketHatchAdjusted
-    ).generateTrajectory(false)
+    ).generateTrajectory(false, false)
 
     val nearRocketHatchToLoadingStation = waypoints(
         kNearRocketHatchAdjusted,
@@ -137,10 +144,12 @@ object Trajectories {
 
     private fun waypoints(vararg points: Pose2d) = points.toList()
 
-    private fun List<Pose2d>.generateTrajectory(reversed: Boolean) = DefaultTrajectoryGenerator.generateTrajectory(
-        wayPoints = this, constraints = kConstraints,
-        startVelocity = 0.0.meter.velocity, endVelocity = 0.0.meter.velocity,
-        maxVelocity = kMaxVelocity, maxAcceleration = kMaxAcceleration, reversed = reversed
-    )
+    private fun List<Pose2d>.generateTrajectory(reversed: Boolean, optimize: Boolean = true) =
+        DefaultTrajectoryGenerator.generateTrajectory(
+            wayPoints = this, constraints = kConstraints,
+            startVelocity = 0.0.meter.velocity, endVelocity = 0.0.meter.velocity,
+            maxVelocity = kMaxVelocity, maxAcceleration = kMaxAcceleration, reversed = reversed,
+            optimizeSplines = optimize
+        )
 
 }

@@ -19,6 +19,7 @@ import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitLengthModel
 import org.ghrobotics.lib.mathematics.units.nativeunits.STU
+import org.ghrobotics.lib.mathematics.units.nativeunits.nativeUnits
 import kotlin.math.pow
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -86,7 +87,7 @@ object Constants {
     val kRobotWidth                         = 29.inch
     val kRobotLength                        = 30.inch
     val kBumperThickness                    = 4.5.inch
-    val kIntakeProtrusion                   = 8.inch       // Out of frame protrusion.
+    val kIntakeProtrusion                   = 10.inch       // Out of frame protrusion.
     val kElevatorCrossbarHeightFromGround   = 46.inch
     val kIntakeCradleHeight                 = 6.inch
     val kArmLength                          = 30.inch
@@ -108,10 +109,10 @@ object Constants {
     // DRIVE
     val kDriveNativeUnitModel = SlopeNativeUnitModel(
         1.57.feet,
-        1440.STU
+        1440.nativeUnits
     )
 
-    val kDriveSensorUnitsPerRotation    = 1440.STU
+    val kDriveSensorUnitsPerRotation    = 1440.nativeUnits
     val kDriveWheelRadius               = kDriveNativeUnitModel.wheelRadius(kDriveSensorUnitsPerRotation)
     val kDriveTrackWidth                = 27.75.inch
 
@@ -159,9 +160,9 @@ object Constants {
     // ELEVATOR
     // from elevator zero (measured from bottom of second stage)
     val kElevatorSwitchHeight                   = 8.inch
-    val kElevatorSwitchNativeUnit               = 2310.STU
+    val kElevatorSwitchNativeUnit               = 2310.nativeUnits
     val kElevatorAfterSwitchHeightSample        = 63.inch
-    val kElevatorAfterSwitchNativeUnitSample    = 10845.STU
+    val kElevatorAfterSwitchNativeUnitSample    = 10845.nativeUnits
 
     val kElevatorNativeUnitModel = SpringCascadeNativeUnitModel(
         switchHeight = kElevatorSwitchHeight,
@@ -188,8 +189,8 @@ object Constants {
 
 
     // ARM
-    val kArmSensorUnitsPerRotation  = 1024.STU
-    val kArmUpTicks                 = (-547).STU
+    val kArmSensorUnitsPerRotation  = 1024.nativeUnits
+    val kArmUpTicks                 = (-547).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,
@@ -216,7 +217,7 @@ object Constants {
 
     // CLIMB
     val kClimbWinchRadius                   = 1.25.inch / 2.0
-    val kClimbWinchNativeUnitsPerRotation   = 4096.STU
+    val kClimbWinchNativeUnitsPerRotation   = 4096.nativeUnits
 
     val kClimbWinchNativeUnitModel = NativeUnitLengthModel(
         kClimbWinchNativeUnitsPerRotation,
