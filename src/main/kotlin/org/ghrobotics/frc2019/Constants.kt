@@ -65,9 +65,9 @@ object Constants {
     const val kPCMId                        = 41
     const val kIntakeExtensionSolenoidId    = 1
     const val kIntakeLauncherSolenoidId     = 5
-    const val kDriveSolenoidId              = 2
+    const val kDriveSolenoidId              = 3
     const val kRampsSolenoidId              = 0
-    const val kClimberWheelSolenoidId       = 3
+    const val kClimberWheelSolenoidId       = 2
 
 
     // FIELD
@@ -80,13 +80,13 @@ object Constants {
 
     // ROBOT AND MECHANISM DIMENSIONS
     val kRobotMass                  = 123.lb
-    const val kRobotMomentOfInertia = 9.0 // kg m^2
+    const val kRobotMomentOfInertia = 12.0 // kg m^2
     const val kRobotAngularDrag     = 6.0 // Nm per rad/s
 
     val kRobotWidth                         = 29.inch
     val kRobotLength                        = 30.inch
     val kBumperThickness                    = 4.5.inch
-    val kIntakeProtrusion                   = 15.inch       // Out of frame protrusion.
+    val kIntakeProtrusion                   = 8.inch       // Out of frame protrusion.
     val kElevatorCrossbarHeightFromGround   = 46.inch
     val kIntakeCradleHeight                 = 6.inch
     val kArmLength                          = 30.inch
@@ -117,10 +117,10 @@ object Constants {
 
     val kDriveCurrentLimit = 38.amp
 
-    const val kDriveKp = 1.2 // Talon SRX Units
+    const val kDriveKp = 1.5 // Talon SRX Units
     const val kDriveKd = 0.0
 
-    const val kStaticFrictionVoltage    = 0.8 // Volts
+    const val kStaticFrictionVoltage    = 1.2 // Volts
     const val kDriveKv                  = 0.135 // Volts per radians per second
     const val kDriveKa                  = 0.012 // Volts per radians per second per second
 
@@ -162,7 +162,7 @@ object Constants {
     val kElevatorSecondStageToArmShaft  = 8.inch
     val kElevatorHeightFromGround       = 6.inch
 
-    val kElevatorCurrentLimit = 15.amp
+    val kElevatorCurrentLimit = 25.amp
 
     val kElevatorClosedLoopVelocityTolerance    = 1.inch.velocity
     val kElevatorClosedLoopTolerance            = 1.inch
@@ -193,12 +193,12 @@ object Constants {
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
     val kArmClosedLoopTolerance         = 10.degree
     val kArmCruiseVelocity              = 5 * 1.0.radian.velocity
-    val kArmAcceleration                = 5 * 1.0.radian.acceleration
+    val kArmAcceleration                = 3 * 1.0.radian.acceleration
 
-    const val kArmKp = 2.0
+    const val kArmKp = 4.0
     const val kArmKd = 0.0
     const val kArmKg = 0.014
-    const val kArmKv = 1.4 / 12.0
+    const val kArmKv = 1.0 / 12.0
     const val kArmKf = 0.0 // 7.566
 
 

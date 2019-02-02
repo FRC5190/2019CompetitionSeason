@@ -20,7 +20,7 @@ object Superstructure {
             (Constants.kArmLength * ArmSubsystem.armPosition.sin)
 
 
-    val kFrontHighRocketHatch get() = goToHeightWithAngle(75.inch, 0.degree)
+    val kFrontHighRocketHatch get() = goToHeightWithAngle(80.inch, 17.degree)
     val kFrontHighRocketCargo get() = goToHeightWithAngle(84.inch, 45.degree)
     val kFrontMiddleRocketHatch get() = goToHeightWithAngle(47.inch, 0.degree)
     val kBackLoadingStation get() = goToHeightWithAngle(20.inch, 180.degree)
@@ -56,7 +56,7 @@ object Superstructure {
                     +InstantRunnableCommand { println("FLIPPING") }
 
                     // Zero the elevator
-                    val zeroElevator = ClosedLoopElevatorCommand(0.inch)
+                    val zeroElevator = ClosedLoopElevatorCommand((-5).inch)
 
                     // Bring elevator down while moving the arm to a position where it is safe.
                     +parallel {
@@ -69,6 +69,9 @@ object Superstructure {
                             }
                         )
                     }.overrideExit { ElevatorSubsystem.isBottomLimitSwitchPressed }
+
+
+                    +ConditionCommand { ElevatorSubsystem.isBottomLimitSwitchPressed }
 
                     // Flip the arm. Take the elevator up to final position once the arm is out of the way.
                     +parallel {

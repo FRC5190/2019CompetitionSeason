@@ -148,6 +148,10 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
         }
     }
 
+    override fun zeroOutputs() {
+        armMaster.percentOutput = 0.0
+    }
+
     // Emergency Management
     override fun activateEmergency() = zeroClosedLoopGains()
 

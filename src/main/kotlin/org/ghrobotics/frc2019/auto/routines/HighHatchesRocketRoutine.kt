@@ -4,12 +4,10 @@ import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.auto.StartingPositions
 import org.ghrobotics.frc2019.auto.Trajectories
 import org.ghrobotics.frc2019.subsystems.Superstructure
-import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
+import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
-import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.lib.commands.ConditionCommand
 import org.ghrobotics.lib.commands.DelayCommand
 import org.ghrobotics.lib.commands.parallel
 import org.ghrobotics.lib.commands.sequential
@@ -20,6 +18,7 @@ import org.ghrobotics.lib.utils.withEquals
 fun highHatchesRocketRoutine() = autoRoutine {
 
     +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+    +ClosedLoopArmCommand(30.degree).withTimeout(2.second)
 
     // Place hatch on near side of rocket
     +parallel {
@@ -29,14 +28,14 @@ fun highHatchesRocketRoutine() = autoRoutine {
             pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
             dt = DriveSubsystem.kPathFollowingDt
         )
+
         +sequential {
-            // Wait until the path is 1 second from completion
-            +DelayCommand(Trajectories.sideStartToNearRocketHatch.lastState.t - 1.5.second)
-            // Take superstructure to place hatch
-            +Superstructure.kFrontMiddleRocketHatch.withTimeout(1.5.second)
+            +DelayCommand(Trajectories.sideStartToNearRocketHatch.lastState.t - 2.25.second)
+            +Superstructure.kFrontHighRocketHatch.withTimeout(2.25.second)
         }
     }
 
+    /*
     +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
 
     // Pickup hatch from loading station
@@ -90,4 +89,5 @@ fun highHatchesRocketRoutine() = autoRoutine {
             +IntakeCargoCommand(IntakeSubsystem.Direction.HOLD)
         }
     }
+    */
 }

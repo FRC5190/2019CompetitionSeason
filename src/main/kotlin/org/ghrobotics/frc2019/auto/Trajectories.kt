@@ -22,9 +22,9 @@ object Trajectories {
 
     /************************************ CONSTRAINTS ************************************/
 
-    private val kMaxVelocity = 5.0.feet.velocity
-    private val kMaxAcceleration = 5.0.feet.acceleration
-    private val kMaxCentripetalAcceleration = 5.0.feet.acceleration
+    private val kMaxVelocity = 12.0.feet.velocity
+    private val kMaxAcceleration = 8.0.feet.acceleration
+    private val kMaxCentripetalAcceleration = 9.0.feet.acceleration
 
     private val kConstraints = listOf(
         CentripetalAccelerationConstraint(kMaxCentripetalAcceleration),
@@ -74,7 +74,7 @@ object Trajectories {
 
     val sideStartToNearRocketHatch = waypoints(
         kSideStart,
-        Pose2d(12.0.feet, 7.496.feet, (-55).degree),
+        Pose2d(11.5.feet, 6.494.feet, (-48).degree),
         kNearRocketHatchAdjusted
     ).generateTrajectory(false)
 

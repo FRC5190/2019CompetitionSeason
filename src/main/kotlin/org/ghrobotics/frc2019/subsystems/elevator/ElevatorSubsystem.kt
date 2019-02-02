@@ -109,7 +109,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
             motor.overrideLimitSwitchesEnable = true
 
             // Clear position when at bottom
-//            motor.clearPositionOnReverseLimitSwitch = true
+            motor.clearPositionOnReverseLimitSwitch = true
 
             motor.softLimitForward = 10850.STU
             motor.softLimitForwardEnabled = true
@@ -172,10 +172,6 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
      * Used to calculate the actualAcceleration of the elevator.
      */
     override fun periodic() {
-        if (isBottomLimitSwitchPressed) {
-            elevatorMaster.sensorPosition = 0.meter
-        }
-
         synchronized(closedLoopSync) {
             if (isClosedLoop) {
                 val feedforward =
