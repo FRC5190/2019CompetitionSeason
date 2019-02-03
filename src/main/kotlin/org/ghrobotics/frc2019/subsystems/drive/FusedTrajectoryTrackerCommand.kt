@@ -38,15 +38,14 @@ class FusedTrajectoryTrackerCommand(
         DriveSubsystem.setOutput(DriveSubsystem.trajectoryTracker.nextState(DriveSubsystem.robotPosition))
         val trackedTarget = TargetTracker.bestTarget
 
-        if (duration - DriveSubsystem.trajectoryTracker.referencePoint!!.state.t < visionLocalizationUpdateStart &&
-            trackedTarget != null
-        ) {
-            DriveSubsystem.localization.addVisionSample(trackedTarget, visionStaticObjectLocation())
-        }
 
         val referencePoint = DriveSubsystem.trajectoryTracker.referencePoint
         if (referencePoint != null) {
             val referencePose = referencePoint.state.state.pose
+
+            if (duration - referencePoint.state.t < visionLocalizationUpdateStart && trackedTarget != null) {
+                DriveSubsystem.localization.addVisionSample(trackedTarget, visionStaticObjectLocation())
+            }
 
             // Update Current Path Location on Live Dashboard
             LiveDashboard.pathX = referencePose.translation.x.feet
@@ -56,5 +55,4 @@ class FusedTrajectoryTrackerCommand(
 
         trajectoryFinished = DriveSubsystem.trajectoryTracker.isFinished
     }
-
 }
