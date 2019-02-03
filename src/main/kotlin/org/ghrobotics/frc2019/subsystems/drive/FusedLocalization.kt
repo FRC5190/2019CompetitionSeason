@@ -27,14 +27,20 @@ class FusedLocalization(
     fun addVisionSample(target: TrackedTarget, staticLocation: Pose2d): Boolean {
         val timestamp = target.lastUpdated
         val historicalPose = this[timestamp]
+        val targetPose = target.averagePose
 
-        val toTarget = target.averagePose inFrameOfReferenceOf historicalPose
-        val visionHistoricalPose = staticLocation - toTarget
+        val toTarget = Pose2d(
+            targetPose.translation.x - historicalPose.translation.x,
+            targetPose.translation.y - historicalPose.translation.y
+        )
+        val visionHistoricalPose = Pose2d(
+            staticLocation.translation.x - toTarget.translation.x,
+            staticLocation.translation.y - toTarget.translation.y
+        )
 
         if (historicalPose.translation.distance(visionHistoricalPose.translation) < kMinDeadReckoningVsVisionNorm.value) {
             fusedDelta = Pose2d(
-                visionHistoricalPose.translation.x - historicalPose.translation.x,
-                visionHistoricalPose.translation.y - historicalPose.translation.y,
+                (visionHistoricalPose inFrameOfReferenceOf historicalPose).translation,
                 0.degree
             )
             System.out.printf(
