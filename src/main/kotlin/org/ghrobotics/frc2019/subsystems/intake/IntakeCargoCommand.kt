@@ -23,8 +23,7 @@ class IntakeCargoCommand(
             IntakeSubsystem.percentOutput = 1.0
         } else {
             IntakeSubsystem.launcherSolenoid.set(false)
-            IntakeSubsystem.extensionSolenoid.set(true)
-//            IntakeSubsystem.set(ControlMode.PercentOutput, -0.5)
+            IntakeSubsystem.percentOutput = -1.0
         }
     }
 

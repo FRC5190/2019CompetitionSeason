@@ -18,7 +18,6 @@ import org.ghrobotics.lib.mathematics.units.*
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitLengthModel
-import org.ghrobotics.lib.mathematics.units.nativeunits.STU
 import org.ghrobotics.lib.mathematics.units.nativeunits.nativeUnits
 import kotlin.math.pow
 
@@ -32,27 +31,27 @@ object Constants {
     const val kCTRETimeout = 10
 
     // MOTOR IDS
-    const val kDriveLeftMasterId        = 1
-    const val kDriveLeftSlaveId         = 2
-    const val kDriveRightMasterId       = 3
-    const val kDriveRightSlaveId        = 4
-    const val kElevatorMasterId         = 5
-    const val kElevatorSlave1Id         = 6
-    const val kElevatorSlave2Id         = 7
-    const val kElevatorSlave3Id         = 8
-    const val kArmId                    = 9
-    const val kIntakeLeftId             = 10
-    const val kIntakeRightId            = 11
-    const val kClimbFrontWinchMasterId  = 12
-    const val kClimbFrontWinchSlaveId   = 13
-    const val kClimbBackWinchMasterId   = 14
-    const val kClimbBackWinchSlaveId    = 15
-    const val kClimbWheelId             = 16
+    const val kDriveLeftMasterId = 1
+    const val kDriveLeftSlaveId = 2
+    const val kDriveRightMasterId = 3
+    const val kDriveRightSlaveId = 4
+    const val kElevatorMasterId = 5
+    const val kElevatorSlave1Id = 6
+    const val kElevatorSlave2Id = 7
+    const val kElevatorSlave3Id = 8
+    const val kArmId = 9
+    const val kIntakeLeftId = 10
+    const val kIntakeRightId = 11
+    const val kClimbFrontWinchMasterId = 12
+    const val kClimbFrontWinchSlaveId = 13
+    const val kClimbBackWinchMasterId = 14
+    const val kClimbBackWinchSlaveId = 15
+    const val kClimbWheelId = 16
 
 
     // ANALOG INPUT
-    const val kLeftBallSensorId     = 0
-    const val kRightBallSensorId    = 1
+    const val kLeftBallSensorId = 0
+    const val kRightBallSensorId = 1
 
     // DIGITAL INPUT
     const val kIntakeExtensionLimitSwitch = 0
@@ -63,26 +62,26 @@ object Constants {
 
 
     // PNEUMATICS
-    const val kPCMId                        = 41
-    const val kIntakeExtensionSolenoidId    = 1
-    const val kIntakeLauncherSolenoidId     = 5
-    const val kDriveSolenoidId              = 3
-    const val kRampsSolenoidId              = 0
-    const val kClimberWheelSolenoidId       = 2
+    const val kPCMId = 41
+    const val kIntakeExtensionSolenoidId = 1
+    const val kIntakeLauncherSolenoidId = 5
+    const val kDriveSolenoidId = 3
+    const val kRampsSolenoidId = 0
+    const val kClimberWheelSolenoidId = 2
 
 
     // FIELD
-    val kLevel2HabitatRightX            = 4.feet
-    val kLevel2HabitatBottomY           = 8.feet
-    val kLevel1HabitatRightX            = 7.feet
-    val kLevel1HabitatPlatform          = Rectangle2d(Translation2d(4.feet, 7.feet), Translation2d(8.feet, 20.feet))
-    val kHypotenuseDifferenceForRamp    = 0.433.inch
+    val kLevel2HabitatRightX = 4.feet
+    val kLevel2HabitatBottomY = 8.feet
+    val kLevel1HabitatRightX = 7.feet
+    val kLevel1HabitatPlatform = Rectangle2d(Translation2d(4.feet, 7.feet), Translation2d(8.feet, 20.feet))
+    val kHypotenuseDifferenceForRamp = 0.433.inch
 
 
     // ROBOT AND MECHANISM DIMENSIONS
-    val kRobotMass                  = 123.lb
+    val kRobotMass = 123.lb
     const val kRobotMomentOfInertia = 12.0 // kg m^2
-    const val kRobotAngularDrag     = 6.0 // Nm per rad/s
+    const val kRobotAngularDrag = 6.0 // Nm per rad/s
 
     val kRobotWidth = 29.inch
     val kRobotLength = 30.inch
@@ -111,16 +110,16 @@ object Constants {
         1440.nativeUnits
     )
 
-    val kDriveSensorUnitsPerRotation    = 1440.nativeUnits
-    val kDriveWheelRadius               = kDriveNativeUnitModel.wheelRadius(kDriveSensorUnitsPerRotation)
-    val kDriveTrackWidth                = 27.75.inch
+    val kDriveSensorUnitsPerRotation = 1440.nativeUnits
+    val kDriveWheelRadius = kDriveNativeUnitModel.wheelRadius(kDriveSensorUnitsPerRotation)
+    val kDriveTrackWidth = 27.75.inch
 
     val kDriveCurrentLimit = 38.amp
 
-    const val kDriveKp = 0.0 // Talon SRX Units
+    const val kDriveKp = 0.2 // Talon SRX Units
     const val kDriveKd = 0.0
 
-    const val kStaticFrictionVoltage    = 1.2 // Volts
+    const val kStaticFrictionVoltage = 1.2 // Volts
 
     const val kDriveLeftKv = 0.1689
     const val kDriveLeftKa = 0.0816
@@ -130,8 +129,8 @@ object Constants {
     const val kDriveRightKa = 0.1103
     const val kDriveRightKs = 1.4468
 
-    const val kDriveBeta = 0.0 // Inverse meters squared
-    const val kDriveZeta = 0.0 // Unitless dampening co-efficient
+    const val kDriveBeta = 1.0 // Inverse meters squared
+    const val kDriveZeta = 0.7 // Unitless dampening co-efficient
 
     private val kDriveLeftDCTransmission = DCMotorTransmission(
         1 / kDriveLeftKv,
@@ -158,10 +157,10 @@ object Constants {
 
     // ELEVATOR
     // from elevator zero (measured from bottom of second stage)
-    val kElevatorSwitchHeight                   = 8.inch
-    val kElevatorSwitchNativeUnit               = 2310.nativeUnits
-    val kElevatorAfterSwitchHeightSample        = 63.inch
-    val kElevatorAfterSwitchNativeUnitSample    = 10845.nativeUnits
+    val kElevatorSwitchHeight = 8.inch
+    val kElevatorSwitchNativeUnit = 2310.nativeUnits
+    val kElevatorAfterSwitchHeightSample = 63.inch
+    val kElevatorAfterSwitchNativeUnitSample = 10845.nativeUnits
 
     val kElevatorNativeUnitModel = SpringCascadeNativeUnitModel(
         switchHeight = kElevatorSwitchHeight,
@@ -170,26 +169,26 @@ object Constants {
         afterSwitchNativeUnitSample = kElevatorAfterSwitchNativeUnitSample
     )
 
-    val kMaxElevatorHeightFromZero      = 67.inch
-    val kElevatorSecondStageToArmShaft  = 8.inch
-    val kElevatorHeightFromGround       = 6.inch
+    val kMaxElevatorHeightFromZero = 67.inch
+    val kElevatorSecondStageToArmShaft = 8.inch
+    val kElevatorHeightFromGround = 6.inch
 
     val kElevatorCurrentLimit = 25.amp
 
-    val kElevatorClosedLoopVelocityTolerance    = 1.inch.velocity
-    val kElevatorClosedLoopTolerance            = 1.inch
-    val kElevatorAcceleration                   = 175.inch.acceleration
-    val kElevatorCruiseVelocity                 = 200.inch.velocity
+    val kElevatorClosedLoopVelocityTolerance = 1.inch.velocity
+    val kElevatorClosedLoopTolerance = 1.inch
+    val kElevatorAcceleration = 175.inch.acceleration
+    val kElevatorCruiseVelocity = 200.inch.velocity
 
-    const val kElevatorKp               = 1.0
-    const val kElevatorKf               = 0.864 / 2.0
-    const val kElevatorBelowSwitchKg    = 0.0 / 12
-    const val kElevatorAfterSwitchKg    = 0.77 / 12
+    const val kElevatorKp = 1.0
+    const val kElevatorKf = 0.864 / 2.0
+    const val kElevatorBelowSwitchKg = 0.0 / 12
+    const val kElevatorAfterSwitchKg = 0.77 / 12
 
 
     // ARM
-    val kArmSensorUnitsPerRotation  = 1024.nativeUnits
-    val kArmUpTicks                 = (-547).nativeUnits
+    val kArmSensorUnitsPerRotation = 1024.nativeUnits
+    val kArmUpTicks = (-547).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,
@@ -198,14 +197,14 @@ object Constants {
         true
     )
 
-    val kArmFlipTolerance   = 40.degree
+    val kArmFlipTolerance = 40.degree
 
     val kArmCurrentLimit = 15.amp
 
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
-    val kArmClosedLoopTolerance         = 10.degree
-    val kArmCruiseVelocity              = 5 * 1.0.radian.velocity
-    val kArmAcceleration                = 3 * 1.0.radian.acceleration
+    val kArmClosedLoopTolerance = 10.degree
+    val kArmCruiseVelocity = 5 * 1.0.radian.velocity
+    val kArmAcceleration = 3 * 1.0.radian.acceleration
 
     const val kArmKp = 4.0
     const val kArmKd = 0.0
@@ -215,8 +214,8 @@ object Constants {
 
 
     // CLIMB
-    val kClimbWinchRadius                   = 1.25.inch / 2.0
-    val kClimbWinchNativeUnitsPerRotation   = 4096.nativeUnits
+    val kClimbWinchRadius = 1.25.inch / 2.0
+    val kClimbWinchNativeUnitsPerRotation = 4096.nativeUnits
 
     val kClimbWinchNativeUnitModel = NativeUnitLengthModel(
         kClimbWinchNativeUnitsPerRotation,
@@ -225,10 +224,10 @@ object Constants {
 
     val kClimbWinchCurrentLimit = 20.amp
 
-    val kClimbWinchClosedLoopTolerance          = 2.inch
-    val kClimbWinchClosedLoopVelocityTolerance  = 1.inch.velocity
-    val kClimbWinchCruiseVelocity               = 1.5.feet.velocity
-    val kClimbWinchAcceleration                 = 1.5.feet.acceleration
+    val kClimbWinchClosedLoopTolerance = 2.inch
+    val kClimbWinchClosedLoopVelocityTolerance = 1.inch.velocity
+    val kClimbWinchCruiseVelocity = 1.5.feet.velocity
+    val kClimbWinchAcceleration = 1.5.feet.acceleration
 
     const val kClimbWinchKp = 0.3
 }

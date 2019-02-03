@@ -42,6 +42,10 @@ object Controls {
 
             triggerAxisButton(GenericHID.Hand.kRight).change(IntakeCargoCommand(IntakeSubsystem.Direction.RELEASE))
             button(kBumperRight).change(IntakeCargoCommand(IntakeSubsystem.Direction.HOLD))
+
+            axisButton(5, 0.1) {
+                change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * .5 }))
+            }
         }
     }
 
