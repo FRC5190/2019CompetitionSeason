@@ -64,7 +64,7 @@ object Trajectories {
     private val kLeftFrontCargoShipAdjusted = kLeftFrontCargoShip + Constants.kForwardIntakeToCenter
     private val kRightFrontCargoShipAdjusted = kRightFrontCargoShip + Constants.kForwardIntakeToCenter
 
-    private val kLoadingStation = Pose2d(0.0.feet, 2.2.feet, 0.degree)
+    val kLoadingStation = Pose2d(0.0.feet, 2.2.feet, 0.degree)
     private val kDepotCargo = Pose2d(3.223.feet, 6.533.feet, (-25).degree)
 
     private val kLoadingStationAdjusted = kLoadingStation + Constants.kBackwardIntakeToCenter

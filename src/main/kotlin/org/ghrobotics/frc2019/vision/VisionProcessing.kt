@@ -25,6 +25,14 @@ object VisionProcessing {
                         .mapNotNull(::processReflectiveTape)
                         .map { robotPose + it }.toList()
                 )
+
+                RawDataTracker.addSamples(
+                    visionData.timestamp,
+                    visionData.targets
+                        .asSequence()
+                        .mapNotNull(::processReflectiveTape)
+                        .map { it }.toList()
+                )
             }
         }
     }
@@ -36,7 +44,6 @@ object VisionProcessing {
 
         return Constants.kCenterToCamera + Pose2d(Translation2d(distance, angle), rotation)
     }
-
 //    private fun processWhiteTape(data: JsonObject): Pose2d? {
 //        // {"one": {"h": -16.875, "v": -32.4375}, "two": {"h": 60.0, "v": -32.4375}}
 //

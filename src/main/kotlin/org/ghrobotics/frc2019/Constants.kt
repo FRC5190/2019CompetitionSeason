@@ -84,21 +84,20 @@ object Constants {
     const val kRobotMomentOfInertia = 12.0 // kg m^2
     const val kRobotAngularDrag     = 6.0 // Nm per rad/s
 
-    val kRobotWidth                         = 29.inch
-    val kRobotLength                        = 30.inch
-    val kBumperThickness                    = 4.5.inch
-    val kIntakeProtrusion                   = 10.inch       // Out of frame protrusion.
-    val kElevatorCrossbarHeightFromGround   = 46.inch
-    val kIntakeCradleHeight                 = 6.inch
-    val kArmLength                          = 30.inch
+    val kRobotWidth = 29.inch
+    val kRobotLength = 30.inch
+    val kBumperThickness = 4.5.inch
+    val kIntakeProtrusion = 3.inch       // Out of frame protrusion.
+    val kElevatorCrossbarHeightFromGround = 46.inch
+    val kIntakeCradleHeight = 6.inch
+    val kArmLength = 30.inch
 
 
     // TRANSFORMATIONS
-    val kFrontBumperToCenter        = Pose2d(-(kRobotLength / 2.0) - kBumperThickness, 0.meter, 0.degree)
-    val kForwardIntakeToCenter      = Pose2d(-(kRobotLength / 2.0) - kIntakeProtrusion, 0.meter, 0.degree)
-    val kBackwardIntakeToCenter     = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, 0.meter, 0.degree)
-    val kCenterToCamera             = Pose2d(1.inch, 17.inch, 0.degree)
-    val kGroundToCamera             = 30.inch
+    val kFrontBumperToCenter = Pose2d(-(kRobotLength / 2.0) - kBumperThickness, 0.meter, 0.degree)
+    val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeProtrusion, 0.meter, 0.degree)
+    val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, 0.meter, 0.degree)
+    val kCenterToCamera = Pose2d((-13).inch, (-15).inch, 180.degree)
 
 
     // VISION
@@ -131,8 +130,8 @@ object Constants {
     const val kDriveRightKa = 0.1103
     const val kDriveRightKs = 1.4468
 
-    const val kDriveBeta = 2.0 // Inverse meters squared
-    const val kDriveZeta = 0.7 // Unitless dampening co-efficient
+    const val kDriveBeta = 0.0 // Inverse meters squared
+    const val kDriveZeta = 0.0 // Unitless dampening co-efficient
 
     private val kDriveLeftDCTransmission = DCMotorTransmission(
         1 / kDriveLeftKv,

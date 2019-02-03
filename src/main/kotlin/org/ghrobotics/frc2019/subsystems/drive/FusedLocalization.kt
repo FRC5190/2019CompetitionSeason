@@ -1,6 +1,7 @@
 package org.ghrobotics.frc2019.subsystems.drive
 
-import org.ghrobotics.frc2019.vision.TrackedTarget
+import edu.wpi.first.wpilibj.Timer
+import org.ghrobotics.frc2019.vision.RawDataTarget
 import org.ghrobotics.lib.localization.Localization
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Twist2d
@@ -22,31 +23,28 @@ class FusedLocalization(
         prevRightEncoder = rightEncoder().value
     }
 
-    var fusedDelta = Pose2d()
+    private var fusedDelta = Pose2d()
+    private var lastUpdated = Timer.getFPGATimestamp()
 
-    fun addVisionSample(target: TrackedTarget, staticLocation: Pose2d): Boolean {
-        val timestamp = target.lastUpdated
+    fun addVisionSample(bestTargetData: RawDataTarget, staticLocation: Pose2d): Boolean {
+        val timestamp = bestTargetData.timestamp
         val historicalPose = this[timestamp]
-        val targetPose = target.averagePose
 
-        val toTarget = Pose2d(
-            targetPose.translation.x - historicalPose.translation.x,
-            targetPose.translation.y - historicalPose.translation.y
-        )
+        val toTarget = bestTargetData.pose
         val visionHistoricalPose = Pose2d(
             staticLocation.translation.x - toTarget.translation.x,
             staticLocation.translation.y - toTarget.translation.y
         )
 
-        if (historicalPose.translation.distance(visionHistoricalPose.translation) < kMinDeadReckoningVsVisionNorm.value) {
+        if (historicalPose.translation.distance(visionHistoricalPose.translation) < kMinDeadReckoningVsVisionNorm.value &&
+            timestamp.second > lastUpdated
+        ) {
             fusedDelta = Pose2d(
                 (visionHistoricalPose inFrameOfReferenceOf historicalPose).translation,
                 0.degree
             )
-            System.out.printf(
-                "[FUSED LOCALIZER] Added Delta: X: %3.3f inches, Y: %3.3f inches",
-                fusedDelta.translation.x.inch, fusedDelta.translation.y.inch
-            )
+            lastUpdated = Timer.getFPGATimestamp()
+            println(lastUpdated)
             return true
         }
         return false
@@ -80,6 +78,6 @@ class FusedLocalization(
     }
 
     companion object {
-        val kMinDeadReckoningVsVisionNorm = 6.inch
+        val kMinDeadReckoningVsVisionNorm = 120.inch
     }
 }

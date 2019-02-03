@@ -1,5 +1,6 @@
 package org.ghrobotics.frc2019.subsystems.drive
 
+import org.ghrobotics.frc2019.vision.RawDataTracker
 import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.debug.LiveDashboard
@@ -36,15 +37,15 @@ class FusedTrajectoryTrackerCommand(
 
     override suspend fun execute() {
         DriveSubsystem.setOutput(DriveSubsystem.trajectoryTracker.nextState(DriveSubsystem.robotPosition))
-        val trackedTarget = TargetTracker.bestTarget
-
+        val trackedTarget = RawDataTracker.bestTargetRawData
 
         val referencePoint = DriveSubsystem.trajectoryTracker.referencePoint
         if (referencePoint != null) {
             val referencePose = referencePoint.state.state.pose
 
             if (duration - referencePoint.state.t < visionLocalizationUpdateStart && trackedTarget != null) {
-                DriveSubsystem.localization.addVisionSample(trackedTarget, visionStaticObjectLocation())
+//                DriveSubsystem.localization.addVisionSample(trackedTarget, visionStaticObjectLocation())
+                println("added sample")
             }
 
             // Update Current Path Location on Live Dashboard

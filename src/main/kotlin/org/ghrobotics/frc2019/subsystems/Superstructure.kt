@@ -19,6 +19,8 @@ object Superstructure {
         get() = Constants.kElevatorHeightFromGround + ElevatorSubsystem.elevatorPosition +
             (Constants.kArmLength * ArmSubsystem.armPosition.sin)
 
+    private val outOfToleranceRange = (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)
+
 
     val kFrontHighRocketHatch get() = goToHeightWithAngle(80.inch, 17.degree)
     val kFrontHighRocketCargo get() = goToHeightWithAngle(84.inch, 45.degree)
@@ -43,12 +45,11 @@ object Superstructure {
         // Check if the configuration is valid.
         return ConditionalCommand(Source(checkIfConfigValid(heightAboveGround, armAngle)), sequential {
 
-
             // Flip arm vs. don't flip arm.
             +ConditionalCommand(
                 {
                     val isFrontCurrent = ArmSubsystem.armPosition.cos >= 0
-                    isFrontWanted != isFrontCurrent
+                    isFrontWanted != isFrontCurrent || ArmSubsystem.armPosition in outOfToleranceRange
                 },
 
                 // We now need to flip the arm
@@ -101,7 +102,7 @@ object Superstructure {
     }
 
     private fun checkIfConfigValid(heightAboveGround: Length, armAngle: Rotation2d) =
-        (armAngle !in (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)) ||
+        (armAngle !in outOfToleranceRange) ||
             (armAngle > 90.degree
                 && heightAboveGround + Constants.kIntakeCradleHeight <= Constants.kElevatorCrossbarHeightFromGround)
 
