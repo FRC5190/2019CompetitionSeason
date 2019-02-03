@@ -1,6 +1,5 @@
 package org.ghrobotics.frc2019.subsystems.drive
 
-import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.lib.mathematics.epsilonEquals
 import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.nativeunits.STU
@@ -8,7 +7,10 @@ import org.junit.Test
 
 class SlopeNativeUnitModelTest {
 
-    private val slopeNativeUnitModel = Constants.kDriveNativeUnitModel
+    private val slopeNativeUnitModel = SlopeNativeUnitModel(
+        1.5700931336.feet,
+        1440.STU
+    )
 
     @Test
     fun testToPosition() {
@@ -37,7 +39,8 @@ class SlopeNativeUnitModelTest {
     @Test
     fun testWheelRadius() {
         val radius = slopeNativeUnitModel.wheelRadius(1440.STU)
-        println(radius.inch)
+
+        assert(radius.inch epsilonEquals 2.998657)
     }
 
 }

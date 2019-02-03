@@ -10,12 +10,10 @@ import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
-import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
-import kotlin.concurrent.thread
 import kotlin.properties.Delegates.observable
 
 object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
@@ -40,17 +38,10 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     private val shifter = Solenoid(Constants.kPCMId, Constants.kDriveSolenoidId)
 
     // Type of localization to determine position on the field
-    override val localization = TankEncoderLocalization(
+    override val localization = FusedLocalization(
         PigeonIMU(Constants.kPigeonIMUId).run {
             setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10)
-            val ypr = DoubleArray(3)
-            thread {
-                while (true) {
-                    getYawPitchRoll(ypr)
-                    Thread.sleep(1000 / 100)
-                }
-            }
-            return@run { ypr[0].degree }
+            return@run { fusedHeading.degree }
         },
         leftMotor::sensorPosition,
         rightMotor::sensorPosition
