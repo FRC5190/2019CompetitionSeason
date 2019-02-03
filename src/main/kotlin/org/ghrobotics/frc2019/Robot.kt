@@ -15,7 +15,6 @@ import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.frc2019.vision.VisionProcessing
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.wrappers.FalconRobotBase
 
@@ -37,7 +36,7 @@ object Robot : FalconRobotBase(), CoroutineScope {
         Autonomous
         Trajectories
 
-        VisionProcessing
+//        VisionProcessing
     }
 
     override fun periodic() {

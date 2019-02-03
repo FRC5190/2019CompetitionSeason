@@ -16,16 +16,15 @@ import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.feet
-import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.mathematics.units.meter
 
 object Trajectories {
 
     /************************************ CONSTRAINTS ************************************/
 
-    private val kMaxVelocity = 12.0.feet.velocity
-    private val kMaxAcceleration = 7.0.feet.acceleration
-    private val kMaxCentripetalAcceleration = 9.0.feet.acceleration
+    private val kMaxVelocity = 5.0.feet.velocity
+    private val kMaxAcceleration = 5.0.feet.acceleration
+    private val kMaxCentripetalAcceleration = 5.0.feet.acceleration
 
     private val kConstraints = listOf(
         CentripetalAccelerationConstraint(kMaxCentripetalAcceleration),
@@ -49,8 +48,8 @@ object Trajectories {
 
     /************************************ FIELD POSES ************************************/
 
-    private val kNearRocketHatch = Pose2d(19.feet - 1.254.feet, 1.7.feet, (-25).degree)
-    private val kFarRocketHatch = Pose2d(19.feet + 1.254.feet, 1.7.feet, (-145).degree)
+    private val kNearRocketHatch = Pose2d(19.feet - 1.254.feet, 1.6.feet, (-33).degree)
+    private val kFarRocketHatch = Pose2d(19.feet + 1.254.feet, 1.6.feet, (-147).degree)
     private val kRocketBay = Pose2d(19.feet, 2.35.feet, (-90).degree)
     private val kForceToNearSideRocketBay = Pose2d(19.feet, 2.35.feet, (-100).degree)
 
@@ -65,7 +64,7 @@ object Trajectories {
     private val kLeftFrontCargoShipAdjusted = kLeftFrontCargoShip + Constants.kForwardIntakeToCenter
     private val kRightFrontCargoShipAdjusted = kRightFrontCargoShip + Constants.kForwardIntakeToCenter
 
-    private val kLoadingStation = Pose2d(1.0.feet, 1.92.feet, 0.degree)
+    private val kLoadingStation = Pose2d(0.0.feet, 2.2.feet, 0.degree)
     private val kDepotCargo = Pose2d(3.223.feet, 6.533.feet, (-25).degree)
 
     private val kLoadingStationAdjusted = kLoadingStation + Constants.kBackwardIntakeToCenter
@@ -81,7 +80,7 @@ object Trajectories {
 
     val sideStartToNearRocketHatch = waypoints(
         kSideStart,
-        Pose2d(8.8.feet, 9.664.feet, 0.degree),
+        Pose2d(9.168.feet, 9.664.feet, 0.degree),
         Pose2d(12.605.feet, 6.848.feet, (-66).degree),
         kNearRocketHatchAdjusted
     ).generateTrajectory(false, false)

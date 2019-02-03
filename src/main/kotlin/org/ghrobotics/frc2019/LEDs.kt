@@ -2,7 +2,6 @@ package org.ghrobotics.frc2019
 
 import edu.wpi.first.wpilibj.SerialPort
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
-import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import kotlin.concurrent.thread
 
 object LEDs {
@@ -41,7 +40,6 @@ object LEDs {
         wantedLEDMode = when {
             Robot.emergencyActive -> Mode.EMERGENCY
             Controls.isClimbing -> Mode.CLIMB
-            IntakeSubsystem.isHoldingCargo() -> Mode.VISION
             Robot.isDisabled -> Mode.DISABLED
             VisionDriveCommand.isActive -> Mode.VISION
             else -> Mode.NONE
