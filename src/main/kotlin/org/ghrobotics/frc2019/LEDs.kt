@@ -2,6 +2,7 @@ package org.ghrobotics.frc2019
 
 import edu.wpi.first.wpilibj.SerialPort
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
+import org.ghrobotics.lib.wrappers.FalconRobot
 import kotlin.concurrent.thread
 
 object LEDs {
@@ -40,7 +41,7 @@ object LEDs {
         wantedLEDMode = when {
             Robot.emergencyActive -> Mode.EMERGENCY
             Controls.isClimbing -> Mode.CLIMB
-            Robot.isDisabled -> Mode.DISABLED
+            Robot.lastRobotMode == FalconRobot.Mode.DISABLED -> Mode.DISABLED
             VisionDriveCommand.isActive -> Mode.VISION
             else -> Mode.NONE
         }

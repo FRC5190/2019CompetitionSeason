@@ -5,7 +5,6 @@
 
 package org.ghrobotics.frc2019
 
-import edu.wpi.first.wpilibj.RobotBase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import org.ghrobotics.frc2019.auto.Autonomous
@@ -16,9 +15,10 @@ import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.FalconSubsystem
-import org.ghrobotics.lib.wrappers.FalconRobotBase
+import org.ghrobotics.lib.mathematics.units.millisecond
+import org.ghrobotics.lib.wrappers.FalconRobot
 
-object Robot : FalconRobotBase(), CoroutineScope {
+object Robot : FalconRobot(), CoroutineScope {
 
     override val coroutineContext = Job()
     val emergencyReadySystems = ArrayList<EmergencyHandleable>()
@@ -26,7 +26,7 @@ object Robot : FalconRobotBase(), CoroutineScope {
     var emergencyActive = false
 
     // Initialize all systems.
-    override fun initialize() {
+    init {
         +DriveSubsystem
         +ElevatorSubsystem
         +ArmSubsystem
@@ -41,7 +41,6 @@ object Robot : FalconRobotBase(), CoroutineScope {
 
     override fun periodic() {
         Controls.update()
-        Network.update()
         Autonomous.update()
         LEDs.update()
 /*
@@ -49,6 +48,10 @@ object Robot : FalconRobotBase(), CoroutineScope {
         if (bestTargetRawData != null) {
             DriveSubsystem.localization.addVisionSample(bestTargetRawData, Trajectories.kLoadingStation)
         }*/
+    }
+
+    override fun periodicNetwork() {
+        Network.update()
     }
 
     override operator fun FalconSubsystem.unaryPlus() {
@@ -60,5 +63,5 @@ object Robot : FalconRobotBase(), CoroutineScope {
 }
 
 fun main() {
-    RobotBase.startRobot { Robot }
+    FalconRobot.startRobot({ Robot }, 20.millisecond)
 }

@@ -13,7 +13,7 @@ import org.ghrobotics.lib.utils.Source
 import org.ghrobotics.lib.utils.and
 import org.ghrobotics.lib.utils.monitor
 import org.ghrobotics.lib.utils.onChangeToTrue
-import org.ghrobotics.lib.wrappers.FalconRobotBase
+import org.ghrobotics.lib.wrappers.FalconRobot
 
 /**
  * Manages the autonomous mode of the game.
@@ -30,7 +30,8 @@ object Autonomous {
     private var configValid = Source(true)
 
     // Stores if we are ready to send it.
-    private val isReady = { Robot.isAutonomous && Robot.isEnabled } and configValid
+    private val isReady =
+        { Robot.lastRobotMode == FalconRobot.Mode.AUTONOMOUS && Robot.lastEnabledState } and configValid
 
     /**
      * Routine that gets executed if an invalid starting position + routine is selected.
@@ -55,7 +56,7 @@ object Autonomous {
 
         // Stop the auto routine when we are not in autonomous anymore.
         modeMonitor.onChange { newValue ->
-            if (newValue != FalconRobotBase.Mode.AUTONOMOUS) JUST.stop()
+            if (newValue != FalconRobot.Mode.AUTONOMOUS) JUST.stop()
         }
     }
 
@@ -88,7 +89,7 @@ object Autonomous {
 
     private val startingPositionMonitor = startingPosition.monitor
     private val isReadyMonitor = isReady.monitor
-    private val modeMonitor = { Robot.currentMode }.monitor
+    private val modeMonitor = { Robot.lastRobotMode }.monitor
 }
 
 enum class StartingPositions(val pose: Pose2d) {
