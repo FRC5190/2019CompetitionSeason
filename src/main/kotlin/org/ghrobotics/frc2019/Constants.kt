@@ -151,7 +151,7 @@ object Constants {
         kDriveWheelRadius.value,
         kDriveTrackWidth.value / 2.0,
         kDriveLeftDCTransmission,
-        kDriveLeftDCTransmission
+        kDriveRightDCTransmission
     )
 
 
