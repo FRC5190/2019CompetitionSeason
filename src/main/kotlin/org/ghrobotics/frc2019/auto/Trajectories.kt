@@ -24,7 +24,7 @@ object Trajectories {
 
     private val kMaxVelocity = 12.0.feet.velocity
     private val kMaxAcceleration = 7.0.feet.acceleration
-    private val kMaxCentripetalAcceleration = 5.0.feet.acceleration
+    private val kMaxCentripetalAcceleration = 9.0.feet.acceleration
 
     private val kConstraints = listOf(
         CentripetalAccelerationConstraint(kMaxCentripetalAcceleration),
@@ -71,12 +71,6 @@ object Trajectories {
     private val kDepotCargoAdjusted = kDepotCargo + Constants.kBackwardIntakeToCenter
 
     /************************************ TRAJECTORIES ************************************/
-
-//    val sideStartToNearRocketHatch = waypoints(
-//        kSideStart,
-//        Pose2d(11.5.feet, 6.494.feet, (-48).degree),
-//        kNearRocketHatchAdjusted
-//    ).generateTrajectory(false)
 
     val sideStartToNearRocketHatch = waypoints(
         kSideStart,

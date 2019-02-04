@@ -17,12 +17,14 @@ class IntakeCargoCommand(
     override suspend fun initialize() {
         startTime = System.currentTimeMillis()
 
+        // Don't launch yet
+        IntakeSubsystem.launcherSolenoid.set(false)
+
         if (direction == IntakeSubsystem.Direction.HOLD) {
-            IntakeSubsystem.launcherSolenoid.set(false)
             IntakeSubsystem.extensionSolenoid.set(true)
             IntakeSubsystem.percentOutput = 1.0
         } else {
-            IntakeSubsystem.launcherSolenoid.set(false)
+
             IntakeSubsystem.percentOutput = -1.0
         }
     }

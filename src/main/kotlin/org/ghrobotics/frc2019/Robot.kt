@@ -15,8 +15,6 @@ import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.frc2019.vision.RawDataTracker
-import org.ghrobotics.frc2019.vision.VisionProcessing
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.wrappers.FalconRobotBase
 
@@ -46,11 +44,11 @@ object Robot : FalconRobotBase(), CoroutineScope {
         Network.update()
         Autonomous.update()
         LEDs.update()
-//
-//        val bestTargetRawData = RawDataTracker.bestTargetRawData
-//        if (bestTargetRawData != null) {
-//            DriveSubsystem.localization.addVisionSample(bestTargetRawData, Trajectories.kLoadingStation)
-//        }
+/*
+        val bestTargetRawData = RawDataTracker.bestTargetRawData
+        if (bestTargetRawData != null) {
+            DriveSubsystem.localization.addVisionSample(bestTargetRawData, Trajectories.kLoadingStation)
+        }*/
     }
 
     override operator fun FalconSubsystem.unaryPlus() {

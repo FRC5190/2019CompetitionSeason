@@ -32,6 +32,7 @@ fun highHatchesRocketRoutine() = autoRoutine {
     }
 
     +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+    +DelayCommand(0.1.second)
 
     +parallel {
         +sequential {
@@ -45,7 +46,7 @@ fun highHatchesRocketRoutine() = autoRoutine {
     }
 
     +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
-    +DelayCommand(0.5.second)
+    +DelayCommand(0.2.second)
 
 
     +DriveSubsystem.followTrajectory(
