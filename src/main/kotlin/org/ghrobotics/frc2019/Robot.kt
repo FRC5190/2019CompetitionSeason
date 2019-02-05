@@ -5,8 +5,6 @@
 
 package org.ghrobotics.frc2019
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.auto.Trajectories
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
@@ -20,9 +18,8 @@ import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.wrappers.FalconRobot
 
-object Robot : FalconRobot(), CoroutineScope {
+object Robot : FalconRobot() {
 
-    override val coroutineContext = Job()
     val emergencyReadySystems = ArrayList<EmergencyHandleable>()
 
     var emergencyActive = false

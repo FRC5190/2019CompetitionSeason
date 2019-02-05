@@ -58,6 +58,9 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
     // Checks if the limit switch is engaged
     val isBottomLimitSwitchPressed get() = elevatorMaster.sensorCollection.isRevLimitSwitchClosed
 
+    var isZeroed = false
+        private set
+
     // Used to retrieve the percent output of each motor and to set the desired percent output.
     var percentOutput
         get() = elevatorMaster.percentOutput
@@ -172,6 +175,10 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
      * Used to calculate the actualAcceleration of the elevator.
      */
     override fun periodic() {
+        if(isBottomLimitSwitchPressed) {
+            isZeroed = true
+        }
+
         synchronized(closedLoopSync) {
             if (isClosedLoop) {
                 val feedforward =

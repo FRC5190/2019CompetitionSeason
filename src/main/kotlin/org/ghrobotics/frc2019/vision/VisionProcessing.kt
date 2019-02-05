@@ -2,9 +2,7 @@ package org.ghrobotics.frc2019.vision
 
 import com.google.gson.JsonObject
 import edu.wpi.first.wpilibj.SerialPort
-import kotlinx.coroutines.launch
 import org.ghrobotics.frc2019.Constants
-import org.ghrobotics.frc2019.Robot
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
@@ -14,26 +12,24 @@ import org.ghrobotics.lib.mathematics.units.inch
 object VisionProcessing {
 
     init {
-        Robot.launch {
-            JeVois(SerialPort.Port.kUSB1) { visionData ->
-                val robotPose = DriveSubsystem.localization[visionData.timestamp]
+        JeVois(SerialPort.Port.kUSB1) { visionData ->
+            val robotPose = DriveSubsystem.localization[visionData.timestamp]
 
-                TargetTracker.addSamples(
-                    visionData.timestamp,
-                    visionData.targets
-                        .asSequence()
-                        .mapNotNull(::processReflectiveTape)
-                        .map { robotPose + it }.toList()
-                )
+            TargetTracker.addSamples(
+                visionData.timestamp,
+                visionData.targets
+                    .asSequence()
+                    .mapNotNull(::processReflectiveTape)
+                    .map { robotPose + it }.toList()
+            )
 
-                RawDataTracker.addSamples(
-                    visionData.timestamp,
-                    visionData.targets
-                        .asSequence()
-                        .mapNotNull(::processReflectiveTape)
-                        .map { it }.toList()
-                )
-            }
+            RawDataTracker.addSamples(
+                visionData.timestamp,
+                visionData.targets
+                    .asSequence()
+                    .mapNotNull(::processReflectiveTape)
+                    .map { it }.toList()
+            )
         }
     }
 

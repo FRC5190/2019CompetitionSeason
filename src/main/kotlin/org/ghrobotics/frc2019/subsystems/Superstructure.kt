@@ -6,12 +6,13 @@ import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.elevator.ClosedLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
+import org.ghrobotics.frc2019.subsystems.intake.IntakeCloseCommand
+import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.*
 import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.inch
-import org.ghrobotics.lib.utils.Source
 
 object Superstructure {
 
@@ -19,7 +20,8 @@ object Superstructure {
         get() = Constants.kElevatorHeightFromGround + ElevatorSubsystem.elevatorPosition +
             (Constants.kArmLength * ArmSubsystem.armPosition.sin)
 
-    private val outOfToleranceRange = (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)
+    private val outOfToleranceRange =
+        (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)
 
 
     val kFrontHighRocketHatch get() = goToHeightWithAngle(80.inch, 17.degree)
@@ -33,6 +35,17 @@ object Superstructure {
         armAngle: Rotation2d
     ): FalconCommand {
 
+        if (!checkIfConfigValid(heightAboveGround, armAngle)) {
+            return InstantRunnableCommand {
+                DriverStation.reportError(
+                    "Desired Superstructure State is Invalid." +
+                        "\nheightAboveGround: ${heightAboveGround.inch}inch" +
+                        "\narmAngle: ${armAngle.degree}degree",
+                    false
+                )
+            }
+        }
+
         // Calculates the wanted elevator height.
         val elevatorHeightWanted =
             (heightAboveGround - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft -
@@ -43,7 +56,7 @@ object Superstructure {
         val isFrontWanted = armAngle.cos >= 0
 
         // Check if the configuration is valid.
-        return ConditionalCommand(Source(checkIfConfigValid(heightAboveGround, armAngle)), sequential {
+        return sequential {
 
             // Flip arm vs. don't flip arm.
             +ConditionalCommand(
@@ -56,12 +69,21 @@ object Superstructure {
                 sequential {
                     +InstantRunnableCommand { println("FLIPPING") }
 
-                    // Zero the elevator
-                    val zeroElevator = ClosedLoopElevatorCommand((-5).inch)
+                    +ConditionalCommand(
+                        IntakeSubsystem.isFullyExtended,
+                        IntakeCloseCommand()
+                    )
 
                     // Bring elevator down while moving the arm to a position where it is safe.
                     +parallel {
-                        +zeroElevator
+                        +sequential {
+                            // Zero Elevator
+                            +ClosedLoopElevatorCommand((-5).inch)
+                                .overrideExit { ElevatorSubsystem.isZeroed }
+                            // Park elevator at 0 after zeroing
+                            +ClosedLoopElevatorCommand(0.inch)
+                        }
+                        // Prepare arm to flip through elevator
                         +ClosedLoopArmCommand(
                             if (isFrontWanted) {
                                 90.degree + Constants.kArmFlipTolerance
@@ -69,10 +91,15 @@ object Superstructure {
                                 90.degree - Constants.kArmFlipTolerance
                             }
                         )
-                    }.overrideExit { ElevatorSubsystem.isBottomLimitSwitchPressed }
+                    }.overrideExit {
+                        // Exit when the elevator is zeroed and within tolerance of zero
+                        ElevatorSubsystem.isZeroed &&
+                            ElevatorSubsystem.elevatorPosition.absoluteValue < Constants.kElevatorClosedLoopTolerance &&
+                            ElevatorSubsystem.velocity < Constants.kElevatorClosedLoopVelocityTolerance
+                    }
 
-
-                    +ConditionCommand { ElevatorSubsystem.isBottomLimitSwitchPressed }
+                    // Ensure elevator is parked at 0 and not -5
+                    +ClosedLoopElevatorCommand(0.inch)
 
                     // Flip the arm. Take the elevator up to final position once the arm is out of the way.
                     +parallel {
@@ -98,7 +125,7 @@ object Superstructure {
                     +ClosedLoopArmCommand(armAngle)
                 }
             )
-        }, InstantRunnableCommand { DriverStation.reportError("Desired Superstructure State is Invalid.", false) })
+        }
     }
 
     private fun checkIfConfigValid(heightAboveGround: Length, armAngle: Rotation2d) =
