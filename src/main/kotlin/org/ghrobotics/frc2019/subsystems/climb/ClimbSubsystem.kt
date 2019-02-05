@@ -1,4 +1,3 @@
-/*
 package org.ghrobotics.frc2019.subsystems.climb
 
 import com.ctre.phoenix.motorcontrol.ControlMode
@@ -106,8 +105,6 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         allMasters.forEach {
             it.kP = Constants.kClimbWinchKp
         }
-
-
     }
 
     private fun zeroClosedLoopGains() {
@@ -118,4 +115,3 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     override fun activateEmergency() = zeroClosedLoopGains()
     override fun recoverFromEmergency() = setClosedLoopGains()
 }
-*/

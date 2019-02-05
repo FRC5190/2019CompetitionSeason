@@ -8,6 +8,7 @@ package org.ghrobotics.frc2019
 import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
+import org.ghrobotics.frc2019.subsystems.climb.ClimbSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
 import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
@@ -74,9 +75,9 @@ object Controls {
             })
 
 
-//            // Nihar xd
-//            button(kY).changeOn { ClimbSubsystem.ramps = true }
-//            button(kX).changeOn { ClimbSubsystem.wheel = true }
+            // Nihar xd
+            button(kY).changeOn { ClimbSubsystem.ramps = true }
+            button(kX).changeOn { ClimbSubsystem.wheel = true }
         }
     }
 

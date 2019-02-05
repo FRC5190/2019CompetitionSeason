@@ -1,4 +1,3 @@
-/*
 package org.ghrobotics.frc2019.subsystems.climb
 
 import edu.wpi.first.wpilibj.GenericHID
@@ -25,4 +24,4 @@ class ManualClimbCommand : FalconCommand(ClimbSubsystem) {
         val backWinchSource = Controls.operatorXbox.getY(GenericHID.Hand.kRight)
         val wheelSource = Controls.driverXbox.getY(GenericHID.Hand.kRight)
     }
-}*/
+}
