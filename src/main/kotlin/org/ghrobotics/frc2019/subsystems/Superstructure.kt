@@ -9,10 +9,9 @@ import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCloseCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.*
-import org.ghrobotics.lib.mathematics.units.Length
-import org.ghrobotics.lib.mathematics.units.Rotation2d
-import org.ghrobotics.lib.mathematics.units.degree
-import org.ghrobotics.lib.mathematics.units.inch
+import org.ghrobotics.lib.mathematics.units.*
+import kotlin.math.absoluteValue
+import kotlin.math.pow
 
 object Superstructure {
 
@@ -101,9 +100,23 @@ object Superstructure {
                     // Ensure elevator is parked at 0 and not -5
                     +ClosedLoopElevatorCommand(0.inch)
 
-                    // Flip the arm. Take the elevator up to final position once the arm is out of the way.
+                    // Flip arm but angle up while elevator is going up
                     +parallel {
-                        +ClosedLoopArmCommand(armAngle)
+                        val heldAngle = if (isFrontWanted) {
+                            90.degree - Constants.kArmFlipTolerance
+                        } else {
+                            90.degree + Constants.kArmFlipTolerance
+                        }
+
+                        val moveArmHeight =
+                            elevatorHeightWanted - calcLevelOutArmHeight(calcDurationOfArm(heldAngle, armAngle))
+
+                        +sequential {
+                            +ClosedLoopArmCommand(heldAngle)
+                                .overrideExit { ElevatorSubsystem.elevatorPosition > moveArmHeight }
+                            +ClosedLoopArmCommand(armAngle)
+                        }
+
                         +sequential {
                             +ConditionCommand {
                                 if (isFrontWanted) {
@@ -117,6 +130,23 @@ object Superstructure {
                             +ClosedLoopElevatorCommand(elevatorHeightWanted)
                         }
                     }
+
+//                    // Flip the arm. Take the elevator up to final position once the arm is out of the way.
+//                    +parallel {
+//                        +ClosedLoopArmCommand(armAngle)
+//                        +sequential {
+//                            +ConditionCommand {
+//                                if (isFrontWanted) {
+//                                    ArmSubsystem.armPosition <= 90.degree - Constants.kArmFlipTolerance &&
+//                                        ArmSubsystem.armPosition.cos > 0
+//                                } else {
+//                                    ArmSubsystem.armPosition >= 90.degree + Constants.kArmFlipTolerance &&
+//                                        ArmSubsystem.armPosition.cos < 0
+//                                }
+//                            }
+//                            +ClosedLoopElevatorCommand(elevatorHeightWanted)
+//                        }
+//                    }
                 },
 
                 // We don't need to flip the arm. Take the elevator and arm to desired locations.
@@ -132,6 +162,47 @@ object Superstructure {
         (armAngle !in outOfToleranceRange) ||
             (armAngle > 90.degree
                 && heightAboveGround + Constants.kIntakeCradleHeight <= Constants.kElevatorCrossbarHeightFromGround)
+
+    // MATH SHOULD WORK (its messy because I'm too lazy to simplify)
+
+    fun calcDurationOfArm(
+        currentAngle: Rotation2d,
+        finalAngle: Rotation2d
+    ): Time {
+        // Starts and ends at rest
+
+        val x = (currentAngle - finalAngle).value.absoluteValue
+        val maxTriangleVelocity = Math.sqrt(Constants.kArmAcceleration.value * x)
+        return when {
+            maxTriangleVelocity > Constants.kArmCruiseVelocity.value -> {
+                val distanceWhenAccel = Constants.kArmCruiseVelocity.value.pow(2.0) /
+                    (2.0 * Constants.kArmAcceleration.value)
+                Time(
+                    Constants.kArmCruiseVelocity.value / Constants.kArmAcceleration.value * 2 +
+                        (x - distanceWhenAccel * 2.0) / Constants.kArmCruiseVelocity.value
+                )
+            }
+            else -> Time(maxTriangleVelocity / Constants.kArmAcceleration.value * 2)
+        }
+    }
+
+    fun calcLevelOutArmHeight(
+        armDuration: Time
+    ): Length {
+        // Currently cruise but ends at rest
+
+        val maxTriangleVelocity = armDuration.value * Constants.kElevatorAcceleration.value
+        return when {
+            maxTriangleVelocity > Constants.kElevatorCruiseVelocity.value -> {
+                val timeToAccel = (Constants.kElevatorCruiseVelocity.value / Constants.kElevatorAcceleration.value)
+                Length(
+                    (0.5 * Constants.kElevatorAcceleration.value * timeToAccel.pow(2.0)) +
+                        (armDuration.value - timeToAccel) * Constants.kElevatorCruiseVelocity.value
+                )
+            }
+            else -> Length(maxTriangleVelocity.pow(2.0) / (2.0 * Constants.kElevatorAcceleration.value))
+        }
+    }
 
     private fun enforceSoftLimits(armPosition: Rotation2d) {
         // TODO
