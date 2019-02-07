@@ -1,7 +1,6 @@
 package org.ghrobotics.frc2019.auto.routines
 
 import org.ghrobotics.frc2019.auto.Autonomous
-import org.ghrobotics.frc2019.auto.StartingPositions
 import org.ghrobotics.frc2019.auto.Trajectories
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
@@ -17,7 +16,7 @@ import org.ghrobotics.lib.utils.withEquals
 
 fun highHatchesRocketRoutine() = autoRoutine {
 
-    val pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT)
+    val pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
 
     +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
 

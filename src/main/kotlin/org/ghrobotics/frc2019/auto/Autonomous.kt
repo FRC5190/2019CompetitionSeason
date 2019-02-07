@@ -63,24 +63,45 @@ object Autonomous {
     private val JUST = stateCommandGroup(startingPosition) {
         state(StartingPositions.LEFT, StartingPositions.RIGHT) {
             stateCommandGroup(autoMode) {
-                state(AutoMode.HIGH_HATCHES_ROCKET, highHatchesRocketRoutine())
-                state(AutoMode.HATCH_AND_CARGO_ROCKET, hatchAndCargoRocketRoutine())
-                state(AutoMode.BASELINE, baselineRoutine())
+                state(
+                    Mode.HIGH_HATCHES_ROCKET,
+                    highHatchesRocketRoutine()
+                )
+                state(
+                    Mode.HATCH_AND_CARGO_ROCKET,
+                    hatchAndCargoRocketRoutine()
+                )
+                state(
+                    Mode.BASELINE,
+                    baselineRoutine()
+                )
 
-                state(AutoMode.TEST_TRAJECTORIES, testTrajectoriesRoutine())
+                state(
+                    Mode.TEST_TRAJECTORIES,
+                    testTrajectoriesRoutine()
+                )
 
-                state(AutoMode.FORWARD_CARGO_SHIP, invalidOptionRoutine)
+                state(Mode.FORWARD_CARGO_SHIP, invalidOptionRoutine)
             }
         }
         state(StartingPositions.CENTER) {
             stateCommandGroup(autoMode) {
-                state(AutoMode.FORWARD_CARGO_SHIP, forwardCargoShipRoutine())
-                state(AutoMode.BASELINE, baselineRoutine())
+                state(
+                    Mode.FORWARD_CARGO_SHIP,
+                    forwardCargoShipRoutine()
+                )
+                state(
+                    Mode.BASELINE,
+                    baselineRoutine()
+                )
 
-                state(AutoMode.TEST_TRAJECTORIES, testTrajectoriesRoutine())
+                state(
+                    Mode.TEST_TRAJECTORIES,
+                    testTrajectoriesRoutine()
+                )
 
-                state(AutoMode.HIGH_HATCHES_ROCKET, invalidOptionRoutine)
-                state(AutoMode.HATCH_AND_CARGO_ROCKET, invalidOptionRoutine)
+                state(Mode.HIGH_HATCHES_ROCKET, invalidOptionRoutine)
+                state(Mode.HATCH_AND_CARGO_ROCKET, invalidOptionRoutine)
             }
         }
     }
@@ -91,12 +112,13 @@ object Autonomous {
     private val startingPositionMonitor = startingPosition.monitor
     private val isReadyMonitor = isReady.monitor
     private val modeMonitor = { Robot.lastRobotMode }.monitor
-}
 
-enum class StartingPositions(val pose: Pose2d) {
-    LEFT(Trajectories.kSideStart.mirror),
-    CENTER(Trajectories.kCenterStart),
-    RIGHT(Trajectories.kSideStart)
-}
 
-enum class AutoMode { TEST_TRAJECTORIES, HIGH_HATCHES_ROCKET, HATCH_AND_CARGO_ROCKET, FORWARD_CARGO_SHIP, BASELINE }
+    enum class StartingPositions(val pose: Pose2d) {
+        LEFT(Trajectories.kSideStart.mirror),
+        CENTER(Trajectories.kCenterStart),
+        RIGHT(Trajectories.kSideStart)
+    }
+
+    enum class Mode { TEST_TRAJECTORIES, HIGH_HATCHES_ROCKET, HATCH_AND_CARGO_ROCKET, FORWARD_CARGO_SHIP, BASELINE }
+}

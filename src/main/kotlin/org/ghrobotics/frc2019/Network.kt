@@ -8,8 +8,7 @@ package org.ghrobotics.frc2019
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
-import org.ghrobotics.frc2019.auto.AutoMode
-import org.ghrobotics.frc2019.auto.StartingPositions
+import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
@@ -19,8 +18,8 @@ import org.ghrobotics.lib.wrappers.networktables.enumSendableChooser
 
 object Network {
 
-    val startingPositionChooser = enumSendableChooser<StartingPositions>()
-    val autoModeChooser = enumSendableChooser<AutoMode>()
+    val startingPositionChooser = enumSendableChooser<Autonomous.StartingPositions>()
+    val autoModeChooser = enumSendableChooser<Autonomous.Mode>()
 
     private val mainShuffleboardDisplay: ShuffleboardTab = Shuffleboard.getTab("5190")
 

@@ -1,7 +1,6 @@
 package org.ghrobotics.frc2019.auto.routines
 
 import org.ghrobotics.frc2019.auto.Autonomous
-import org.ghrobotics.frc2019.auto.StartingPositions
 import org.ghrobotics.frc2019.auto.Trajectories
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
@@ -21,12 +20,12 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
 
     +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
 
-   // Place hatch on near side of rocket
+    // Place hatch on near side of rocket
     +parallel {
         // Drive path to near rocket
         +DriveSubsystem.followTrajectory(
             trajectory = Trajectories.sideStartToNearRocketHatch,
-            pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
+            pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
             dt = DriveSubsystem.kPathFollowingDt
         )
         +sequential {
@@ -44,7 +43,7 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
         // Drive path to loading station
         +DriveSubsystem.followTrajectory(
             trajectory = Trajectories.nearRocketHatchToLoadingStation,
-            pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
+            pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
             dt = DriveSubsystem.kPathFollowingDt
         )
         // Take superstructure to pickup hatch
@@ -58,7 +57,7 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
         // Drive path to far rocket
         +DriveSubsystem.followTrajectory(
             trajectory = Trajectories.loadingStationToNearRocketHatch,
-            pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
+            pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
             dt = DriveSubsystem.kPathFollowingDt
         )
         +sequential {
@@ -79,14 +78,14 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
         // Drive path to loading station
         +DriveSubsystem.followTrajectory(
             trajectory = Trajectories.nearRocketHatchToCargoBall,
-            pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
+            pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
             dt = DriveSubsystem.kPathFollowingDt
         )
         // Take superstructure to pickup ball
         +Superstructure.kBackLoadingStation.withTimeout(1.5.second)
 
         +sequential {
-            +ConditionCommand { ArmSubsystem.armPosition > 150.degree}
+            +ConditionCommand { ArmSubsystem.armPosition > 150.degree }
             +IntakeCargoCommand(IntakeSubsystem.Direction.HOLD)
         }
     }
@@ -96,7 +95,7 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
         // Drive path to far rocket
         +DriveSubsystem.followTrajectory(
             trajectory = Trajectories.cargoBallToForcedNearSideRocketBay,
-            pathMirrored = Autonomous.startingPosition.withEquals(StartingPositions.LEFT),
+            pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
             dt = DriveSubsystem.kPathFollowingDt
         )
         +sequential {
