@@ -86,12 +86,12 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     )
 
     override fun activateEmergency() {
-        leftGearbox.setClosedLoopGains()
-        rightGearbox.setClosedLoopGains()
+        leftGearbox.zeroClosedLoopGains()
+        rightGearbox.zeroClosedLoopGains()
     }
 
     override fun recoverFromEmergency() {
-        leftGearbox.zeroClosedLoopGains()
-        rightGearbox.zeroClosedLoopGains()
+        leftGearbox.setClosedLoopGains()
+        rightGearbox.setClosedLoopGains()
     }
 }
