@@ -10,6 +10,7 @@ import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame
 import com.team254.lib.physics.DifferentialDrive
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
+import org.ghrobotics.frc2019.kMainLoopDt
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
@@ -19,6 +20,8 @@ import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedTrajectory
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.mirror
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.degree
+import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
+import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
 import org.ghrobotics.lib.utils.Source
@@ -45,16 +48,17 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
 
     // Shifter for two-speed gearbox
     private val shifter = Solenoid(Constants.kPCMId, Constants.kDriveSolenoidId)
+    private val pigeon = PigeonIMU(Constants.kPigeonIMUId)
 
     // Type of localization to determine position on the field
     override val localization = TankEncoderLocalization(
-        PigeonIMU(Constants.kPigeonIMUId).run {
-            setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10)
-            return@run { fusedHeading.degree }
-        },
+        { pigeon.fusedHeading.degree },
         leftMotor::sensorPosition,
         rightMotor::sensorPosition
     )
+
+    var pitchAcceleration = 0.degree.acceleration
+        private set
 
     // Shift up and down
     var lowGear by observable(false) { _, _, wantLow ->
@@ -73,6 +77,19 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     init {
         lowGear = false
         defaultCommand = ManualDriveCommand()
+
+        pigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10)
+    }
+
+    private var previousGyroPitchVelocity = 0.degree.velocity
+    private val gyroTemp = DoubleArray(3)
+
+    override fun periodic() {
+        super.periodic()
+        pigeon.getRawGyro(gyroTemp)
+        val newPitchVelocity = gyroTemp[0].degree.velocity
+        pitchAcceleration = (newPitchVelocity - previousGyroPitchVelocity) / kMainLoopDt
+        previousGyroPitchVelocity = newPitchVelocity
     }
 
     fun followFusedTrajectory(

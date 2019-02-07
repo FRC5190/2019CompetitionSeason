@@ -18,6 +18,8 @@ import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.wrappers.FalconRobot
 
+val kMainLoopDt = 20.millisecond
+
 object Robot : FalconRobot() {
 
     val emergencyReadySystems = ArrayList<EmergencyHandleable>()
@@ -63,5 +65,5 @@ object Robot : FalconRobot() {
 }
 
 fun main() {
-    FalconRobot.startRobot({ Robot }, 20.millisecond)
+    FalconRobot.startRobot({ Robot }, kMainLoopDt)
 }
