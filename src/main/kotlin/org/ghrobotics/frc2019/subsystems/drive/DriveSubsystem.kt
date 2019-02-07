@@ -89,7 +89,7 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     override fun setOutput(wheelVelocities: DifferentialDrive.WheelState, wheelVoltages: DifferentialDrive.WheelState) {
         super.setOutput(wheelVelocities, wheelVoltages)
         System.out.printf(
-            "L Reference: %3.3f, R Reference: %3.3f, L Real: %3.3f, R Real: %3.3f, L Voltage: %3.3f, R Voltage: %3.3f",
+            "L Reference: %3.3f, R Reference: %3.3f, L Real: %3.3f, R Real: %3.3f, L Voltage: %3.3f, R Voltage: %3.3f%n",
             wheelVelocities.left * differentialDrive.wheelRadius,
             wheelVelocities.right * differentialDrive.wheelRadius,
             leftMotor.velocity.value, rightMotor.velocity.value,
