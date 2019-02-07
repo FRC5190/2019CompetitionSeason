@@ -1,9 +1,7 @@
-package org.ghrobotics.frc2019.subsystems.drive
+package org.ghrobotics.lib.mathematics.units.nativeunits
 
 import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.SIUnit
-import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnit
-import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitModel
 
 class SlopeNativeUnitModel<T : SIUnit<T>>(
     val modelledSample: T,

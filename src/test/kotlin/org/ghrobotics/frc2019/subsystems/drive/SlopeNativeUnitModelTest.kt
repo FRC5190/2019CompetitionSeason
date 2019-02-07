@@ -3,6 +3,8 @@ package org.ghrobotics.frc2019.subsystems.drive
 import org.ghrobotics.lib.mathematics.epsilonEquals
 import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.nativeunits.STU
+import org.ghrobotics.lib.mathematics.units.nativeunits.SlopeNativeUnitModel
+import org.ghrobotics.lib.mathematics.units.nativeunits.wheelRadius
 import org.junit.Test
 
 class SlopeNativeUnitModelTest {
