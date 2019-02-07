@@ -2,7 +2,10 @@ package org.ghrobotics.frc2019.auto
 
 import org.ghrobotics.frc2019.Network
 import org.ghrobotics.frc2019.Robot
-import org.ghrobotics.frc2019.auto.routines.*
+import org.ghrobotics.frc2019.auto.routines.baselineRoutine
+import org.ghrobotics.frc2019.auto.routines.forwardCargoShipRoutine
+import org.ghrobotics.frc2019.auto.routines.hatchAndCargoRocketRoutine
+import org.ghrobotics.frc2019.auto.routines.highHatchesRocketRoutine
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.commands.InstantRunnableCommand
 import org.ghrobotics.lib.commands.S3ND
@@ -67,7 +70,6 @@ object Autonomous {
                 state(AutoMode.HIGH_HATCHES_ROCKET, highHatchesRocketRoutine())
                 state(AutoMode.HATCH_AND_CARGO_ROCKET, hatchAndCargoRocketRoutine())
                 state(AutoMode.BASELINE, baselineRoutine())
-                state(AutoMode.CHARACTERIZE, characterizationRoutine())
 
                 state(AutoMode.FORWARD_CARGO_SHIP, invalidOptionRoutine)
             }
@@ -76,7 +78,6 @@ object Autonomous {
             stateCommandGroup(autoMode) {
                 state(AutoMode.FORWARD_CARGO_SHIP, forwardCargoShipRoutine())
                 state(AutoMode.BASELINE, baselineRoutine())
-                state(AutoMode.CHARACTERIZE, characterizationRoutine())
 
                 state(AutoMode.HIGH_HATCHES_ROCKET, invalidOptionRoutine)
                 state(AutoMode.HATCH_AND_CARGO_ROCKET, invalidOptionRoutine)
@@ -98,4 +99,4 @@ enum class StartingPositions(val pose: Pose2d) {
     RIGHT(Trajectories.kSideStart)
 }
 
-enum class AutoMode { CHARACTERIZE, HIGH_HATCHES_ROCKET, HATCH_AND_CARGO_ROCKET, FORWARD_CARGO_SHIP, BASELINE }
+enum class AutoMode { HIGH_HATCHES_ROCKET, HATCH_AND_CARGO_ROCKET, FORWARD_CARGO_SHIP, BASELINE }
