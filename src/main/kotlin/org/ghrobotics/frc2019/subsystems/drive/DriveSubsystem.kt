@@ -7,6 +7,7 @@ package org.ghrobotics.frc2019.subsystems.drive
 
 import com.ctre.phoenix.sensors.PigeonIMU
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame
+import com.team254.lib.physics.DifferentialDrive
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
@@ -84,6 +85,16 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
         visionLocalizationUpdateStart,
         visionStaticObjectLocation
     )
+
+    override fun setOutput(wheelVelocities: DifferentialDrive.WheelState, wheelVoltages: DifferentialDrive.WheelState) {
+        super.setOutput(wheelVelocities, wheelVoltages)
+        System.out.printf(
+            "L Reference: %3.3f, R Reference: %3.3f, L Real: %3.3f, R Real: %3.3f",
+            wheelVelocities.left * differentialDrive.wheelRadius,
+            wheelVelocities.right * differentialDrive.wheelRadius,
+            leftMotor.velocity.value, rightMotor.velocity.value
+        )
+    }
 
     override fun activateEmergency() {
         leftGearbox.zeroClosedLoopGains()
