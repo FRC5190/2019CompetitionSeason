@@ -8,8 +8,6 @@ package org.ghrobotics.frc2019
 import com.team254.lib.physics.DCMotorTransmission
 import com.team254.lib.physics.DifferentialDrive
 import org.ghrobotics.frc2019.subsystems.arm.ArmNativeUnitModel
-import org.ghrobotics.lib.mathematics.units.nativeunits.SlopeNativeUnitModel
-import org.ghrobotics.lib.mathematics.units.nativeunits.wheelRadius
 import org.ghrobotics.frc2019.subsystems.elevator.SpringCascadeNativeUnitModel
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Rectangle2d
@@ -18,7 +16,9 @@ import org.ghrobotics.lib.mathematics.units.*
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitLengthModel
+import org.ghrobotics.lib.mathematics.units.nativeunits.SlopeNativeUnitModel
 import org.ghrobotics.lib.mathematics.units.nativeunits.nativeUnits
+import org.ghrobotics.lib.mathematics.units.nativeunits.wheelRadius
 import kotlin.math.pow
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -106,8 +106,8 @@ object Constants {
 
     // DRIVE
     val kDriveNativeUnitModel = SlopeNativeUnitModel(
-        1.57.feet,
-        1440.nativeUnits
+        6.feet,
+        5320.nativeUnits
     )
 
     val kDriveSensorUnitsPerRotation = 1440.nativeUnits
@@ -118,8 +118,6 @@ object Constants {
 
     const val kDriveKp = 0.2 // Talon SRX Units
     const val kDriveKd = 0.0
-
-    const val kStaticFrictionVoltage = 1.2 // Volts
 
     const val kDriveLeftKv = 0.1689
     const val kDriveLeftKa = 0.0816

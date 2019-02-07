@@ -53,7 +53,7 @@ object Trajectories {
     private val kRocketBay = Pose2d(19.feet, 2.35.feet, (-90).degree)
     private val kForceToNearSideRocketBay = Pose2d(19.feet, 2.35.feet, (-100).degree)
 
-    private val kNearRocketHatchAdjusted = kNearRocketHatch + Constants.kForwardIntakeToCenter
+    private val kNearRocketHatchAdjusted = kNearRocketHatch + Constants.kFrontBumperToCenter
     private val kFarRocketHatchAdjusted = kFarRocketHatch + Constants.kForwardIntakeToCenter
     private val kRocketBayAdjusted = kRocketBay + Constants.kForwardIntakeToCenter
     private val kForceToNearSideRocketBayAdjusted = kForceToNearSideRocketBay + Constants.kForwardIntakeToCenter
