@@ -24,17 +24,23 @@ class IntakeCargoCommand(
             IntakeSubsystem.extensionSolenoid.set(true)
             IntakeSubsystem.percentOutput = 1.0
         } else {
-
-            IntakeSubsystem.percentOutput = -1.0
+            IntakeSubsystem.extensionSolenoid.set(true)
         }
     }
 
     override suspend fun execute() {
         if (direction == IntakeSubsystem.Direction.RELEASE) {
             if (
-                System.currentTimeMillis() - startTime > 250
+                System.currentTimeMillis() - startTime > 500
                 && !IntakeSubsystem.launcherSolenoid.get()
             ) {
+                IntakeSubsystem.percentOutput = -1.0
+            }
+            if (
+                System.currentTimeMillis() - startTime > 1000
+                && !IntakeSubsystem.launcherSolenoid.get()
+            ) {
+                IntakeSubsystem.extensionSolenoid.set(false)
                 IntakeSubsystem.launcherSolenoid.set(true)
             }
         }

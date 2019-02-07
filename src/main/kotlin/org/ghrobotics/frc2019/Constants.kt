@@ -86,7 +86,7 @@ object Constants {
     val kRobotWidth = 29.inch
     val kRobotLength = 30.inch
     val kBumperThickness = 4.5.inch
-    val kIntakeProtrusion = 3.inch       // Out of frame protrusion.
+    val kIntakeProtrusion = 2.inch       // Out of frame protrusion.
     val kElevatorCrossbarHeightFromGround = 46.inch
     val kIntakeCradleHeight = 6.inch
     val kArmLength = 30.inch
@@ -129,7 +129,7 @@ object Constants {
     const val kDriveRightKa = 0.1103
     const val kDriveRightKs = 1.4468
 
-    const val kDriveBeta = 1.0 // Inverse meters squared
+    const val kDriveBeta = 1.2 // Inverse meters squared
     const val kDriveZeta = 0.7 // Unitless dampening co-efficient
 
     private val kDriveLeftDCTransmission = DCMotorTransmission(

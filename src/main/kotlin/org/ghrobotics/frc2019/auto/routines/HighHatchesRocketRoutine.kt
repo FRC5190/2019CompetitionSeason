@@ -10,7 +10,6 @@ import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.DelayCommand
 import org.ghrobotics.lib.commands.parallel
-import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.duration
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.second
@@ -35,19 +34,15 @@ fun highHatchesRocketRoutine() = autoRoutine {
     +DelayCommand(0.1.second)
 
     +parallel {
-        +sequential {
-            +DelayCommand(1.second)
-            +DriveSubsystem.followTrajectory(
-                trajectory = Trajectories.nearRocketHatchToLoadingStation,
-                pathMirrored = pathMirrored
-            )
-        }
+        +DriveSubsystem.followTrajectory(
+            trajectory = Trajectories.nearRocketHatchToLoadingStation,
+            pathMirrored = pathMirrored
+        )
         +Superstructure.kBackLoadingStation.withTimeout(2.second)
     }
 
     +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
     +DelayCommand(0.2.second)
-
 
     +DriveSubsystem.followTrajectory(
         trajectory = Trajectories.loadingStationToFarRocketHatch,
