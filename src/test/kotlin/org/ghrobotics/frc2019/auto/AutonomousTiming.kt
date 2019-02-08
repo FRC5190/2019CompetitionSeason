@@ -7,9 +7,7 @@ class AutonomousTiming {
     fun doubleHatchRocketAutoTimer() {
         val time = Trajectories.sideStartToNearRocketHatch.lastState.t.second +
             Trajectories.nearRocketHatchToLoadingStation.lastState.t.second +
-            Trajectories.loadingStationToFarRocketHatch.lastState.t.second +
-            Trajectories.farRocketHatchToCargoBall.lastState.t.second +
-            Trajectories.cargoBallToRocketBay.lastState.t.second
+            Trajectories.loadingStationToFarRocketHatch.lastState.t.second
         println("High Hatches Rocket Execution Time: $time")
     }
 

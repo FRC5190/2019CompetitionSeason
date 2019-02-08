@@ -4,12 +4,14 @@ import com.ctre.phoenix.motorcontrol.NeutralMode
 import edu.wpi.first.wpilibj.AnalogInput
 import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.Solenoid
+import kotlinx.coroutines.GlobalScope
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.utils.and
 import org.ghrobotics.lib.utils.greaterThan
+import org.ghrobotics.lib.utils.launchFrequency
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 
 object IntakeSubsystem : FalconSubsystem() {
@@ -18,8 +20,11 @@ object IntakeSubsystem : FalconSubsystem() {
     val extensionSolenoid = Solenoid(Constants.kPCMId, Constants.kIntakeExtensionSolenoidId)
     val launcherSolenoid = Solenoid(Constants.kPCMId, Constants.kIntakeLauncherSolenoidId)
 
-    val isHoldingCargo = AnalogInput(Constants.kLeftBallSensorId)::getAverageVoltage.greaterThan(0.9) and
-        AnalogInput(Constants.kRightBallSensorId)::getAverageVoltage.greaterThan(0.9)
+    val sensor1 = AnalogInput(Constants.kLeftBallSensorId)
+    val sensor2 = AnalogInput(Constants.kRightBallSensorId)
+
+    val isHoldingCargo = sensor1::getAverageVoltage.greaterThan(0.9) and
+        sensor2::getAverageVoltage.also { println(it) }.greaterThan(0.9)
 
     val isFullyExtended = DigitalInput(Constants.kIntakeExtensionLimitSwitch)::get
 

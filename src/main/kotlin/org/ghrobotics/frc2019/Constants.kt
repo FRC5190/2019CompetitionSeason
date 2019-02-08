@@ -74,7 +74,7 @@ object Constants {
     val kLevel2HabitatRightX = 4.feet
     val kLevel2HabitatBottomY = 8.feet
     val kLevel1HabitatRightX = 7.feet
-    val kLevel1HabitatPlatform = Rectangle2d(Translation2d(4.feet, 7.feet), Translation2d(8.feet, 20.feet))
+    val kLevel1HabitatPlatform = Rectangle2d(Translation2d(4.feet, 7.feet), Translation2d(11.feet, 20.feet))
     val kHypotenuseDifferenceForRamp = 0.433.inch
 
 
@@ -106,8 +106,8 @@ object Constants {
 
     // DRIVE
     val kDriveNativeUnitModel = SlopeNativeUnitModel(
-        6.feet,
-        5320.nativeUnits
+        97.5.inch,
+        7244.nativeUnits
     )
 
     val kDriveSensorUnitsPerRotation = 1440.nativeUnits
@@ -116,8 +116,8 @@ object Constants {
 
     val kDriveCurrentLimit = 38.amp
 
-    const val kDriveKp = 0.2 // Talon SRX Units
-    const val kDriveKd = 0.0
+    const val kDriveKp = 1.75 // Talon SRX Units
+    const val kDriveKd = 25.0
 
     const val kDriveLeftKv = 0.1689
     const val kDriveLeftKa = 0.0816
@@ -202,7 +202,7 @@ object Constants {
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
     val kArmClosedLoopTolerance = 10.degree
     val kArmCruiseVelocity = 5 * 1.0.radian.velocity
-    val kArmAcceleration = 3 * 1.0.radian.acceleration
+    val kArmAcceleration = 6 * 1.0.radian.acceleration
 
     const val kArmKp = 4.0
     const val kArmKd = 0.0

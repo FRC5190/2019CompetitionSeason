@@ -6,15 +6,18 @@ class IntakeCargoCommand(
     private val direction: IntakeSubsystem.Direction
 ) : FalconCommand(IntakeSubsystem) {
 
+    private var sensedBall = 0L
+
     init {
         if (direction == IntakeSubsystem.Direction.HOLD) {
-            finishCondition += IntakeSubsystem.isHoldingCargo
+            finishCondition += { sensedBall != 0L && System.currentTimeMillis() - sensedBall > 500 }
         }
     }
 
     private var startTime = 0L
 
     override suspend fun initialize() {
+        sensedBall = 0L
         startTime = System.currentTimeMillis()
 
         // Don't launch yet
@@ -43,6 +46,10 @@ class IntakeCargoCommand(
                 IntakeSubsystem.extensionSolenoid.set(false)
                 IntakeSubsystem.launcherSolenoid.set(true)
             }
+        }
+        if(IntakeSubsystem.isHoldingCargo() && sensedBall == 0L) {
+            IntakeSubsystem.extensionSolenoid.set(false)
+            sensedBall = System.currentTimeMillis()
         }
     }
 

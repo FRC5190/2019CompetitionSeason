@@ -73,6 +73,8 @@ object Superstructure {
                         IntakeCloseCommand()
                     )
 
+                    val elevatorLimit = (-2).inch
+
                     // Bring elevator down while moving the arm to a position where it is safe.
                     +parallel {
                         +sequential {
@@ -80,7 +82,7 @@ object Superstructure {
                             +ClosedLoopElevatorCommand((-5).inch)
                                 .overrideExit { ElevatorSubsystem.isZeroed }
                             // Park elevator at 0 after zeroing
-                            +ClosedLoopElevatorCommand(0.inch)
+                            +ClosedLoopElevatorCommand(elevatorLimit)
                         }
                         // Prepare arm to flip through elevator
                         +ClosedLoopArmCommand(
@@ -98,14 +100,15 @@ object Superstructure {
                     }
 
                     // Ensure elevator is parked at 0 and not -5
-                    +ClosedLoopElevatorCommand(0.inch)
+                    +ClosedLoopElevatorCommand(elevatorLimit)
+                        .overrideExit { ElevatorSubsystem.isZeroed }
 
                     // Flip arm but angle up while elevator is going up
                     +parallel {
                         val heldAngle = if (isFrontWanted) {
-                            90.degree - Constants.kArmFlipTolerance
+                            90.degree - Constants.kArmFlipTolerance - Constants.kArmClosedLoopTolerance
                         } else {
-                            90.degree + Constants.kArmFlipTolerance
+                            90.degree + Constants.kArmFlipTolerance + Constants.kArmClosedLoopTolerance
                         }
 
                         val moveArmHeight =
@@ -120,10 +123,10 @@ object Superstructure {
                         +sequential {
                             +ConditionCommand {
                                 if (isFrontWanted) {
-                                    ArmSubsystem.armPosition <= 90.degree - Constants.kArmFlipTolerance &&
+                                    ArmSubsystem.armPosition <= 90.degree - Constants.kArmFlipTolerance + Constants.kArmClosedLoopTolerance &&
                                         ArmSubsystem.armPosition.cos > 0
                                 } else {
-                                    ArmSubsystem.armPosition >= 90.degree + Constants.kArmFlipTolerance &&
+                                    ArmSubsystem.armPosition >= 90.degree + Constants.kArmFlipTolerance - Constants.kArmClosedLoopTolerance &&
                                         ArmSubsystem.armPosition.cos < 0
                                 }
                             }
