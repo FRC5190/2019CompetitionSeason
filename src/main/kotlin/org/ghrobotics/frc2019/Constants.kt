@@ -79,14 +79,15 @@ object Constants {
 
 
     // ROBOT AND MECHANISM DIMENSIONS
-    val kRobotMass = 123.lb
-    const val kRobotMomentOfInertia = 15.0 // kg m^2
-    const val kRobotAngularDrag = 6.0 // Nm per rad/s
+    val kRobotMass = 140.lb
+    const val kRobotMomentOfInertia = 10.0 // kg m^2
+    const val kRobotAngularDrag = 12.0 // Nm per rad/s
 
     val kRobotWidth = 29.inch
+
     val kRobotLength = 30.inch
     val kBumperThickness = 4.5.inch
-    val kIntakeProtrusion = 2.inch       // Out of frame protrusion.
+    val kIntakeProtrusion = 5.inch       // Out of frame protrusion.
     val kElevatorCrossbarHeightFromGround = 46.inch
     val kIntakeCradleHeight = 6.inch
     val kArmLength = 28.5.inch

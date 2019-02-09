@@ -116,7 +116,7 @@ object Superstructure {
                             elevatorHeightWanted - calcLevelOutArmHeight(calcDurationOfArm(heldAngle, armAngle))
 
                         +sequential {
-//                            +ClosedLoopArmCommand(heldAngle)
+                            //                            +ClosedLoopArmCommand(heldAngle)
 //                                .overrideExit { ElevatorSubsystem.elevatorPosition > moveArmHeight }
                             +ClosedLoopArmCommand(armAngle)
                         }
@@ -124,10 +124,12 @@ object Superstructure {
                         +sequential {
                             +ConditionCommand {
                                 if (isFrontWanted) {
-                                    ArmSubsystem.armPosition <= 90.degree - Constants.kArmFlipTolerance + Constants.kArmClosedLoopTolerance &&
+                                    ArmSubsystem.armPosition <=
+                                        90.degree - Constants.kArmFlipTolerance + Constants.kArmClosedLoopTolerance &&
                                         ArmSubsystem.armPosition.cos > 0
                                 } else {
-                                    ArmSubsystem.armPosition >= 90.degree + Constants.kArmFlipTolerance - Constants.kArmClosedLoopTolerance &&
+                                    ArmSubsystem.armPosition >=
+                                        90.degree + Constants.kArmFlipTolerance - Constants.kArmClosedLoopTolerance &&
                                         ArmSubsystem.armPosition.cos < 0
                                 }
                             }

@@ -9,9 +9,14 @@ class ClosedLoopClimbCommand(private val frontTarget: Length, private val backTa
 
     init {
         finishCondition += {
-            (ClimbSubsystem.frontWinchPosition - frontTarget).absoluteValue < Constants.kClimbWinchClosedLoopTolerance &&
+            (ClimbSubsystem.frontWinchPosition - frontTarget).absoluteValue <
+                Constants.kClimbWinchClosedLoopTolerance &&
+
                 ClimbSubsystem.frontWinchVelocity < Constants.kClimbWinchClosedLoopVelocityTolerance &&
-                (ClimbSubsystem.backWinchPosition - backTarget).absoluteValue < Constants.kClimbWinchClosedLoopTolerance &&
+
+                (ClimbSubsystem.backWinchPosition - backTarget).absoluteValue <
+                Constants.kClimbWinchClosedLoopTolerance &&
+
                 ClimbSubsystem.backWinchVelocity < Constants.kClimbWinchClosedLoopVelocityTolerance
 
         }

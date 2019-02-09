@@ -1,7 +1,6 @@
 package org.ghrobotics.frc2019.subsystems.drive
 
 import org.ghrobotics.frc2019.vision.RawDataTracker
-import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.debug.LiveDashboard
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d

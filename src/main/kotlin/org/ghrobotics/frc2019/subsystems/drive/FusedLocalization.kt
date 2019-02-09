@@ -36,7 +36,8 @@ class FusedLocalization(
             staticLocation.translation.y - toTarget.translation.y
         )
 
-        if (historicalPose.translation.distance(visionHistoricalPose.translation) < kMinDeadReckoningVsVisionNorm.value &&
+        if (historicalPose.translation.distance(visionHistoricalPose.translation) <
+            kMinDeadReckoningVsVisionNorm.value &&
             timestamp.second > lastUpdated
         ) {
             fusedDelta = Pose2d(

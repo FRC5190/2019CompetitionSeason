@@ -54,7 +54,7 @@ object Trajectories {
     private val kRocketBay = Pose2d(19.feet, 2.35.feet, (-90).degree)
     private val kForceToNearSideRocketBay = Pose2d(19.feet, 2.35.feet, (-100).degree)
 
-    private val kNearRocketHatchAdjusted = kNearRocketHatch
+    private val kNearRocketHatchAdjusted = kNearRocketHatch + Constants.kFrontBumperToCenter
     private val kFarRocketHatchAdjusted = kFarRocketHatch + Constants.kForwardIntakeToCenter
     private val kRocketBayAdjusted = kRocketBay + Constants.kForwardIntakeToCenter
     private val kForceToNearSideRocketBayAdjusted = kForceToNearSideRocketBay + Constants.kForwardIntakeToCenter
@@ -65,7 +65,7 @@ object Trajectories {
     private val kLeftFrontCargoShipAdjusted = kLeftFrontCargoShip + Constants.kForwardIntakeToCenter
     private val kRightFrontCargoShipAdjusted = kRightFrontCargoShip + Constants.kForwardIntakeToCenter
 
-    private val kLoadingStation = Pose2d(0.0.feet, 2.0.feet, 0.degree)
+    private val kLoadingStation = Pose2d(0.0.feet, 2.0.feet - 0.75.inch, 0.degree)
     private val kDepotCargo = Pose2d(3.223.feet, 6.533.feet, (-25).degree)
 
     private val kLoadingStationAdjusted = kLoadingStation + Constants.kBackwardIntakeToCenter

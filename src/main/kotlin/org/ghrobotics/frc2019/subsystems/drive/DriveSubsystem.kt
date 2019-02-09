@@ -7,7 +7,6 @@ package org.ghrobotics.frc2019.subsystems.drive
 
 import com.ctre.phoenix.sensors.PigeonIMU
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame
-import com.team254.lib.physics.DifferentialDrive
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.kMainLoopDt
@@ -57,7 +56,7 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
         pigeon.run {
             val ypr = DoubleArray(3)
             thread {
-                while(true){
+                while (true) {
                     getYawPitchRoll(ypr)
                     Thread.sleep(1000 / 100)
                 }
@@ -125,38 +124,39 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
         visionLocalizationUpdateStart,
         visionStaticObjectLocation
     )
-//
-//    override fun setOutput(
-//        wheelVelocities: DifferentialDrive.WheelState, wheelVoltages: DifferentialDrive.WheelState
-//    ) {
-//        System.out.printf(
-//            "L Reference: %3.3f, R Reference: %3.3f, L Real: %3.3f, R Real: %3.3f, L Voltage: %3.3f, R Voltage: %3.3f%n",
-//            wheelVelocities.left * differentialDrive.wheelRadius,
-//            wheelVelocities.right * differentialDrive.wheelRadius,
-//            leftMotor.velocity.value, rightMotor.velocity.value,
-//            leftMotor.voltageOutput.value, rightMotor.voltageOutput.value
-//        )
-//        val r = Matrix(
-//            arrayOf(
-//                doubleArrayOf(wheelVelocities.left * Constants.kDriveWheelRadius.value),
-//                doubleArrayOf(wheelVelocities.right * Constants.kDriveWheelRadius.value)
-//            )
-//        )
-//
-//        val y = Matrix(
-//            arrayOf(
-//                doubleArrayOf(leftMotor.sensorVelocity.value),
-//                doubleArrayOf(rightMotor.sensorVelocity.value)
-//            )
-//        )
-//
-//        velocityReferenceTracker.nextR = r
-//        velocityReferenceTracker.correct(y)
-//        val u = velocityReferenceTracker.update()
-//
-//        leftMotor.percentOutput = u.data[0][0] / 12.0
-//        rightMotor.percentOutput = u.data[1][0] / 12.0
-//    }
+
+    /*override fun setOutput(
+        wheelVelocities: DifferentialDrive.WheelState, wheelVoltages: DifferentialDrive.WheelState
+    ) {
+        System.out.printf(
+            "L Reference: %3.3f, R Reference: %3.3f, L Real: %3.3f, R Real: %3.3f, " +
+                "L Voltage: %3.3f, R Voltage: %3.3f%n",
+            wheelVelocities.left * differentialDrive.wheelRadius,
+            wheelVelocities.right * differentialDrive.wheelRadius,
+            leftMotor.velocity.value, rightMotor.velocity.value,
+            leftMotor.voltageOutput.value, rightMotor.voltageOutput.value
+        )
+        val r = Matrix(
+            arrayOf(
+                doubleArrayOf(wheelVelocities.left * Constants.kDriveWheelRadius.value),
+                doubleArrayOf(wheelVelocities.right * Constants.kDriveWheelRadius.value)
+            )
+        )
+
+        val y = Matrix(
+            arrayOf(
+                doubleArrayOf(leftMotor.sensorVelocity.value),
+                doubleArrayOf(rightMotor.sensorVelocity.value)
+            )
+        )
+
+        velocityReferenceTracker.nextR = r
+        velocityReferenceTracker.correct(y)
+        val u = velocityReferenceTracker.update()
+
+        leftMotor.percentOutput = u.data[0][0] / 12.0
+        rightMotor.percentOutput = u.data[1][0] / 12.0
+    }*/
 
     override fun activateEmergency() {
         leftGearbox.zeroClosedLoopGains()

@@ -14,6 +14,7 @@ object RawDataTracker {
         if (time >= current) return
 
         if (targets.isNotEmpty()) {
+            @Suppress("UnsafeCallOnNullableType")
             bestTargetRawData = RawDataTarget(time, targets.minBy { it.translation.norm }!!)
         }
     }
