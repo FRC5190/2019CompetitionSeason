@@ -193,6 +193,7 @@ def main():
     desired_pose = Pose2d()
 
     print(drivetrain.K)
+    print(drivetrain.L)
 
     # Ramsete tuning constants
     b = 2

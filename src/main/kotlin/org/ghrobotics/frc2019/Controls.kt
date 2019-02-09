@@ -67,7 +67,7 @@ object Controls {
             pov(0).changeOn(Superstructure.kFrontHighRocketHatch)
             pov(90).changeOn(Superstructure.kFrontLoadingStation)
             pov(180).changeOn(Superstructure.kFrontMiddleRocketHatch)
-            pov(270).changeOn(Superstructure.kBackLoadingStation)
+            pov(270).changeOn(Superstructure.kBackIntake)
         }
         state({ isClimbing }) {
             button(kA).change(sequential {

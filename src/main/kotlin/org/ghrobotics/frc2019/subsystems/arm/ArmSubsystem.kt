@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
+import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.Rotation2d
@@ -85,10 +86,10 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
             // Analog encoder hackery
             configFeedbackNotContinuous(true, Constants.kCTRETimeout)
 
-            softLimitForward = 200.degree.toNativeUnitPosition(Constants.kArmNativeUnitModel)
+            softLimitForward = 220.degree.toNativeUnitPosition(Constants.kArmNativeUnitModel)
             softLimitForwardEnabled = true
 
-            softLimitReverse = (-20).degree.toNativeUnitPosition(Constants.kArmNativeUnitModel)
+            softLimitReverse = (-40).degree.toNativeUnitPosition(Constants.kArmNativeUnitModel)
             softLimitReverseEnabled = true
 
             kF = Constants.kArmKf
@@ -132,7 +133,13 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
                 val experiencedAcceleration = Constants.kAccelerationDueToGravity +
                     ElevatorSubsystem.actualAcceleration.value
 
-                val feedforward = Constants.kArmKg * armPosition.cos * experiencedAcceleration +
+                val Kg = if (armPosition.sin > 0) {
+                    if (IntakeSubsystem.extensionSolenoid.get() && !IntakeSubsystem.isFullyExtended()) {
+                        Constants.kArmHatchKg
+                    } else Constants.kArmEmptyKg
+                } else 0.0
+
+                val feedforward = Kg * armPosition.cos * experiencedAcceleration +
                     if (armMaster.controlMode == ControlMode.MotionMagic) {
                         Constants.kArmKv * armMaster.activeTrajectoryVelocity.value
                     } else {

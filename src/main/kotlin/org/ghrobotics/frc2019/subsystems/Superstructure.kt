@@ -23,11 +23,12 @@ object Superstructure {
         (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)
 
 
-    val kFrontHighRocketHatch get() = goToHeightWithAngle(80.inch, 17.degree)
+    val kFrontHighRocketHatch get() = goToHeightWithAngle(73.inch, 0.degree)
     val kFrontHighRocketCargo get() = goToHeightWithAngle(84.inch, 45.degree)
     val kFrontMiddleRocketHatch get() = goToHeightWithAngle(47.inch, 0.degree)
-    val kBackLoadingStation get() = goToHeightWithAngle(20.inch, 180.degree)
-    val kFrontLoadingStation get() = goToHeightWithAngle(20.inch, 0.degree)
+    val kBackLoadingStation get() = goToHeightWithAngle(18.inch, 175.degree)
+    val kFrontLoadingStation get() = goToHeightWithAngle(18.inch, 5.degree)
+    val kBackIntake get() = goToHeightWithAngle(4.inch, (-160).degree)
 
     private fun goToHeightWithAngle(
         heightAboveGround: Length,
@@ -115,8 +116,8 @@ object Superstructure {
                             elevatorHeightWanted - calcLevelOutArmHeight(calcDurationOfArm(heldAngle, armAngle))
 
                         +sequential {
-                            +ClosedLoopArmCommand(heldAngle)
-                                .overrideExit { ElevatorSubsystem.elevatorPosition > moveArmHeight }
+//                            +ClosedLoopArmCommand(heldAngle)
+//                                .overrideExit { ElevatorSubsystem.elevatorPosition > moveArmHeight }
                             +ClosedLoopArmCommand(armAngle)
                         }
 

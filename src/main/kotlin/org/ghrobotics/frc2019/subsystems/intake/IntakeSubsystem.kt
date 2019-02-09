@@ -24,7 +24,7 @@ object IntakeSubsystem : FalconSubsystem() {
     val sensor2 = AnalogInput(Constants.kRightBallSensorId)
 
     val isHoldingCargo = sensor1::getAverageVoltage.greaterThan(0.9) and
-        sensor2::getAverageVoltage.also { println(it) }.greaterThan(0.9)
+        sensor2::getAverageVoltage.greaterThan(0.9)
 
     val isFullyExtended = DigitalInput(Constants.kIntakeExtensionLimitSwitch)::get
 

@@ -12,6 +12,7 @@ import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
+import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.lib.mathematics.units.derivedunits.inchesPerSecond
 import org.ghrobotics.lib.wrappers.networktables.enumSendableChooser
@@ -77,6 +78,8 @@ object Network {
     private val armCurrent = armSubsystemLayout.add("Current", 0.0).entry
     private val armVoltage = armSubsystemLayout.add("Voltage", 0.0).entry
     private val armVelocity = armSubsystemLayout.add("Velocity (dps)", 0.0).entry
+    private val isHoldingCargo = armSubsystemLayout.add("Intake Holding Cargo", false).entry
+    private val intakeFullyExtended = armSubsystemLayout.add("Intake Fully Extended", false).entry
 
     private val frontClimbWinchPosition = climbSubsystemLayout.add("Front Winch Position (in)", 0.0).entry
     private val backClimbWinchPosition = climbSubsystemLayout.add("Back Winch Position (in)", 0.0).entry
@@ -124,6 +127,9 @@ object Network {
         armCurrent.setDouble(ArmSubsystem.current)
         armVoltage.setDouble(ArmSubsystem.voltage)
         armVelocity.setDouble(ArmSubsystem.velocity.value * 180 / Math.PI)
+
+        isHoldingCargo.setBoolean(IntakeSubsystem.isHoldingCargo())
+        intakeFullyExtended.setBoolean(IntakeSubsystem.isFullyExtended())
 
 //        frontClimbWinchPosition.setDouble(ClimbSubsystem.frontWinchPosition.inch)
 //        backClimbWinchPosition.setDouble(ClimbSubsystem.backWinchPosition.inch)

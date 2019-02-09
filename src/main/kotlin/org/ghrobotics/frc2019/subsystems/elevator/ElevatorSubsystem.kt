@@ -154,6 +154,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
     private fun setClosedLoopGains() {
         allMotors.forEach { motor ->
             motor.kP = Constants.kElevatorKp
+            motor.kD = Constants.kElevatorKd
         }
     }
 
@@ -163,6 +164,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
     private fun zeroClosedLoopGains() {
         allMotors.forEach { motor ->
             motor.kP = 0.0
+            motor.kD = 0.0
         }
     }
 

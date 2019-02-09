@@ -45,7 +45,7 @@ class JeVois(
                 return serialPort
             } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
                 e.printStackTrace()
-                TimeUnit.MILLISECONDS.sleep(10)
+                TimeUnit.MILLISECONDS.sleep(1000)
             }
         }
     }

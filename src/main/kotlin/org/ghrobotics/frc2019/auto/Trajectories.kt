@@ -16,6 +16,7 @@ import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.feet
+import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.mathematics.units.meter
 
 object Trajectories {
@@ -24,7 +25,7 @@ object Trajectories {
 
     private val kMaxVelocity = 10.0.feet.velocity
     private val kMaxAcceleration = 4.0.feet.acceleration
-    private val kMaxCentripetalAcceleration = 9.0.feet.acceleration
+    private val kMaxCentripetalAcceleration = 7.0.feet.acceleration
 
     private val kConstraints = listOf(
         CentripetalAccelerationConstraint(kMaxCentripetalAcceleration),
@@ -48,12 +49,12 @@ object Trajectories {
 
     /************************************ FIELD POSES ************************************/
 
-    private val kNearRocketHatch = Pose2d(19.feet - 1.254.feet, 1.6.feet, (-30).degree)
-    private val kFarRocketHatch = Pose2d(19.feet + 1.5.feet, 1.4.feet, (-150).degree)
+    private val kNearRocketHatch = Pose2d(19.feet - 1.254.feet, 19.inch, (-25).degree)
+    private val kFarRocketHatch = Pose2d(19.feet + 1.5.feet, 1.4.feet, (-155).degree)
     private val kRocketBay = Pose2d(19.feet, 2.35.feet, (-90).degree)
     private val kForceToNearSideRocketBay = Pose2d(19.feet, 2.35.feet, (-100).degree)
 
-    private val kNearRocketHatchAdjusted = kNearRocketHatch + Constants.kFrontBumperToCenter
+    private val kNearRocketHatchAdjusted = kNearRocketHatch
     private val kFarRocketHatchAdjusted = kFarRocketHatch + Constants.kForwardIntakeToCenter
     private val kRocketBayAdjusted = kRocketBay + Constants.kForwardIntakeToCenter
     private val kForceToNearSideRocketBayAdjusted = kForceToNearSideRocketBay + Constants.kForwardIntakeToCenter
@@ -74,7 +75,6 @@ object Trajectories {
 
     val sideStartToNearRocketHatch = waypoints(
         kSideStart,
-        Pose2d(12.0.feet, 7.496.feet, (-55).degree),
         kNearRocketHatchAdjusted
     ).generateTrajectory(false)
 
