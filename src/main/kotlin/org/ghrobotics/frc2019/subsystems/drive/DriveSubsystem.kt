@@ -23,6 +23,7 @@ import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.millisecond
+import org.ghrobotics.lib.sensors.asSource
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
 import org.ghrobotics.lib.utils.Source
 import org.ghrobotics.lib.utils.map
@@ -53,16 +54,7 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
 
     // Type of localization to determine position on the field
     override val localization = TankEncoderLocalization(
-        pigeon.run {
-            val ypr = DoubleArray(3)
-            thread {
-                while (true) {
-                    getYawPitchRoll(ypr)
-                    Thread.sleep(1000 / 100)
-                }
-            }
-            return@run { ypr[0].degree }
-        },
+        pigeon.asSource(),
         leftMotor::sensorPosition,
         rightMotor::sensorPosition
     )

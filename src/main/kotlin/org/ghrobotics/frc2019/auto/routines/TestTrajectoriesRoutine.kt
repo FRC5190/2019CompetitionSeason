@@ -11,4 +11,5 @@ fun testTrajectoriesRoutine() = autoRoutine {
     +DriveSubsystem.followTrajectory(Trajectories.sideStartToNearRocketHatch, pathMirrored)
     +DriveSubsystem.followTrajectory(Trajectories.nearRocketHatchToLoadingStation, pathMirrored)
     +DriveSubsystem.followTrajectory(Trajectories.loadingStationToFarRocketHatch, pathMirrored)
+    +DriveSubsystem.followTrajectory(Trajectories.farRocketHatchToCargoBall, pathMirrored)
 }

@@ -91,12 +91,13 @@ object Constants {
     val kElevatorCrossbarHeightFromGround = 46.inch
     val kIntakeCradleHeight = 6.inch
     val kArmLength = 28.5.inch
+    val kBadIntakeOffset = 1.7.inch
 
 
     // TRANSFORMATIONS
     val kFrontBumperToCenter = Pose2d(-(kRobotLength / 2.0) - kBumperThickness, 0.meter, 0.degree)
-    val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeProtrusion, 0.meter, 0.degree)
-    val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, 0.meter, 0.degree)
+    val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeProtrusion, kBadIntakeOffset, 0.degree)
+    val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
     val kCenterToCamera = Pose2d((-13).inch, (-15).inch, 180.degree)
 
 
@@ -181,7 +182,7 @@ object Constants {
     val kElevatorCruiseVelocity = 200.inch.velocity
 
     const val kElevatorKp = 2.0
-    const val kElevatorKd =  5.0
+    const val kElevatorKd = 5.0
     const val kElevatorKf = 0.800 / 2.0
     const val kElevatorBelowSwitchKg = 0.0 / 12
     const val kElevatorAfterSwitchKg = 0.77 / 12
