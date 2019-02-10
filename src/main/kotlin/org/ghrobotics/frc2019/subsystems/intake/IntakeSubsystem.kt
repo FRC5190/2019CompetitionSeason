@@ -32,6 +32,7 @@ object IntakeSubsystem : FalconSubsystem() {
             intakeMaster.percentOutput = value
         }
 
+
     init {
         val intakeSlave = NativeFalconSRX(Constants.kIntakeRightId)
 

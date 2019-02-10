@@ -7,6 +7,7 @@ package org.ghrobotics.frc2019.subsystems.drive
 
 import com.ctre.phoenix.sensors.PigeonIMU
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame
+import com.team254.lib.physics.DifferentialDrive
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.kMainLoopDt
@@ -27,7 +28,6 @@ import org.ghrobotics.lib.sensors.asSource
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
 import org.ghrobotics.lib.utils.Source
 import org.ghrobotics.lib.utils.map
-import kotlin.concurrent.thread
 import kotlin.properties.Delegates.observable
 
 object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
@@ -116,6 +116,16 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
         visionLocalizationUpdateStart,
         visionStaticObjectLocation
     )
+
+
+    override fun setOutput(wheelVelocities: DifferentialDrive.WheelState, wheelVoltages: DifferentialDrive.WheelState) {
+        super.setOutput(wheelVelocities, wheelVoltages)
+        System.out.printf(
+            "%3.3f, %3.3f%n",
+            wheelVelocities.left * Constants.kDriveWheelRadius.value,
+            leftMotor.sensorVelocity.value
+        )
+    }
 
     /*override fun setOutput(
         wheelVelocities: DifferentialDrive.WheelState, wheelVoltages: DifferentialDrive.WheelState

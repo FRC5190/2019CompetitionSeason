@@ -5,7 +5,6 @@ import org.ghrobotics.frc2019.auto.Trajectories
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
-import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.DelayCommand
@@ -28,8 +27,8 @@ fun highHatchesRocketRoutine() = autoRoutine {
             pathMirrored = pathMirrored
         )
         +sequential {
-            +executeFor(Trajectories.sideStartToNearRocketHatch.duration - 2.75.second, ClosedLoopArmCommand(30.degree))
-            +Superstructure.kFrontLoadingStation.withTimeout(2.second)
+            +executeFor(Trajectories.sideStartToNearRocketHatch.duration - 3.25.second, ClosedLoopArmCommand(30.degree))
+            +Superstructure.kFrontHighRocketHatch.withTimeout(4.second)
         }
     }
 
@@ -43,7 +42,7 @@ fun highHatchesRocketRoutine() = autoRoutine {
         )
         +sequential {
             +DelayCommand(0.2.second)
-            +Superstructure.kBackLoadingStation.withTimeout(4.second)
+            +Superstructure.kBackHatchFromLoadingStation.withTimeout(4.second)
         }
     }
 
@@ -57,23 +56,24 @@ fun highHatchesRocketRoutine() = autoRoutine {
         )
         +sequential {
             +executeFor(
-                Trajectories.loadingStationToFarRocketHatch.duration - 2.second,
-                Superstructure.kFrontLoadingStation
+                Trajectories.loadingStationToFarRocketHatch.duration - 2.75.second,
+                Superstructure.kFrontCargoFromLoadingStation
             )
-            +Superstructure.kFrontLoadingStation
+            +Superstructure.kFrontHighRocketHatch
         }
     }
+
     +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
     +DelayCommand(0.3.second)
+
     +parallel {
         +DriveSubsystem.followTrajectory(
             trajectory = Trajectories.farRocketHatchToCargoBall,
             pathMirrored = pathMirrored
         )
         +sequential {
-            +Superstructure.kBackIntake
-            +IntakeCargoCommand(IntakeSubsystem.Direction.HOLD)
+            +DelayCommand(0.5.second)
+            +Superstructure.kFrontCargoFromLoadingStation.withTimeout(4.second)
         }
-
     }
 }

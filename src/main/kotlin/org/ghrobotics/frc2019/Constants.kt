@@ -24,6 +24,8 @@ import kotlin.math.pow
 @Suppress("MemberVisibilityCanBePrivate")
 object Constants {
 
+    const val isRaceRobot = false
+
     // PHYSICS
     const val kAccelerationDueToGravity = 9.80665
 
@@ -33,8 +35,8 @@ object Constants {
     // MOTOR IDS
     const val kDriveLeftMasterId = 1
     const val kDriveLeftSlaveId = 2
-    const val kDriveRightMasterId = 3
-    const val kDriveRightSlaveId = 4
+    val kDriveRightMasterId = if (isRaceRobot) 3 else 4
+    val kDriveRightSlaveId = if (isRaceRobot) 4 else 3
     const val kElevatorMasterId = 5
     const val kElevatorSlave1Id = 6
     const val kElevatorSlave2Id = 7
@@ -75,7 +77,7 @@ object Constants {
     val kLevel2HabitatBottomY = 8.feet
     val kLevel1HabitatRightX = 7.feet
     val kLevel1HabitatPlatform = Rectangle2d(Translation2d(4.feet, 7.feet), Translation2d(8.feet, 20.feet))
-    val kHypotenuseDifferenceForRamp = 0.433.inch
+    val kHypotenuseDifferenceForRamp = 2.inch
 
 
     // ROBOT AND MECHANISM DIMENSIONS
@@ -87,7 +89,7 @@ object Constants {
 
     val kRobotLength = 30.inch
     val kBumperThickness = 4.5.inch
-    val kIntakeProtrusion = 5.inch       // Out of frame protrusion.
+    val kIntakeProtrusion = 9.inch       // Out of frame protrusion.
     val kElevatorCrossbarHeightFromGround = 46.inch
     val kIntakeCradleHeight = 6.inch
     val kArmLength = 28.5.inch
@@ -96,6 +98,7 @@ object Constants {
 
     // TRANSFORMATIONS
     val kFrontBumperToCenter = Pose2d(-(kRobotLength / 2.0) - kBumperThickness, 0.meter, 0.degree)
+    val kBackBumperToCenter = Pose2d((kRobotLength / 2.0) + kBumperThickness, 0.meter, 0.degree)
     val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeProtrusion, kBadIntakeOffset, 0.degree)
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
     val kCenterToCamera = Pose2d((-13).inch, (-15).inch, 180.degree)
@@ -118,17 +121,16 @@ object Constants {
 
     val kDriveCurrentLimit = 38.amp
 
-    const val kDriveKp = 1.75 // Talon SRX Units
-    const val kDriveKd = 25.0
+    const val kDriveKp = 0.9 // Talon SRX Units
+    const val kDriveKd = 9.0
 
-    const val kDriveLeftKv = 0.1689
-    const val kDriveLeftKa = 0.0816 // 0.0816
-    const val kDriveLeftKs = 1.5423
+    const val kDriveLeftKv = 0.1489
+    const val kDriveLeftKa = 0.0716 // 0.0816
+    const val kDriveLeftKs = 1.2423
 
-    const val kDriveRightKv = 0.1875
-    const val kDriveRightKa = 0.1103 //
-
-    const val kDriveRightKs = 1.4468
+    const val kDriveRightKv = 0.1475
+    const val kDriveRightKa = 0.1003 //
+    const val kDriveRightKs = 1.2468
 
     const val kDriveBeta = 2.0 // Inverse meters squared
     const val kDriveZeta = 0.7 // Unitless dampening co-efficient
@@ -182,7 +184,7 @@ object Constants {
     val kElevatorCruiseVelocity = 200.inch.velocity
 
     const val kElevatorKp = 2.0
-    const val kElevatorKd = 5.0
+    const val kElevatorKd = 0.0
     const val kElevatorKf = 0.800 / 2.0
     const val kElevatorBelowSwitchKg = 0.0 / 12
     const val kElevatorAfterSwitchKg = 0.77 / 12
@@ -204,12 +206,12 @@ object Constants {
     val kArmCurrentLimit = 15.amp
 
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
-    val kArmClosedLoopTolerance = 10.degree
+    val kArmClosedLoopTolerance = 5.degree
     val kArmCruiseVelocity = 6 * 1.0.radian.velocity
     val kArmAcceleration = 4 * 1.0.radian.acceleration
 
-    const val kArmKp = 4.0
-    const val kArmKd = 0.0
+    const val kArmKp = 8.0
+    const val kArmKd = 20.0
 
     const val kArmEmptyKg = 0.015
 

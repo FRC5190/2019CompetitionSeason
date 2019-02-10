@@ -23,8 +23,8 @@ object Superstructure {
         (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)
 
 
-    val kFrontHighRocketHatch get() = goToHeightWithAngle(73.inch, 0.degree)
-    val kFrontMiddleRocketHatch get() = goToHeightWithAngle(47.inch, 0.degree)
+    val kFrontHighRocketHatch get() = goToHeightWithAngle(79.inch, 15.degree)
+    val kFrontMiddleRocketHatch get() = goToHeightWithAngle(47.inch, 5.degree)
 
     val kFrontHighRocketCargo get() = goToHeightWithAngle(83.inch, 45.degree)
     val kFrontMiddleRocketCargo get() = goToHeightWithAngle(56.inch, 45.degree)
@@ -86,10 +86,10 @@ object Superstructure {
                 sequential {
                     +InstantRunnableCommand { println("FLIPPING") }
 
-                    +ConditionalCommand(
-                        IntakeSubsystem.isFullyExtended,
-                        IntakeCloseCommand()
-                    )
+//                    +ConditionalCommand(
+//                        IntakeSubsystem.isFullyExtended,
+//                        IntakeCloseCommand()
+//                    )
 
                     val elevatorLimit = (-2).inch
 
