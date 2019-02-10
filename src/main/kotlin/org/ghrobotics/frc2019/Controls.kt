@@ -8,7 +8,6 @@ package org.ghrobotics.frc2019
 import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
-import org.ghrobotics.frc2019.subsystems.climb.ClimbSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
 import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
@@ -50,11 +49,13 @@ object Controls {
         registerEmergencyMode()
 
         // Enter climb mode
-        button(kB).changeOn { isClimbing = !isClimbing }
+        button(kB).changeOn {
+            isClimbing = !isClimbing
+            DriveSubsystem.lowGear = true
+        }
 
         state({ !isClimbing }) {
             // Elevator
-
             axisButton(1, 0.05) {
                 change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * .5 }))
             }
@@ -63,21 +64,66 @@ object Controls {
                 change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * .5 }))
             }
 
+            val backModifier = triggerAxisButton(GenericHID.Hand.kLeft)
+
             // Superstructure
-            pov(0).changeOn(Superstructure.kFrontHighRocketHatch)
-            pov(90).changeOn(Superstructure.kFrontLoadingStation)
-            pov(180).changeOn(Superstructure.kFrontMiddleRocketHatch)
-            pov(270).changeOn(Superstructure.kBackIntake)
+
+            // HIGH ROCKET
+            pov(0).changeOn {
+                if (IntakeSubsystem.isHoldingCargo()) {
+                    Superstructure.kFrontHighRocketCargo.start()
+                } else {
+                    Superstructure.kFrontHighRocketHatch.start()
+                }
+            }
+
+            // MIDDLE ROCKET
+            pov(90).changeOn {
+                if (IntakeSubsystem.isHoldingCargo()) {
+                    Superstructure.kFrontMiddleRocketCargo.start()
+                } else {
+                    Superstructure.kFrontMiddleRocketHatch.start()
+                }
+            }
+
+            // LOW ROCKET, CARGO SHIP, AND LOADING STATION
+            pov(180).changeOn {
+                if (backModifier.source() > 0.5) {
+                    if (IntakeSubsystem.isHoldingCargo()) {
+                        Superstructure.kBackLowRocketCargo.start()
+                    } else {
+                        Superstructure.kBackHatchFromLoadingStation.start()
+                    }
+                } else {
+                    if (IntakeSubsystem.isHoldingCargo()) {
+                        Superstructure.kFrontLowRocketCargo.start()
+                    } else {
+                        Superstructure.kFrontHatchFromLoadingStation.start()
+                    }
+                }
+            }
+
+            // CARGO INTAKE
+            pov(270).changeOn {
+                if (backModifier.source() > 0.5) {
+                    Superstructure.kBackCargoIntake.start()
+                } else {
+                    Superstructure.kFrontCargoIntake.start()
+                }
+            }
+
+            triggerAxisButton(GenericHID.Hand.kRight).changeOn {
+                if (backModifier.source() > 0.5) {
+                    Superstructure.kBackCargoFromLoadingStation.start()
+                } else {
+                    Superstructure.kFrontCargoFromLoadingStation.start()
+                }
+            }
         }
         state({ isClimbing }) {
             button(kA).change(sequential {
                 // Auto climbing logic here
             })
-
-
-            // Nihar xd
-            button(kY).changeOn { ClimbSubsystem.ramps = true }
-            button(kX).changeOn { ClimbSubsystem.wheel = true }
         }
     }
 
