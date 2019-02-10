@@ -106,18 +106,6 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
         previousGyroPitchVelocity = newPitchVelocity
     }
 
-    fun followFusedTrajectory(
-        trajectory: TimedTrajectory<Pose2dWithCurvature>,
-        pathMirrored: Source<Boolean>,
-        visionLocalizationUpdateStart: Time,
-        visionStaticObjectLocation: Source<Pose2d>
-    ) = FusedTrajectoryTrackerCommand(
-        pathMirrored.map(trajectory.mirror(), trajectory),
-        visionLocalizationUpdateStart,
-        visionStaticObjectLocation
-    )
-
-
     override fun setOutput(wheelVelocities: DifferentialDrive.WheelState, wheelVoltages: DifferentialDrive.WheelState) {
         super.setOutput(wheelVelocities, wheelVoltages)
         System.out.printf(
