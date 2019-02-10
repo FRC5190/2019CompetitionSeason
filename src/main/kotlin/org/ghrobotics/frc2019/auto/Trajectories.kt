@@ -7,17 +7,15 @@ package org.ghrobotics.frc2019.auto
 
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
+import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.twodim.trajectory.DefaultTrajectoryGenerator
 import org.ghrobotics.lib.mathematics.twodim.trajectory.constraints.CentripetalAccelerationConstraint
 import org.ghrobotics.lib.mathematics.twodim.trajectory.constraints.DifferentialDriveDynamicsConstraint
 import org.ghrobotics.lib.mathematics.twodim.trajectory.constraints.VelocityLimitRegionConstraint
-import org.ghrobotics.lib.mathematics.units.degree
+import org.ghrobotics.lib.mathematics.units.*
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
-import org.ghrobotics.lib.mathematics.units.feet
-import org.ghrobotics.lib.mathematics.units.inch
-import org.ghrobotics.lib.mathematics.units.meter
 
 object Trajectories {
 
@@ -139,7 +137,20 @@ object Trajectories {
 
     /************************************ HELPER METHODS ************************************/
 
+    data class FieldLocation(
+        val trueLocation: Pose2d,
+        val transform: Pose2d = Pose2d(),
+        val translationalOffset: Translation2d = Translation2d(),
+        val rotationalOffset: Rotation2d = 0.radian
+    ) {
+        val position = Pose2d(
+            trueLocation.translation + translationalOffset,
+            trueLocation.rotation + rotationalOffset
+        ) + transform
+    }
+
     private fun waypoints(vararg points: Pose2d) = points.toList()
+    private fun waypoints(vararg points: FieldLocation) = points.map { it.position }.toList()
 
     private fun List<Pose2d>.generateTrajectory(reversed: Boolean, optimize: Boolean = true) =
         DefaultTrajectoryGenerator.generateTrajectory(
