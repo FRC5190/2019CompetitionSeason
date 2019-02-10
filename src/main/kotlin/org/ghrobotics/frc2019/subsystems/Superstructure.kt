@@ -24,11 +24,21 @@ object Superstructure {
 
 
     val kFrontHighRocketHatch get() = goToHeightWithAngle(73.inch, 0.degree)
-    val kFrontHighRocketCargo get() = goToHeightWithAngle(84.inch, 45.degree)
     val kFrontMiddleRocketHatch get() = goToHeightWithAngle(47.inch, 0.degree)
-    val kBackLoadingStation get() = goToHeightWithAngle(18.inch, 175.degree)
-    val kFrontLoadingStation get() = goToHeightWithAngle(18.inch, 5.degree)
-    val kBackIntake get() = goToHeightWithAngle(4.inch, (-160).degree)
+
+    val kFrontHighRocketCargo get() = goToHeightWithAngle(83.inch, 45.degree)
+    val kFrontMiddleRocketCargo get() = goToHeightWithAngle(56.inch, 45.degree)
+    val kFrontLowRocketCargo get() = goToHeightWithAngle(32.inch, 45.degree)
+    val kBackLowRocketCargo get() = goToHeightWithAngle(32.inch, 135.degree)
+
+    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(18.inch, 5.degree)
+    val kBackHatchFromLoadingStation get() = goToHeightWithAngle(18.inch, 175.degree)
+
+    val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, (-20).degree)
+    val kBackCargoIntake get() = elevatorAndArmHeight(0.inch, (-160).degree)
+
+    val kFrontCargoFromLoadingStation get() = elevatorAndArmHeight(0.inch, 45.degree)
+    val kBackCargoFromLoadingStation get() = elevatorAndArmHeight(0.inch, 135.degree)
 
     private fun goToHeightWithAngle(
         heightAboveGround: Length,
@@ -51,6 +61,13 @@ object Superstructure {
             (heightAboveGround - Constants.kElevatorHeightFromGround - Constants.kElevatorSecondStageToArmShaft -
                 (Constants.kArmLength * armAngle.sin)).coerceIn(0.inch, Constants.kMaxElevatorHeightFromZero)
 
+        return elevatorAndArmHeight(elevatorHeightWanted, armAngle)
+    }
+
+    private fun elevatorAndArmHeight(
+        elevatorHeightWanted: Length,
+        armAngle: Rotation2d
+    ): FalconCommand {
         // Values that store the side of the robot the arm is currently in and the side of the robot that the arm
         // wants to be in.
         val isFrontWanted = armAngle.cos >= 0
