@@ -1,6 +1,5 @@
 package org.ghrobotics.frc2019.auto.routines
 
-import kotlinx.coroutines.Delay
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.auto.Trajectories
 import org.ghrobotics.frc2019.subsystems.Superstructure
