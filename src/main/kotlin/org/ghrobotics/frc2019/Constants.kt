@@ -73,10 +73,6 @@ object Constants {
 
 
     // FIELD
-    val kLevel2HabitatRightX = 4.feet
-    val kLevel2HabitatBottomY = 8.feet
-    val kLevel1HabitatRightX = 7.feet
-    val kLevel1HabitatPlatform = Rectangle2d(Translation2d(4.feet, 7.feet), Translation2d(8.feet, 20.feet))
     val kHypotenuseDifferenceForRamp = 2.inch
 
 

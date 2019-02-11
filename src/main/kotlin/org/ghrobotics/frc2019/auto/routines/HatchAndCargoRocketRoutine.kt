@@ -94,24 +94,5 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
         }
     }
 
-    // Place ball on rocket bay
-    +parallel {
-        // Drive path to far rocket
-        +DriveSubsystem.followTrajectory(
-            trajectory = Trajectories.cargoBallToForcedNearSideRocketBay,
-            pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
-            dt = DriveSubsystem.kPathFollowingDt
-        )
-        +sequential {
-            // Take the superstructure to a good state to minimize the time it takes to go up later on.
-            +sequential {
-                +Superstructure.kFrontHatchFromLoadingStation
-                +DelayCommand(100.second)
-            }.withTimeout(Trajectories.cargoBallToForcedNearSideRocketBay.lastState.t - 1.second)
-            // Take superstructure to full height.
-            +Superstructure.kFrontHighRocketCargo.withTimeout(1.5.second)
-        }
-    }
-
     +IntakeCargoCommand(IntakeSubsystem.Direction.RELEASE)
 }
