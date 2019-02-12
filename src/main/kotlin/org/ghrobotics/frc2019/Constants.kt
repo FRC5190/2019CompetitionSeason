@@ -71,7 +71,7 @@ object Constants {
 
 
     // FIELD
-    val kHypotenuseDifferenceForRamp = 2.inch
+    val kHypotenuseDifferenceForRamp = .4.inch
 
 
     // ROBOT AND MECHANISM DIMENSIONS
@@ -80,8 +80,8 @@ object Constants {
     const val kRobotAngularDrag = 12.0 // Nm per rad/s
 
     val kRobotWidth = 29.inch
-
     val kRobotLength = 30.inch
+
     val kBumperThickness = 4.5.inch
     val kIntakeProtrusion = 9.inch       // Out of frame protrusion.
     val kElevatorCrossbarHeightFromGround = 46.inch
