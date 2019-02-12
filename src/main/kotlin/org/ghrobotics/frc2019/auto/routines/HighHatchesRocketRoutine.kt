@@ -1,15 +1,15 @@
 package org.ghrobotics.frc2019.auto.routines
 
+import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.auto.Autonomous
+import org.ghrobotics.frc2019.auto.Field
 import org.ghrobotics.frc2019.auto.Trajectories
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.lib.commands.DelayCommand
-import org.ghrobotics.lib.commands.parallel
-import org.ghrobotics.lib.commands.sequential
+import org.ghrobotics.lib.commands.*
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.duration
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.second
@@ -46,8 +46,13 @@ fun highHatchesRocketRoutine() = autoRoutine {
         }
     }
 
-    +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
-    +DelayCommand(0.2.second)
+    // Reset odometry at loading station
+    +parallel {
+        +DelayCommand(0.2.second)
+        +ConditionalCommand(IntakeSubsystem.isHoldingHatch, InstantRunnableCommand {
+            DriveSubsystem.localization.reset(Field.kLoadingStation + Constants.kBackwardIntakeToCenter)
+        })
+    }
 
     +parallel {
         +DriveSubsystem.followTrajectory(
