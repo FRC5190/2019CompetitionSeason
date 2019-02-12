@@ -231,5 +231,9 @@ object Constants {
     val kClimbWinchCruiseVelocity = 1.5.feet.velocity
     val kClimbWinchAcceleration = 1.5.feet.acceleration
 
+    const val kClimbEncoderPIDSlot = 0
+    const val kClimbLevelingPIDSlot = 1
+
     const val kClimbWinchKp = 0.3
+    const val kClimbWinchLevelingKp = 0.0
 }

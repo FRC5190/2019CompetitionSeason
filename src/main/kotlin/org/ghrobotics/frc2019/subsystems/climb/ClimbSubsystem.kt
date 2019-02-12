@@ -1,8 +1,6 @@
 package org.ghrobotics.frc2019.subsystems.climb
 
-import com.ctre.phoenix.motorcontrol.ControlMode
-import com.ctre.phoenix.motorcontrol.FeedbackDevice
-import com.ctre.phoenix.motorcontrol.NeutralMode
+import com.ctre.phoenix.motorcontrol.*
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
@@ -57,6 +55,18 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
             backWinchMaster.set(ControlMode.MotionMagic, value)
         }
 
+    var winchPosition
+        get() = (frontWinchPosition + backWinchPosition) / 2.0
+        set(value) {
+            if (value.value < 0.0) {
+                frontWinchMaster.set(ControlMode.MotionMagic, value)
+                backWinchMaster.set(ControlMode.MotionMagic, value)
+            } else {
+                frontWinchMaster.set(ControlMode.MotionMagic, value, DemandType.AuxPID, 0.0)
+                backWinchMaster.set(ControlMode.MotionMagic, value, DemandType.AuxPID, 0.0)
+            }
+        }
+
     var ramps by Delegates.observable(false) { _, _, newValue -> rampsSolenoid.set(newValue) }
     var wheel by Delegates.observable(false) { _, _, newValue -> wheelSolenoid.set(newValue) }
 
@@ -88,13 +98,36 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         }
 
         allMasters.forEach { master ->
-            // Soft Limits
+            // TODO configure soft limits
+            /*master.softLimitForward = 0.nativeUnits
+            master.softLimitReverse = 0.nativeUnits
+            master.softLimitForwardEnabled = true
+            master.softLimitReverseEnabled = true*/
 
-            master.feedbackSensor = FeedbackDevice.CTRE_MagEncoder_Relative
+            // Configure Pigeon as a remote sensor 0
+            master.configRemoteFeedbackFilter(Constants.kPigeonIMUId, RemoteSensorSource.Pigeon_Pitch, 0, 10)
+
+            // Configure Mag Encoder as main Feedback (Main PID)
+            master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10)
+            master.configSelectedFeedbackCoefficient(1.0, 0, 10)
+
+            // Configure Pigeon (Remote Feedback) as leveling Feedback (Aux PID)
+            master.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0, 1, 10)
+            master.configSelectedFeedbackCoefficient(1.0, 1, 10)
+
+            // Determine which pid slot affects which pid loop
+            master.selectProfileSlot(Constants.kClimbEncoderPIDSlot, 0)
+            master.selectProfileSlot(Constants.kClimbLevelingPIDSlot, 1)
+
+            master.inverted = false
+            master.encoderPhase = false
 
             master.motionCruiseVelocity = Constants.kClimbWinchCruiseVelocity
             master.motionAcceleration = Constants.kClimbWinchAcceleration
         }
+
+        frontWinchMaster.configAuxPIDPolarity(false)
+        backWinchMaster.configAuxPIDPolarity(true)
 
         defaultCommand = ManualClimbCommand()
 
@@ -103,12 +136,18 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     private fun setClosedLoopGains() {
         allMasters.forEach {
-            it.kP = Constants.kClimbWinchKp
+            it.config_kP(Constants.kClimbEncoderPIDSlot, Constants.kClimbWinchKp, 10)
+
+            it.config_kP(Constants.kClimbLevelingPIDSlot, Constants.kClimbWinchLevelingKp, 10)
         }
     }
 
     private fun zeroClosedLoopGains() {
-        allMasters.forEach { it.kP = 0.0 }
+        allMasters.forEach {
+            it.config_kP(Constants.kClimbEncoderPIDSlot, 0.0, 10)
+
+            it.config_kP(Constants.kClimbLevelingPIDSlot, 0.0, 10)
+        }
     }
 
 
