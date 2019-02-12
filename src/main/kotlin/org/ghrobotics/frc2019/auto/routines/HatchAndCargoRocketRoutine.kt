@@ -41,6 +41,8 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
             +Superstructure.kBackHatchFromLoadingStation
         }
     }
+    
+    +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
 
     // Reset odometry at loading station
     +parallel {
