@@ -1,63 +1,62 @@
 package org.ghrobotics.frc2019.auto.routines
 
-import org.ghrobotics.frc2019.auto.Autonomous
+import org.ghrobotics.frc2019.Constants
+import org.ghrobotics.frc2019.auto.Field
 import org.ghrobotics.frc2019.auto.Trajectories
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.lib.commands.DelayCommand
-import org.ghrobotics.lib.commands.parallel
-import org.ghrobotics.lib.commands.sequential
+import org.ghrobotics.lib.commands.*
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.duration
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.second
-import org.ghrobotics.lib.utils.withEquals
 
 fun forwardCargoShipRoutine() = autoRoutine {
 
-    val pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
-
+    // Hold hatch
     +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
 
+    // Put hatch on FL cargo ship
     +parallel {
-        +DriveSubsystem.followTrajectory(
-            trajectory = Trajectories.centerStartToLeftForwardCargoShip,
-            pathMirrored = false,
-            dt = DriveSubsystem.kPathFollowingDt
-        )
+        +DriveSubsystem.followTrajectory(Trajectories.centerStartToLeftForwardCargoShip)
         +sequential {
             +executeFor(
                 Trajectories.centerStartToLeftForwardCargoShip.duration - 2.second,
                 ClosedLoopArmCommand(30.degree)
             )
-            +Superstructure.kFrontHatchFromLoadingStation.withTimeout(4.second)
+            +Superstructure.kFrontHatchFromLoadingStation
         }
     }
 
+    // Release hatch
     +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
     +DelayCommand(0.1.second)
 
+    // Go to loading station
     +parallel {
-        +DriveSubsystem.followTrajectory(
-            trajectory = Trajectories.leftForwardCargoShipToLoadingStation,
-            pathMirrored = pathMirrored
-        )
+        +DriveSubsystem.followTrajectory(Trajectories.leftForwardCargoShipToLoadingStation)
         +sequential {
             +DelayCommand(0.2.second)
-            +Superstructure.kBackHatchFromLoadingStation.withTimeout(4.second)
+            +Superstructure.kBackHatchFromLoadingStation
         }
     }
 
+    // Pickup hatch
     +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
-    +DelayCommand(0.2.second)
 
+    // Reset odometry at loading station
     +parallel {
-        +DriveSubsystem.followTrajectory(
-            trajectory = Trajectories.loadingStationToRightForwardCargoShip,
-            pathMirrored = pathMirrored
-        )
+        +DelayCommand(0.2.second)
+        +ConditionalCommand(IntakeSubsystem.isHoldingHatch, InstantRunnableCommand {
+            DriveSubsystem.localization.reset(Field.kLoadingStation + Constants.kBackwardIntakeToCenter)
+        })
+    }
+
+    // Go to FR cargo ship
+    +parallel {
+        +DriveSubsystem.followTrajectory(Trajectories.loadingStationToRightForwardCargoShip)
         +sequential {
             +executeFor(
                 Trajectories.loadingStationToRightForwardCargoShip.duration - 2.75.second,
@@ -67,9 +66,11 @@ fun forwardCargoShipRoutine() = autoRoutine {
         }
     }
 
+    // Place hatch
     +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
     +DelayCommand(0.3.second)
 
+    // Go back to loading station
     +DriveSubsystem.followTrajectory(
         trajectory = Trajectories.leftForwardCargoShipToLoadingStation,
         pathMirrored = false,
