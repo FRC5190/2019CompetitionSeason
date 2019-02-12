@@ -172,15 +172,4 @@ object Trajectories {
             maxVelocity = kMaxVelocity, maxAcceleration = kMaxAcceleration, reversed = reversed,
             optimizeSplines = optimize
         )
-
-    @JvmStatic
-    fun main(args: Array<String>) {
-        println(kRocketFAdjusted.position)
-        println(kRocketNAdjusted.position)
-        println(kRocketBayAdjusted.position)
-        println(kCargoShipFLAdjusted.position)
-        println(kCargoShipFRAdjusted.position)
-        println(kLoadingStationAdjusted.position)
-    }
-
 }

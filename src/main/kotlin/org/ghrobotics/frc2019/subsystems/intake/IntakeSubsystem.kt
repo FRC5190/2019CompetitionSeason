@@ -8,8 +8,10 @@ import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
+import org.ghrobotics.lib.utils.Source
 import org.ghrobotics.lib.utils.and
 import org.ghrobotics.lib.utils.greaterThan
+import org.ghrobotics.lib.utils.not
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 
 object IntakeSubsystem : FalconSubsystem() {
@@ -25,6 +27,7 @@ object IntakeSubsystem : FalconSubsystem() {
         sensor2::getAverageVoltage.greaterThan(0.9)
 
     val isFullyExtended = DigitalInput(Constants.kIntakeExtensionLimitSwitch)::get
+    val isHoldingHatch = Source(extensionSolenoid.get()) and !isFullyExtended
 
     var percentOutput
         get() = intakeMaster.percentOutput
