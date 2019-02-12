@@ -6,9 +6,9 @@ import io.gitlab.arturbosch.detekt.detekt
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.3.20"
+    kotlin("jvm") version "1.3.21"
     id("edu.wpi.first.GradleRIO") version "2019.2.1"
-    id("io.gitlab.arturbosch.detekt") version "1.0.0-RC12"
+    id("io.gitlab.arturbosch.detekt") version "1.0.0-RC13"
 }
 
 val kMainRobotClass = "org.ghrobotics.frc2019.RobotKt"
@@ -78,7 +78,7 @@ repositories {
 dependencies {
     // Kotlin Standard Library and Coroutines
     compile(kotlin("stdlib"))
-    compile("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.1.0")
+    compile("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.1.1")
 
     // FalconLibrary
     compile("org.ghrobotics", "FalconLibrary", "2019.2.7")
@@ -93,7 +93,7 @@ dependencies {
     compile("com.github.salomonbrys.kotson", "kotson", "2.5.0")
 
     // XChart for Simulations and Tests
-    compile("org.knowm.xchart", "xchart", "3.2.2")
+    testCompile("org.knowm.xchart", "xchart", "3.2.2")
 
     // Unit Testing
     testCompile("junit", "junit", "4.12")
