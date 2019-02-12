@@ -234,6 +234,11 @@ object Constants {
     const val kClimbEncoderPIDSlot = 0
     const val kClimbLevelingPIDSlot = 1
 
+    val kClimbDistanceBetweenLegs = 30.inch
+    val kClimbAngle = 5.degree
+
+    val kClimbLegHeightOffset = kClimbDistanceBetweenLegs / 2.0 * Math.tan(kClimbAngle.radian)
+
     const val kClimbWinchKp = 0.3
     const val kClimbWinchLevelingKp = 0.0
 }

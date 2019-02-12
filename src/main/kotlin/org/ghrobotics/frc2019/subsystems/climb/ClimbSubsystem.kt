@@ -55,15 +55,25 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
             backWinchMaster.set(ControlMode.MotionMagic, value)
         }
 
-    var winchPosition
+    var robotHeightFromGround
         get() = (frontWinchPosition + backWinchPosition) / 2.0
         set(value) {
-            if (value.value < 0.0) {
-                frontWinchMaster.set(ControlMode.MotionMagic, value)
-                backWinchMaster.set(ControlMode.MotionMagic, value)
+            if (value < Constants.kClimbLegHeightOffset) {
+                frontWinchMaster.set(ControlMode.MotionMagic, value + Constants.kClimbLegHeightOffset)
+                backWinchMaster.set(ControlMode.MotionMagic, value - Constants.kClimbLegHeightOffset)
             } else {
-                frontWinchMaster.set(ControlMode.MotionMagic, value, DemandType.AuxPID, 0.0)
-                backWinchMaster.set(ControlMode.MotionMagic, value, DemandType.AuxPID, 0.0)
+                frontWinchMaster.set(
+                    ControlMode.MotionMagic,
+                    value + Constants.kClimbLegHeightOffset, // Offset to angle the robot to wanted angle
+                    DemandType.AuxPID,
+                    Constants.kClimbAngle.degree // Angle wanted when climbing
+                )
+                backWinchMaster.set(
+                    ControlMode.MotionMagic,
+                    value - Constants.kClimbLegHeightOffset,// Offset to angle the robot to wanted angle
+                    DemandType.AuxPID,
+                    Constants.kClimbAngle.degree // Angle wanted when climbing
+                )
             }
         }
 
