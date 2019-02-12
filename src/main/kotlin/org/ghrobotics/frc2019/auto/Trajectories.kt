@@ -34,7 +34,7 @@ object Trajectories {
     /************************************ STARTING LOCATIONS ************************************/
 
     private val kStartX =
-        Field.kHabitatL1RX + Constants.kBumperThickness + Constants.kRobotLength / 2.0 -
+        Field.kHabitatL2RX + Constants.kBumperThickness + Constants.kRobotLength / 2.0 -
             Constants.kHypotenuseDifferenceForRamp
 
     val kSideStart =
@@ -49,14 +49,12 @@ object Trajectories {
 
     private val kRocketNAdjusted = Waypoint(
         trueLocation = Field.kRocketN,
-        transform = Constants.kFrontBumperToCenter + Pose2d(5.inch, 0.inch),
-        translationalOffset = Translation2d(0.176.inch, 3.8.inch)
+        transform = Constants.kForwardIntakeToCenter
     )
 
     private val kRocketFAdjusted = Waypoint(
         trueLocation = Field.kRocketF,
-        transform = Constants.kForwardIntakeToCenter,
-        translationalOffset = Translation2d(4.inch, (-6.2).inch)
+        transform = Constants.kForwardIntakeToCenter
     )
 
     private val kRocketBayAdjusted = Waypoint(
@@ -67,21 +65,18 @@ object Trajectories {
 
     private val kCargoShipFLAdjusted = Waypoint(
         trueLocation = Field.kCargoShipFL,
-        transform = Constants.kForwardIntakeToCenter,
-        translationalOffset = Translation2d(1.75.inch, (-1.875).inch)
+        transform = Constants.kForwardIntakeToCenter
     )
 
     private val kCargoShipFRAdjusted = Waypoint(
         trueLocation = Field.kCargoShipFR,
-        transform = Constants.kForwardIntakeToCenter,
-        translationalOffset = Translation2d(6.55.inch, (-11.125).inch)
+        transform = Constants.kForwardIntakeToCenter
     )
 
 
     private val kLoadingStationAdjusted = Waypoint(
         trueLocation = Field.kLoadingStation,
-        transform = Constants.kBackwardIntakeToCenter,
-        translationalOffset = Translation2d(0.inch, (-3.69).inch)
+        transform = Constants.kBackwardIntakeToCenter
     )
 
     private val kDepotBRCorner = Waypoint(
@@ -104,7 +99,7 @@ object Trajectories {
 
     val loadingStationToNearRocketHatch = waypoints(
         kLoadingStationAdjusted,
-        Waypoint(kRocketNAdjusted.position, transform = Pose2d(6.inch, 0.inch), rotationalOffset = (-10).degree)
+        kRocketNAdjusted
     ).generateTrajectory(false)
 
     val loadingStationToFarRocketHatch = waypoints(
@@ -177,5 +172,15 @@ object Trajectories {
             maxVelocity = kMaxVelocity, maxAcceleration = kMaxAcceleration, reversed = reversed,
             optimizeSplines = optimize
         )
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        println(kRocketFAdjusted.position)
+        println(kRocketNAdjusted.position)
+        println(kRocketBayAdjusted.position)
+        println(kCargoShipFLAdjusted.position)
+        println(kCargoShipFRAdjusted.position)
+        println(kLoadingStationAdjusted.position)
+    }
 
 }

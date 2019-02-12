@@ -13,7 +13,7 @@ import org.ghrobotics.lib.mathematics.units.inch
 object Field {
 
     /** HABITAT **/
-    val kHabitatL2RX = 47.00.inch
+    val kHabitatL2RX = 48.00.inch
     val kHabitatL2BY = 97.00.inch
     val kHabitatL1RX = 95.28.feet
 
@@ -30,13 +30,14 @@ object Field {
 
 
     /** ROCKET **/
-    val kRocketN = Pose2d(212.80.inch, 19.20.inch, (-20).degree)
-    val kRocketF = Pose2d(243.20.inch, 19.20.inch, (-160).degree)
+    val kRocketN = Pose2d(213.57.inch, 17.074.inch, (-028.720).degree) // Pose2d(213.57.inch, 18.60.inch, (-032.748).degree)
+    val kRocketF = Pose2d(244.69.inch, 17.074.inch, (-151.280).degree) // Pose2d(244.69.inch, 18.60.inch, (-147.252).degree)
 
-    val kRocketBay = Pose2d(228.inch, 27.44.inch, (-90).degree)
+    val kRocketBay = Pose2d(229.13.inch, 27.44.inch, (-90).degree)
+
 
     /** LOADING STATION **/
-    val kLoadingStation = Pose2d(0.inch, 26.94.inch, 0.degree)
+    val kLoadingStation = Pose2d(0.inch, 25.72.inch, 0.degree)
 
     /** DEPOT **/
     val kDepotBRCorner = Pose2d(47.inch, 78.396.feet, (-25).degree)
