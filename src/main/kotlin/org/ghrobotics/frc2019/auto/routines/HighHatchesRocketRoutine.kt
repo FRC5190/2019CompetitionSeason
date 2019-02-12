@@ -45,6 +45,8 @@ fun highHatchesRocketRoutine() = autoRoutine {
             +Superstructure.kBackHatchFromLoadingStation.withTimeout(4.second)
         }
     }
+    
+    +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
 
     // Reset odometry at loading station
     +parallel {
