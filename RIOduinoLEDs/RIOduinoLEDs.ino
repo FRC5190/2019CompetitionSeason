@@ -5,7 +5,8 @@
 
 CRGB leds[NUM_LEDS];
 
-byte ledmode = 0;
+byte ledmode = -1;
+unsigned long ledmodeStart = 0;
 
 uint8_t gHue = 0;
 
@@ -83,6 +84,19 @@ void loop() {
       }
       break;
     }
+    case 5: {
+      // emergency
+      if(currentMillis - ledmodeStart < 2000) {
+        if(currentMillis % 400 > 200) {
+          fill_solid(leds, NUM_LEDS, CRGB(0, 255, 0));
+        }else {
+          fill_solid(leds, NUM_LEDS, CRGB(0, 0, 0));
+        }
+      }else{
+          fill_solid(leds, NUM_LEDS, CRGB(0, 255, 0));
+      }
+      break;
+    }
   }
   FastLED.show();
 
@@ -97,6 +111,7 @@ void serialEvent() {
     serialBuffer += readChar; 
     if(readChar == '\n') {
       ledmode = serialBuffer.toInt();
+      ledmodeStart = millis();
       serialBuffer = "";
       Serial.println("Ok");
     }
