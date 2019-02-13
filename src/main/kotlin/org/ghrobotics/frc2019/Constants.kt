@@ -204,8 +204,8 @@ object Constants {
     val kArmCruiseVelocity = 6 * 1.0.radian.velocity
     val kArmAcceleration = 4 * 1.0.radian.acceleration
 
-    const val kArmKp = 8.0
-    const val kArmKd = 20.0
+    const val kArmKp = 4.0
+    const val kArmKd = 0.0
 
     const val kArmEmptyKg = 0.015
 
@@ -231,5 +231,14 @@ object Constants {
     val kClimbWinchCruiseVelocity = 1.5.feet.velocity
     val kClimbWinchAcceleration = 1.5.feet.acceleration
 
+    const val kClimbEncoderPIDSlot = 0
+    const val kClimbLevelingPIDSlot = 1
+
+    val kClimbDistanceBetweenLegs = if(isRaceRobot) 21.inch else 21.5.inch
+    val kClimbAngle = 5.degree
+
+    val kClimbLegHeightOffset = kClimbDistanceBetweenLegs / 2.0 * Math.tan(kClimbAngle.radian)
+
     const val kClimbWinchKp = 0.3
+    const val kClimbWinchLevelingKp = 0.0
 }
