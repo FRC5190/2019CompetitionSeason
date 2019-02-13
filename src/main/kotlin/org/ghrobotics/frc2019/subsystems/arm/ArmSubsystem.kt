@@ -133,11 +133,9 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
                 val experiencedAcceleration = Constants.kAccelerationDueToGravity +
                     ElevatorSubsystem.actualAcceleration.value
 
-                val Kg = if (armPosition.sin > 0) {
-                    if (IntakeSubsystem.extensionSolenoid.get() && !IntakeSubsystem.isFullyExtended()) {
-                        Constants.kArmHatchKg
-                    } else Constants.kArmEmptyKg
-                } else 0.0
+                val Kg = if (IntakeSubsystem.extensionSolenoid.get() && !IntakeSubsystem.isFullyExtended()) {
+                    Constants.kArmHatchKg
+                } else Constants.kArmEmptyKg
 
                 val feedforward = Kg * armPosition.cos * experiencedAcceleration +
                     if (armMaster.controlMode == ControlMode.MotionMagic) {
