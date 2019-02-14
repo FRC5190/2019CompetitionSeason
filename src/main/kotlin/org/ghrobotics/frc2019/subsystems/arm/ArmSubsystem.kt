@@ -87,10 +87,10 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
             configFeedbackNotContinuous(true, Constants.kCTRETimeout)
 
             softLimitForward = 220.degree.toNativeUnitPosition(Constants.kArmNativeUnitModel)
-            softLimitForwardEnabled = true
+            softLimitForwardEnabled = false
 
             softLimitReverse = (-40).degree.toNativeUnitPosition(Constants.kArmNativeUnitModel)
-            softLimitReverseEnabled = true
+            softLimitReverseEnabled = false
 
             kF = Constants.kArmKf
         }

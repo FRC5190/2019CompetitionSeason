@@ -86,8 +86,8 @@ object Constants {
     val kIntakeProtrusion = 9.inch       // Out of frame protrusion.
     val kElevatorCrossbarHeightFromGround = 46.inch
     val kIntakeCradleHeight = 6.inch
-    val kArmLength = 28.5.inch
-    val kBadIntakeOffset = 1.7.inch
+    val kArmLength = 24.5.inch
+    val kBadIntakeOffset = 0.inch
 
 
     // TRANSFORMATIONS
@@ -126,7 +126,7 @@ object Constants {
     const val kDriveRightKa = 0.1003 //
     const val kDriveRightKs = 1.2468
 
-    const val kDriveBeta = 2.0 // Inverse meters squared
+    const val kDriveBeta = 2.5 // Inverse meters squared
     const val kDriveZeta = 0.7 // Unitless dampening co-efficient
 
     private val kDriveLeftDCTransmission = DCMotorTransmission(
@@ -156,7 +156,7 @@ object Constants {
     // from elevator zero (measured from bottom of second stage)
     val kElevatorSwitchHeight = 8.inch
     val kElevatorSwitchNativeUnit = 2310.nativeUnits
-    val kElevatorAfterSwitchHeightSample = 63.inch
+    val kElevatorAfterSwitchHeightSample = 58.inch
     val kElevatorAfterSwitchNativeUnitSample = 10845.nativeUnits
 
     val kElevatorNativeUnitModel = SpringCascadeNativeUnitModel(
@@ -186,7 +186,7 @@ object Constants {
 
     // ARM
     val kArmSensorUnitsPerRotation = 1024.nativeUnits
-    val kArmUpTicks = (-547).nativeUnits
+    val kArmUpTicks = (-710).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,

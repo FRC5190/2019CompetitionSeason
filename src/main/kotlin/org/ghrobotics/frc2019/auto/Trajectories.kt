@@ -21,11 +21,11 @@ object Trajectories {
 
     /************************************ CONSTRAINTS ************************************/
 
-    private val kMaxVelocity = 10.0.feet.velocity
-    private val kMaxAcceleration = 4.0.feet.acceleration
-    private val kMaxCentripetalAcceleration = 5.0.feet.acceleration
+    val kMaxVelocity = 10.0.feet.velocity
+    val kMaxAcceleration = 4.0.feet.acceleration
+    val kMaxCentripetalAcceleration = 5.0.feet.acceleration
 
-    private val kConstraints = listOf(
+    val kConstraints = listOf(
         CentripetalAccelerationConstraint(kMaxCentripetalAcceleration),
         DifferentialDriveDynamicsConstraint(Constants.kDriveModel, 10.0.volt),
         VelocityLimitRegionConstraint(Field.kHabitatL1Platform, 3.feet.velocity)
@@ -49,7 +49,8 @@ object Trajectories {
 
     private val kRocketNAdjusted = Waypoint(
         trueLocation = Field.kRocketN,
-        transform = Constants.kForwardIntakeToCenter
+        transform = Constants.kForwardIntakeToCenter + Pose2d(5.inch, 0.inch),
+        rotationalOffset = 10.degree
     )
 
     private val kRocketFAdjusted = Waypoint(
@@ -145,7 +146,7 @@ object Trajectories {
 
     /************************************ HELPER METHODS ************************************/
 
-    private data class Waypoint(
+    data class Waypoint(
         val trueLocation: Pose2d,
         val transform: Pose2d = Pose2d(),
         val translationalOffset: Translation2d = Translation2d(),
@@ -160,16 +161,17 @@ object Trajectories {
         )
     }
 
-    private fun Pose2d.asWaypoint() = Waypoint(this)
+    fun waypoints(vararg points: Pose2d) = points.toList()
+    fun waypoints(vararg points: Waypoint) = points.map { it.position }.toList()
 
-    private fun waypoints(vararg points: Pose2d) = points.toList()
-    private fun waypoints(vararg points: Waypoint) = points.map { it.position }.toList()
 
-    private fun List<Pose2d>.generateTrajectory(reversed: Boolean, optimize: Boolean = true) =
-        DefaultTrajectoryGenerator.generateTrajectory(
-            wayPoints = this, constraints = kConstraints,
-            startVelocity = 0.0.meter.velocity, endVelocity = 0.0.meter.velocity,
-            maxVelocity = kMaxVelocity, maxAcceleration = kMaxAcceleration, reversed = reversed,
-            optimizeSplines = optimize
-        )
 }
+
+fun Pose2d.asWaypoint() = Trajectories.Waypoint(this)
+fun List<Pose2d>.generateTrajectory(reversed: Boolean, optimize: Boolean = true) =
+    DefaultTrajectoryGenerator.generateTrajectory(
+        wayPoints = this, constraints = Trajectories.kConstraints,
+        startVelocity = 0.0.meter.velocity, endVelocity = 0.0.meter.velocity,
+        maxVelocity = Trajectories.kMaxVelocity, maxAcceleration = Trajectories.kMaxAcceleration, reversed = reversed,
+        optimizeSplines = optimize
+    )

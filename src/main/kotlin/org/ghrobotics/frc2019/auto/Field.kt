@@ -30,8 +30,8 @@ object Field {
 
 
     /** ROCKET **/
-    val kRocketN = Pose2d(213.57.inch, 17.074.inch, (-028.720).degree) // Pose2d(213.57.inch, 18.60.inch, (-032.748).degree)
-    val kRocketF = Pose2d(244.69.inch, 17.074.inch, (-151.280).degree) // Pose2d(244.69.inch, 18.60.inch, (-147.252).degree)
+    val kRocketN = Pose2d(216.57.inch, 18.60.inch, (-032.748).degree)
+    val kRocketF = Pose2d(241.69.inch, 18.60.inch, (-147.252).degree)
 
     val kRocketBay = Pose2d(229.13.inch, 27.44.inch, (-90).degree)
 
