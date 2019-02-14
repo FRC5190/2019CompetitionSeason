@@ -1,6 +1,7 @@
 package org.ghrobotics.frc2019.auto
 
 import org.ghrobotics.frc2019.Constants
+import org.ghrobotics.frc2019.auto.paths.TrajectoryFactory
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Twist2d
@@ -11,7 +12,7 @@ class TrajectoryTrackerTest {
     @Test
     fun testFollowerReachesGoal() {
         val tracker = RamseteTracker(Constants.kDriveBeta, Constants.kDriveZeta)
-        val path = Trajectories.sideStartToNearRocketHatch
+        val path = TrajectoryFactory.loadingStationToRocketF
 
         val initialPose = path.firstState.state.pose.transformBy(Pose2d(1.inch, 2.inch, 10.degree))
         tracker.reset(path)

@@ -70,10 +70,6 @@ object Constants {
     const val kClimberWheelSolenoidId = 2
 
 
-    // FIELD
-    val kHypotenuseDifferenceForRamp = .4.inch
-
-
     // ROBOT AND MECHANISM DIMENSIONS
     val kRobotMass = 140.lb
     const val kRobotMomentOfInertia = 10.0 // kg m^2

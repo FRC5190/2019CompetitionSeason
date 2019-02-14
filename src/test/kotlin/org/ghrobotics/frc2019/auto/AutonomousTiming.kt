@@ -1,33 +1,26 @@
-/*
- package org.ghrobotics.frc2019.auto
+package org.ghrobotics.frc2019.auto
 
+import org.ghrobotics.frc2019.auto.routines.ForwardCargoShipRoutine
+import org.ghrobotics.frc2019.auto.routines.HatchAndCargoRocketRoutine
+import org.ghrobotics.frc2019.auto.routines.HighHatchesRocketRoutine
 import org.junit.Test
 
 class AutonomousTiming {
     @Test
-    fun doubleHatchRocketAutoTimer() {
-        val time = Trajectories.sideStartToNearRocketHatch.lastState.t.second +
-            Trajectories.nearRocketHatchToLoadingStation.lastState.t.second +
-            Trajectories.loadingStationToFarRocketHatch.lastState.t.second
+    fun highHatchesRocketTimer() {
+        val time = HighHatchesRocketRoutine().duration.second
         println("High Hatches Rocket Execution Time: $time")
     }
 
     @Test
-    fun forwardCargoShipAutoTimer() {
-        val time = Trajectories.centerStartToLeftForwardCargoShip.lastState.t.second +
-            Trajectories.leftForwardCargoShipToLoadingStation.lastState.t.second +
-            Trajectories.loadingStationToRightForwardCargoShip.lastState.t.second
+    fun forwardCargoShipTimer() {
+        val time = ForwardCargoShipRoutine().duration.second
         println("Forward Cargo Ship Execution Time: $time")
     }
 
     @Test
-    fun hatchAndCargoRocketAutoTimer() {
-        val time = Trajectories.sideStartToNearRocketHatch.lastState.t.second +
-            Trajectories.nearRocketHatchToLoadingStation.lastState.t.second +
-            Trajectories.loadingStationToNearRocketHatch.lastState.t.second +
-            Trajectories.nearRocketHatchToCargoBall.lastState.t.second +
-            Trajectories.cargoBallToForcedNearSideRocketBay.lastState.t.second
-
+    fun hatchAndCargoRocketTimer() {
+        val time = HatchAndCargoRocketRoutine().duration.second
         println("Hatch and Cargo Rocket Execution Time: $time")
     }
-}*/
+}

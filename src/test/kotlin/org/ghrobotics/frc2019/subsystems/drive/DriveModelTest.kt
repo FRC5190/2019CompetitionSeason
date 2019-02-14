@@ -2,7 +2,7 @@ package org.ghrobotics.frc2019.subsystems.drive
 
 import com.team254.lib.physics.DifferentialDrive
 import org.ghrobotics.frc2019.Constants
-import org.ghrobotics.frc2019.auto.Trajectories
+import org.ghrobotics.frc2019.auto.paths.TrajectoryFactory
 import org.ghrobotics.lib.mathematics.units.derivedunits.feetPerSecond
 import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.meter
@@ -74,7 +74,7 @@ class DriveModelTest {
 
     @Test
     fun visualizeTrajectory() {
-        val iterator = Trajectories.loadingStationToFarRocketHatch.iterator()
+        val iterator = TrajectoryFactory.loadingStationToRocketF.iterator()
 
         val t = ArrayList<Double>()
         val v = ArrayList<Double>()
@@ -96,7 +96,8 @@ class DriveModelTest {
 
     @Test
     fun testTorque() {
-        val torquePerVolt = Constants.kDriveWheelRadius.value.pow(2) * Constants.kRobotMass.value / (2.0 * Constants.kDriveRightKa)
+        val torquePerVolt =
+            Constants.kDriveWheelRadius.value.pow(2) * Constants.kRobotMass.value / (2.0 * Constants.kDriveRightKa)
         println(torquePerVolt * 12.0)
     }
 }

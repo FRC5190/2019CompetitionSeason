@@ -1,9 +1,7 @@
 package org.ghrobotics.frc2019.auto.routines
 
-import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.auto.Autonomous
-import org.ghrobotics.frc2019.auto.Field
-import org.ghrobotics.frc2019.auto.Trajectories
+import org.ghrobotics.frc2019.auto.paths.TrajectoryFactory
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
@@ -11,77 +9,95 @@ import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.lib.commands.*
+import org.ghrobotics.lib.commands.ConditionCommand
+import org.ghrobotics.lib.commands.DelayCommand
+import org.ghrobotics.lib.commands.parallel
+import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.duration
+import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.withEquals
 
-fun hatchAndCargoRocketRoutine() = autoRoutine {
+class HatchAndCargoRocketRoutine : AutoRoutine() {
+    private val path1 = TrajectoryFactory.sideStartToRocketN
+    private val path2 = TrajectoryFactory.rocketNToLoadingStation
+    private val path3 = TrajectoryFactory.loadingStationToRocketN
+    private val path4 = TrajectoryFactory.rocketNToDepot
 
-    val pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
+    override val duration: Time
+        get() = path1.duration + path2.duration + path3.duration + path4.duration
 
-    +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+    override val routine
+        get() = sequential {
 
-    +parallel {
-        +DriveSubsystem.followTrajectory(Trajectories.sideStartToNearRocketHatch, pathMirrored)
-        +sequential {
-            +executeFor(Trajectories.sideStartToNearRocketHatch.duration - 3.25.second, ClosedLoopArmCommand(30.degree))
-            +Superstructure.kFrontHighRocketHatch
-        }
-    }
+            val pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
 
-    +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
-    +DelayCommand(0.1.second)
+            +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
 
-    +parallel {
-        +DriveSubsystem.followTrajectory(Trajectories.nearRocketHatchToLoadingStation, pathMirrored)
-        +sequential {
-            +DelayCommand(0.2.second)
-            +Superstructure.kBackHatchFromLoadingStation
-        }
-    }
-    
-    +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+            +parallel {
+                +DriveSubsystem.followTrajectory(path1, pathMirrored)
+                +sequential {
+                    +executeFor(
+                        path1.duration - 3.25.second,
+                        ClosedLoopArmCommand(30.degree)
+                    )
+                    +Superstructure.kFrontHighRocketHatch
+                }
+            }
 
-    // Reset odometry at loading station
-    +parallel {
-        +DelayCommand(0.2.second)
-        +ConditionalCommand(IntakeSubsystem.isHoldingHatch, InstantRunnableCommand {
-            DriveSubsystem.localization.reset(Field.kLoadingStation + Constants.kBackwardIntakeToCenter)
-        })
-    }
+            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+            +DelayCommand(0.1.second)
 
-    // Place hatch on near rocket
-    +parallel {
-        // Drive path to far rocket
-        +DriveSubsystem.followTrajectory(Trajectories.loadingStationToNearRocketHatch, pathMirrored)
-        +sequential {
-            +executeFor(
-                Trajectories.loadingStationToNearRocketHatch.duration - 2.75.second,
-                Superstructure.kFrontCargoFromLoadingStation
-            )
-            +Superstructure.kFrontMiddleRocketHatch
-        }
-    }
+            +parallel {
+                +DriveSubsystem.followTrajectory(path2, pathMirrored)
+                +sequential {
+                    +DelayCommand(0.2.second)
+                    +Superstructure.kBackHatchFromLoadingStation
+                }
+            }
 
-    +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
-    +DelayCommand(0.3.second)
+            +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
 
-    // Pickup cargo from depot
-    +parallel {
-        // Drive path to loading station
-        +DriveSubsystem.followTrajectory(Trajectories.nearRocketHatchToCargoBall, pathMirrored)
+            // Reset odometry at loading station
+//        +parallel {
+//            +DelayCommand(0.2.second)
+//            +ConditionalCommand(IntakeSubsystem.isHoldingHatch, InstantRunnableCommand {
+//                DriveSubsystem.localization.reset(TrajectoryWaypoints.kLoadingStation + Constants.kBackwardIntakeToCenter)
+//            })
+//        }
 
-        +sequential {
-            +DelayCommand(0.5.second)
-            // Take superstructure to pickup ball
-            +Superstructure.kBackCargoIntake.withTimeout(1.5.second)
+            // Place hatch on near rocket
+            +parallel {
+                // Drive path to far rocket
+                +DriveSubsystem.followTrajectory(path3, pathMirrored)
+                +sequential {
+                    +executeFor(
+                        path3.duration - 2.75.second,
+                        Superstructure.kFrontCargoFromLoadingStation
+                    )
+                    +Superstructure.kFrontMiddleRocketHatch
+                }
+            }
 
-            +sequential {
-                +ConditionCommand { ArmSubsystem.armPosition > 150.degree }
-                +IntakeCargoCommand(IntakeSubsystem.Direction.HOLD)
+            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+            +DelayCommand(0.3.second)
+
+            // Pickup cargo from depot
+            +parallel {
+                // Drive path to loading station
+                +DriveSubsystem.followTrajectory(path4, pathMirrored)
+
+                +sequential {
+                    +DelayCommand(0.5.second)
+                    // Take superstructure to pickup ball
+                    +Superstructure.kBackCargoIntake.withTimeout(1.5.second)
+
+                    +sequential {
+                        +ConditionCommand { ArmSubsystem.armPosition > 150.degree }
+                        +IntakeCargoCommand(IntakeSubsystem.Direction.HOLD)
+                    }
+                }
             }
         }
-    }
 }

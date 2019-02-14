@@ -2,6 +2,7 @@ package org.ghrobotics.frc2019.auto
 
 import org.ghrobotics.frc2019.Network
 import org.ghrobotics.frc2019.Robot
+import org.ghrobotics.frc2019.auto.paths.TrajectoryWaypoints
 import org.ghrobotics.frc2019.auto.routines.*
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.commands.InstantRunnableCommand
@@ -45,7 +46,7 @@ object Autonomous {
             +InstantRunnableCommand {
                 println("[Autonomous] Invalid Option for this Starting Configuration. Running Baseline.")
             }
-            +baselineRoutine()
+            +BaselineRoutine()()
         }
 
     fun update() {
@@ -69,20 +70,20 @@ object Autonomous {
             stateCommandGroup(autoMode) {
                 state(
                     Mode.HIGH_HATCHES_ROCKET,
-                    highHatchesRocketRoutine()
+                    HighHatchesRocketRoutine()
                 )
                 state(
                     Mode.HATCH_AND_CARGO_ROCKET,
-                    hatchAndCargoRocketRoutine()
+                    HatchAndCargoRocketRoutine()
                 )
                 state(
                     Mode.BASELINE,
-                    baselineRoutine()
+                    BaselineRoutine()
                 )
 
                 state(
                     Mode.TEST_TRAJECTORIES,
-                    testTrajectoriesRoutine()
+                    TestTrajectoriesRoutine()
                 )
 
                 state(Mode.FORWARD_CARGO_SHIP, invalidOptionRoutine)
@@ -92,16 +93,16 @@ object Autonomous {
             stateCommandGroup(autoMode) {
                 state(
                     Mode.FORWARD_CARGO_SHIP,
-                    forwardCargoShipRoutine()
+                    ForwardCargoShipRoutine()
                 )
                 state(
                     Mode.BASELINE,
-                    baselineRoutine()
+                    BaselineRoutine()
                 )
 
                 state(
                     Mode.TEST_TRAJECTORIES,
-                    testTrajectoriesRoutine()
+                    TestTrajectoriesRoutine()
                 )
 
                 state(Mode.HIGH_HATCHES_ROCKET, invalidOptionRoutine)
@@ -119,9 +120,9 @@ object Autonomous {
 
 
     enum class StartingPositions(val pose: Pose2d) {
-        LEFT(Trajectories.kSideStart.mirror),
-        CENTER(Trajectories.kCenterStart),
-        RIGHT(Trajectories.kSideStart)
+        LEFT(TrajectoryWaypoints.kSideStart.mirror),
+        CENTER(TrajectoryWaypoints.kCenterStart),
+        RIGHT(TrajectoryWaypoints.kSideStart)
     }
 
     enum class GamePiece { HATCH, CARGO }
