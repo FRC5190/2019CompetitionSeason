@@ -1,6 +1,8 @@
 package org.ghrobotics.frc2019.auto.routines
 
+import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.auto.Autonomous
+import org.ghrobotics.frc2019.auto.Field
 import org.ghrobotics.frc2019.auto.Trajectories
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
@@ -9,10 +11,7 @@ import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.lib.commands.ConditionCommand
-import org.ghrobotics.lib.commands.DelayCommand
-import org.ghrobotics.lib.commands.parallel
-import org.ghrobotics.lib.commands.sequential
+import org.ghrobotics.lib.commands.*
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.duration
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.second
@@ -25,13 +24,10 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
     +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
 
     +parallel {
-        +DriveSubsystem.followTrajectory(
-            trajectory = Trajectories.sideStartToNearRocketHatch,
-            pathMirrored = pathMirrored
-        )
+        +DriveSubsystem.followTrajectory(Trajectories.sideStartToNearRocketHatch, pathMirrored)
         +sequential {
             +executeFor(Trajectories.sideStartToNearRocketHatch.duration - 3.25.second, ClosedLoopArmCommand(30.degree))
-            +Superstructure.kFrontHighRocketHatch.withTimeout(4.second)
+            +Superstructure.kFrontHighRocketHatch
         }
     }
 
@@ -39,27 +35,27 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
     +DelayCommand(0.1.second)
 
     +parallel {
-        +DriveSubsystem.followTrajectory(
-            trajectory = Trajectories.nearRocketHatchToLoadingStation,
-            pathMirrored = pathMirrored
-        )
+        +DriveSubsystem.followTrajectory(Trajectories.nearRocketHatchToLoadingStation, pathMirrored)
         +sequential {
             +DelayCommand(0.2.second)
-            +Superstructure.kBackHatchFromLoadingStation.withTimeout(4.second)
+            +Superstructure.kBackHatchFromLoadingStation
         }
     }
-
+    
     +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
-    +DelayCommand(0.2.second)
+
+    // Reset odometry at loading station
+    +parallel {
+        +DelayCommand(0.2.second)
+        +ConditionalCommand(IntakeSubsystem.isHoldingHatch, InstantRunnableCommand {
+            DriveSubsystem.localization.reset(Field.kLoadingStation + Constants.kBackwardIntakeToCenter)
+        })
+    }
 
     // Place hatch on near rocket
     +parallel {
         // Drive path to far rocket
-        +DriveSubsystem.followTrajectory(
-            trajectory = Trajectories.loadingStationToNearRocketHatch,
-            pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
-            dt = DriveSubsystem.kPathFollowingDt
-        )
+        +DriveSubsystem.followTrajectory(Trajectories.loadingStationToNearRocketHatch, pathMirrored)
         +sequential {
             +executeFor(
                 Trajectories.loadingStationToNearRocketHatch.duration - 2.75.second,
@@ -75,11 +71,7 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
     // Pickup cargo from depot
     +parallel {
         // Drive path to loading station
-        +DriveSubsystem.followTrajectory(
-            trajectory = Trajectories.nearRocketHatchToCargoBall,
-            pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
-            dt = DriveSubsystem.kPathFollowingDt
-        )
+        +DriveSubsystem.followTrajectory(Trajectories.nearRocketHatchToCargoBall, pathMirrored)
 
         +sequential {
             +DelayCommand(0.5.second)
@@ -92,6 +84,4 @@ fun hatchAndCargoRocketRoutine() = autoRoutine {
             }
         }
     }
-
-    +IntakeCargoCommand(IntakeSubsystem.Direction.RELEASE)
 }

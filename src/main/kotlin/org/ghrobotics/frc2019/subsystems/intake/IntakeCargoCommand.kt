@@ -27,27 +27,18 @@ class IntakeCargoCommand(
             IntakeSubsystem.extensionSolenoid.set(true)
             IntakeSubsystem.percentOutput = 1.0
         } else {
-            IntakeSubsystem.extensionSolenoid.set(true)
+            IntakeSubsystem.percentOutput = -1.0
+            IntakeSubsystem.extensionSolenoid.set(false)
         }
     }
 
     override suspend fun execute() {
-        if (direction == IntakeSubsystem.Direction.RELEASE) {
-            if (
-                System.currentTimeMillis() - startTime > 500
-                && !IntakeSubsystem.launcherSolenoid.get()
-            ) {
-                IntakeSubsystem.percentOutput = -1.0
-            }
-            if (
-                System.currentTimeMillis() - startTime > 1000
-                && !IntakeSubsystem.launcherSolenoid.get()
-            ) {
-                IntakeSubsystem.extensionSolenoid.set(false)
-                IntakeSubsystem.launcherSolenoid.set(true)
-            }
+        if (direction == IntakeSubsystem.Direction.RELEASE && (System.currentTimeMillis() - startTime > 1000
+                && !IntakeSubsystem.launcherSolenoid.get())
+        ) {
+            IntakeSubsystem.launcherSolenoid.set(true)
         }
-        if(IntakeSubsystem.isHoldingCargo() && sensedBall == 0L) {
+        if (IntakeSubsystem.isHoldingCargo() && sensedBall == 0L) {
             IntakeSubsystem.extensionSolenoid.set(false)
             sensedBall = System.currentTimeMillis()
         }

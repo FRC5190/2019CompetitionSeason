@@ -1,3 +1,4 @@
+/*
  package org.ghrobotics.frc2019.auto
 
 import org.junit.Test
@@ -29,4 +30,4 @@ class AutonomousTiming {
 
         println("Hatch and Cargo Rocket Execution Time: $time")
     }
-}
+}*/

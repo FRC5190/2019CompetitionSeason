@@ -21,11 +21,11 @@ object Trajectories {
 
     /************************************ CONSTRAINTS ************************************/
 
-    private val kMaxVelocity = 10.0.feet.velocity
-    private val kMaxAcceleration = 4.0.feet.acceleration
-    private val kMaxCentripetalAcceleration = 5.0.feet.acceleration
+    val kMaxVelocity = 10.0.feet.velocity
+    val kMaxAcceleration = 4.0.feet.acceleration
+    val kMaxCentripetalAcceleration = 5.0.feet.acceleration
 
-    private val kConstraints = listOf(
+    val kConstraints = listOf(
         CentripetalAccelerationConstraint(kMaxCentripetalAcceleration),
         DifferentialDriveDynamicsConstraint(Constants.kDriveModel, 10.0.volt),
         VelocityLimitRegionConstraint(Field.kHabitatL1Platform, 3.feet.velocity)
@@ -34,7 +34,7 @@ object Trajectories {
     /************************************ STARTING LOCATIONS ************************************/
 
     private val kStartX =
-        Field.kHabitatL1RX + Constants.kBumperThickness + Constants.kRobotLength / 2.0 -
+        Field.kHabitatL2RX + Constants.kBumperThickness + Constants.kRobotLength / 2.0 -
             Constants.kHypotenuseDifferenceForRamp
 
     val kSideStart =
@@ -49,14 +49,13 @@ object Trajectories {
 
     private val kRocketNAdjusted = Waypoint(
         trueLocation = Field.kRocketN,
-        transform = Constants.kFrontBumperToCenter + Pose2d(5.inch, 0.inch),
-        translationalOffset = Translation2d(0.176.inch, 3.8.inch)
+        transform = Constants.kForwardIntakeToCenter + Pose2d(5.inch, 0.inch),
+        rotationalOffset = 10.degree
     )
 
     private val kRocketFAdjusted = Waypoint(
         trueLocation = Field.kRocketF,
-        transform = Constants.kForwardIntakeToCenter,
-        translationalOffset = Translation2d(4.inch, (-6.2).inch)
+        transform = Constants.kForwardIntakeToCenter
     )
 
     private val kRocketBayAdjusted = Waypoint(
@@ -67,21 +66,18 @@ object Trajectories {
 
     private val kCargoShipFLAdjusted = Waypoint(
         trueLocation = Field.kCargoShipFL,
-        transform = Constants.kForwardIntakeToCenter,
-        translationalOffset = Translation2d(1.75.inch, (-1.875).inch)
+        transform = Constants.kForwardIntakeToCenter
     )
 
     private val kCargoShipFRAdjusted = Waypoint(
         trueLocation = Field.kCargoShipFR,
-        transform = Constants.kForwardIntakeToCenter,
-        translationalOffset = Translation2d(6.55.inch, (-11.125).inch)
+        transform = Constants.kForwardIntakeToCenter
     )
 
 
     private val kLoadingStationAdjusted = Waypoint(
         trueLocation = Field.kLoadingStation,
-        transform = Constants.kBackwardIntakeToCenter,
-        translationalOffset = Translation2d(0.inch, (-3.69).inch)
+        transform = Constants.kBackwardIntakeToCenter
     )
 
     private val kDepotBRCorner = Waypoint(
@@ -104,7 +100,7 @@ object Trajectories {
 
     val loadingStationToNearRocketHatch = waypoints(
         kLoadingStationAdjusted,
-        Waypoint(kRocketNAdjusted.position, transform = Pose2d(6.inch, 0.inch), rotationalOffset = (-10).degree)
+        kRocketNAdjusted
     ).generateTrajectory(false)
 
     val loadingStationToFarRocketHatch = waypoints(
@@ -150,7 +146,7 @@ object Trajectories {
 
     /************************************ HELPER METHODS ************************************/
 
-    private data class Waypoint(
+    data class Waypoint(
         val trueLocation: Pose2d,
         val transform: Pose2d = Pose2d(),
         val translationalOffset: Translation2d = Translation2d(),
@@ -165,17 +161,17 @@ object Trajectories {
         )
     }
 
-    private fun Pose2d.asWaypoint() = Waypoint(this)
+    fun waypoints(vararg points: Pose2d) = points.toList()
+    fun waypoints(vararg points: Waypoint) = points.map { it.position }.toList()
 
-    private fun waypoints(vararg points: Pose2d) = points.toList()
-    private fun waypoints(vararg points: Waypoint) = points.map { it.position }.toList()
-
-    private fun List<Pose2d>.generateTrajectory(reversed: Boolean, optimize: Boolean = true) =
-        DefaultTrajectoryGenerator.generateTrajectory(
-            wayPoints = this, constraints = kConstraints,
-            startVelocity = 0.0.meter.velocity, endVelocity = 0.0.meter.velocity,
-            maxVelocity = kMaxVelocity, maxAcceleration = kMaxAcceleration, reversed = reversed,
-            optimizeSplines = optimize
-        )
 
 }
+
+fun Pose2d.asWaypoint() = Trajectories.Waypoint(this)
+fun List<Pose2d>.generateTrajectory(reversed: Boolean, optimize: Boolean = true) =
+    DefaultTrajectoryGenerator.generateTrajectory(
+        wayPoints = this, constraints = Trajectories.kConstraints,
+        startVelocity = 0.0.meter.velocity, endVelocity = 0.0.meter.velocity,
+        maxVelocity = Trajectories.kMaxVelocity, maxAcceleration = Trajectories.kMaxAcceleration, reversed = reversed,
+        optimizeSplines = optimize
+    )

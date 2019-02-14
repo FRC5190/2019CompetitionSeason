@@ -41,13 +41,20 @@ fun highHatchesRocketRoutine() = autoRoutine {
             pathMirrored = pathMirrored
         )
         +sequential {
-            +DelayCommand(0.2.second)
+            +DelayCommand(0.5.second)
             +Superstructure.kBackHatchFromLoadingStation.withTimeout(4.second)
         }
     }
 
     +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
-    +DelayCommand(0.2.second)
+
+    // Reset odometry at loading station
+    +parallel {
+        +DelayCommand(0.2.second)
+//        +ConditionalCommand(Source(true), InstantRunnableCommand {
+//            DriveSubsystem.localization.reset(Field.kLoadingStation + Constants.kBackwardIntakeToCenter)
+//        })
+    }
 
     +parallel {
         +DriveSubsystem.followTrajectory(

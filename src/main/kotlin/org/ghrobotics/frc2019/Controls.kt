@@ -58,11 +58,11 @@ object Controls {
 
         state({ !isClimbing }) {
             // Elevator
-            axisButton(1, 0.05) {
+            axisButton(1, 0.15) {
                 change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * .5 }))
             }
             // Arm
-            axisButton(5, 0.1) {
+            axisButton(5, 0.15) {
                 change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * .5 }))
             }
 

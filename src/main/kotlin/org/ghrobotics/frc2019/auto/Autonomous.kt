@@ -26,6 +26,10 @@ object Autonomous {
     // Starting position of the robot
     val startingPosition = { Network.startingPositionChooser.selected }
 
+    val cargoShipGamePiece1 = { Network.cargoShip1Chooser.selected }
+    val cargoShipGamePiece2 = { Network.cargoShip2Chooser.selected }
+    val cargoShipGamePiece3 = { Network.cargoShip3Chooser.selected }
+
     // Stores whether the current config is valid.
     private var configValid = Source(true)
 
@@ -119,6 +123,8 @@ object Autonomous {
         CENTER(Trajectories.kCenterStart),
         RIGHT(Trajectories.kSideStart)
     }
+
+    enum class GamePiece { HATCH, CARGO }
 
     enum class Mode { TEST_TRAJECTORIES, HIGH_HATCHES_ROCKET, HATCH_AND_CARGO_ROCKET, FORWARD_CARGO_SHIP, BASELINE }
 }

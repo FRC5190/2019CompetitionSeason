@@ -22,6 +22,10 @@ object Network {
     val startingPositionChooser = enumSendableChooser<Autonomous.StartingPositions>()
     val autoModeChooser = enumSendableChooser<Autonomous.Mode>()
 
+    val cargoShip1Chooser = enumSendableChooser<Autonomous.GamePiece>()
+    val cargoShip2Chooser = enumSendableChooser<Autonomous.GamePiece>()
+    val cargoShip3Chooser = enumSendableChooser<Autonomous.GamePiece>()
+
     private val mainShuffleboardDisplay: ShuffleboardTab = Shuffleboard.getTab("5190")
 
     private val autoLayout = mainShuffleboardDisplay.getLayout("Autonomous", BuiltInLayouts.kList)
@@ -98,6 +102,15 @@ object Network {
         autoLayout.add(
             "Starting Position",
             startingPositionChooser
+        )
+        autoLayout.add(
+            "Cargo Ship 1", cargoShip1Chooser
+        )
+        autoLayout.add(
+            "Cargo Ship 2", cargoShip2Chooser
+        )
+        autoLayout.add(
+            "Cargo Ship 3", cargoShip3Chooser
         )
 
         //mainShuffleboardDisplay.add(VisionProcessing.cameraSource).withPosition(3, 2).withSize(3, 3)

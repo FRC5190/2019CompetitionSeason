@@ -71,7 +71,7 @@ object Constants {
 
 
     // FIELD
-    val kHypotenuseDifferenceForRamp = 2.inch
+    val kHypotenuseDifferenceForRamp = .4.inch
 
 
     // ROBOT AND MECHANISM DIMENSIONS
@@ -80,14 +80,14 @@ object Constants {
     const val kRobotAngularDrag = 12.0 // Nm per rad/s
 
     val kRobotWidth = 29.inch
-
     val kRobotLength = 30.inch
+
     val kBumperThickness = 4.5.inch
     val kIntakeProtrusion = 9.inch       // Out of frame protrusion.
     val kElevatorCrossbarHeightFromGround = 46.inch
     val kIntakeCradleHeight = 6.inch
-    val kArmLength = 28.5.inch
-    val kBadIntakeOffset = 1.7.inch
+    val kArmLength = 24.5.inch
+    val kBadIntakeOffset = 0.inch
 
 
     // TRANSFORMATIONS
@@ -126,7 +126,7 @@ object Constants {
     const val kDriveRightKa = 0.1003 //
     const val kDriveRightKs = 1.2468
 
-    const val kDriveBeta = 2.0 // Inverse meters squared
+    const val kDriveBeta = 2.5 // Inverse meters squared
     const val kDriveZeta = 0.7 // Unitless dampening co-efficient
 
     private val kDriveLeftDCTransmission = DCMotorTransmission(
@@ -156,7 +156,7 @@ object Constants {
     // from elevator zero (measured from bottom of second stage)
     val kElevatorSwitchHeight = 8.inch
     val kElevatorSwitchNativeUnit = 2310.nativeUnits
-    val kElevatorAfterSwitchHeightSample = 63.inch
+    val kElevatorAfterSwitchHeightSample = 58.inch
     val kElevatorAfterSwitchNativeUnitSample = 10845.nativeUnits
 
     val kElevatorNativeUnitModel = SpringCascadeNativeUnitModel(
@@ -186,7 +186,7 @@ object Constants {
 
     // ARM
     val kArmSensorUnitsPerRotation = 1024.nativeUnits
-    val kArmUpTicks = (-547).nativeUnits
+    val kArmUpTicks = (-710).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,
@@ -204,8 +204,8 @@ object Constants {
     val kArmCruiseVelocity = 6 * 1.0.radian.velocity
     val kArmAcceleration = 4 * 1.0.radian.acceleration
 
-    const val kArmKp = 8.0
-    const val kArmKd = 20.0
+    const val kArmKp = 4.0
+    const val kArmKd = 0.0
 
     const val kArmEmptyKg = 0.015
 
@@ -234,7 +234,7 @@ object Constants {
     const val kClimbEncoderPIDSlot = 0
     const val kClimbLevelingPIDSlot = 1
 
-    val kClimbDistanceBetweenLegs = 30.inch
+    val kClimbDistanceBetweenLegs = if(isRaceRobot) 21.inch else 21.5.inch
     val kClimbAngle = 5.degree
 
     val kClimbLegHeightOffset = kClimbDistanceBetweenLegs / 2.0 * Math.tan(kClimbAngle.radian)

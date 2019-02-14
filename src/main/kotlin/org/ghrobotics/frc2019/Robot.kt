@@ -5,6 +5,7 @@
 
 package org.ghrobotics.frc2019
 
+import edu.wpi.first.cameraserver.CameraServer
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.auto.Trajectories
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
@@ -37,6 +38,7 @@ object Robot : FalconRobot() {
         Autonomous
         Trajectories
 
+//        CameraServer.getInstance().startAutomaticCapture()
 //        VisionProcessing
     }
 
