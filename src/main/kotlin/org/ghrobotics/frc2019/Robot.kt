@@ -43,7 +43,6 @@ object Robot : FalconRobot() {
         Controls.update()
         Autonomous.update()
         LEDs.update()
-        Localization.update()
 /*
         val bestTargetRawData = RawDataTracker.bestTargetRawData
         if (bestTargetRawData != null) {
