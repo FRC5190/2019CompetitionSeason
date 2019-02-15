@@ -111,8 +111,8 @@ object Constants {
 
     val kDriveCurrentLimit = 38.amp
 
-    const val kDriveKp = 0.9 // Talon SRX Units
-    const val kDriveKd = 9.0
+    const val kDriveKp = 1.5 // Talon SRX Units
+    const val kDriveKd = 5.0
 
     const val kDriveLeftKv = 0.1489
     const val kDriveLeftKa = 0.0716 // 0.0816
@@ -122,7 +122,7 @@ object Constants {
     const val kDriveRightKa = 0.1003 //
     const val kDriveRightKs = 1.2468
 
-    const val kDriveBeta = 2.5 // Inverse meters squared
+    const val kDriveBeta = 2.0 // Inverse meters squared
     const val kDriveZeta = 0.7 // Unitless dampening co-efficient
 
     private val kDriveLeftDCTransmission = DCMotorTransmission(

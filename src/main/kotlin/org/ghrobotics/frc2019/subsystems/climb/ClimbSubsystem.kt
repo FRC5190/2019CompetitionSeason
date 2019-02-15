@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.lib.commands.FalconSubsystem
+import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.millisecond
@@ -17,6 +18,9 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     private val frontWinchMaster = FalconSRX(Constants.kClimbFrontWinchMasterId, Constants.kClimbWinchNativeUnitModel)
     private val backWinchMaster = FalconSRX(Constants.kClimbBackWinchMasterId, Constants.kClimbWinchNativeUnitModel)
+
+    val frontWinchSlave = NativeFalconSRX(Constants.kClimbFrontWinchSlaveId)
+
     private val wheelMaster = NativeFalconSRX(Constants.kClimbWheelId)
 
     private val rampsSolenoid = Solenoid(Constants.kPCMId, Constants.kRampsSolenoidId)
@@ -55,28 +59,6 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
             backWinchMaster.set(ControlMode.MotionMagic, value)
         }
 
-    var robotHeightFromGround
-        get() = (frontWinchPosition + backWinchPosition) / 2.0
-        set(value) {
-            if (value < Constants.kClimbLegHeightOffset) {
-                frontWinchMaster.set(ControlMode.MotionMagic, value + Constants.kClimbLegHeightOffset)
-                backWinchMaster.set(ControlMode.MotionMagic, value - Constants.kClimbLegHeightOffset)
-            } else {
-                frontWinchMaster.set(
-                    ControlMode.MotionMagic,
-                    value + Constants.kClimbLegHeightOffset, // Offset to angle the robot to wanted angle
-                    DemandType.AuxPID,
-                    Constants.kClimbAngle.degree // Angle wanted when climbing
-                )
-                backWinchMaster.set(
-                    ControlMode.MotionMagic,
-                    value - Constants.kClimbLegHeightOffset,// Offset to angle the robot to wanted angle
-                    DemandType.AuxPID,
-                    Constants.kClimbAngle.degree // Angle wanted when climbing
-                )
-            }
-        }
-
     var ramps by Delegates.observable(false) { _, _, newValue -> rampsSolenoid.set(newValue) }
     var wheel by Delegates.observable(false) { _, _, newValue -> wheelSolenoid.set(newValue) }
 
@@ -87,7 +69,6 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     val backWinchVelocity get() = backWinchMaster.sensorVelocity
 
     init {
-        val frontWinchSlave = NativeFalconSRX(Constants.kClimbFrontWinchSlaveId)
         val backWinchSlave = NativeFalconSRX(Constants.kClimbBackWinchSlaveId)
 
         allMotors = listOf(frontWinchMaster, frontWinchSlave, backWinchMaster, backWinchSlave)
@@ -142,6 +123,26 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         defaultCommand = ManualClimbCommand()
 
         setClosedLoopGains()
+    }
+
+    fun climbToHeight(height: Length) {
+        if (height < Constants.kClimbLegHeightOffset) {
+            frontWinchMaster.set(ControlMode.MotionMagic, height + Constants.kClimbLegHeightOffset)
+            backWinchMaster.set(ControlMode.MotionMagic, height - Constants.kClimbLegHeightOffset)
+        } else {
+            frontWinchMaster.set(
+                ControlMode.MotionMagic,
+                height + Constants.kClimbLegHeightOffset, // Offset to angle the robot to wanted angle
+                DemandType.AuxPID,
+                Constants.kClimbAngle.degree // Angle wanted when climbing
+            )
+            backWinchMaster.set(
+                ControlMode.MotionMagic,
+                height - Constants.kClimbLegHeightOffset,// Offset to angle the robot to wanted angle
+                DemandType.AuxPID,
+                Constants.kClimbAngle.degree // Angle wanted when climbing
+            )
+        }
     }
 
     private fun setClosedLoopGains() {
