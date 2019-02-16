@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Timer
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.second
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import kotlin.concurrent.thread
 
 class JeVois(
@@ -59,40 +60,39 @@ class JeVois(
     }
 
     private fun readPort(serialPort: SerialPort) {
+        val tempStringBuilder = StringBuilder()
+        var lastReceivedTime = System.currentTimeMillis()
         while (true) {
-            val line = serialPort.readLine()
-
-            if (!line.startsWith('{')) continue
-            try {
-                val jsonData = kJevoisGson.fromJson<JsonObject>(line)
-
-                val timestamp = jsonData["Epoch Time"].asDouble.second + fpgaOffset
-                val contours = jsonData["Targets"].asJsonArray
-                    .filterIsInstance<JsonObject>()
-
-                processData(VisionData(timestamp, contours))
-            } catch (e: JsonParseException) {
-                e.printStackTrace()
-                println("[JeVois-${port.name}] Got Invalid Data: $line")
+            val newData = serialPort.read(serialPort.bytesReceived)
+            if(newData.isNotEmpty()){
+                lastReceivedTime = System.currentTimeMillis()
             }
-        }
-    }
-
-    private val tempStringBuilder = StringBuilder()
-    private fun SerialPort.readLine(): String {
-        tempStringBuilder.clear()
-        while (true) {
-            val nextChar = read(1).firstOrNull()?.toChar()
-            if (nextChar != null) {
-                if (nextChar == '\n') {
-                    val result = tempStringBuilder.toString()
+            if(System.currentTimeMillis() - lastReceivedTime > 1000) {
+                throw TimeoutException("Roborio didnt receive data from jevois in time")
+            }
+            for(byte in newData) {
+                val charReceived = byte.toChar()
+                if(charReceived == '\n') {
+                    val line = tempStringBuilder.toString()
                     tempStringBuilder.clear()
-                    return result
+                    if (!line.startsWith('{')) continue
+                    try {
+                        val jsonData = kJevoisGson.fromJson<JsonObject>(line)
+
+                        val timestamp = jsonData["Epoch Time"].asDouble.second + fpgaOffset
+                        val contours = jsonData["Targets"].asJsonArray
+                            .filterIsInstance<JsonObject>()
+
+                        processData(VisionData(timestamp, contours))
+                    } catch (e: JsonParseException) {
+                        e.printStackTrace()
+                        println("[JeVois-${port.name}] Got Invalid Data: $line")
+                    }
+                }else{
+                    tempStringBuilder.append(charReceived)
                 }
-                tempStringBuilder.append(nextChar)
-            } else {
-                Thread.sleep(1)
             }
+            Thread.sleep(1)
         }
     }
 
