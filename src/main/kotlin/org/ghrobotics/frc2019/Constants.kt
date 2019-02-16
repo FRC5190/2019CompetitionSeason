@@ -13,10 +13,7 @@ import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.units.*
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
-import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitLengthModel
-import org.ghrobotics.lib.mathematics.units.nativeunits.SlopeNativeUnitModel
-import org.ghrobotics.lib.mathematics.units.nativeunits.nativeUnits
-import org.ghrobotics.lib.mathematics.units.nativeunits.wheelRadius
+import org.ghrobotics.lib.mathematics.units.nativeunits.*
 import kotlin.math.pow
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -91,7 +88,7 @@ object Constants {
     val kBackBumperToCenter = Pose2d((kRobotLength / 2.0) + kBumperThickness, 0.meter, 0.degree)
     val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeProtrusion, kBadIntakeOffset, 0.degree)
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
-    val kCenterToCamera = Pose2d((-13).inch, (-15).inch, 180.degree)
+    val kCenterToCamera = Pose2d(13.5.inch, 9.5.inch, 0.degree)
 
 
     // VISION
@@ -101,8 +98,8 @@ object Constants {
 
     // DRIVE
     val kDriveNativeUnitModel = SlopeNativeUnitModel(
-        97.5.inch,
-        7244.nativeUnits
+        170.5.inch,
+        12918.nativeUnits
     )
 
     val kDriveSensorUnitsPerRotation = 1440.nativeUnits
@@ -166,23 +163,27 @@ object Constants {
     val kElevatorSecondStageToArmShaft = 8.inch
     val kElevatorHeightFromGround = 6.inch
 
+    val kElevatorSafeFlipHeight = 3.inch
+
     val kElevatorCurrentLimit = 25.amp
 
     val kElevatorClosedLoopVelocityTolerance = 1.inch.velocity
     val kElevatorClosedLoopTolerance = 1.inch
-    val kElevatorAcceleration = 175.inch.acceleration
-    val kElevatorCruiseVelocity = 200.inch.velocity
+    val kElevatorAcceleration = 122.5.inch.acceleration
+    val kElevatorCruiseVelocity = 70.inch.velocity
 
-    const val kElevatorKp = 2.0
+    const val kElevatorHoldVoltage = 1.07
+
+    const val kElevatorKp = 1.0
     const val kElevatorKd = 0.0
-    const val kElevatorKf = 0.800 / 2.0
+    val kElevatorKf = kElevatorNativeUnitModel.calculatekF(11.1 - kElevatorHoldVoltage, 65.inch.velocity.value)
     const val kElevatorBelowSwitchKg = 0.0 / 12
-    const val kElevatorAfterSwitchKg = 0.77 / 12
+    const val kElevatorAfterSwitchKg = kElevatorHoldVoltage / 12.0
 
 
     // ARM
     val kArmSensorUnitsPerRotation = 1024.nativeUnits
-    val kArmUpTicks = (-710).nativeUnits
+    val kArmUpTicks = (-729).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,
@@ -197,19 +198,18 @@ object Constants {
 
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
     val kArmClosedLoopTolerance = 5.degree
-    val kArmCruiseVelocity = 6 * 1.0.radian.velocity
-    val kArmAcceleration = 4 * 1.0.radian.acceleration
+    val kArmCruiseVelocity = 380.0 * 1.0.degree.velocity
+    val kArmAcceleration = 372.0 * 1.0.degree.acceleration
 
-    const val kArmKp = 4.0
-    const val kArmKd = 0.0
+    const val kArmEmptyHoldVoltage = 1.9
 
-    const val kArmEmptyKg = 0.015
+    const val kArmEmptyKg = kArmEmptyHoldVoltage / kAccelerationDueToGravity / 12.0
+    const val kArmHatchKg = 3.0 / kAccelerationDueToGravity / 12.0
 
-    const val kArmHatchKg = 0.028
-
+    const val kArmKp = 7.0
+    const val kArmKd = 140.0
     const val kArmKv = 0.0 / 12.0
-    const val kArmKf = 0.0 // 7.566
-
+    val kArmKf = kArmNativeUnitModel.calculatekF(11.366 - kArmEmptyHoldVoltage, Math.toRadians(260.1562))
 
     // CLIMB
     val kClimbWinchRadius = 1.25.inch / 2.0
@@ -230,11 +230,19 @@ object Constants {
     const val kClimbEncoderPIDSlot = 0
     const val kClimbLevelingPIDSlot = 1
 
-    val kClimbDistanceBetweenLegs = if(isRaceRobot) 21.inch else 21.5.inch
+    val kClimbDistanceBetweenLegs = if (isRaceRobot) 21.inch else 21.5.inch
     val kClimbAngle = 5.degree
 
     val kClimbLegHeightOffset = kClimbDistanceBetweenLegs / 2.0 * Math.tan(kClimbAngle.radian)
 
     const val kClimbWinchKp = 0.3
     const val kClimbWinchLevelingKp = 0.0
+
+    private fun NativeUnitModel<*>.calculatekF(voltage: Double, velocity: Double) =
+        (voltage / 12.0 * 1023.0) / (toNativeUnitVelocity(velocity) / 10.0)
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        println(kDriveWheelRadius.inch)
+    }
 }

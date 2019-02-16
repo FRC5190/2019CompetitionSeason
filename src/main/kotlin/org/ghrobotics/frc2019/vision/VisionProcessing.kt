@@ -37,7 +37,7 @@ object VisionProcessing {
         val angle = data["angle"].asDouble.degree
         val rotation = -data["rotation"].asDouble.degree + angle + 180.degree
         val distance = data["distance"].asDouble.inch
-
+        
         return Constants.kCenterToCamera + Pose2d(Translation2d(distance, angle), rotation)
     }
 //    private fun processWhiteTape(data: JsonObject): Pose2d? {

@@ -46,8 +46,7 @@ object TrajectoryFactory {
     )
     private val rocketFAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kRocketF,
-        transform = Constants.kForwardIntakeToCenter,
-        translationalOffset = Translation2d(0.inch, (-6).inch)
+        transform = Constants.kForwardIntakeToCenter
     )
     private val rocketNAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kRocketN,
@@ -116,12 +115,7 @@ object TrajectoryFactory {
 
     val loadingStationToRocketN: TimedTrajectory<Pose2dWithCurvature>
         get() {
-            val newRocketN = TrajectoryWaypoints.Waypoint(
-                trueLocation = TrajectoryWaypoints.kRocketN,
-                transform = Constants.kForwardIntakeToCenter + Pose2d(5.inch, 0.inch),
-                translationalOffset = Translation2d(4.inch, (-4).inch)
-            )
-            val waypoints = listOf(loadingStationAdjusted, newRocketN)
+            val waypoints = listOf(loadingStationAdjusted, rocketNAdjusted)
             val constraints = listOf(
                 CentripetalAccelerationConstraint(kMaxCentripetalAccelerationElevatorUp),
                 VelocityLimitRadiusConstraint(rocketNAdjusted.position.translation, 3.feet, 4.feet.velocity)

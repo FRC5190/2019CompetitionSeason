@@ -121,18 +121,17 @@ object Superstructure {
 
                     // Flip arm but angle up while elevator is going up
                     +parallel {
-                        val heldAngle = if (isFrontWanted) {
-                            90.degree - Constants.kArmFlipTolerance - Constants.kArmClosedLoopTolerance
+                        val safeFlipAngle = if (isFrontWanted) {
+                            90.degree - Constants.kArmFlipTolerance - Constants.kArmClosedLoopTolerance / 2.0
                         } else {
-                            90.degree + Constants.kArmFlipTolerance + Constants.kArmClosedLoopTolerance
+                            90.degree + Constants.kArmFlipTolerance + Constants.kArmClosedLoopTolerance / 2.0
                         }
 
-                        val moveArmHeight =
-                            elevatorHeightWanted - calcLevelOutArmHeight(calcDurationOfArm(heldAngle, armAngle))
-
                         +sequential {
-                            //                            +ClosedLoopArmCommand(heldAngle)
-//                                .overrideExit { ElevatorSubsystem.elevatorPosition > moveArmHeight }
+                            if(elevatorHeightWanted > Constants.kElevatorSafeFlipHeight + Constants.kElevatorClosedLoopTolerance) {
+                                +ClosedLoopArmCommand(safeFlipAngle)
+                                    .overrideExit { ElevatorSubsystem.elevatorPosition > Constants.kElevatorSafeFlipHeight }
+                            }
                             +ClosedLoopArmCommand(armAngle)
                         }
 
@@ -185,6 +184,7 @@ object Superstructure {
                 && heightAboveGround + Constants.kIntakeCradleHeight <= Constants.kElevatorCrossbarHeightFromGround)
 
     // MATH SHOULD WORK (its messy because I'm too lazy to simplify)
+
 
     fun calcDurationOfArm(
         currentAngle: Rotation2d,

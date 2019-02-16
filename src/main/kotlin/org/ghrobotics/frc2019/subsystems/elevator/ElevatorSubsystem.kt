@@ -123,7 +123,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
 
             motor.kF = Constants.kElevatorKf
 
-            motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 1000 / 20)
+            motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 1000 / 40)
         }
 
         // Default command to hold the current position
@@ -138,7 +138,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
 
         var previousVelocity = 0.meter.velocity
         val deltaTime = DeltaTime()
-        fixedRateTimer(period = 1000 / 10) {
+        fixedRateTimer(period = 1000 / 20) {
             val dt = deltaTime.updateTime(System.currentTimeMillis().millisecond)
             val newVelocity = elevatorMaster.sensorVelocity
             if (dt.value > 0) {

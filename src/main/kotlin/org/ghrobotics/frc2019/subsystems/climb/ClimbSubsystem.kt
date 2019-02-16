@@ -71,6 +71,8 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     init {
         val backWinchSlave = NativeFalconSRX(Constants.kClimbBackWinchSlaveId)
 
+        frontWinchSlave.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 10)
+
         allMotors = listOf(frontWinchMaster, frontWinchSlave, backWinchMaster, backWinchSlave)
 
         frontWinchSlave.follow(frontWinchMaster)

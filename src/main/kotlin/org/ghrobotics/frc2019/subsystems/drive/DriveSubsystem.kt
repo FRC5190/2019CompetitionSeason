@@ -6,7 +6,6 @@
 package org.ghrobotics.frc2019.subsystems.drive
 
 import com.ctre.phoenix.sensors.PigeonIMU
-import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame
 import com.team254.lib.physics.DifferentialDrive
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
@@ -16,12 +15,18 @@ import org.ghrobotics.frc2019.subsystems.climb.ClimbSubsystem
 import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.statespace.*
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
+import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature
+import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedTrajectory
+import org.ghrobotics.lib.mathematics.twodim.trajectory.types.mirror
+import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.sensors.asSource
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
+import org.ghrobotics.lib.utils.Source
+import org.ghrobotics.lib.utils.map
 import kotlin.properties.Delegates.observable
 
 object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
@@ -85,12 +90,17 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     init {
         lowGear = false
         defaultCommand = ManualDriveCommand()
-
-        pigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10)
     }
 
     private var previousGyroPitchVelocity = 0.degree.velocity
     private val gyroTemp = DoubleArray(3)
+
+    fun followVisionAssistedTrajectory(
+        trajectory: TimedTrajectory<Pose2dWithCurvature>,
+        pathMirrored: Source<Boolean>,
+        or: Length,
+        ir: Length
+    ) = VisionAssistedTrajectoryTrackerCommand(pathMirrored.map(trajectory.mirror(), trajectory), or, ir)
 
     override fun periodic() {
         super.periodic()
@@ -98,15 +108,6 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
         val newPitchVelocity = gyroTemp[0].degree.velocity
         pitchAcceleration = (newPitchVelocity - previousGyroPitchVelocity) / kMainLoopDt
         previousGyroPitchVelocity = newPitchVelocity
-    }
-
-    override fun setOutput(wheelVelocities: DifferentialDrive.WheelState, wheelVoltages: DifferentialDrive.WheelState) {
-        super.setOutput(wheelVelocities, wheelVoltages)
-        System.out.printf(
-            "%3.3f, %3.3f%n",
-            wheelVelocities.left * Constants.kDriveWheelRadius.value,
-            leftMotor.sensorVelocity.value
-        )
     }
 
     /*override fun setOutput(
