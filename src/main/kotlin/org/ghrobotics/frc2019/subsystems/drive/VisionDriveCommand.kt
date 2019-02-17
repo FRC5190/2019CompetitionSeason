@@ -43,7 +43,7 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
                 this.currentTarget = newTarget
             }
         } else {
-            this.currentTarget = TargetTracker.bestTarget
+            this.currentTarget = TargetTracker.bestTargetFront
         }
     }
 

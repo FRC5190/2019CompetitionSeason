@@ -60,10 +60,11 @@ object Constants {
 
     // PNEUMATICS
     const val kPCMId = 41
-    const val kIntakeExtensionSolenoidId = 1
-    const val kIntakeLauncherSolenoidId = 5
-    const val kDriveSolenoidId = 3
-    const val kRampsSolenoidId = 0
+    const val kIntakeExtensionSolenoidForwardId = 4
+    const val kIntakeExtensionSolenoidReverseId = 5
+    const val kIntakeLauncherSolenoidId = 3
+    const val kDriveSolenoidId = 0
+    const val kRampsSolenoidId = 1
     const val kClimberWheelSolenoidId = 2
 
 
@@ -88,7 +89,9 @@ object Constants {
     val kBackBumperToCenter = Pose2d((kRobotLength / 2.0) + kBumperThickness, 0.meter, 0.degree)
     val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeProtrusion, kBadIntakeOffset, 0.degree)
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
-    val kCenterToCamera = Pose2d(13.5.inch, 9.5.inch, 0.degree)
+
+    val kCenterToFrontCamera = Pose2d(13.5.inch, 9.5.inch, 0.degree)
+    val kCenterToBackCamera = Pose2d((-10.5).inch, (-9.5).inch, 180.degree)
 
 
     // VISION
@@ -165,7 +168,7 @@ object Constants {
 
     val kElevatorSafeFlipHeight = 3.inch
 
-    val kElevatorCurrentLimit = 25.amp
+    val kElevatorCurrentLimit = 15.amp
 
     val kElevatorClosedLoopVelocityTolerance = 1.inch.velocity
     val kElevatorClosedLoopTolerance = 1.inch
@@ -183,7 +186,7 @@ object Constants {
 
     // ARM
     val kArmSensorUnitsPerRotation = 1024.nativeUnits
-    val kArmUpTicks = (-729).nativeUnits
+    val kArmUpTicks = (if (isRaceRobot) -524 else -562).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,
@@ -201,9 +204,9 @@ object Constants {
     val kArmCruiseVelocity = 380.0 * 1.0.degree.velocity
     val kArmAcceleration = 372.0 * 1.0.degree.acceleration
 
-    const val kArmEmptyHoldVoltage = 1.9
+    val kArmEmptyHoldVoltage = if (isRaceRobot) 1.0 else 1.9
 
-    const val kArmEmptyKg = kArmEmptyHoldVoltage / kAccelerationDueToGravity / 12.0
+    val kArmEmptyKg = kArmEmptyHoldVoltage / kAccelerationDueToGravity / 12.0
     const val kArmHatchKg = 3.0 / kAccelerationDueToGravity / 12.0
 
     const val kArmKp = 7.0

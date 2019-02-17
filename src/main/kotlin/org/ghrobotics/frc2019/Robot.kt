@@ -37,7 +37,7 @@ object Robot : FalconRobot() {
         Autonomous
 
 //        CameraServer.getInstance().startAutomaticCapture()
-        VisionProcessing
+//        VisionProcessing
     }
 
     override fun periodic() {

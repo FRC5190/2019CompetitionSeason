@@ -3,31 +3,36 @@ package org.ghrobotics.frc2019.subsystems.intake
 import com.ctre.phoenix.motorcontrol.NeutralMode
 import edu.wpi.first.wpilibj.AnalogInput
 import edu.wpi.first.wpilibj.DigitalInput
+import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
-import org.ghrobotics.lib.utils.Source
 import org.ghrobotics.lib.utils.and
 import org.ghrobotics.lib.utils.greaterThan
 import org.ghrobotics.lib.utils.not
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 
 object IntakeSubsystem : FalconSubsystem() {
-    private val intakeMaster = NativeFalconSRX(Constants.kIntakeLeftId)
+    val intakeMaster = NativeFalconSRX(Constants.kIntakeLeftId)
 
-    val extensionSolenoid = Solenoid(Constants.kPCMId, Constants.kIntakeExtensionSolenoidId)
+    val extensionSolenoid = DoubleSolenoid(
+        Constants.kPCMId,
+        Constants.kIntakeExtensionSolenoidForwardId,
+        Constants.kIntakeExtensionSolenoidReverseId
+    )
     val launcherSolenoid = Solenoid(Constants.kPCMId, Constants.kIntakeLauncherSolenoidId)
 
     val sensor1 = AnalogInput(Constants.kLeftBallSensorId)
     val sensor2 = AnalogInput(Constants.kRightBallSensorId)
 
-    val isHoldingCargo = sensor1::getAverageVoltage.greaterThan(0.9) and
-        sensor2::getAverageVoltage.greaterThan(0.9)
+    val isSeeingCargo = sensor2::getAverageVoltage.greaterThan(1.7)
 
     val isFullyExtended = DigitalInput(Constants.kIntakeExtensionLimitSwitch)::get
-    val isHoldingHatch = Source(extensionSolenoid.get()) and !isFullyExtended
+
+    val isHoldingCargo = { extensionSolenoid.get() == DoubleSolenoid.Value.kReverse } and isSeeingCargo
+    val isHoldingHatch = { extensionSolenoid.get() == DoubleSolenoid.Value.kForward } and !isFullyExtended
 
     var percentOutput
         get() = intakeMaster.percentOutput

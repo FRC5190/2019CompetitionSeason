@@ -1,5 +1,6 @@
 package org.ghrobotics.frc2019.subsystems.intake
 
+import edu.wpi.first.wpilibj.DoubleSolenoid
 import org.ghrobotics.lib.commands.FalconCommand
 
 class IntakeHatchCommand(
@@ -12,9 +13,9 @@ class IntakeHatchCommand(
 
     override suspend fun initialize() {
         if (direction == IntakeSubsystem.Direction.HOLD) {
-            IntakeSubsystem.extensionSolenoid.set(true)
+            IntakeSubsystem.extensionSolenoid.set(DoubleSolenoid.Value.kForward)
         } else {
-            IntakeSubsystem.extensionSolenoid.set(false)
+            IntakeSubsystem.extensionSolenoid.set(DoubleSolenoid.Value.kReverse)
         }
     }
 

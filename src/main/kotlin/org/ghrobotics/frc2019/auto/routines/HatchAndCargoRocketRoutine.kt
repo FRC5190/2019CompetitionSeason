@@ -16,6 +16,7 @@ import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.duration
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.degree
+import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.withEquals
 
@@ -38,11 +39,8 @@ class HatchAndCargoRocketRoutine : AutoRoutine() {
             +parallel {
                 +DriveSubsystem.followTrajectory(path1, pathMirrored)
                 +sequential {
-                    +executeFor(
-                        path1.duration - 3.25.second,
-                        ClosedLoopArmCommand(30.degree)
-                    )
-                    +Superstructure.kFrontHighRocketHatch
+                    +DelayCommand(path1.duration - 4.0.second)
+                    +Superstructure.kFrontHighRocketHatch.withTimeout(4.second)
                 }
             }
 
@@ -50,9 +48,9 @@ class HatchAndCargoRocketRoutine : AutoRoutine() {
             +DelayCommand(0.1.second)
 
             +parallel {
-                +DriveSubsystem.followTrajectory(path2, pathMirrored)
+                +DriveSubsystem.followVisionAssistedTrajectory(path2, pathMirrored, 5.feet, 2.feet)
                 +sequential {
-                    +DelayCommand(0.2.second)
+                    +DelayCommand(0.5.second)
                     +Superstructure.kBackHatchFromLoadingStation
                 }
             }
@@ -70,7 +68,7 @@ class HatchAndCargoRocketRoutine : AutoRoutine() {
             // Place hatch on near rocket
             +parallel {
                 // Drive path to far rocket
-                +DriveSubsystem.followTrajectory(path3, pathMirrored)
+                +DriveSubsystem.followVisionAssistedTrajectory(path3, pathMirrored, 4.feet, 2.feet)
                 +sequential {
                     +executeFor(
                         path3.duration - 2.75.second,

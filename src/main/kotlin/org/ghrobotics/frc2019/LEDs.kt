@@ -1,7 +1,9 @@
 package org.ghrobotics.frc2019
 
 import edu.wpi.first.wpilibj.SerialPort
+import org.ghrobotics.frc2019.subsystems.drive.VisionAssistedTrajectoryTrackerCommand
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
+import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.wrappers.FalconRobot
 import kotlin.concurrent.thread
 
@@ -41,13 +43,15 @@ object LEDs {
         wantedLEDMode = when {
             Robot.emergencyActive -> Mode.EMERGENCY
             Controls.isClimbing -> Mode.CLIMB
+            IntakeSubsystem.isHoldingCargo() || IntakeSubsystem.isHoldingHatch() -> Mode.HAS_OBTAINED
             Robot.lastRobotMode == FalconRobot.Mode.DISABLED -> Mode.DISABLED
-            VisionDriveCommand.isActive -> Mode.VISION
+            VisionDriveCommand.isActive || VisionAssistedTrajectoryTrackerCommand.isActive -> Mode.VISION
             else -> Mode.NONE
         }
     }
 
     enum class Mode(val value: Int) {
+        HAS_OBTAINED(5),
         CLIMB(4),
         VISION(3),
         DISABLED(1),

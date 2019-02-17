@@ -72,7 +72,7 @@ object Controls {
 
             // HIGH ROCKET
             pov(0).changeOn {
-                if (IntakeSubsystem.isHoldingCargo()) {
+                if (IntakeSubsystem.isSeeingCargo()) {
                     Superstructure.kFrontHighRocketCargo.start()
                 } else {
                     Superstructure.kFrontHighRocketHatch.start()
@@ -81,7 +81,7 @@ object Controls {
 
             // MIDDLE ROCKET
             pov(90).changeOn {
-                if (IntakeSubsystem.isHoldingCargo()) {
+                if (IntakeSubsystem.isSeeingCargo()) {
                     Superstructure.kFrontMiddleRocketCargo.start()
                 } else {
                     Superstructure.kFrontMiddleRocketHatch.start()
@@ -91,13 +91,13 @@ object Controls {
             // LOW ROCKET, CARGO SHIP, AND LOADING STATION
             pov(180).changeOn {
                 if (backModifier.source() > 0.5) {
-                    if (IntakeSubsystem.isHoldingCargo()) {
+                    if (IntakeSubsystem.isSeeingCargo()) {
                         Superstructure.kBackLowRocketCargo.start()
                     } else {
                         Superstructure.kBackHatchFromLoadingStation.start()
                     }
                 } else {
-                    if (IntakeSubsystem.isHoldingCargo()) {
+                    if (IntakeSubsystem.isSeeingCargo()) {
                         Superstructure.kFrontLowRocketCargo.start()
                     } else {
                         Superstructure.kFrontHatchFromLoadingStation.start()

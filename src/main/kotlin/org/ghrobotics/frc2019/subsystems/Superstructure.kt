@@ -24,18 +24,18 @@ object Superstructure {
     val kFrontHighRocketHatch get() = goToHeightWithAngle(76.inch, 15.degree)
     val kFrontMiddleRocketHatch get() = goToHeightWithAngle(50.inch, 5.degree)
 
-    val kFrontHighRocketCargo get() = goToHeightWithAngle(83.inch, 45.degree)
+    val kFrontHighRocketCargo get() = goToHeightWithAngle(79.inch, 45.degree)
     val kFrontMiddleRocketCargo get() = goToHeightWithAngle(56.inch, 45.degree)
     val kFrontLowRocketCargo get() = goToHeightWithAngle(32.inch, 45.degree)
     val kBackLowRocketCargo get() = goToHeightWithAngle(32.inch, 135.degree)
 
     val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(20.inch, 0.degree)
-    val kBackHatchFromLoadingStation get() = goToHeightWithAngle(20.inch, 180.degree)
+    val kBackHatchFromLoadingStation get() = goToHeightWithAngle(14.inch, 180.degree)
 
     val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, (-20).degree)
     val kBackCargoIntake get() = elevatorAndArmHeight(0.inch, (-160).degree)
 
-    val kFrontCargoFromLoadingStation get() = elevatorAndArmHeight(0.inch, 45.degree)
+    val kFrontCargoFromLoadingStation get() = elevatorAndArmHeight(0.inch, 35.degree)
     val kBackCargoFromLoadingStation get() = elevatorAndArmHeight(0.inch, 135.degree)
 
     private fun goToHeightWithAngle(
@@ -62,6 +62,7 @@ object Superstructure {
         return elevatorAndArmHeight(elevatorHeightWanted, armAngle)
     }
 
+    @Suppress("ComplexMethod")
     private fun elevatorAndArmHeight(
         elevatorHeightWanted: Length,
         armAngle: Rotation2d
@@ -91,52 +92,10 @@ object Superstructure {
 
                     val elevatorLimit = (-2).inch
 
-                    // Bring elevator down while moving the arm to a position where it is safe.
                     +parallel {
+                        // Elevator
                         +sequential {
-                            // Zero Elevator
-                            +ClosedLoopElevatorCommand((-5).inch)
-                                .overrideExit { ElevatorSubsystem.isZeroed }
-                            // Park elevator at 0 after zeroing
-                            +ClosedLoopElevatorCommand(elevatorLimit)
-                        }
-                        // Prepare arm to flip through elevator
-                        +ClosedLoopArmCommand(
-                            if (isFrontWanted) {
-                                90.degree + Constants.kArmFlipTolerance
-                            } else {
-                                90.degree - Constants.kArmFlipTolerance
-                            }
-                        )
-                    }.overrideExit {
-                        // Exit when the elevator is zeroed and within tolerance of zero
-                        ElevatorSubsystem.isZeroed &&
-                            ElevatorSubsystem.elevatorPosition.absoluteValue < Constants.kElevatorClosedLoopTolerance &&
-                            ElevatorSubsystem.velocity < Constants.kElevatorClosedLoopVelocityTolerance
-                    }
-
-                    // Ensure elevator is parked at 0 and not -5
-                    +ClosedLoopElevatorCommand(elevatorLimit)
-                        .overrideExit { ElevatorSubsystem.isZeroed }
-
-                    // Flip arm but angle up while elevator is going up
-                    +parallel {
-                        val safeFlipAngle = if (isFrontWanted) {
-                            90.degree - Constants.kArmFlipTolerance - Constants.kArmClosedLoopTolerance / 2.0
-                        } else {
-                            90.degree + Constants.kArmFlipTolerance + Constants.kArmClosedLoopTolerance / 2.0
-                        }
-
-                        +sequential {
-                            if(elevatorHeightWanted > Constants.kElevatorSafeFlipHeight + Constants.kElevatorClosedLoopTolerance) {
-                                +ClosedLoopArmCommand(safeFlipAngle)
-                                    .overrideExit { ElevatorSubsystem.elevatorPosition > Constants.kElevatorSafeFlipHeight }
-                            }
-                            +ClosedLoopArmCommand(armAngle)
-                        }
-
-                        +sequential {
-                            +ConditionCommand {
+                            val elevatorWaitCondition = {
                                 if (isFrontWanted) {
                                     ArmSubsystem.armPosition <=
                                         90.degree - Constants.kArmFlipTolerance + Constants.kArmClosedLoopTolerance &&
@@ -147,7 +106,41 @@ object Superstructure {
                                         ArmSubsystem.armPosition.cos < 0
                                 }
                             }
+                            +sequential {
+                                // Zero Elevator
+                                +ClosedLoopElevatorCommand((-5).inch)
+                                    .overrideExit { ElevatorSubsystem.isZeroed }
+                                // Park elevator at 0 after zeroing
+                                +ClosedLoopElevatorCommand(elevatorLimit)
+                            }.overrideExit(elevatorWaitCondition)
+                            // Wait for arm to flip
+                            +ConditionCommand(elevatorWaitCondition)
                             +ClosedLoopElevatorCommand(elevatorHeightWanted)
+                        }
+                        // Arm
+                        +sequential {
+                            // Prepare arm to flip through elevator
+                            +ClosedLoopArmCommand(
+                                if (isFrontWanted) {
+                                    90.degree + Constants.kArmFlipTolerance
+                                } else {
+                                    90.degree - Constants.kArmFlipTolerance
+                                }
+                            )
+                            // Wait for elevator to come down to safe height
+                            +ConditionCommand { ElevatorSubsystem.elevatorPosition < Constants.kElevatorSafeFlipHeight }
+
+                            val safeFlipAngle = if (isFrontWanted) {
+                                90.degree - Constants.kArmFlipTolerance - Constants.kArmClosedLoopTolerance / 2.0
+                            } else {
+                                90.degree + Constants.kArmFlipTolerance + Constants.kArmClosedLoopTolerance / 2.0
+                            }
+
+                            if (elevatorHeightWanted > Constants.kElevatorSafeFlipHeight + Constants.kElevatorClosedLoopTolerance) {
+                                +ClosedLoopArmCommand(safeFlipAngle)
+                                    .overrideExit { ElevatorSubsystem.elevatorPosition > Constants.kElevatorSafeFlipHeight }
+                            }
+                            +ClosedLoopArmCommand(armAngle)
                         }
                     }
 

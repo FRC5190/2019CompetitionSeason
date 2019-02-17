@@ -141,7 +141,7 @@ object Network {
         armVoltage.setDouble(ArmSubsystem.voltage)
         armVelocity.setDouble(ArmSubsystem.velocity.value * 180 / Math.PI)
 
-        isHoldingCargo.setBoolean(IntakeSubsystem.isHoldingCargo())
+        isHoldingCargo.setBoolean(IntakeSubsystem.isSeeingCargo())
         intakeFullyExtended.setBoolean(IntakeSubsystem.isFullyExtended())
 
 //        frontClimbWinchPosition.setDouble(ClimbSubsystem.frontWinchPosition.inch)
@@ -149,12 +149,12 @@ object Network {
 //        frontClimbWinchCurrent.setDouble(ClimbSubsystem.frontWinchCurrent)
 //        backClimbWinchCurrent.setDouble(ClimbSubsystem.backWinchCurrent)
 
-        val trackedObject = TargetTracker.bestTarget
-        if (trackedObject != null) {
-            val visionTargetPose = trackedObject.averagePose
-            visionTargetX.setDouble(visionTargetPose.translation.x.inch)
-            visionTargetY.setDouble(visionTargetPose.translation.y.inch)
-            visionTargetRotation.setDouble(visionTargetPose.rotation.degree)
-        }
+//        val trackedObject = TargetTracker.bestTarget
+//        if (trackedObject != null) {
+//            val visionTargetPose = trackedObject.averagePose
+//            visionTargetX.setDouble(visionTargetPose.translation.x.inch)
+//            visionTargetY.setDouble(visionTargetPose.translation.y.inch)
+//            visionTargetRotation.setDouble(visionTargetPose.rotation.degree)
+//        }
     }
 }

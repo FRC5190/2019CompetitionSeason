@@ -19,26 +19,31 @@ object VisionProcessing {
                 visionData.timestamp,
                 visionData.targets
                     .asSequence()
-                    .mapNotNull(::processReflectiveTape)
+                    .mapNotNull { processReflectiveTape(it, Constants.kCenterToFrontCamera) }
                     .map { robotPose + it }.toList()
             )
+        }
+        JeVois(SerialPort.Port.kUSB2) { visionData ->
+            val robotPose = DriveSubsystem.localization[visionData.timestamp]
 
-            RawDataTracker.addSamples(
+            TargetTracker.addSamples(
                 visionData.timestamp,
                 visionData.targets
                     .asSequence()
-                    .mapNotNull(::processReflectiveTape)
-                    .map { it }.toList()
+                    .mapNotNull { processReflectiveTape(it, Constants.kCenterToBackCamera) }
+                    .map { robotPose + it }.toList()
             )
         }
     }
 
-    private fun processReflectiveTape(data: JsonObject): Pose2d? {
+    private fun processReflectiveTape(data: JsonObject, transform: Pose2d): Pose2d? {
         val angle = data["angle"].asDouble.degree
         val rotation = -data["rotation"].asDouble.degree + angle + 180.degree
         val distance = data["distance"].asDouble.inch
-        
-        return Constants.kCenterToCamera + Pose2d(Translation2d(distance, angle), rotation)
+
+//        println("${distance.inch}, ${angle.degree}")
+
+        return transform + Pose2d(Translation2d(distance, angle), rotation)
     }
 //    private fun processWhiteTape(data: JsonObject): Pose2d? {
 //        // {"one": {"h": -16.875, "v": -32.4375}, "two": {"h": 60.0, "v": -32.4375}}

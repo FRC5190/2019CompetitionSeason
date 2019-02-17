@@ -15,19 +15,23 @@ object TargetTracker {
     private val _trackedTargets = mutableListOf<TrackedTarget>()
     val trackedTargets: List<TrackedTarget> = _trackedTargets
 
-    var bestTarget: TrackedTarget? = null
+    var bestTargetFront: TrackedTarget? = null
         private set
 
+    var bestTargetBack: TrackedTarget? = null
+        private set
+
+    @Suppress("ComplexMethod")
     fun addSamples(time: Time, targets: List<Pose2d>) {
-        val current = Timer.getFPGATimestamp().second
+        val current = (Timer.getFPGATimestamp() + 1.0).second
         if (time >= current) return
 
         for (targetPose in targets) {
             val closestTarget = _trackedTargets.minBy {
-                it.averagePose.distance(targetPose)
+                it.averagePose.translation.distance(targetPose.translation)
             }
             if (closestTarget == null
-                || closestTarget.averagePose.distance(targetPose) > Constants.kMaxTargetTrackingDistance.value
+                || closestTarget.averagePose.translation.distance(targetPose.translation) > Constants.kMaxTargetTrackingDistance.value
             ) {
                 // Create a new target if none is close enough
                 _trackedTargets += TrackedTarget(time, targetPose)
@@ -41,9 +45,31 @@ object TargetTracker {
 
         val robotPose = DriveSubsystem.localization()
 
-        bestTarget = _trackedTargets.minBy {
-            it.averagePose.rotation - robotPose.rotation
+        var newFrontTarget: TrackedTarget? = null
+        var tempFrontDistance = 0.0
+        var newBackTarget: TrackedTarget? = null
+        var tempBackDistance = 0.0
+
+        for (target in _trackedTargets) {
+            val targetRelative = target.averagePose inFrameOfReferenceOf robotPose
+            val newDistance = targetRelative.translation.norm.value
+            if (targetRelative.translation.x.value > 0.0) {
+                // Front
+                if (newFrontTarget == null || newDistance < tempFrontDistance) {
+                    newFrontTarget = target
+                    tempFrontDistance = newDistance
+                }
+            } else {
+                // Back
+                if (newBackTarget == null || newDistance < tempBackDistance) {
+                    newBackTarget = target
+                    tempBackDistance = newDistance
+                }
+            }
         }
+
+        bestTargetFront = newFrontTarget
+        bestTargetFront = newBackTarget
 
         LiveDashboard.visionTargets = _trackedTargets.map {
             it.averagePose

@@ -155,7 +155,7 @@ object TrajectoryFactory {
         get() {
             val waypoints = listOf(
                 TrajectoryWaypoints.kSideStart.asWaypoint(),
-                TrajectoryWaypoints.kSideStart.transformBy(Pose2d(45.inch, 0.inch, 0.degree)).asWaypoint(),
+                TrajectoryWaypoints.kSideStart.transformBy(Pose2d(30.inch, 0.inch, 0.degree)).asWaypoint(),
                 rocketNAdjusted
             )
             val constraints = listOf(

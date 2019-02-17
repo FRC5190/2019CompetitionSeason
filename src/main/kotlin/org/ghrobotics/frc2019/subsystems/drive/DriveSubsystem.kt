@@ -6,12 +6,12 @@
 package org.ghrobotics.frc2019.subsystems.drive
 
 import com.ctre.phoenix.sensors.PigeonIMU
-import com.team254.lib.physics.DifferentialDrive
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.kMainLoopDt
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.climb.ClimbSubsystem
+import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.statespace.*
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
@@ -49,7 +49,7 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
 
     // Shifter for two-speed gearbox
     private val shifter = Solenoid(Constants.kPCMId, Constants.kDriveSolenoidId)
-    val pigeon = PigeonIMU(ClimbSubsystem.frontWinchSlave)
+    val pigeon = PigeonIMU(IntakeSubsystem.intakeMaster)
 
     // Type of localization to determine position on the field
     override val localization = TankEncoderLocalization(
