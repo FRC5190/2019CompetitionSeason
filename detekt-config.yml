@@ -67,7 +67,7 @@ comments:
     active: false
 
 complexity:
-  active: true
+  active: false
   ComplexCondition:
     active: true
     threshold: 4
@@ -196,7 +196,7 @@ exceptions:
       - RuntimeException
 
 formatting:
-  active: true
+  active: false
   android: false
   autoCorrect: true
   ChainWrapping:
@@ -399,7 +399,7 @@ potential-bugs:
     active: true
 
 style:
-  active: true
+  active: false
   CollapsibleIfStatements:
     active: true
   DataClassContainsFunctions:
