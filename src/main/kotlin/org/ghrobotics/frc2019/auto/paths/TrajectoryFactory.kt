@@ -19,10 +19,17 @@ object TrajectoryFactory {
     private val kMaxVelocity = 12.feet.velocity
     private val kMaxAcceleration = 6.feet.acceleration
 
+    private val kMaxHabitatVelocity = 3.feet.velocity
+
+    private val kFirstPathMaxAcceleration = 4.feet.acceleration
+
+    private val kVelocityRadiusConstraintRadius = 3.feet
+    private val kVelocityRadiusConstraintVelocity = 4.feet.velocity
+
     private val kMaxCentripetalAccelerationElevatorUp = 4.feet.acceleration
     private val kMaxCentripetalAccelerationElevatorDown = 4.feet.acceleration
 
-    val kMaxVoltage = 10.volt
+    private val kMaxVoltage = 10.volt
 
     /** Adjusted Poses **/
 
@@ -39,7 +46,7 @@ object TrajectoryFactory {
     private val cargoShipS1Adjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kCargoShipS1,
         transform = Constants.kForwardIntakeToCenter,
-        translationalOffset = Translation2d(-1.inch, 0.inch)
+        translationalOffset = Translation2d((-1).inch, 0.inch)
     )
     private val cargoShipS2Adjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kCargoShipS2,
@@ -57,7 +64,7 @@ object TrajectoryFactory {
     private val loadingStationAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kLoadingStation,
         transform = Constants.kBackwardIntakeToCenter,
-        translationalOffset = Translation2d(4.inch, 0.inch)
+        translationalOffset = Translation2d(4.inch, (-3).inch)
     )
     private val rocketFAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kRocketF,
@@ -65,145 +72,117 @@ object TrajectoryFactory {
     )
     private val rocketNAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kRocketN,
-        transform = Constants.kForwardIntakeToCenter,
-        rotationalOffset = 10.degree
+        transform = Constants.kForwardIntakeToCenter
     )
 
     /** Trajectories **/
 
-    val cargoShipFLToLoadingStation: TimedTrajectory<Pose2dWithCurvature>
-        get() {
-            val adjustedLoadingStation = Pose2d(
-                loadingStationAdjusted.position.translation - Translation2d(0.inch, 3.inch),
-                loadingStationAdjusted.position.rotation
-            )
-            val waypoints = listOf(
-                cargoShipFLAdjusted,
-                Pose2d(10.6.feet, 6.614.feet, 69.degree).asWaypoint(),
-                adjustedLoadingStation.asWaypoint()
-            )
-            val constraints = listOf(
-                CentripetalAccelerationConstraint(kMaxCentripetalAccelerationElevatorDown),
-                VelocityLimitRadiusConstraint(loadingStationAdjusted.position.translation, 3.feet, 4.feet.velocity)
-            )
-            return generateTrajectory(true, waypoints, constraints, kMaxVelocity, kMaxAcceleration, kMaxVoltage)
-        }
+    val cargoShipFLToLoadingStation = generateTrajectory(
+        true,
+        listOf(
+            cargoShipFLAdjusted,
+            Pose2d(10.6.feet, 6.614.feet, 69.degree).asWaypoint(),
+            loadingStationAdjusted
+        ),
+        getConstraints(false, loadingStationAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
+    )
 
-    val cargoShipS1ToDepot: TimedTrajectory<Pose2dWithCurvature>
-        get() {
-            val waypoints =
-                listOf(cargoShipS1Adjusted, Pose2d(15.feet, 4.951.feet, 17.degree).asWaypoint(), depotAdjusted)
-            val constraints = listOf(
-                CentripetalAccelerationConstraint(kMaxCentripetalAccelerationElevatorDown),
-                VelocityLimitRadiusConstraint(depotAdjusted.position.translation, 3.feet, 4.feet.velocity)
-            )
-            return generateTrajectory(true, waypoints, constraints, kMaxVelocity, kMaxAcceleration, kMaxVoltage)
-        }
+    val cargoShipS1ToDepot = generateTrajectory(
+        true,
+        listOf(
+            cargoShipS1Adjusted,
+            Pose2d(15.feet, 4.951.feet, 17.degree).asWaypoint(),
+            depotAdjusted
+        ),
+        getConstraints(false, depotAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
+    )
 
-    val cargoShipS1ToLoadingStation: TimedTrajectory<Pose2dWithCurvature>
-        get() {
-            val waypoints =
-                listOf(cargoShipS1Adjusted, Pose2d(15.feet, 4.951.feet, 17.degree).asWaypoint(), loadingStationAdjusted)
-            val constraints = listOf(
-                CentripetalAccelerationConstraint(kMaxCentripetalAccelerationElevatorDown),
-                VelocityLimitRadiusConstraint(loadingStationAdjusted.position.translation, 3.feet, 4.feet.velocity)
-            )
-            return generateTrajectory(true, waypoints, constraints, kMaxVelocity, kMaxAcceleration, kMaxVoltage)
-        }
+    val cargoShipS1ToLoadingStation = generateTrajectory(
+        true,
+        listOf(
+            cargoShipS1Adjusted,
+            Pose2d(15.feet, 4.951.feet, 17.degree).asWaypoint(),
+            loadingStationAdjusted
+        ),
+        getConstraints(false, loadingStationAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
+    )
 
-    val centerStartToCargoShipFL: TimedTrajectory<Pose2dWithCurvature>
-        get() {
-            val waypoints = listOf(TrajectoryWaypoints.kCenterStart.asWaypoint(), cargoShipFLAdjusted)
-            val constraints = listOf(
-                CentripetalAccelerationConstraint(kMaxCentripetalAccelerationElevatorDown),
-                VelocityLimitRadiusConstraint(cargoShipFLAdjusted.position.translation, 3.feet, 4.feet.velocity)
-            )
-            return generateTrajectory(false, waypoints, constraints, kMaxVelocity, 4.feet.acceleration, kMaxVoltage)
-        }
+    val centerStartToCargoShipFL = generateTrajectory(
+        false,
+        listOf(
+            TrajectoryWaypoints.kCenterStart.asWaypoint(),
+            cargoShipFLAdjusted
+        ),
+        getConstraints(false, cargoShipFLAdjusted), kMaxVelocity, kFirstPathMaxAcceleration, kMaxVoltage
+    )
 
-    val depotToCargoShipS2: TimedTrajectory<Pose2dWithCurvature>
-        get() {
-            val waypoints =
-                listOf(depotAdjusted, Pose2d(15.feet, 4.951.feet, 17.degree).asWaypoint(), cargoShipS2Adjusted)
-            val constraints = listOf(
-                CentripetalAccelerationConstraint(kMaxCentripetalAccelerationElevatorDown),
-                VelocityLimitRadiusConstraint(cargoShipS2Adjusted.position.translation, 3.feet, 4.feet.velocity)
-            )
-            return generateTrajectory(false, waypoints, constraints, kMaxVelocity, 4.feet.acceleration, kMaxVoltage)
-        }
+    val depotToCargoShipS2 = generateTrajectory(
+        false,
+        listOf(
+            depotAdjusted,
+            Pose2d(15.feet, 4.951.feet, 17.degree).asWaypoint(),
+            cargoShipS2Adjusted
+        ),
+        getConstraints(false, cargoShipS2Adjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
+    )
 
-    val loadingStationToCargoShipFR: TimedTrajectory<Pose2dWithCurvature>
-        get() {
-            val waypoints = listOf(
-                loadingStationAdjusted,
-                Pose2d(10.6.feet, 6.614.feet, 69.degree).asWaypoint(),
-                cargoShipFRAdjusted
-            )
-            val constraints = listOf(
-                CentripetalAccelerationConstraint(kMaxCentripetalAccelerationElevatorDown),
-                VelocityLimitRadiusConstraint(cargoShipFRAdjusted.position.translation, 3.feet, 4.feet.velocity)
-            )
-            return generateTrajectory(false, waypoints, constraints, kMaxVelocity, kMaxAcceleration, kMaxVoltage)
-        }
+    val loadingStationToCargoShipFR = generateTrajectory(
+        false,
+        listOf(
+            loadingStationAdjusted,
+            Pose2d(10.6.feet, 6.614.feet, 69.degree).asWaypoint(),
+            cargoShipFRAdjusted
+        ),
+        getConstraints(false, cargoShipFRAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
+    )
 
-    val loadingStationToCargoShipS2: TimedTrajectory<Pose2dWithCurvature>
-        get() {
-            val waypoints =
-                listOf(loadingStationAdjusted, Pose2d(15.feet, 4.951.feet, 17.degree).asWaypoint(), cargoShipS2Adjusted)
-            val constraints = listOf(
-                CentripetalAccelerationConstraint(kMaxCentripetalAccelerationElevatorDown),
-                VelocityLimitRadiusConstraint(cargoShipS2Adjusted.position.translation, 3.feet, 4.feet.velocity)
-            )
-            return generateTrajectory(false, waypoints, constraints, kMaxVelocity, kMaxAcceleration, kMaxVoltage)
-        }
+    val loadingStationToCargoShipS2 = generateTrajectory(
+        false,
+        listOf(
+            loadingStationAdjusted,
+            Pose2d(15.feet, 4.951.feet, 17.degree).asWaypoint(),
+            cargoShipS2Adjusted
+        ),
+        getConstraints(false, cargoShipS2Adjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
+    )
 
-    val loadingStationToRocketF: TimedTrajectory<Pose2dWithCurvature>
-        get() {
-            val waypoints = listOf(
-                loadingStationAdjusted,
-                Pose2d(17.039.feet, 6.378.feet, 9.degree).asWaypoint(),
-                rocketFAdjusted
-            )
-            val constraints = listOf(
-                CentripetalAccelerationConstraint(kMaxCentripetalAccelerationElevatorUp),
-                VelocityLimitRadiusConstraint(rocketFAdjusted.position.translation, 3.feet, 4.feet.velocity)
-            )
-            return generateTrajectory(false, waypoints, constraints, kMaxVelocity, kMaxAcceleration, kMaxVoltage)
-        }
+    val loadingStationToRocketF = generateTrajectory(
+        false,
+        listOf(
+            loadingStationAdjusted,
+            Pose2d(17.039.feet, 6.378.feet, 9.degree).asWaypoint(),
+            rocketFAdjusted
+        ),
+        getConstraints(true, rocketFAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
+    )
 
-    val loadingStationToRocketN: TimedTrajectory<Pose2dWithCurvature>
-        get() {
-            val newRocketNAdjusted = TrajectoryWaypoints.Waypoint(
-                rocketNAdjusted.position,
-                translationalOffset = Translation2d(0.inch, (-2).inch),
-                rotationalOffset = 10.degree
-            )
-            val waypoints =
-                listOf(loadingStationAdjusted, newRocketNAdjusted)
-            val constraints = listOf(
-                CentripetalAccelerationConstraint(kMaxCentripetalAccelerationElevatorUp),
-                VelocityLimitRadiusConstraint(rocketNAdjusted.position.translation, 3.feet, 4.feet.velocity)
-            )
-            return generateTrajectory(false, waypoints, constraints, kMaxVelocity, kMaxAcceleration, kMaxVoltage)
-        }
+    val loadingStationToRocketN = generateTrajectory(
+        false,
+        listOf(
+            loadingStationAdjusted,
+            Pose2d(rocketNAdjusted.position.translation, rocketNAdjusted.position.rotation + 10.degree).asWaypoint()
+        ),
+        getConstraints(true, rocketNAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
+    )
 
-    val rocketNToDepot: TimedTrajectory<Pose2dWithCurvature>
-        get() {
-            val waypoints = listOf(rocketNAdjusted, depotAdjusted)
-            val constraints = listOf(CentripetalAccelerationConstraint(kMaxCentripetalAccelerationElevatorDown))
-            return generateTrajectory(true, waypoints, constraints, kMaxVelocity, 3.feet.acceleration, kMaxVoltage)
-        }
+    val rocketNToDepot = generateTrajectory(
+        true,
+        listOf(
+            rocketNAdjusted,
+            depotAdjusted
+        ),
+        getConstraints(false, depotAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
+    )
 
-    val rocketFToDepot: TimedTrajectory<Pose2dWithCurvature>
-        get() {
-            val waypoints = listOf(
-                rocketFAdjusted,
-                Pose2d(19.216.feet, 5.345.feet, 5.degree).asWaypoint(),
-                depotAdjusted
-            )
-            val constraints = listOf(CentripetalAccelerationConstraint(kMaxCentripetalAccelerationElevatorDown))
-            return generateTrajectory(true, waypoints, constraints, kMaxVelocity, kMaxAcceleration, kMaxVoltage)
-        }
+    val rocketFToDepot = generateTrajectory(
+        true,
+        listOf(
+            rocketFAdjusted,
+            Pose2d(19.216.feet, 5.345.feet, 5.degree).asWaypoint(),
+            depotAdjusted
+        ),
+        getConstraints(false, depotAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
+    )
 
     val rocketNToLoadingStation: TimedTrajectory<Pose2dWithCurvature>
         get() {
@@ -219,33 +198,44 @@ object TrajectoryFactory {
             return generateTrajectory(true, waypoints, constraints, kMaxVelocity, kMaxAcceleration, kMaxVoltage)
         }
 
-    val sideStartToCargoShipS1: TimedTrajectory<Pose2dWithCurvature>
-        get() {
-            val waypoints = listOf(TrajectoryWaypoints.kSideStart.asWaypoint(), cargoShipS1Adjusted)
-            val constraints = listOf(
-                CentripetalAccelerationConstraint(kMaxCentripetalAccelerationElevatorUp),
-                VelocityLimitRadiusConstraint(cargoShipS1Adjusted.position.translation, 5.feet, 4.feet.velocity),
-                VelocityLimitRegionConstraint(TrajectoryWaypoints.kHabitatL1Platform, 3.feet.velocity)
-            )
-            return generateTrajectory(false, waypoints, constraints, kMaxVelocity, 4.feet.acceleration, kMaxVoltage)
-        }
+    val sideStartToCargoShipS1 = generateTrajectory(
+        false,
+        listOf(
+            TrajectoryWaypoints.kSideStart.asWaypoint(),
+            cargoShipS1Adjusted
+        ),
+        getConstraints(true, cargoShipS1Adjusted), kMaxVelocity, kFirstPathMaxAcceleration, kMaxVoltage
+    )
 
-    val sideStartToRocketN: TimedTrajectory<Pose2dWithCurvature>
-        get() {
-            val waypoints = listOf(
-                TrajectoryWaypoints.kSideStart.asWaypoint(),
-                TrajectoryWaypoints.kSideStart.transformBy(Pose2d(30.inch, 0.inch, 0.degree)).asWaypoint(),
-                rocketNAdjusted
-            )
-            val constraints = listOf(
-                CentripetalAccelerationConstraint(kMaxCentripetalAccelerationElevatorUp),
-                VelocityLimitRadiusConstraint(rocketNAdjusted.position.translation, 5.feet, 4.feet.velocity),
-                VelocityLimitRegionConstraint(TrajectoryWaypoints.kHabitatL1Platform, 3.feet.velocity)
-            )
-            return generateTrajectory(false, waypoints, constraints, kMaxVelocity, kMaxAcceleration, kMaxVoltage)
-        }
+    val sideStartToRocketN = generateTrajectory(
+        false,
+        listOf(
+            TrajectoryWaypoints.kSideStart.asWaypoint(),
+            TrajectoryWaypoints.kSideStart.transformBy(Pose2d(30.inch, 0.inch, 0.degree)).asWaypoint(),
+            rocketNAdjusted
+        ),
+        getConstraints(true, rocketNAdjusted), kMaxVelocity, kFirstPathMaxAcceleration, kMaxVoltage
+    )
 
     /** Generation **/
+
+    private fun getConstraints(elevatorUp: Boolean, trajectoryEndpoint: Pose2d) = listOf(
+        CentripetalAccelerationConstraint(
+            if (elevatorUp)
+                kMaxCentripetalAccelerationElevatorUp
+            else
+                kMaxCentripetalAccelerationElevatorDown
+        ),
+        VelocityLimitRadiusConstraint(
+            trajectoryEndpoint.translation,
+            kVelocityRadiusConstraintRadius,
+            kVelocityRadiusConstraintVelocity
+        ),
+        VelocityLimitRegionConstraint(TrajectoryWaypoints.kHabitatL1Platform, kMaxHabitatVelocity)
+    )
+
+    private fun getConstraints(elevatorUp: Boolean, trajectoryEndpoint: TrajectoryWaypoints.Waypoint) =
+        getConstraints(elevatorUp, trajectoryEndpoint.position)
 
     fun generateTrajectory(
         reversed: Boolean,
@@ -274,4 +264,6 @@ object TrajectoryFactory {
             optimizeCurvature
         )
     }
+
+    fun Pose2d.asWaypoint() = TrajectoryWaypoints.Waypoint(this)
 }
