@@ -184,19 +184,14 @@ object TrajectoryFactory {
         getConstraints(false, depotAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
     )
 
-    val rocketNToLoadingStation: TimedTrajectory<Pose2dWithCurvature>
-        get() {
-            val newLoadingStation = TrajectoryWaypoints.Waypoint(
-                loadingStationAdjusted.position,
-                translationalOffset = Translation2d(0.inch, -3.inch)
-            )
-            val waypoints = listOf(rocketNAdjusted, newLoadingStation)
-            val constraints = listOf(
-                CentripetalAccelerationConstraint(kMaxCentripetalAccelerationElevatorDown),
-                VelocityLimitRadiusConstraint(loadingStationAdjusted.position.translation, 3.feet, 4.feet.velocity)
-            )
-            return generateTrajectory(true, waypoints, constraints, kMaxVelocity, kMaxAcceleration, kMaxVoltage)
-        }
+    val rocketNToLoadingStation = generateTrajectory(
+        true,
+        listOf(
+            rocketNAdjusted,
+            loadingStationAdjusted
+        ),
+        getConstraints(false, loadingStationAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
+    )
 
     val sideStartToCargoShipS1 = generateTrajectory(
         false,
@@ -237,7 +232,7 @@ object TrajectoryFactory {
     private fun getConstraints(elevatorUp: Boolean, trajectoryEndpoint: TrajectoryWaypoints.Waypoint) =
         getConstraints(elevatorUp, trajectoryEndpoint.position)
 
-    fun generateTrajectory(
+    private fun generateTrajectory(
         reversed: Boolean,
         points: List<TrajectoryWaypoints.Waypoint>,
         constraints: List<TimingConstraint<Pose2dWithCurvature>>,

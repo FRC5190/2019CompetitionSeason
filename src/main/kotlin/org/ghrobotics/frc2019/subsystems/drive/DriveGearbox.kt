@@ -28,7 +28,7 @@ class DriveGearbox(
 
         // Configure Encoder
         master.feedbackSensor = FeedbackDevice.QuadEncoder
-        master.encoderPhase = Constants.isRaceRobot
+        master.encoderPhase = Constants.kDriveSensorPhase
         master.sensorPosition = 0.meter
 
         allMotors.forEach { motor ->
