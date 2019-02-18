@@ -19,7 +19,7 @@ void setup() {
 
 void loop() {
 
-  if(ledmode == 1) {
+  if(ledmode == 1 || ledmode == 6) {
     FastLED.setBrightness(255 / 2);
   }else {
     FastLED.setBrightness(255);
@@ -85,17 +85,70 @@ void loop() {
       break;
     }
     case 5: {
-      // emergency
-      if(currentMillis - ledmodeStart < 2000) {
-        if(currentMillis % 400 > 200) {
-          fill_solid(leds, NUM_LEDS, CRGB(0, 255, 0));
-        }else {
-          fill_solid(leds, NUM_LEDS, CRGB(0, 0, 0));
+      // has stuff
+      CRGB color = CRGB(255, 20, 147);
+      int s = 1500;
+      if(currentMillis - ledmodeStart < s) {
+        int i = (((currentMillis - ledmodeStart) % s) / (s / 2.0)) * NUM_LEDS / 2;
+        if(i > NUM_LEDS / 2) {
+          i = NUM_LEDS / 2 - (i - NUM_LEDS / 2);
+        }
+        for (int k=0; k<NUM_LEDS / 2; k++) {
+          if(k == i || k == i - 1 || k == i + 1) {
+            leds[k] = color;
+          }else{ 
+            leds[k].r = 0;
+            leds[k].g = 0;
+            leds[k].b = 0;
+          }
+        }
+        
+        for (int k=NUM_LEDS / 2; k<NUM_LEDS; k++) {
+          if(k - NUM_LEDS / 2 == i || k - NUM_LEDS / 2 == i - 1 || k - NUM_LEDS / 2 == i + 1) {
+            leds[k] = color;
+          }else{ 
+            leds[k].r = 0;
+            leds[k].g = 0;
+            leds[k].b = 0;
+          }
+        }
+      }else if(currentMillis - ledmodeStart < s * 1.5){
+        double fillTime = s / 2.0;
+        int ledcount = (currentMillis - ledmodeStart - s) / fillTime * (NUM_LEDS / 2.0);
+        Serial.println(ledcount);
+        for (int k=0; k<NUM_LEDS / 2; k++) {
+          if(k < ledcount) {
+            leds[k] = color;
+          }else{ 
+            leds[k].r = 0;
+            leds[k].g = 0;
+            leds[k].b = 0;
+          }
+        }
+        
+        for (int k=NUM_LEDS / 2; k<NUM_LEDS; k++) {
+          if(k - NUM_LEDS / 2  < ledcount) {
+            leds[k] = color;
+          }else{ 
+            leds[k].r = 0;
+            leds[k].g = 0;
+            leds[k].b = 0;
+          }
         }
       }else{
-          fill_solid(leds, NUM_LEDS, CRGB(0, 255, 0));
+          fill_solid(leds, NUM_LEDS, color);
       }
       break;
+    }
+    case 6: {
+      // teleop
+      for (int k=0; k<NUM_LEDS / 2; k++) {
+        leds[k] =  CRGB(255, 255, 255);
+      }
+      
+      for (int k=NUM_LEDS / 2; k<NUM_LEDS; k++) {
+        leds[k] = CRGB(255, 0, 0);
+      }
     }
   }
   FastLED.show();
