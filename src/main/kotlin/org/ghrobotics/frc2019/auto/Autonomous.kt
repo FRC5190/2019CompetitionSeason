@@ -51,7 +51,7 @@ object Autonomous {
 
     fun update() {
         // Update localization.
-        startingPositionMonitor.onChange { DriveSubsystem.localization.reset(it.pose) }
+        startingPositionMonitor.onChange { if (!Robot.lastEnabledState) DriveSubsystem.localization.reset(it.pose) }
 
         // Just send it when everything is ready.
         isReadyMonitor.onChangeToTrue {
@@ -80,6 +80,7 @@ object Autonomous {
                     Mode.BASELINE,
                     BaselineRoutine()
                 )
+                state(Mode.SIDE_CARGO_SHIP, SideCargoShipRoutine())
 
                 state(
                     Mode.TEST_TRAJECTORIES,
@@ -127,5 +128,5 @@ object Autonomous {
 
     enum class GamePiece { HATCH, CARGO }
 
-    enum class Mode { TEST_TRAJECTORIES, HIGH_HATCHES_ROCKET, HATCH_AND_CARGO_ROCKET, FORWARD_CARGO_SHIP, BASELINE }
+    enum class Mode { TEST_TRAJECTORIES, HIGH_HATCHES_ROCKET, HATCH_AND_CARGO_ROCKET, FORWARD_CARGO_SHIP, SIDE_CARGO_SHIP, BASELINE }
 }

@@ -93,6 +93,8 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
             softLimitReverseEnabled = false
 
             kF = Constants.kArmKf
+
+            configMotionSCurveStrength(3)
         }
         defaultCommand = object : FalconCommand(this@ArmSubsystem) {
             override suspend fun initialize() {

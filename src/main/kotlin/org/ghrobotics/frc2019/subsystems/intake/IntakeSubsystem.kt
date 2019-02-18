@@ -1,10 +1,7 @@
 package org.ghrobotics.frc2019.subsystems.intake
 
 import com.ctre.phoenix.motorcontrol.NeutralMode
-import edu.wpi.first.wpilibj.AnalogInput
-import edu.wpi.first.wpilibj.DigitalInput
-import edu.wpi.first.wpilibj.DoubleSolenoid
-import edu.wpi.first.wpilibj.Solenoid
+import edu.wpi.first.wpilibj.*
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.amp
@@ -27,9 +24,11 @@ object IntakeSubsystem : FalconSubsystem() {
     val sensor1 = AnalogInput(Constants.kLeftBallSensorId)
     val sensor2 = AnalogInput(Constants.kRightBallSensorId)
 
+    val dio = DigitalOutput(Constants.kIntakeExtensionLimitSwitch)
+
     val isSeeingCargo = sensor2::getAverageVoltage.greaterThan(1.7)
 
-    val isFullyExtended = DigitalInput(Constants.kIntakeExtensionLimitSwitch)::get
+    val isFullyExtended = dio::get
 
     val isHoldingCargo = { extensionSolenoid.get() == DoubleSolenoid.Value.kReverse } and isSeeingCargo
     val isHoldingHatch = { extensionSolenoid.get() == DoubleSolenoid.Value.kForward } and !isFullyExtended

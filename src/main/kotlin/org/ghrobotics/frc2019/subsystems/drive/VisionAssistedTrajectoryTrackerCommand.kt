@@ -110,7 +110,7 @@ class VisionAssistedTrajectoryTrackerCommand(
                 1.0 - 1.0 / 6.0 * theta * theta
             } else sin(theta) / theta
 
-        const val kCorrectionKp = 1.0
+        const val kCorrectionKp = -1.0
         var isActive = false
             private set
     }

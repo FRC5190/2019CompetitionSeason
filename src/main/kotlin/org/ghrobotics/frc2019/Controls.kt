@@ -59,7 +59,7 @@ object Controls {
         state({ !isClimbing }) {
             // Elevator
             axisButton(1, 0.15) {
-                change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * 0.5 }))
+                change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * 1.0 }))
             }
             // Arm
             axisButton(5, 0.15) {

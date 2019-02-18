@@ -19,7 +19,7 @@ import kotlin.math.pow
 @Suppress("MemberVisibilityCanBePrivate")
 object Constants {
 
-    const val isRaceRobot = false
+    const val isRaceRobot = true
 
     // PHYSICS
     const val kAccelerationDueToGravity = 9.80665
@@ -77,7 +77,7 @@ object Constants {
     val kRobotLength = 30.inch
 
     val kBumperThickness = 4.5.inch
-    val kIntakeProtrusion = 9.inch       // Out of frame protrusion.
+    val kIntakeProtrusion = 5.inch       // Out of frame protrusion.
     val kElevatorCrossbarHeightFromGround = 46.inch
     val kIntakeCradleHeight = 6.inch
     val kArmLength = 24.5.inch
@@ -90,20 +90,21 @@ object Constants {
     val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeProtrusion, kBadIntakeOffset, 0.degree)
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
 
-    val kCenterToFrontCamera = Pose2d(13.5.inch, 9.5.inch, 0.degree)
+    val kCenterToFrontCamera = Pose2d(13.5.inch, (-11).inch, 0.degree)
     val kCenterToBackCamera = Pose2d((-10.5).inch, (-9.5).inch, 180.degree)
 
 
     // VISION
-    val kMaxTargetTrackingDistance = 10.inch
+    val kMaxTargetTrackingDistance = 16.inch
     val kMaxTargetTrackingLifetime = 1.second
 
 
     // DRIVE
-    val kDriveNativeUnitModel = SlopeNativeUnitModel(
-        170.5.inch,
-        12918.nativeUnits
-    )
+    val kDriveNativeUnitModel =
+        if (isRaceRobot) SlopeNativeUnitModel(160.inch, 12094.nativeUnits) else SlopeNativeUnitModel(
+            170.5.inch,
+            12918.nativeUnits
+        )
 
     val kDriveSensorUnitsPerRotation = 1440.nativeUnits
     val kDriveWheelRadius = kDriveNativeUnitModel.wheelRadius(kDriveSensorUnitsPerRotation)
@@ -111,8 +112,8 @@ object Constants {
 
     val kDriveCurrentLimit = 38.amp
 
-    const val kDriveKp = 1.5 // Talon SRX Units
-    const val kDriveKd = 5.0
+    val kDriveKp = 1.5 // Talon SRX Units
+    val kDriveKd = 5.0
 
     const val kDriveLeftKv = 0.1489
     const val kDriveLeftKa = 0.0716 // 0.0816
@@ -150,10 +151,10 @@ object Constants {
 
     // ELEVATOR
     // from elevator zero (measured from bottom of second stage)
-    val kElevatorSwitchHeight = 8.inch
-    val kElevatorSwitchNativeUnit = 2310.nativeUnits
-    val kElevatorAfterSwitchHeightSample = 58.inch
-    val kElevatorAfterSwitchNativeUnitSample = 10845.nativeUnits
+    val kElevatorSwitchHeight = if (isRaceRobot) 9.inch else 8.inch
+    val kElevatorSwitchNativeUnit = if (isRaceRobot) 2490.nativeUnits else 2310.nativeUnits
+    val kElevatorAfterSwitchHeightSample = if (isRaceRobot) 54.5.inch else 58.inch
+    val kElevatorAfterSwitchNativeUnitSample = if (isRaceRobot) 9606.nativeUnits else 10845.nativeUnits
 
     val kElevatorNativeUnitModel = SpringCascadeNativeUnitModel(
         switchHeight = kElevatorSwitchHeight,
@@ -179,7 +180,10 @@ object Constants {
 
     const val kElevatorKp = 1.0
     const val kElevatorKd = 0.0
-    val kElevatorKf = kElevatorNativeUnitModel.calculatekF(11.1 - kElevatorHoldVoltage, 65.inch.velocity.value)
+    val kElevatorKf = kElevatorNativeUnitModel.calculatekF(
+        (if (isRaceRobot) 8.66 else 11.1) - kElevatorHoldVoltage,
+        if (isRaceRobot) 64.inch.velocity.value else 65.inch.velocity.value
+    )
     const val kElevatorBelowSwitchKg = 0.0 / 12
     const val kElevatorAfterSwitchKg = kElevatorHoldVoltage / 12.0
 

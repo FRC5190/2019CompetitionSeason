@@ -4,7 +4,6 @@ import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.auto.paths.TrajectoryFactory
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
-import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
@@ -48,7 +47,7 @@ class HatchAndCargoRocketRoutine : AutoRoutine() {
             +DelayCommand(0.1.second)
 
             +parallel {
-                +DriveSubsystem.followVisionAssistedTrajectory(path2, pathMirrored, 5.feet, 2.feet)
+                +DriveSubsystem.followTrajectory(path2, pathMirrored)
                 +sequential {
                     +DelayCommand(0.5.second)
                     +Superstructure.kBackHatchFromLoadingStation
@@ -68,13 +67,13 @@ class HatchAndCargoRocketRoutine : AutoRoutine() {
             // Place hatch on near rocket
             +parallel {
                 // Drive path to far rocket
-                +DriveSubsystem.followVisionAssistedTrajectory(path3, pathMirrored, 4.feet, 2.feet)
+                +DriveSubsystem.followTrajectory(path3, pathMirrored)
                 +sequential {
                     +executeFor(
                         path3.duration - 2.75.second,
                         Superstructure.kFrontCargoFromLoadingStation
                     )
-                    +Superstructure.kFrontMiddleRocketHatch
+                    +Superstructure.kFrontMiddleRocketHatch.withTimeout(4.second)
                 }
             }
 

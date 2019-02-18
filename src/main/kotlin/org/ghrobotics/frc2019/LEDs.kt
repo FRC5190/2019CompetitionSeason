@@ -46,11 +46,13 @@ object LEDs {
             IntakeSubsystem.isHoldingCargo() || IntakeSubsystem.isHoldingHatch() -> Mode.HAS_OBTAINED
             Robot.lastRobotMode == FalconRobot.Mode.DISABLED -> Mode.DISABLED
             VisionDriveCommand.isActive || VisionAssistedTrajectoryTrackerCommand.isActive -> Mode.VISION
+            Robot.lastRobotMode == FalconRobot.Mode.TELEOP && Robot.lastEnabledState -> Mode.TELEOP
             else -> Mode.NONE
         }
     }
 
     enum class Mode(val value: Int) {
+        TELEOP(6),
         HAS_OBTAINED(5),
         CLIMB(4),
         VISION(3),

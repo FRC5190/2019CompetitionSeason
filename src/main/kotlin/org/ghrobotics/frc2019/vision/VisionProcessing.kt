@@ -12,18 +12,18 @@ import org.ghrobotics.lib.mathematics.units.inch
 object VisionProcessing {
 
     init {
+//        JeVois(SerialPort.Port.kUSB1) { visionData ->
+//            val robotPose = DriveSubsystem.localization[visionData.timestamp]
+//
+//            TargetTracker.addSamples(
+//                visionData.timestamp,
+//                visionData.targets
+//                    .asSequence()
+//                    .mapNotNull { processReflectiveTape(it, Constants.kCenterToFrontCamera) }
+//                    .map { robotPose + it }.toList()
+//            )
+//        }
         JeVois(SerialPort.Port.kUSB1) { visionData ->
-            val robotPose = DriveSubsystem.localization[visionData.timestamp]
-
-            TargetTracker.addSamples(
-                visionData.timestamp,
-                visionData.targets
-                    .asSequence()
-                    .mapNotNull { processReflectiveTape(it, Constants.kCenterToFrontCamera) }
-                    .map { robotPose + it }.toList()
-            )
-        }
-        JeVois(SerialPort.Port.kUSB2) { visionData ->
             val robotPose = DriveSubsystem.localization[visionData.timestamp]
 
             TargetTracker.addSamples(

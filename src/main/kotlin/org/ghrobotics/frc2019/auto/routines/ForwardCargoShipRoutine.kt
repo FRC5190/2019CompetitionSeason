@@ -36,7 +36,7 @@ class ForwardCargoShipRoutine : AutoRoutine() {
                         path1.duration - 2.second,
                         ClosedLoopArmCommand(30.degree)
                     )
-                    +Superstructure.kFrontHatchFromLoadingStation
+                    +Superstructure.kFrontHatchFromLoadingStation.withTimeout(2.0.second)
                 }
             }
 
@@ -72,7 +72,7 @@ class ForwardCargoShipRoutine : AutoRoutine() {
                         path3.duration - 2.75.second,
                         Superstructure.kFrontCargoFromLoadingStation
                     )
-                    +Superstructure.kFrontHatchFromLoadingStation
+                    +Superstructure.kFrontHatchFromLoadingStation.withTimeout(3.second)
                 }
             }
 

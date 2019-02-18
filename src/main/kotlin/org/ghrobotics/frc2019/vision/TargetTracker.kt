@@ -69,7 +69,7 @@ object TargetTracker {
         }
 
         bestTargetFront = newFrontTarget
-        bestTargetFront = newBackTarget
+        bestTargetBack = newBackTarget
 
         LiveDashboard.visionTargets = _trackedTargets.map {
             it.averagePose

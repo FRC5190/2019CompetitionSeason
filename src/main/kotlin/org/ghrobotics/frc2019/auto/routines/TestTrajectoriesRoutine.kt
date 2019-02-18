@@ -22,13 +22,13 @@ class TestTrajectoriesRoutine : AutoRoutine() {
         get() = sequential {
             val pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
 
-//            +DriveSubsystem.followTrajectory(path1, pathMirrored)
-//            +DriveSubsystem.followTrajectory(path2, pathMirrored)
-////            +DriveSubsystem.followTrajectory(path3, pathMirrored)
+            +DriveSubsystem.followTrajectory(path1, pathMirrored)
+            +DriveSubsystem.followVisionAssistedTrajectory(path2, pathMirrored, 5.feet, 2.feet)
+            +DriveSubsystem.followTrajectory(path3, pathMirrored)
 //
 //
-            +DriveSubsystem.followVisionAssistedTrajectory(path1, pathMirrored, 5.feet, 2.feet)
+//            +DriveSubsystem.followVisionAssistedTrajectory(path1, pathMirrored, 3.feet, 2.feet)
 //            +DriveSubsystem.followTrajectory(path2, pathMirrored)
-//            +DriveSubsystem.followVisionAssistedTrajectory(path3, pathMirrored, 5.feet, 2.feet)
+//            +DriveSubsystem.followVisionAssistedTrajectory(path3, pathMirrored, 4.feet, 3.feet)
         }
 }

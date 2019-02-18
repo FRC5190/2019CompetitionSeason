@@ -19,15 +19,15 @@ object TrajectoryWaypoints {
 
 
     // Cargo Ship
-    val kCargoShipFL = Pose2d(220.25.inch, 172.875.inch, 0.degree)
-    val kCargoShipFR = Pose2d(220.25.inch, 151.125.inch, 0.degree)
+    val kCargoShipFL = Pose2d(220.25.inch, 173.5.inch, 0.degree)
+    val kCargoShipFR = Pose2d(220.25.inch, 152.0.inch, 0.degree)
     val kCargoShipS1 = Pose2d(260.75.inch, 133.13.inch, 90.degree)
     val kCargoShipS2 = Pose2d(282.50.inch, 133.13.inch, 90.degree)
     val kCargoShipS3 = Pose2d(304.25.inch, 133.13.inch, 90.degree)
 
     // Rocket
-    val kRocketN = Pose2d(216.57.inch, 18.60.inch, (-032.748).degree)
-    val kRocketF = Pose2d(241.69.inch, 18.60.inch, (-147.252).degree)
+    val kRocketN = Pose2d(216.57.inch, 15.5.inch, (-050.748).degree)
+    val kRocketF = Pose2d(241.69.inch, 17.0.inch, (-147.252).degree)
     val kRocketBay = Pose2d(229.13.inch, 27.44.inch, (-90).degree)
 
     // Loading Station

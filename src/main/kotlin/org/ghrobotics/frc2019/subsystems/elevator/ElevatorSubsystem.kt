@@ -124,6 +124,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
             motor.kF = Constants.kElevatorKf
 
             motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 1000 / 40)
+            motor.configMotionSCurveStrength(3)
         }
 
         // Default command to hold the current position

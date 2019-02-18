@@ -6,6 +6,8 @@ import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.elevator.ClosedLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
+import org.ghrobotics.frc2019.subsystems.intake.IntakeCloseCommand
+import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.*
 import org.ghrobotics.lib.mathematics.units.*
 import kotlin.math.absoluteValue
@@ -29,8 +31,8 @@ object Superstructure {
     val kFrontLowRocketCargo get() = goToHeightWithAngle(32.inch, 45.degree)
     val kBackLowRocketCargo get() = goToHeightWithAngle(32.inch, 135.degree)
 
-    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(20.inch, 0.degree)
-    val kBackHatchFromLoadingStation get() = goToHeightWithAngle(14.inch, 180.degree)
+    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 0.degree)
+    val kBackHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 180.degree)
 
     val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, (-20).degree)
     val kBackCargoIntake get() = elevatorAndArmHeight(0.inch, (-160).degree)
@@ -85,10 +87,10 @@ object Superstructure {
                 sequential {
                     +InstantRunnableCommand { println("FLIPPING") }
 
-//                    +ConditionalCommand(
-//                        IntakeSubsystem.isFullyExtended,
-//                        IntakeCloseCommand()
-//                    )
+                    +ConditionalCommand(
+                        IntakeSubsystem.isFullyExtended,
+                        IntakeCloseCommand()
+                    )
 
                     val elevatorLimit = (-2).inch
 
@@ -119,6 +121,7 @@ object Superstructure {
                         }
                         // Arm
                         +sequential {
+                            val waitCondition ={ ElevatorSubsystem.elevatorPosition < Constants.kElevatorSafeFlipHeight }
                             // Prepare arm to flip through elevator
                             +ClosedLoopArmCommand(
                                 if (isFrontWanted) {
@@ -126,9 +129,9 @@ object Superstructure {
                                 } else {
                                     90.degree - Constants.kArmFlipTolerance
                                 }
-                            )
+                            ).withExit(waitCondition)
                             // Wait for elevator to come down to safe height
-                            +ConditionCommand { ElevatorSubsystem.elevatorPosition < Constants.kElevatorSafeFlipHeight }
+                            +ConditionCommand(waitCondition)
 
                             val safeFlipAngle = if (isFrontWanted) {
                                 90.degree - Constants.kArmFlipTolerance - Constants.kArmClosedLoopTolerance / 2.0

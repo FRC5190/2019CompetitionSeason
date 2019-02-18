@@ -90,6 +90,7 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     init {
         lowGear = false
         defaultCommand = ManualDriveCommand()
+        pigeon.setTemperatureCompensationDisable(true)
     }
 
     private var previousGyroPitchVelocity = 0.degree.velocity
