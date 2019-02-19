@@ -53,7 +53,7 @@ object Controls {
         button(kB).changeOn {
             isClimbing = !isClimbing
             DriveSubsystem.lowGear = true
-            ElevatorSubsystem.wpiSubsystem.currentCommand.cancel()
+            Superstructure.kStowedPosition.start()
         }
 
         state({ !isClimbing }) {
@@ -121,6 +121,8 @@ object Controls {
                     Superstructure.kFrontCargoFromLoadingStation.start()
                 }
             }
+
+            button(kBumperRight).changeOn(Superstructure.kStowedPosition)
         }
         state({ isClimbing }) {
             button(kA).change(sequential {
