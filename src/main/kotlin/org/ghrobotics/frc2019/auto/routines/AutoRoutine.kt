@@ -1,5 +1,6 @@
 package org.ghrobotics.frc2019.auto.routines
 
+import org.ghrobotics.frc2019.Robot
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.commands.DelayCommand
@@ -20,7 +21,7 @@ abstract class AutoRoutine : Source<FalconCommand> {
             DriveSubsystem.localization.reset(Autonomous.startingPosition().pose)
         }
         +routine
-    }
+    }.withExit { Robot.emergencyActive }
 
     protected fun executeFor(time: Time, command: FalconCommand) = sequential {
         +command

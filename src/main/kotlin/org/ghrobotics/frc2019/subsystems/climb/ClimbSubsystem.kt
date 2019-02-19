@@ -164,6 +164,9 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     }
 
 
-    override fun activateEmergency() = zeroClosedLoopGains()
+    override fun activateEmergency() {
+        zeroOutputs()
+        zeroClosedLoopGains()
+    }
     override fun recoverFromEmergency() = setClosedLoopGains()
 }

@@ -166,7 +166,10 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     }
 
     // Emergency Management
-    override fun activateEmergency() = zeroClosedLoopGains()
+    override fun activateEmergency() {
+        zeroOutputs()
+        zeroClosedLoopGains()
+    }
 
     override fun recoverFromEmergency() = setClosedLoopGains()
 }

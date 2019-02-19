@@ -145,6 +145,7 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     }*/
 
     override fun activateEmergency() {
+        zeroOutputs()
         leftGearbox.zeroClosedLoopGains()
         rightGearbox.zeroClosedLoopGains()
     }

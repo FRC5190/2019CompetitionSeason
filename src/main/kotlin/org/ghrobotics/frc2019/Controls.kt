@@ -59,11 +59,11 @@ object Controls {
         state({ !isClimbing }) {
             // Elevator
             axisButton(1, 0.15) {
-                change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * 1.0 }))
+                change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * 0.5 }))
             }
             // Arm
             axisButton(5, 0.15) {
-                change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * 1.0 }))
+                change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * 0.5 }))
             }
 
             val backModifier = triggerAxisButton(GenericHID.Hand.kLeft)
