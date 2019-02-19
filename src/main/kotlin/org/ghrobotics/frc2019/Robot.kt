@@ -5,6 +5,8 @@
 
 package org.ghrobotics.frc2019
 
+import edu.wpi.cscore.VideoMode
+import edu.wpi.first.cameraserver.CameraServer
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
@@ -37,6 +39,7 @@ object Robot : FalconRobot() {
         Autonomous
 
 //        CameraServer.getInstance().startAutomaticCapture()
+//            .setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 15)
         VisionProcessing
     }
 

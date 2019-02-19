@@ -94,7 +94,7 @@ object Autonomous {
             stateCommandGroup(autoMode) {
                 state(
                     Mode.FORWARD_CARGO_SHIP,
-                    ForwardCargoShipRoutine()
+                    ForwardCargoShipRoutine()()
                 )
                 state(
                     Mode.BASELINE,

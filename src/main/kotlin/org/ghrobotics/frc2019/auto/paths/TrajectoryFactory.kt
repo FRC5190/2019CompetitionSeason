@@ -41,7 +41,7 @@ object TrajectoryFactory {
     private val cargoShipFRAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kCargoShipFR,
         transform = Constants.kForwardIntakeToCenter,
-        translationalOffset = Translation2d(9.inch, (-4).inch)
+        translationalOffset = Translation2d(9.inch, (-2).inch)
     )
     private val cargoShipS1Adjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kCargoShipS1,
@@ -111,6 +111,7 @@ object TrajectoryFactory {
         false,
         listOf(
             TrajectoryWaypoints.kCenterStart.asWaypoint(),
+            TrajectoryWaypoints.kCenterStart.transformBy(Pose2d(30.inch, 0.inch, 0.degree)).asWaypoint(),
             cargoShipFLAdjusted
         ),
         getConstraints(false, cargoShipFLAdjusted), kMaxVelocity, kFirstPathMaxAcceleration, kMaxVoltage
@@ -160,7 +161,7 @@ object TrajectoryFactory {
         false,
         listOf(
             loadingStationAdjusted,
-            Pose2d(rocketNAdjusted.position.translation, rocketNAdjusted.position.rotation + 10.degree).asWaypoint()
+            rocketNAdjusted.position.transformBy(Pose2d(3.inch, 0.inch)).asWaypoint()
         ),
         getConstraints(true, rocketNAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
     )
@@ -207,7 +208,7 @@ object TrajectoryFactory {
         listOf(
             TrajectoryWaypoints.kSideStart.asWaypoint(),
             TrajectoryWaypoints.kSideStart.transformBy(Pose2d(30.inch, 0.inch, 0.degree)).asWaypoint(),
-            rocketNAdjusted
+            rocketNAdjusted.position.transformBy(Pose2d(2.inch, 2.inch)).asWaypoint()
         ),
         getConstraints(true, rocketNAdjusted), kMaxVelocity, kFirstPathMaxAcceleration, kMaxVoltage
     )

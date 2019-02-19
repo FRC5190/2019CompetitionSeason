@@ -184,7 +184,7 @@ object Constants {
 
     // ARM
     val kArmSensorUnitsPerRotation = 1024.nativeUnits
-    val kArmUpTicks = (-524).nativeUnits
+    val kArmUpTicks = (-514).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,
@@ -199,18 +199,18 @@ object Constants {
 
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
     val kArmClosedLoopTolerance = 5.degree
-    val kArmCruiseVelocity = 380.0 * 1.0.degree.velocity
-    val kArmAcceleration = 372.0 * 1.0.degree.acceleration
+    val kArmCruiseVelocity = 260.156 * 1.0.degree.velocity
+    val kArmAcceleration = 218.0 * 1.0.degree.acceleration
 
     const val kArmEmptyHoldVoltage = 1.0
 
     val kArmEmptyKg = kArmEmptyHoldVoltage / kAccelerationDueToGravity / 12.0
-    const val kArmHatchKg = 3.0 / kAccelerationDueToGravity / 12.0
+    const val kArmHatchKg = 1.5 / kAccelerationDueToGravity / 12.0
 
-    const val kArmKp = 7.0
+    const val kArmKp = 3.5
     const val kArmKd = 140.0
     const val kArmKv = 0.0 / 12.0
-    val kArmKf = kArmNativeUnitModel.calculatekF(11.366 - kArmEmptyHoldVoltage, Math.toRadians(260.1562))
+    val kArmKf = kArmNativeUnitModel.calculatekF(11.718 - kArmEmptyHoldVoltage, Math.toRadians(260.156))
 
     // CLIMB
     val kClimbWinchRadius = 1.25.inch / 2.0

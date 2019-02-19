@@ -12,7 +12,7 @@ import org.ghrobotics.lib.utils.withEquals
 class TestTrajectoriesRoutine : AutoRoutine() {
     private val path1 = TrajectoryFactory.sideStartToRocketN
     private val path2 = TrajectoryFactory.rocketNToLoadingStation
-    private val path3 = TrajectoryFactory.loadingStationToRocketN
+    private val path3 = TrajectoryFactory.loadingStationToRocketF
     private val path4 = TrajectoryFactory.rocketFToDepot
 
     override val duration: Time
@@ -23,7 +23,7 @@ class TestTrajectoriesRoutine : AutoRoutine() {
             val pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
 
             +DriveSubsystem.followTrajectory(path1, pathMirrored)
-            +DriveSubsystem.followVisionAssistedTrajectory(path2, pathMirrored, 5.feet, 2.feet)
+            +DriveSubsystem.followTrajectory(path2, pathMirrored)
             +DriveSubsystem.followTrajectory(path3, pathMirrored)
 //
 //

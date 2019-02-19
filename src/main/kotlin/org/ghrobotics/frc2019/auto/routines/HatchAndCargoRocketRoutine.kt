@@ -73,7 +73,7 @@ class HatchAndCargoRocketRoutine : AutoRoutine() {
                         path3.duration - 2.75.second,
                         Superstructure.kFrontCargoFromLoadingStation
                     )
-                    +Superstructure.kFrontMiddleRocketHatch.withTimeout(4.second)
+                    +Superstructure.kFrontMiddleRocketHatch.withTimeout(3.second)
                 }
             }
 

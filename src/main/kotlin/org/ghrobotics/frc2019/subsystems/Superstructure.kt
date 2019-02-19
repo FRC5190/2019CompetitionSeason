@@ -1,12 +1,12 @@
 package org.ghrobotics.frc2019.subsystems
 
+import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.DriverStation
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.elevator.ClosedLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
-import org.ghrobotics.frc2019.subsystems.intake.IntakeCloseCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.*
 import org.ghrobotics.lib.mathematics.units.*
@@ -26,10 +26,10 @@ object Superstructure {
     val kFrontHighRocketHatch get() = goToHeightWithAngle(76.inch, 15.degree)
     val kFrontMiddleRocketHatch get() = goToHeightWithAngle(50.inch, 5.degree)
 
-    val kFrontHighRocketCargo get() = goToHeightWithAngle(79.inch, 45.degree)
-    val kFrontMiddleRocketCargo get() = goToHeightWithAngle(56.inch, 45.degree)
-    val kFrontLowRocketCargo get() = goToHeightWithAngle(32.inch, 45.degree)
-    val kBackLowRocketCargo get() = goToHeightWithAngle(32.inch, 135.degree)
+    val kFrontHighRocketCargo get() = goToHeightWithAngle(83.inch, 15.degree)
+    val kFrontMiddleRocketCargo get() = goToHeightWithAngle(56.inch, 15.degree)
+    val kFrontLowRocketCargo get() = goToHeightWithAngle(26.inch, 15.degree)
+    val kBackLowRocketCargo get() = goToHeightWithAngle(25.inch, 135.degree)
 
     val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 0.degree)
     val kBackHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 180.degree)
@@ -87,14 +87,23 @@ object Superstructure {
                 sequential {
                     +InstantRunnableCommand { println("FLIPPING") }
 
-                    +ConditionalCommand(
-                        IntakeSubsystem.isFullyExtended,
-                        IntakeCloseCommand()
-                    )
-
                     val elevatorLimit = (-2).inch
 
+                    var intakeSafeToOpen = false
+
                     +parallel {
+                        +object : FalconCommand() {
+                            init {
+                                finishCondition += { intakeSafeToOpen }
+                            }
+
+                            override suspend fun execute() {
+                                if (IntakeSubsystem.isFullyExtended()) {
+                                    IntakeSubsystem.extensionSolenoid.set(DoubleSolenoid.Value.kReverse)
+                                    IntakeSubsystem.launcherSolenoid.set(false)
+                                }
+                            }
+                        }
                         // Elevator
                         +sequential {
                             val elevatorWaitCondition = {
@@ -117,11 +126,16 @@ object Superstructure {
                             }.overrideExit(elevatorWaitCondition)
                             // Wait for arm to flip
                             +ConditionCommand(elevatorWaitCondition)
+
+                            // Allow intake to open
+                            +InstantRunnableCommand { intakeSafeToOpen = true }
+
                             +ClosedLoopElevatorCommand(elevatorHeightWanted)
                         }
                         // Arm
                         +sequential {
-                            val waitCondition ={ ElevatorSubsystem.elevatorPosition < Constants.kElevatorSafeFlipHeight }
+                            val waitCondition =
+                                { ElevatorSubsystem.elevatorPosition < Constants.kElevatorSafeFlipHeight }
                             // Prepare arm to flip through elevator
                             +ClosedLoopArmCommand(
                                 if (isFrontWanted) {

@@ -32,10 +32,7 @@ class ForwardCargoShipRoutine : AutoRoutine() {
             +parallel {
                 +DriveSubsystem.followTrajectory(path1)
                 +sequential {
-                    +executeFor(
-                        path1.duration - 2.second,
-                        ClosedLoopArmCommand(30.degree)
-                    )
+                    +DelayCommand(path1.duration - 3.second)
                     +Superstructure.kFrontHatchFromLoadingStation.withTimeout(2.0.second)
                 }
             }
@@ -79,5 +76,7 @@ class ForwardCargoShipRoutine : AutoRoutine() {
             // Place hatch
             +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
             +DelayCommand(0.3.second)
+
+            +DriveSubsystem.followTrajectory(TrajectoryFactory.cargoShipFLToLoadingStation)
         }
 }
