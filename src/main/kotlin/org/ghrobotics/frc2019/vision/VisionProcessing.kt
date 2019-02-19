@@ -1,9 +1,7 @@
 package org.ghrobotics.frc2019.vision
 
+import com.fazecast.jSerialComm.SerialPort
 import com.google.gson.JsonObject
-import edu.wpi.first.wpilibj.SerialPort
-import org.ghrobotics.frc2019.Constants
-import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.degree
@@ -12,6 +10,7 @@ import org.ghrobotics.lib.mathematics.units.inch
 object VisionProcessing {
 
     init {
+        println(SerialPort.getCommPorts().joinToString(separator = "\n") { it.descriptivePortName })
 //        JeVois(SerialPort.Port.kUSB1) { visionData ->
 //            val robotPose = DriveSubsystem.localization[visionData.timestamp]
 //
@@ -23,17 +22,17 @@ object VisionProcessing {
 //                    .map { robotPose + it }.toList()
 //            )
 //        }
-        JeVois(SerialPort.Port.kUSB1) { visionData ->
-            val robotPose = DriveSubsystem.localization[visionData.timestamp]
-
-            TargetTracker.addSamples(
-                visionData.timestamp,
-                visionData.targets
-                    .asSequence()
-                    .mapNotNull { processReflectiveTape(it, Constants.kCenterToBackCamera) }
-                    .map { robotPose + it }.toList()
-            )
-        }
+//        JeVois(SerialPort.Port.kUSB1) { visionData ->
+//            val robotPose = DriveSubsystem.localization[visionData.timestamp]
+//
+//            TargetTracker.addSamples(
+//                visionData.timestamp,
+//                visionData.targets
+//                    .asSequence()
+//                    .mapNotNull { processReflectiveTape(it, Constants.kCenterToBackCamera) }
+//                    .map { robotPose + it }.toList()
+//            )
+//        }
     }
 
     private fun processReflectiveTape(data: JsonObject, transform: Pose2d): Pose2d? {
