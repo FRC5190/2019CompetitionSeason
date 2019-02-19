@@ -123,14 +123,22 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
 
             motor.kF = Constants.kElevatorKf
 
-            motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 1000 / 40)
+            motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 25)
+            motor.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_25Ms)
+
             motor.configMotionSCurveStrength(3)
         }
 
         // Default command to hold the current position
         defaultCommand = object : FalconCommand(this@ElevatorSubsystem) {
             override suspend fun initialize() {
-                ElevatorSubsystem.elevatorPosition = elevatorPosition
+                synchronized(closedLoopSync) {
+                    ElevatorSubsystem.elevatorPosition = if (elevatorMaster.controlMode == ControlMode.MotionMagic) {
+                        elevatorMaster.activeTrajectoryPosition
+                    } else {
+                        elevatorPosition
+                    }
+                }
             }
         }
 
@@ -139,7 +147,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
 
         var previousVelocity = 0.meter.velocity
         val deltaTime = DeltaTime()
-        fixedRateTimer(period = 1000 / 20) {
+        fixedRateTimer(period = 50) {
             val dt = deltaTime.updateTime(System.currentTimeMillis().millisecond)
             val newVelocity = elevatorMaster.sensorVelocity
             if (dt.value > 0) {
@@ -178,7 +186,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
      * Used to calculate the actualAcceleration of the elevator.
      */
     override fun periodic() {
-        if(isBottomLimitSwitchPressed) {
+        if (isBottomLimitSwitchPressed) {
             isZeroed = true
         }
 

@@ -98,7 +98,13 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
         }
         defaultCommand = object : FalconCommand(this@ArmSubsystem) {
             override suspend fun initialize() {
-                armPosition = armPosition
+                synchronized(closedLoopSync) {
+                    armPosition = if(armMaster.controlMode == ControlMode.MotionMagic) {
+                        armMaster.activeTrajectoryPosition
+                    }else{
+                        armPosition
+                    }
+                }
             }
         }
         setClosedLoopGains()
