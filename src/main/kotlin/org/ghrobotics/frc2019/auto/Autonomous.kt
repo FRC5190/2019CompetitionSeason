@@ -27,9 +27,9 @@ object Autonomous {
     // Starting position of the robot
     val startingPosition = { Network.startingPositionChooser.selected }
 
-    val cargoShipGamePiece1 = { Network.cargoShip1Chooser.selected }
-    val cargoShipGamePiece2 = { Network.cargoShip2Chooser.selected }
-    val cargoShipGamePiece3 = { Network.cargoShip3Chooser.selected }
+//    val cargoShipGamePiece1 = { Network.cargoShip1Chooser.selected }
+//    val cargoShipGamePiece2 = { Network.cargoShip2Chooser.selected }
+//    val cargoShipGamePiece3 = { Network.cargoShip3Chooser.selected }
 
     // Stores whether the current config is valid.
     private var configValid = Source(true)
@@ -80,7 +80,7 @@ object Autonomous {
                     Mode.BASELINE,
                     BaselineRoutine()
                 )
-                state(Mode.SIDE_CARGO_SHIP, SideCargoShipRoutine())
+//                state(Mode.SIDE_CARGO_SHIP, SideCargoShipRoutine())
 
                 state(
                     Mode.TEST_TRAJECTORIES,
@@ -128,5 +128,5 @@ object Autonomous {
 
     enum class GamePiece { HATCH, CARGO }
 
-    enum class Mode { TEST_TRAJECTORIES, HIGH_HATCHES_ROCKET, HATCH_AND_CARGO_ROCKET, FORWARD_CARGO_SHIP, SIDE_CARGO_SHIP, BASELINE }
+    enum class Mode { TEST_TRAJECTORIES, HIGH_HATCHES_ROCKET, HATCH_AND_CARGO_ROCKET, FORWARD_CARGO_SHIP, BASELINE }
 }
