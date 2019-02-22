@@ -16,8 +16,8 @@ import kotlin.math.pow
 object Superstructure {
 
     val heightAboveGround
-        get() = Constants.kElevatorHeightFromGround + ElevatorSubsystem.elevatorPosition +
-            (Constants.kArmLength * ArmSubsystem.armPosition.sin)
+        get() = Constants.kElevatorHeightFromGround + ElevatorSubsystem.position +
+            (Constants.kArmLength * ArmSubsystem.position.sin)
 
     private val outOfToleranceRange =
         (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)
@@ -81,8 +81,8 @@ object Superstructure {
             // Flip arm vs. don't flip arm.
             +ConditionalCommand(
                 {
-                    val isFrontCurrent = ArmSubsystem.armPosition.cos >= 0
-                    isFrontWanted != isFrontCurrent || ArmSubsystem.armPosition in outOfToleranceRange
+                    val isFrontCurrent = ArmSubsystem.position.cos >= 0
+                    isFrontWanted != isFrontCurrent || ArmSubsystem.position in outOfToleranceRange
                 },
 
                 // We now need to flip the arm
@@ -110,13 +110,13 @@ object Superstructure {
                         +sequential {
                             val elevatorWaitCondition = {
                                 if (isFrontWanted) {
-                                    ArmSubsystem.armPosition <=
+                                    ArmSubsystem.position <=
                                         90.degree - Constants.kArmFlipTolerance + Constants.kArmClosedLoopTolerance &&
-                                        ArmSubsystem.armPosition.cos > 0
+                                        ArmSubsystem.position.cos > 0
                                 } else {
-                                    ArmSubsystem.armPosition >=
+                                    ArmSubsystem.position >=
                                         90.degree + Constants.kArmFlipTolerance - Constants.kArmClosedLoopTolerance &&
-                                        ArmSubsystem.armPosition.cos < 0
+                                        ArmSubsystem.position.cos < 0
                                 }
                             }
                             +sequential {
@@ -137,7 +137,7 @@ object Superstructure {
                         // Arm
                         +sequential {
                             val waitCondition =
-                                { ElevatorSubsystem.elevatorPosition < Constants.kElevatorSafeFlipHeight }
+                                { ElevatorSubsystem.position < Constants.kElevatorSafeFlipHeight }
                             // Prepare arm to flip through elevator
                             +ClosedLoopArmCommand(
                                 if (isFrontWanted) {
@@ -157,7 +157,7 @@ object Superstructure {
 
                             if (elevatorHeightWanted > Constants.kElevatorSafeFlipHeight + Constants.kElevatorClosedLoopTolerance) {
                                 +ClosedLoopArmCommand(safeFlipAngle)
-                                    .overrideExit { ElevatorSubsystem.elevatorPosition > Constants.kElevatorSafeFlipHeight }
+                                    .overrideExit { ElevatorSubsystem.position > Constants.kElevatorSafeFlipHeight }
                             }
                             +ClosedLoopArmCommand(armAngle)
                         }
@@ -169,11 +169,11 @@ object Superstructure {
 //                        +sequential {
 //                            +ConditionCommand {
 //                                if (isFrontWanted) {
-//                                    ArmSubsystem.armPosition <= 90.degree - Constants.kArmFlipTolerance &&
-//                                        ArmSubsystem.armPosition.cos > 0
+//                                    ArmSubsystem.position <= 90.degree - Constants.kArmFlipTolerance &&
+//                                        ArmSubsystem.position.cos > 0
 //                                } else {
-//                                    ArmSubsystem.armPosition >= 90.degree + Constants.kArmFlipTolerance &&
-//                                        ArmSubsystem.armPosition.cos < 0
+//                                    ArmSubsystem.position >= 90.degree + Constants.kArmFlipTolerance &&
+//                                        ArmSubsystem.position.cos < 0
 //                                }
 //                            }
 //                            +ClosedLoopElevatorCommand(elevatorHeightWanted)

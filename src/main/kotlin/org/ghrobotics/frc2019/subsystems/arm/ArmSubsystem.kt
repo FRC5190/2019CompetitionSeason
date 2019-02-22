@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.DemandType
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import com.ctre.phoenix.motorcontrol.NeutralMode
 import org.ghrobotics.frc2019.Constants
+import org.ghrobotics.frc2019.Robot
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
@@ -32,12 +33,12 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     private var closedLoopGoal = Rotation2d(0.0)
 
     // Used to retrieve the current arm position and to set the arm elevator position.
-    var armPosition
-        get() = armMaster.sensorPosition
-        set(value) = synchronized(closedLoopSync) {
-            isClosedLoop = true
-            closedLoopGoal = value
-        }
+    var position = armMaster.sensorPosition
+        private set
+
+    // Velocity of the arm.
+    var velocity = armMaster.sensorVelocity
+        private set
 
     // Current draw per motor.
     val current get() = armMaster.outputCurrent
@@ -48,24 +49,16 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     // Voltage draw per motor.
     val voltage get() = armMaster.motorOutputPercent * 12.0
 
-    // Velocity of the arm.
-    val velocity get() = armMaster.sensorVelocity
-
-    // Used to retrieve the percent output of each motor and to set the desired percent output.
-    var percentOutput
-        get() = armMaster.percentOutput
-        set(value) = synchronized(closedLoopSync) {
-            isClosedLoop = false
-            armMaster.percentOutput = value
-        }
+    var arbitraryFeedForward = 0.0
+        private set
 
     init {
-        // Configure feedback sensor and sensor phase
-        armMaster.feedbackSensor = FeedbackDevice.Analog
-        armMaster.encoderPhase = true
-
         // Configure startup settings
         armMaster.run {
+            // Configure feedback sensor and sensor phase
+            feedbackSensor = FeedbackDevice.Analog
+            encoderPhase = true
+
             // Brake mode
             brakeMode = NeutralMode.Brake
 
@@ -99,16 +92,29 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
         defaultCommand = object : FalconCommand(this@ArmSubsystem) {
             override suspend fun initialize() {
                 synchronized(closedLoopSync) {
-                    armPosition = if(armMaster.controlMode == ControlMode.MotionMagic) {
-                        armMaster.activeTrajectoryPosition
-                    }else{
-                        armPosition
+                    val lockedPosition = when {
+                        isClosedLoop && (position - closedLoopGoal).absoluteValue < Constants.kArmClosedLoopTolerance -> closedLoopGoal
+                        armMaster.controlMode == ControlMode.MotionMagic -> armMaster.activeTrajectoryPosition
+                        else -> position
                     }
+                    setPosition(lockedPosition)
                 }
             }
         }
         setClosedLoopGains()
     }
+
+    fun setPosition(newPosition: Rotation2d) =
+        synchronized(closedLoopSync) {
+            isClosedLoop = true
+            closedLoopGoal = newPosition
+        }
+
+    fun setPercentOutput(newOutput: Double) =
+        synchronized(closedLoopSync) {
+            isClosedLoop = false
+            armMaster.percentOutput = newOutput
+        }
 
     /**
      * Configures closed loop gains for the arm.
@@ -118,7 +124,6 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
             kP = Constants.kArmKp
             kD = Constants.kArmKd
         }
-
     }
 
     /**
@@ -133,36 +138,38 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     /**
      * Runs periodically.
-     * Used to calculate the actualAcceleration of the arm.
+     * Used to calculate the acceleration of the arm.
      */
     override fun periodic() {
+        this.position = armMaster.sensorPosition
+        this.velocity = armMaster.sensorVelocity
+
+        arbitraryFeedForward = if (!Robot.emergencyActive) {
+            val experiencedAcceleration = Constants.kAccelerationDueToGravity +
+                ElevatorSubsystem.acceleration.value
+
+            val Kg = if (IntakeSubsystem.isHoldingHatch()) {
+                Constants.kArmHatchKg
+            } else Constants.kArmEmptyKg
+
+            Kg * position.cos * experiencedAcceleration
+        } else {
+            // Feedforward for 45 degree angle on arm
+            Constants.kAccelerationDueToGravity * Constants.kArmEmptyKg * 0.5
+        }
+
         synchronized(closedLoopSync) {
             if (isClosedLoop) {
-                val experiencedAcceleration = Constants.kAccelerationDueToGravity +
-                    ElevatorSubsystem.actualAcceleration.value
-
-                val Kg = if (IntakeSubsystem.isHoldingHatch()) {
-                    Constants.kArmHatchKg
-                } else Constants.kArmEmptyKg
-
-                val feedforward = Kg * armPosition.cos * experiencedAcceleration +
-                    if (armMaster.controlMode == ControlMode.MotionMagic) {
-                        Constants.kArmKv * armMaster.activeTrajectoryVelocity.value
-                    } else {
-                        0.0
-                    }
-
-
                 armMaster.set(
                     ControlMode.MotionMagic, closedLoopGoal,
-                    DemandType.ArbitraryFeedForward, feedforward
+                    DemandType.ArbitraryFeedForward, arbitraryFeedForward
                 )
             }
         }
     }
 
     override fun zeroOutputs() {
-        percentOutput = 0.0
+        setPercentOutput(0.0)
     }
 
     // Emergency Management

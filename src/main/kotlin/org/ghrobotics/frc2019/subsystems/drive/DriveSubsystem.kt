@@ -49,7 +49,7 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
 
     // Shifter for two-speed gearbox
     private val shifter = Solenoid(Constants.kPCMId, Constants.kDriveSolenoidId)
-    val pigeon = PigeonIMU(IntakeSubsystem.intakeMaster)
+    private val pigeon = PigeonIMU(Constants.kPigeonIMUId)
 
     // Type of localization to determine position on the field
     override val localization = TankEncoderLocalization(
@@ -57,9 +57,6 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
         leftMotor::sensorPosition,
         rightMotor::sensorPosition
     )
-
-    var pitchAcceleration = 0.degree.acceleration
-        private set
 
     // Shift up and down
     var lowGear by observable(false) { _, _, wantLow ->
@@ -93,23 +90,12 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
         pigeon.setTemperatureCompensationDisable(true)
     }
 
-    private var previousGyroPitchVelocity = 0.degree.velocity
-    private val gyroTemp = DoubleArray(3)
-
     fun followVisionAssistedTrajectory(
         trajectory: TimedTrajectory<Pose2dWithCurvature>,
         pathMirrored: Source<Boolean>,
         or: Length,
         ir: Length
     ) = VisionAssistedTrajectoryTrackerCommand(pathMirrored.map(trajectory.mirror(), trajectory), or, ir)
-
-    override fun periodic() {
-        super.periodic()
-        pigeon.getRawGyro(gyroTemp)
-        val newPitchVelocity = gyroTemp[0].degree.velocity
-        pitchAcceleration = (newPitchVelocity - previousGyroPitchVelocity) / kMainLoopDt
-        previousGyroPitchVelocity = newPitchVelocity
-    }
 
     /*override fun setOutput(
         wheelVelocities: DifferentialDrive.WheelState, wheelVoltages: DifferentialDrive.WheelState

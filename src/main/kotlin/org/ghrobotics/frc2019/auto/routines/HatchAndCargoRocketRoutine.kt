@@ -15,7 +15,6 @@ import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.duration
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.degree
-import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.withEquals
 
@@ -91,7 +90,7 @@ class HatchAndCargoRocketRoutine : AutoRoutine() {
                     +Superstructure.kBackCargoIntake.withTimeout(1.5.second)
 
                     +sequential {
-                        +ConditionCommand { ArmSubsystem.armPosition > 150.degree }
+                        +ConditionCommand { ArmSubsystem.position > 150.degree }
                         +IntakeCargoCommand(IntakeSubsystem.Direction.HOLD)
                     }
                 }

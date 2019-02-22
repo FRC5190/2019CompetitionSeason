@@ -12,7 +12,7 @@ import org.ghrobotics.lib.utils.not
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 
 object IntakeSubsystem : FalconSubsystem() {
-    val intakeMaster = NativeFalconSRX(Constants.kIntakeLeftId)
+    private val intakeMaster = NativeFalconSRX(Constants.kIntakeLeftId)
 
     val extensionSolenoid = DoubleSolenoid(
         Constants.kPCMId,
@@ -21,10 +21,10 @@ object IntakeSubsystem : FalconSubsystem() {
     )
     val launcherSolenoid = Solenoid(Constants.kPCMId, Constants.kIntakeLauncherSolenoidId)
 
-    val sensor1 = AnalogInput(Constants.kLeftBallSensorId)
-    val sensor2 = AnalogInput(Constants.kRightBallSensorId)
+    private val sensor1 = AnalogInput(Constants.kLeftBallSensorId)
+    private val sensor2 = AnalogInput(Constants.kRightBallSensorId)
 
-    val dio = DigitalOutput(Constants.kIntakeExtensionLimitSwitch)
+    private val dio = DigitalOutput(Constants.kIntakeExtensionLimitSwitch)
 
     val isSeeingCargo = sensor2::getAverageVoltage.greaterThan(1.7)
 

@@ -55,7 +55,7 @@ object Constants {
 
 
     // GYROS
-    const val kPigeonIMUId = 17
+    const val kPigeonIMUId = kIntakeLeftId
 
 
     // PNEUMATICS
@@ -209,7 +209,6 @@ object Constants {
 
     const val kArmKp = 3.5
     const val kArmKd = 140.0
-    const val kArmKv = 0.0 / 12.0
     val kArmKf = kArmNativeUnitModel.calculatekF(11.718 - kArmEmptyHoldVoltage, Math.toRadians(260.156))
 
     // CLIMB

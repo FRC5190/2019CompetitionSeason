@@ -13,7 +13,6 @@ import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.lib.mathematics.units.derivedunits.inchesPerSecond
 import org.ghrobotics.lib.wrappers.networktables.enumSendableChooser
 
@@ -129,14 +128,14 @@ object Network {
         rightAmperageEntry.setDouble(DriveSubsystem.rightMotor.outputCurrent)
 
         elevatorRawPosition.setDouble(ElevatorSubsystem.rawEncoder.toDouble())
-        elevatorPosition.setDouble(ElevatorSubsystem.elevatorPosition.inch)
+        elevatorPosition.setDouble(ElevatorSubsystem.position.inch)
         elevatorCurrent.setDouble(ElevatorSubsystem.current)
         elevatorVoltage.setDouble(ElevatorSubsystem.voltage)
         elevatorVelocity.setDouble(ElevatorSubsystem.velocity.inchesPerSecond)
         elevatorLimitSwitch.setBoolean(ElevatorSubsystem.isBottomLimitSwitchPressed)
 
         armRawPosition.setDouble(ArmSubsystem.rawEncoder.toDouble())
-        armPosition.setDouble(ArmSubsystem.armPosition.degree)
+        armPosition.setDouble(ArmSubsystem.position.degree)
         armCurrent.setDouble(ArmSubsystem.current)
         armVoltage.setDouble(ArmSubsystem.voltage)
         armVelocity.setDouble(ArmSubsystem.velocity.value * 180 / Math.PI)
