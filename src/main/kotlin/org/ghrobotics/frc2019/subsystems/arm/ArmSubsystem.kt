@@ -113,7 +113,7 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     fun setPercentOutput(newOutput: Double) =
         synchronized(closedLoopSync) {
             isClosedLoop = false
-            armMaster.percentOutput = newOutput
+            armMaster.set(ControlMode.PercentOutput, newOutput, DemandType.ArbitraryFeedForward, arbitraryFeedForward)
         }
 
     /**
