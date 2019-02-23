@@ -47,6 +47,8 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     override val leftMotor get() = leftGearbox.master
     override val rightMotor get() = rightGearbox.master
 
+    val velocity get() = (leftMotor.velocity + rightMotor.velocity) / 2.0
+
     // Shifter for two-speed gearbox
     private val shifter = Solenoid(Constants.kPCMId, Constants.kDriveSolenoidId)
     private val pigeon = PigeonIMU(Constants.kPigeonIMUId)

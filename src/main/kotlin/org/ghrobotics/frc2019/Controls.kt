@@ -9,12 +9,11 @@ import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
-import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
-import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
+import org.ghrobotics.frc2019.vision.OTFTrajectoryGenerator
 import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.utils.map
 import org.ghrobotics.lib.wrappers.hid.*
@@ -31,7 +30,8 @@ object Controls {
 
         state({ !isClimbing }) {
             // Vision align
-            button(kY).change(VisionDriveCommand())
+//            button(kY).change(VisionDriveCommand())
+            button(kY).change(DriveSubsystem.followTrajectory(OTFTrajectoryGenerator.generateForwardOTFTrajectory()!!))
 
             // Shifting
             button(kA).changeOn { DriveSubsystem.lowGear = true }
