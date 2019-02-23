@@ -2,104 +2,120 @@
 
 package org.ghrobotics.frc2019.vision
 
+import com.fazecast.jSerialComm.SerialPort
+import com.fazecast.jSerialComm.SerialPortDataListener
+import com.fazecast.jSerialComm.SerialPortEvent
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
-import edu.wpi.first.wpilibj.SerialPort
 import edu.wpi.first.wpilibj.Timer
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.second
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
-import kotlin.concurrent.thread
 
 class JeVois(
-    private val port: SerialPort.Port,
+    private val serialPort: SerialPort,
     private val processData: (VisionData) -> Unit
 ) {
 
-    private var fpgaOffset = 0.second
+    private var state = State.NONE
+    private var timeOffset = 0.second
 
     init {
-        thread {
-            while (true) {
-                try {
-                    val port = createSerialPort()
-                    initPort(port)
-                    readPort(port)
-                } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
-                    e.printStackTrace()
-                    println("[JeVois-${port.name}] Failure in connection!!!")
-                }
-            }
-        }
-    }
+        serialPort.openPort()
+        serialPort.addDataListener(object : SerialPortDataListener {
+            private var byteBuffer = ByteArray(1024)
+            private var bufferIndex = 0
 
-    private fun createSerialPort(): SerialPort {
-        println("[JeVois-${port.name}] Trying to create serial port...")
-        while (true) {
-            try {
-                val serialPort = SerialPort(115200, port)
-                serialPort.setTimeout(0.5)
-                println("[JeVois-${port.name}] Serial port created!")
-                return serialPort
-            } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
-                e.printStackTrace()
-                TimeUnit.MILLISECONDS.sleep(1000)
-            }
-        }
-    }
-
-    private fun initPort(serialPort: SerialPort) {
-        serialPort.writeString("setpar serout USB\n")
-        serialPort.writeString("date 0101000070\n")
-        serialPort.writeString("streamon\n")
-
-        fpgaOffset = Timer.getFPGATimestamp().second
-    }
-
-    private fun readPort(serialPort: SerialPort) {
-        val tempStringBuilder = StringBuilder()
-        var lastReceivedTime = System.currentTimeMillis()
-        while (true) {
-            val newData = serialPort.read(serialPort.bytesReceived)
-            if(newData.isNotEmpty()){
-                lastReceivedTime = System.currentTimeMillis()
-            }
-            if(System.currentTimeMillis() - lastReceivedTime > 1000) {
-                throw TimeoutException("Roborio didnt receive data from jevois in time")
-            }
-            for(byte in newData) {
-                val charReceived = byte.toChar()
-                if(charReceived == '\n') {
-                    val line = tempStringBuilder.toString()
-                    tempStringBuilder.clear()
-                    if (!line.startsWith('{')) continue
-                    try {
-                        val jsonData = kJevoisGson.fromJson<JsonObject>(line)
-
-                        val timestamp = jsonData["Epoch Time"].asDouble.second + fpgaOffset
-                        val contours = jsonData["Targets"].asJsonArray
-                            .filterIsInstance<JsonObject>()
-
-                        processData(VisionData(timestamp, contours))
-                    } catch (e: JsonParseException) {
-                        e.printStackTrace()
-                        println("[JeVois-${port.name}] Got Invalid Data: $line")
+            override fun serialEvent(event: SerialPortEvent) {
+                if (event.eventType != SerialPort.LISTENING_EVENT_DATA_AVAILABLE)
+                    return
+                val newData = ByteArray(serialPort.bytesAvailable())
+                serialPort.readBytes(newData, newData.size.toLong())
+                for (newByte in newData) {
+                    if (newByte.toChar() != '\n') {
+                        byteBuffer[bufferIndex++] = newByte
+                        continue
                     }
-                }else{
-                    tempStringBuilder.append(charReceived)
+                    onStringReceived(String(byteBuffer, 0, bufferIndex).trim())
+                    while (bufferIndex > 0) {
+                        byteBuffer[--bufferIndex] = 0
+                    }
                 }
             }
-            Thread.sleep(1)
+
+            override fun getListeningEvents() = SerialPort.LISTENING_EVENT_DATA_AVAILABLE
+        })
+        state = State.SET_DATE
+        serialPort.writeString("date 0101000070\n")
+    }
+
+    private fun onStringReceived(receivedString: String) {
+        when (state) {
+            State.NONE -> {
+                println("[JeVois] [STATE: NONE] Got Data: $receivedString")
+            }
+            State.SET_DATE -> {
+                if (receivedString == "OK") {
+                    println("[JeVois] [STATE: SET_DATE] Synced Time on JeVois")
+                    timeOffset = Timer.getFPGATimestamp().second
+                    state = State.SET_OUTPUT
+                    serialPort.writeString("setpar serout USB\n")
+                } else {
+                    println("[JeVois] [STATE: SET_DATE] Failed to Sync time on JeVois")
+                }
+            }
+            State.SET_OUTPUT -> {
+                if (receivedString == "OK") {
+                    println("[JeVois] [STATE: SET_OUTPUT] Set Serial Output on JeVois to USB")
+                    state = State.START_STREAMING
+                    serialPort.writeString("streamon\n")
+                } else {
+                    println("[JeVois] [STATE: SET_OUTPUT] Failed to set Serial Output on JeVois to USB")
+                }
+            }
+            State.START_STREAMING -> {
+                if (receivedString == "OK" || receivedString == "ERR Unsupported command [streamon]"
+                    || receivedString.startsWith("{", true)
+                ) {
+                    println("[JeVois] [STATE: START_STREAMING] Started streaming data from JeVois...")
+                    state = State.RUNNING
+                } else {
+                    println("[JeVois] [STATE: START_STREAMING] Failed to start Streaming data from JeVois")
+                }
+            }
+            State.RUNNING -> {
+                if (!receivedString.startsWith('{')) return
+                try {
+                    val jsonData = kJevoisGson.fromJson<JsonObject>(receivedString)
+
+                    val timestamp = jsonData["Epoch Time"].asDouble.second + timeOffset
+                    val contours = jsonData["Targets"].asJsonArray
+                        .filterIsInstance<JsonObject>()
+
+                    processData(VisionData(timestamp, contours))
+                } catch (e: JsonParseException) {
+                    e.printStackTrace()
+                    println("[JeVois] Got Invalid Data: $receivedString")
+                }
+            }
         }
+    }
+
+    private fun SerialPort.writeString(data: String) = writeBytes(data.toByteArray())
+    private fun SerialPort.writeBytes(data: ByteArray) = writeBytes(data, data.size.toLong())
+
+    private enum class State {
+        NONE,
+        SET_OUTPUT,
+        SET_DATE,
+        START_STREAMING,
+        RUNNING
     }
 
     companion object {
         private val kJevoisGson = Gson()
     }
-
 }
 
 data class VisionData(

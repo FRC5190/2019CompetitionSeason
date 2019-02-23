@@ -31,7 +31,7 @@ object Controls {
         state({ !isClimbing }) {
             // Vision align
 //            button(kY).change(VisionDriveCommand())
-            button(kY).change(DriveSubsystem.followTrajectory(OTFTrajectoryGenerator.generateForwardOTFTrajectory()!!))
+            //button(kY).change(DriveSubsystem.followTrajectory(OTFTrajectoryGenerator.generateForwardOTFTrajectory()!!))
 
             // Shifting
             button(kA).changeOn { DriveSubsystem.lowGear = true }
