@@ -49,7 +49,7 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
 
     // Shifter for two-speed gearbox
     private val shifter = Solenoid(Constants.kPCMId, Constants.kDriveSolenoidId)
-    val pigeon = PigeonIMU(IntakeSubsystem.intakeMaster)
+    val pigeon = PigeonIMU(17)
 
     // Type of localization to determine position on the field
     override val localization = TankEncoderLocalization(

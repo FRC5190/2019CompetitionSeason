@@ -30,13 +30,14 @@ class JeVois(
             override fun serialEvent(event: SerialPortEvent) {
                 if (event.eventType != SerialPort.LISTENING_EVENT_DATA_AVAILABLE)
                     return
-                val newData = event.receivedData
+                val newData = ByteArray(serialPort.bytesAvailable())
+                serialPort.readBytes(newData, newData.size.toLong())
                 for (newByte in newData) {
                     if (newByte.toChar() != '\n') {
                         byteBuffer[bufferIndex++] = newByte
                         continue
                     }
-                    onStringReceived(String(byteBuffer, 0, bufferIndex))
+                    onStringReceived(String(byteBuffer, 0, bufferIndex).trim())
                     while (bufferIndex > 0) {
                         byteBuffer[--bufferIndex] = 0
                     }

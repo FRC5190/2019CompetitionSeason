@@ -10,7 +10,14 @@ import org.ghrobotics.lib.mathematics.units.inch
 object VisionProcessing {
 
     init {
-        println(SerialPort.getCommPorts().joinToString(separator = "\n") { it.descriptivePortName })
+        val jevoisCameras = SerialPort.getCommPorts()
+            .filter { it.descriptivePortName.contains("JeVois", true) }
+        println("Found ${jevoisCameras.size} jevoises")
+        jevoisCameras.forEach {
+            JeVois(it) {
+
+            }
+        }
 //        JeVois(SerialPort.Port.kUSB1) { visionData ->
 //            val robotPose = DriveSubsystem.localization[visionData.timestamp]
 //
