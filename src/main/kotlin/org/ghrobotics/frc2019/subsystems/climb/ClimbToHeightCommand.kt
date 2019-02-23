@@ -19,6 +19,6 @@ class ClimbToHeightCommand(private val targetHeight: Length) :
     }
 
     override suspend fun initialize() {
-        ClimbSubsystem.climbToHeight(targetHeight)
+//        ClimbSubsystem.climbToHeight(targetHeight)
     }
 }

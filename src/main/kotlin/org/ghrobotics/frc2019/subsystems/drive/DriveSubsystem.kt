@@ -100,6 +100,13 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
         ir: Length
     ) = VisionAssistedTrajectoryTrackerCommand(pathMirrored.map(trajectory.mirror(), trajectory), or, ir)
 
+    private val tempYPR = DoubleArray(3)
+
+    override fun periodic() {
+        pigeon.getYawPitchRoll(tempYPR)
+        println("YPR ${tempYPR.joinToString(", ")}")
+    }
+
     /*override fun setOutput(
         wheelVelocities: DifferentialDrive.WheelState, wheelVoltages: DifferentialDrive.WheelState
     ) {

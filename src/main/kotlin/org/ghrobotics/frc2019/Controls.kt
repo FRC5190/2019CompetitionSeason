@@ -8,6 +8,7 @@ package org.ghrobotics.frc2019
 import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
+import org.ghrobotics.frc2019.subsystems.climb.ClimbToHeightCommand
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
@@ -15,6 +16,7 @@ import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.frc2019.vision.OTFTrajectoryGenerator
 import org.ghrobotics.lib.commands.sequential
+import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.utils.map
 import org.ghrobotics.lib.wrappers.hid.*
 import kotlin.math.pow
@@ -126,7 +128,7 @@ object Controls {
         }
         state({ isClimbing }) {
             button(kA).change(sequential {
-                // Auto climbing logic here
+//                +ClimbToHeightCommand(10.inch)
             })
         }
     }

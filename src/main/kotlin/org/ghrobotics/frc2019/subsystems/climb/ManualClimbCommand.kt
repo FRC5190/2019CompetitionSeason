@@ -9,9 +9,10 @@ class ManualClimbCommand : FalconCommand(ClimbSubsystem) {
 
     override suspend fun execute() {
         if (Controls.isClimbing) {
-            ClimbSubsystem.frontWinchPercentOutput = -frontWinchSource()
-            ClimbSubsystem.backWinchPercentOutput = -backWinchSource()
-            ClimbSubsystem.wheelPercentOutput = -wheelSource()
+            ClimbSubsystem.setPercentOutput(-frontWinchSource())
+//            ClimbSubsystem.frontWinchPercentOutput = -frontWinchSource()
+//            ClimbSubsystem.backWinchPercentOutput = -backWinchSource()
+//            ClimbSubsystem.wheelPercentOutput = -wheelSource()
         } else {
             ClimbSubsystem.frontWinchPercentOutput = 0.0
             ClimbSubsystem.backWinchPercentOutput = 0.0

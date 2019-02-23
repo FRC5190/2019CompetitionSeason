@@ -29,18 +29,18 @@ object Robot : FalconRobot() {
 
     // Initialize all systems.
     init {
+        +ClimbSubsystem
         +DriveSubsystem
         +ElevatorSubsystem
         +ArmSubsystem
         +IntakeSubsystem
-        +ClimbSubsystem
 
         Network
         Autonomous
 
 //        CameraServer.getInstance().startAutomaticCapture()
 //            .setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 15)
-        VisionProcessing
+//        VisionProcessing
     }
 
     override fun periodic() {

@@ -200,7 +200,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         synchronized(closedLoopSync) {
             if (isClosedLoop) {
                 elevatorMaster.set(
-                    ControlMode.MotionMagic, closedLoopGoal,
+                    ControlMode.Disabled, closedLoopGoal,
                     DemandType.ArbitraryFeedForward, arbitraryFeedForward
                 )
             }

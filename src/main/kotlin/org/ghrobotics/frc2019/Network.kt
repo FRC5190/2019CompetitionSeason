@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
+import org.ghrobotics.frc2019.subsystems.climb.ClimbSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
@@ -88,6 +89,8 @@ object Network {
     private val backClimbWinchPosition = climbSubsystemLayout.add("Back Winch Position (in)", 0.0).entry
     private val frontClimbWinchCurrent = climbSubsystemLayout.add("Front Winch Current", 0.0).entry
     private val backClimbWinchCurrent = climbSubsystemLayout.add("Back Winch Current", 0.0).entry
+    private val frontClimbWinchVoltage = climbSubsystemLayout.add("Front Winch Voltage", 0.0).entry
+    private val backClimbWinchVoltage = climbSubsystemLayout.add("Back Winch Voltage", 0.0).entry
 
     val visionDriveAngle = visionLayout.add("Vision Drive Angle", 0.0).entry
     val visionDriveActive = visionLayout.add("Vision Drive Active", false).entry
@@ -143,10 +146,12 @@ object Network {
         isHoldingCargo.setBoolean(IntakeSubsystem.isSeeingCargo())
         intakeFullyExtended.setBoolean(IntakeSubsystem.isFullyExtended())
 
-//        frontClimbWinchPosition.setDouble(ClimbSubsystem.frontWinchPosition.inch)
-//        backClimbWinchPosition.setDouble(ClimbSubsystem.backWinchPosition.inch)
-//        frontClimbWinchCurrent.setDouble(ClimbSubsystem.frontWinchCurrent)
-//        backClimbWinchCurrent.setDouble(ClimbSubsystem.backWinchCurrent)
+        frontClimbWinchPosition.setDouble(ClimbSubsystem.frontWinchPosition.inch)
+        backClimbWinchPosition.setDouble(ClimbSubsystem.backWinchPosition.inch)
+        frontClimbWinchCurrent.setDouble(ClimbSubsystem.frontWinchCurrent)
+        backClimbWinchCurrent.setDouble(ClimbSubsystem.backWinchCurrent)
+        frontClimbWinchVoltage.setDouble(ClimbSubsystem.frontWinchVoltage)
+        backClimbWinchVoltage.setDouble(ClimbSubsystem.backWinchVoltage)
 
 //        val trackedObject = TargetTracker.bestTarget
 //        if (trackedObject != null) {
