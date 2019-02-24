@@ -142,10 +142,10 @@ object Controls {
                         +ClimbWheelCommand(Source(1.0)).withExit { ClimbSubsystem.lidarRaw < 500 }
                         +parallel {
                             +ClimbWheelCommand(Source(0.2))
-                            +BringUpBackCommand()
+                            +ResetWinchCommand(ClimbSubsystem.Winch.BACK)
                         }.withExit { ClimbSubsystem.backWinchMaster.sensorCollection.isRevLimitSwitchClosed }
                         +ClimbWheelCommand(Source(1.0)).withTimeout(1.5.second)
-                        +BringUpFrontCommand()
+                        +ResetWinchCommand(ClimbSubsystem.Winch.FRONT)
                     }
                 }
             })

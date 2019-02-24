@@ -7,7 +7,6 @@ package org.ghrobotics.lib.util
 
 import java.util.*
 
-// Class that manages current limiting while acting as an Evicting Queue
 class CircularBuffer(private val size: Int) {
 
     private val buffer: ArrayList<Double> = ArrayList(size)

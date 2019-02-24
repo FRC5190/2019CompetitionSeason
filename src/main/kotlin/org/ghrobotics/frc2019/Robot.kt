@@ -47,11 +47,6 @@ object Robot : FalconRobot() {
         Controls.update()
         Autonomous.update()
         LEDs.update()
-/*
-        val bestTargetRawData = RawDataTracker.bestTargetRawData
-        if (bestTargetRawData != null) {
-            DriveSubsystem.localization.addVisionSample(bestTargetRawData, Trajectories.kLoadingStation)
-        }*/
     }
 
     override fun periodicNetwork() {

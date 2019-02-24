@@ -6,14 +6,15 @@ import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
-import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.*
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
+import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnit
 import org.ghrobotics.lib.mathematics.units.nativeunits.toNativeUnitPosition
 import org.ghrobotics.lib.util.CircularBuffer
+import org.ghrobotics.lib.wrappers.FalconMotor
 import org.ghrobotics.lib.wrappers.ctre.AbstractFalconSRX
 import org.ghrobotics.lib.wrappers.ctre.FalconSRX
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
@@ -214,4 +215,6 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     }
 
     override fun recoverFromEmergency() = setClosedLoopGains()
+
+    enum class Winch(val motor: FalconSRX<Length>) { FRONT(frontWinchMaster), BACK(backWinchMaster) }
 }
