@@ -3,6 +3,8 @@
  * Green Hope Falcons
  */
 
+@file:Suppress("unused")
+
 package org.ghrobotics.frc2019
 
 import com.team254.lib.physics.DCMotorTransmission
@@ -13,7 +15,10 @@ import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.units.*
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
-import org.ghrobotics.lib.mathematics.units.nativeunits.*
+import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitModel
+import org.ghrobotics.lib.mathematics.units.nativeunits.SlopeNativeUnitModel
+import org.ghrobotics.lib.mathematics.units.nativeunits.nativeUnits
+import org.ghrobotics.lib.mathematics.units.nativeunits.wheelRadius
 import kotlin.math.pow
 
 
@@ -340,12 +345,12 @@ object Constants {
     val kDriveWheelRadius = kDriveNativeUnitModel.wheelRadius(kDriveSensorUnitsPerRotation)
     val kDriveTrackWidth = 27.75.inch
 
-    val kDriveSensorPhase = false
+    const val kDriveSensorPhase = false
 
     val kDriveCurrentLimit = 38.amp
 
-    val kDriveKp = 1.5 // Talon SRX Units
-    val kDriveKd = 5.0
+    const val kDriveKp = 1.5 // Talon SRX Units
+    const val kDriveKd = 5.0
 
     const val kDriveLeftKv = 0.1489
     const val kDriveLeftKa = 0.0716 // 0.0816
@@ -448,21 +453,24 @@ object Constants {
     val kArmKf = kArmNativeUnitModel.calculatekF(11.366 - kArmEmptyHoldVoltage, Math.toRadians(260.1562))
 
     // CLIMB
-    val kClimbWinchCurrentLimit = 20.amp
-
     val kClimbWinchNativeUnitModel = SlopeNativeUnitModel(
         12.5.inch,
         8900.nativeUnits
     )
 
-    val kClimbWinchClosedLoopTolerance = 2.inch
-    val kClimbWinchClosedLoopVelocityTolerance = 1.inch.velocity
+    val kClimbWinchCurrentLimit = 20.amp
+
+    const val kClimbWinchClosedLoopTolerance = 2000
+
+    const val kClimbFrontWinchLimitSwitchTicks = -1254
+    const val kClimbBackWinchLimitSwitchTicks = -2220
+
 
     val kClimbLidarScale = 22.inch / 516
-    val kClimbLidarZero = 150
+    const val kClimbLidarZero = 150
 
-    const val kFrontEncoderPositionL3 = 22489.0
-    const val kBackEncoderPositionL3 = 18892.0
+    const val kClimbFrontL3Ticks = 22489.0
+    const val kClimbBackL3Ticks = 18892.0
 
     val kEncoderErrorTolerance = 2.inch
     val kEncoderLidarResetTolerance = 2.5.inch
@@ -476,9 +484,4 @@ object Constants {
 
     private fun NativeUnitModel<*>.calculatekF(voltage: Double, velocity: Double) =
         (voltage / 12.0 * 1023.0) / (toNativeUnitVelocity(velocity) / 10.0)
-
-    @JvmStatic
-    fun main(args: Array<String>) {
-        println(kDriveWheelRadius.inch)
-    }
 }

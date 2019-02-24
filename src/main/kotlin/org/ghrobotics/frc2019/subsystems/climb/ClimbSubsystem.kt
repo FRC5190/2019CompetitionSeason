@@ -1,7 +1,10 @@
 package org.ghrobotics.frc2019.subsystems.climb
 
 import com.ctre.phoenix.CANifier
-import com.ctre.phoenix.motorcontrol.*
+import com.ctre.phoenix.motorcontrol.ControlMode
+import com.ctre.phoenix.motorcontrol.FeedbackDevice
+import com.ctre.phoenix.motorcontrol.NeutralMode
+import com.ctre.phoenix.motorcontrol.RemoteSensorSource
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
@@ -11,19 +14,18 @@ import org.ghrobotics.lib.mathematics.units.*
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
-import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnit
+import org.ghrobotics.lib.mathematics.units.nativeunits.toNativeUnitAcceleration
 import org.ghrobotics.lib.mathematics.units.nativeunits.toNativeUnitPosition
+import org.ghrobotics.lib.mathematics.units.nativeunits.toNativeUnitVelocity
 import org.ghrobotics.lib.util.CircularBuffer
-import org.ghrobotics.lib.wrappers.FalconMotor
 import org.ghrobotics.lib.wrappers.ctre.AbstractFalconSRX
-import org.ghrobotics.lib.wrappers.ctre.FalconSRX
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 import kotlin.properties.Delegates
 
 object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
 
-    val frontWinchMaster = FalconSRX(Constants.kClimbFrontWinchMasterId, Constants.kClimbWinchNativeUnitModel)
-    val backWinchMaster = FalconSRX(Constants.kClimbBackWinchMasterId, Constants.kClimbWinchNativeUnitModel)
+    val frontWinchMaster = NativeFalconSRX(Constants.kClimbFrontWinchMasterId)
+    val backWinchMaster = NativeFalconSRX(Constants.kClimbBackWinchMasterId)
 
     private val wheelMaster = NativeFalconSRX(Constants.kClimbWheelId)
 
@@ -34,7 +36,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     private val canifier = CANifier(Constants.kCanifier)
 
     private val allMotors: List<AbstractFalconSRX<*>>
-    private val allMasters = listOf<FalconSRX<Length>>(frontWinchMaster, backWinchMaster)
+    private val allMasters = listOf(frontWinchMaster, backWinchMaster)
 
     val rawFront get() = frontWinchMaster.selectedSensorPosition
     val rawBack get() = backWinchMaster.selectedSensorPosition
@@ -127,8 +129,9 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
             master.selectProfileSlot(0, 0)
             master.selectProfileSlot(1, 1)
 
-            master.motionAcceleration = 1.5.feet.acceleration
-            master.motionCruiseVelocity = 1.0.feet.velocity
+            master.motionAcceleration =
+                1.5.feet.acceleration.toNativeUnitAcceleration(Constants.kClimbWinchNativeUnitModel)
+            master.motionCruiseVelocity = 1.0.feet.velocity.toNativeUnitVelocity(Constants.kClimbWinchNativeUnitModel)
 
             master.inverted = false
             master.encoderPhase = false
@@ -144,20 +147,15 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         setClosedLoopGains()
     }
 
-    fun climbToLevel3() {
-        frontWinchMaster.set(ControlMode.MotionMagic, Constants.kFrontEncoderPositionL3, DemandType.AuxPID, 0.0)
-        backWinchMaster.set(ControlMode.MotionMagic, Constants.kBackEncoderPositionL3, DemandType.AuxPID, 0.0)
-    }
-
     private val tempPWMData = DoubleArray(2)
-
-    var resetFront = false
-    var resetBack = false
 
     override fun periodic() {
 
-        if (frontWinchMaster.sensorCollection.isRevLimitSwitchClosed) frontWinchMaster.selectedSensorPosition = -1254
-        if (backWinchMaster.sensorCollection.isRevLimitSwitchClosed) backWinchMaster.selectedSensorPosition = -2220
+        if (frontWinchMaster.sensorCollection.isRevLimitSwitchClosed) frontWinchMaster.selectedSensorPosition =
+            Constants.kClimbFrontWinchLimitSwitchTicks
+
+        if (backWinchMaster.sensorCollection.isRevLimitSwitchClosed) backWinchMaster.selectedSensorPosition =
+            Constants.kClimbBackWinchLimitSwitchTicks
 
         canifier.getPWMInput(CANifier.PWMChannel.PWMChannel0, tempPWMData)
         rollingAverage.add(tempPWMData[0])
@@ -172,27 +170,6 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         backWinchHeightFromLidar = lidarHeight
 
         robotHeight = Length((frontWinchHeightFromLidar.value + backWinchHeightFromLidar.value) / 2.0)
-
-//        if (!resetFront && frontWinchHeightFromLidar > Constants.kEncoderLidarResetTolerance) {
-//            frontWinchMaster.sensorPosition = 0.inch
-//            println("Reset Front")
-//            resetFront = true
-//        }
-//        if (frontWinchMaster.sensorCollection.isRevLimitSwitchClosed) {
-//            resetFront = false
-//        }
-//
-//        if (!resetBack && backWinchHeightFromLidar > Constants.kEncoderLidarResetTolerance) {
-//            backWinchMaster.sensorPosition = 0.inch
-//            println("Reset Back")
-//            resetBack = true
-//        }
-//        if (backWinchMaster.sensorCollection.isRevLimitSwitchClosed) {
-//            resetBack = false
-//        }
-
-        println("LE: ${frontWinchMaster.getSelectedSensorPosition(0)}, RE: ${backWinchMaster.getSelectedSensorPosition(0)}")
-
     }
 
     private fun setClosedLoopGains() {
@@ -216,5 +193,5 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     override fun recoverFromEmergency() = setClosedLoopGains()
 
-    enum class Winch(val motor: FalconSRX<Length>) { FRONT(frontWinchMaster), BACK(backWinchMaster) }
+    enum class Winch(val motor: NativeFalconSRX) { FRONT(frontWinchMaster), BACK(backWinchMaster) }
 }

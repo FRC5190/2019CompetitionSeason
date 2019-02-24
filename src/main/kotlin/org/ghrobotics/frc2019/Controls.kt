@@ -5,11 +5,13 @@
 
 package org.ghrobotics.frc2019
 
-import com.ctre.phoenix.motorcontrol.ControlMode
 import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
-import org.ghrobotics.frc2019.subsystems.climb.*
+import org.ghrobotics.frc2019.subsystems.climb.ClimbSubsystem
+import org.ghrobotics.frc2019.subsystems.climb.ClimbWheelCommand
+import org.ghrobotics.frc2019.subsystems.climb.ClosedLoopClimbCommand
+import org.ghrobotics.frc2019.subsystems.climb.ResetWinchCommand
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
@@ -131,7 +133,7 @@ object Controls {
         }
         state({ isClimbing }) {
             button(kA).changeOn(sequential {
-                +ClimbToLevel3Command()
+                +ClosedLoopClimbCommand(Constants.kClimbFrontL3Ticks, Constants.kClimbBackL3Ticks)
                 +parallel {
                     +PeriodicRunnableCommand({
                         val output =

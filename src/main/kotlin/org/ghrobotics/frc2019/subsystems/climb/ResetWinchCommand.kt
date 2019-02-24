@@ -2,7 +2,7 @@ package org.ghrobotics.frc2019.subsystems.climb
 
 import org.ghrobotics.lib.commands.FalconCommand
 
-class ResetWinchCommand(val winch: ClimbSubsystem.Winch) : FalconCommand(ClimbSubsystem) {
+class ResetWinchCommand(private val winch: ClimbSubsystem.Winch) : FalconCommand(ClimbSubsystem) {
     init {
         finishCondition += winch.motor.sensorCollection::isRevLimitSwitchClosed
     }
