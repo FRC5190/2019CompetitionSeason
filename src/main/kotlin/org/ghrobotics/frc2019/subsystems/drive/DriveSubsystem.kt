@@ -19,6 +19,7 @@ import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedTrajectory
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.mirror
 import org.ghrobotics.lib.mathematics.units.Length
+import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
@@ -53,6 +54,8 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     private val shifter = Solenoid(Constants.kPCMId, Constants.kDriveSolenoidId)
     private val pigeon = PigeonIMU(Constants.kPigeonIMUId)
 
+    var pitch = 0.degree
+        private set
 
     // Type of localization to determine position on the field
     override val localization = TankEncoderLocalization(
@@ -105,6 +108,7 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     override fun periodic() {
         pigeon.getYawPitchRoll(tempYPR)
         println("YPR ${tempYPR.joinToString(", ")}")
+        pitch = tempYPR[1].degree
     }
 
     /*override fun setOutput(

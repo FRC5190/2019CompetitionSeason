@@ -275,6 +275,7 @@ object Constants {
     const val kClimbBackWinchSlaveId = 15
     const val kClimbWheelId = 16
 
+    const val kCanifier = 17
 
     // ANALOG INPUT
     const val kLeftBallSensorId = 0
@@ -296,7 +297,6 @@ object Constants {
     const val kIntakeLauncherSolenoidId = 3
     const val kDriveSolenoidId = 0
     const val kRampsSolenoidId = 1
-    const val kClimberWheelSolenoidId = 2
 
 
     // ROBOT AND MECHANISM DIMENSIONS
@@ -448,23 +448,20 @@ object Constants {
     val kArmKf = kArmNativeUnitModel.calculatekF(11.366 - kArmEmptyHoldVoltage, Math.toRadians(260.1562))
 
     // CLIMB
-    val kClimbWinchNativeUnitModel = SlopeNativeUnitModel(
-        17.inch,
-        15958.nativeUnits
-    )
-
     val kClimbWinchCurrentLimit = 20.amp
 
     val kClimbWinchClosedLoopTolerance = 2.inch
     val kClimbWinchClosedLoopVelocityTolerance = 1.inch.velocity
-    val kClimbWinchCruiseVelocity = 1.5.feet.velocity
-    val kClimbWinchAcceleration = 1.5.feet.acceleration
 
-    const val kClimbEncoderPIDSlot = 0
-    const val kClimbLevelingPIDSlot = 1
+    val kClimbLidarScale = 0.meter
 
-    const val kClimbWinchLidarKp = 0.0
-    const val kClimbWinchPitchKp = 0.3
+    val kClimbDistanceBetweenLegs = 21.5.inch
+    val kClimbLidarDistanceFromFront = 18.inch
+    val kClimbLidarDistanceFromBack = kClimbDistanceBetweenLegs - kClimbLidarDistanceFromFront
+
+    val kClimbMaxHeight = 30.inch
+
+    const val kClimbWinchPositionKp = 0.0
 
     private fun NativeUnitModel<*>.calculatekF(voltage: Double, velocity: Double) =
         (voltage / 12.0 * 1023.0) / (toNativeUnitVelocity(velocity) / 10.0)
