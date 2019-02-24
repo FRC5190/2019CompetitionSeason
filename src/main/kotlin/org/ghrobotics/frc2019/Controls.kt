@@ -5,18 +5,21 @@
 
 package org.ghrobotics.frc2019
 
+import com.ctre.phoenix.motorcontrol.ControlMode
 import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
-import org.ghrobotics.frc2019.subsystems.climb.ClimbToHeightCommand
+import org.ghrobotics.frc2019.subsystems.climb.*
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.frc2019.vision.OTFTrajectoryGenerator
+import org.ghrobotics.lib.commands.PeriodicRunnableCommand
+import org.ghrobotics.lib.commands.parallel
 import org.ghrobotics.lib.commands.sequential
-import org.ghrobotics.lib.mathematics.units.inch
+import org.ghrobotics.lib.mathematics.units.second
+import org.ghrobotics.lib.utils.Source
 import org.ghrobotics.lib.utils.map
 import org.ghrobotics.lib.wrappers.hid.*
 import kotlin.math.pow
@@ -127,8 +130,24 @@ object Controls {
             button(kBumperRight).changeOn(Superstructure.kStowedPosition)
         }
         state({ isClimbing }) {
-            button(kA).change(sequential {
-//                +ClimbToHeightCommand(10.inch)
+            button(kA).changeOn(sequential {
+                +ClimbToLevel3Command()
+                +parallel {
+                    +PeriodicRunnableCommand({
+                        val output =
+                            if (ClimbSubsystem.frontWinchMaster.sensorCollection.isRevLimitSwitchClosed) -0.40 else -0.40
+                        DriveSubsystem.tankDrive(output, output)
+                    }, { false })
+                    +sequential {
+                        +ClimbWheelCommand(Source(1.0)).withExit { ClimbSubsystem.lidarRaw < 500 }
+                        +parallel {
+                            +ClimbWheelCommand(Source(0.2))
+                            +BringUpBackCommand()
+                        }.withExit { ClimbSubsystem.backWinchMaster.sensorCollection.isRevLimitSwitchClosed }
+                        +ClimbWheelCommand(Source(1.0)).withTimeout(1.5.second)
+                        +BringUpFrontCommand()
+                    }
+                }
             })
         }
     }

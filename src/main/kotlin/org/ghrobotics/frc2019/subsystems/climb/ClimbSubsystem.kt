@@ -1,38 +1,42 @@
 package org.ghrobotics.frc2019.subsystems.climb
 
 import com.ctre.phoenix.CANifier
-import com.ctre.phoenix.motorcontrol.ControlMode
-import com.ctre.phoenix.motorcontrol.DemandType
-import com.ctre.phoenix.motorcontrol.FeedbackDevice
-import com.ctre.phoenix.motorcontrol.NeutralMode
+import com.ctre.phoenix.motorcontrol.*
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
-import org.ghrobotics.frc2019.subsystems.drive.ManualDriveCommand
+import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
-import org.ghrobotics.lib.mathematics.units.Length
-import org.ghrobotics.lib.mathematics.units.amp
+import org.ghrobotics.lib.mathematics.units.*
+import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
+import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
-import org.ghrobotics.lib.mathematics.units.meter
-import org.ghrobotics.lib.mathematics.units.millisecond
+import org.ghrobotics.lib.mathematics.units.nativeunits.toNativeUnitPosition
+import org.ghrobotics.lib.util.CircularBuffer
 import org.ghrobotics.lib.wrappers.ctre.AbstractFalconSRX
+import org.ghrobotics.lib.wrappers.ctre.FalconSRX
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 import kotlin.properties.Delegates
 
 object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
 
-    private val frontWinchMaster = NativeFalconSRX(Constants.kClimbFrontWinchMasterId)
-    private val backWinchMaster = NativeFalconSRX(Constants.kClimbBackWinchMasterId)
+    val frontWinchMaster = FalconSRX(Constants.kClimbFrontWinchMasterId, Constants.kClimbWinchNativeUnitModel)
+    val backWinchMaster = FalconSRX(Constants.kClimbBackWinchMasterId, Constants.kClimbWinchNativeUnitModel)
 
     private val wheelMaster = NativeFalconSRX(Constants.kClimbWheelId)
 
     private val rampsSolenoid = Solenoid(Constants.kPCMId, Constants.kRampsSolenoidId)
 
+    val rollingAverage = CircularBuffer(20)
+
     private val canifier = CANifier(Constants.kCanifier)
 
     private val allMotors: List<AbstractFalconSRX<*>>
-    private val allMasters = listOf(frontWinchMaster, backWinchMaster)
+    private val allMasters = listOf<FalconSRX<Length>>(frontWinchMaster, backWinchMaster)
+
+    val rawFront get() = frontWinchMaster.selectedSensorPosition
+    val rawBack get() = backWinchMaster.selectedSensorPosition
 
     var lidarRaw = 0.0
         private set
@@ -43,10 +47,13 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     var lidarHeight = 0.meter
         private set
 
-    var frontWinchHeight = 0.meter
+    var frontWinchHeightFromLidar = 0.meter
         private set
 
-    var backWinchHeight = 0.meter
+    var backWinchHeightFromLidar = 0.meter
+        private set
+
+    var robotHeight = 0.meter
         private set
 
     var wheelPercentOutput
@@ -107,17 +114,20 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
 
         allMasters.forEach { master ->
             // TODO configure soft limits
-            /*master.softLimitForward = 0.nativeUnits
-            master.softLimitReverse = 0.nativeUnits
-            master.softLimitForwardEnabled = true
-            master.softLimitReverseEnabled = true*/
+            master.softLimitForward = 24.inch.toNativeUnitPosition(Constants.kClimbWinchNativeUnitModel)
+            master.softLimitForwardEnabled = false
 
-            // Configure Mag Encoder as main Feedback (Main PID)
+            master.configRemoteFeedbackFilter(Constants.kPigeonIMUId, RemoteSensorSource.GadgeteerPigeon_Roll, 0)
+
             master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10)
-            master.configSelectedFeedbackCoefficient(1.0, 0, 10)
+            master.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0, 1, 10)
 
             // Determine which pid slot affects which pid loop
             master.selectProfileSlot(0, 0)
+            master.selectProfileSlot(1, 1)
+
+            master.motionAcceleration = 1.5.feet.acceleration
+            master.motionCruiseVelocity = 1.0.feet.velocity
 
             master.inverted = false
             master.encoderPhase = false
@@ -128,52 +138,78 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         frontWinchMaster.configAuxPIDPolarity(false)
         backWinchMaster.configAuxPIDPolarity(true)
 
-        defaultCommand = ManualDriveCommand()
+        defaultCommand = ManualClimbCommand()
 
         setClosedLoopGains()
     }
 
-    fun setPercentOutput(newOutput: Double) {
-        frontWinchMaster.set(ControlMode.PercentOutput, newOutput)
-        backWinchMaster.set(ControlMode.PercentOutput, newOutput)
-    }
-
-    fun climbToHeight(height: Double) {
-        frontWinchMaster.set(ControlMode.MotionMagic, height, DemandType.AuxPID, 0.0)
-        backWinchMaster.set(ControlMode.MotionMagic, height, DemandType.AuxPID, 0.0)
+    fun climbToLevel3() {
+        frontWinchMaster.set(ControlMode.MotionMagic, Constants.kFrontEncoderPositionL3, DemandType.AuxPID, 0.0)
+        backWinchMaster.set(ControlMode.MotionMagic, Constants.kBackEncoderPositionL3, DemandType.AuxPID, 0.0)
     }
 
     private val tempPWMData = DoubleArray(2)
 
-    override fun periodic() {
-        canifier.getPWMInput(CANifier.PWMChannel.PWMChannel0, tempPWMData)
-        lidarRaw = tempPWMData[0]
+    var resetFront = false
+    var resetBack = false
 
-        lidarRawHeight = lidarRaw * DriveSubsystem.pitch.cos
+    override fun periodic() {
+
+        if (frontWinchMaster.sensorCollection.isRevLimitSwitchClosed) frontWinchMaster.selectedSensorPosition = -1254
+        if (backWinchMaster.sensorCollection.isRevLimitSwitchClosed) backWinchMaster.selectedSensorPosition = -2220
+
+        canifier.getPWMInput(CANifier.PWMChannel.PWMChannel0, tempPWMData)
+        rollingAverage.add(tempPWMData[0])
+        lidarRaw = rollingAverage.average
+
+
+        lidarRawHeight = (lidarRaw - Constants.kClimbLidarZero) * DriveSubsystem.pitch.cos
 
         lidarHeight = Constants.kClimbLidarScale * lidarRawHeight
-        frontWinchHeight =
-            Length(lidarHeight.value + Constants.kClimbLidarDistanceFromFront.value * DriveSubsystem.pitch.sin)
-        backWinchHeight =
-            Length(lidarHeight.value - Constants.kClimbLidarDistanceFromBack.value * DriveSubsystem.pitch.sin)
+        frontWinchHeightFromLidar =
+            (lidarHeight.value + Constants.kClimbDistanceBetweenLegs.value * DriveSubsystem.pitch.sin).meter
+        backWinchHeightFromLidar = lidarHeight
+
+        robotHeight = Length((frontWinchHeightFromLidar.value + backWinchHeightFromLidar.value) / 2.0)
+
+//        if (!resetFront && frontWinchHeightFromLidar > Constants.kEncoderLidarResetTolerance) {
+//            frontWinchMaster.sensorPosition = 0.inch
+//            println("Reset Front")
+//            resetFront = true
+//        }
+//        if (frontWinchMaster.sensorCollection.isRevLimitSwitchClosed) {
+//            resetFront = false
+//        }
+//
+//        if (!resetBack && backWinchHeightFromLidar > Constants.kEncoderLidarResetTolerance) {
+//            backWinchMaster.sensorPosition = 0.inch
+//            println("Reset Back")
+//            resetBack = true
+//        }
+//        if (backWinchMaster.sensorCollection.isRevLimitSwitchClosed) {
+//            resetBack = false
+//        }
+
+        println("LE: ${frontWinchMaster.getSelectedSensorPosition(0)}, RE: ${backWinchMaster.getSelectedSensorPosition(0)}")
+
     }
 
     private fun setClosedLoopGains() {
         allMasters.forEach {
             it.config_kP(0, Constants.kClimbWinchPositionKp, 10)
+            it.config_kP(1, Constants.kClimbWinchLevelingKp, 10)
         }
     }
 
     private fun zeroClosedLoopGains() {
         allMasters.forEach {
             it.config_kP(0, 0.0, 10)
+            it.config_kP(1, 0.0, 10)
         }
     }
 
-
     override fun activateEmergency() {
         zeroOutputs()
-
         zeroClosedLoopGains()
     }
 

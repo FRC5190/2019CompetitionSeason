@@ -12,7 +12,7 @@ import org.ghrobotics.lib.utils.not
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 
 object IntakeSubsystem : FalconSubsystem() {
-    private val intakeMaster = NativeFalconSRX(Constants.kIntakeLeftId)
+    val intakeMaster = NativeFalconSRX(Constants.kIntakeLeftId)
 
     val extensionSolenoid = DoubleSolenoid(
         Constants.kPCMId,

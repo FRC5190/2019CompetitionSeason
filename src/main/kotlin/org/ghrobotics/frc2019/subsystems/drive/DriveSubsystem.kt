@@ -52,7 +52,7 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
 
     // Shifter for two-speed gearbox
     private val shifter = Solenoid(Constants.kPCMId, Constants.kDriveSolenoidId)
-    private val pigeon = PigeonIMU(Constants.kPigeonIMUId)
+    private val pigeon = PigeonIMU(IntakeSubsystem.intakeMaster)
 
     var pitch = 0.degree
         private set
@@ -107,8 +107,8 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
 
     override fun periodic() {
         pigeon.getYawPitchRoll(tempYPR)
-        println("YPR ${tempYPR.joinToString(", ")}")
-        pitch = tempYPR[1].degree
+//        println("YPR ${tempYPR.joinToString(", ")}")
+        pitch = tempYPR[2].degree
     }
 
     /*override fun setOutput(

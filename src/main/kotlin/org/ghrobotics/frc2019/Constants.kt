@@ -275,7 +275,7 @@ object Constants {
     const val kClimbBackWinchSlaveId = 15
     const val kClimbWheelId = 16
 
-    const val kCanifier = 17
+    const val kCanifier = 16
 
     // ANALOG INPUT
     const val kLeftBallSensorId = 0
@@ -450,18 +450,29 @@ object Constants {
     // CLIMB
     val kClimbWinchCurrentLimit = 20.amp
 
+    val kClimbWinchNativeUnitModel = SlopeNativeUnitModel(
+        12.5.inch,
+        8900.nativeUnits
+    )
+
     val kClimbWinchClosedLoopTolerance = 2.inch
     val kClimbWinchClosedLoopVelocityTolerance = 1.inch.velocity
 
-    val kClimbLidarScale = 0.meter
+    val kClimbLidarScale = 22.inch / 516
+    val kClimbLidarZero = 150
+
+    const val kFrontEncoderPositionL3 = 22489.0
+    const val kBackEncoderPositionL3 = 18892.0
+
+    val kEncoderErrorTolerance = 2.inch
+    val kEncoderLidarResetTolerance = 2.5.inch
 
     val kClimbDistanceBetweenLegs = 21.5.inch
-    val kClimbLidarDistanceFromFront = 18.inch
-    val kClimbLidarDistanceFromBack = kClimbDistanceBetweenLegs - kClimbLidarDistanceFromFront
-
     val kClimbMaxHeight = 30.inch
+    val kClimbDisableLevelingHeight = 3.inch
 
-    const val kClimbWinchPositionKp = 0.0
+    const val kClimbWinchPositionKp = 0.85
+    const val kClimbWinchLevelingKp = 4.0
 
     private fun NativeUnitModel<*>.calculatekF(voltage: Double, velocity: Double) =
         (voltage / 12.0 * 1023.0) / (toNativeUnitVelocity(velocity) / 10.0)

@@ -8,22 +8,22 @@ class ClosedLoopClimbCommand(private val frontTarget: Length, private val backTa
     FalconCommand(ClimbSubsystem) {
 
     init {
-        finishCondition += {
-            (ClimbSubsystem.frontWinchPosition - frontTarget).absoluteValue <
-                Constants.kClimbWinchClosedLoopTolerance &&
-
-                ClimbSubsystem.frontWinchVelocity < Constants.kClimbWinchClosedLoopVelocityTolerance &&
-
-                (ClimbSubsystem.backWinchPosition - backTarget).absoluteValue <
-                Constants.kClimbWinchClosedLoopTolerance &&
-
-                ClimbSubsystem.backWinchVelocity < Constants.kClimbWinchClosedLoopVelocityTolerance
-
-        }
+//        finishCondition += {
+//            (ClimbSubsystem.frontWinchPosition - frontTarget).absoluteValue <
+//                Constants.kClimbWinchClosedLoopTolerance &&
+//
+//                ClimbSubsystem.frontWinchVelocity < Constants.kClimbWinchClosedLoopVelocityTolerance &&
+//
+//                (ClimbSubsystem.backWinchPosition - backTarget).absoluteValue <
+//                Constants.kClimbWinchClosedLoopTolerance &&
+//
+//                ClimbSubsystem.backWinchVelocity < Constants.kClimbWinchClosedLoopVelocityTolerance
+//
+//        }
     }
 
     override suspend fun initialize() {
-        ClimbSubsystem.frontWinchPosition = frontTarget
-        ClimbSubsystem.backWinchPosition = backTarget
+//        ClimbSubsystem.frontWinchPosition = frontTarget
+//        ClimbSubsystem.backWinchPosition = backTarget
     }
 }
