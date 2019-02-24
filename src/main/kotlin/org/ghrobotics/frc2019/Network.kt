@@ -147,8 +147,8 @@ object Network {
         isHoldingCargo.setBoolean(IntakeSubsystem.isSeeingCargo())
         intakeFullyExtended.setBoolean(IntakeSubsystem.isFullyExtended())
 
-        frontClimbWinchPosition.setDouble(ClimbSubsystem.frontWinchPosition.inch)
-        backClimbWinchPosition.setDouble(ClimbSubsystem.backWinchPosition.inch)
+        frontClimbWinchPosition.setDouble(ClimbSubsystem.frontWinchPosition.value)
+        backClimbWinchPosition.setDouble(ClimbSubsystem.backWinchPosition.value)
         climbLidarRaw.setDouble(ClimbSubsystem.lidarRaw)
         frontClimbWinchHeight.setDouble(ClimbSubsystem.frontWinchHeightFromLidar.inch)
         backClimbWinchHeight.setDouble(ClimbSubsystem.backWinchHeightFromLidar.inch)
