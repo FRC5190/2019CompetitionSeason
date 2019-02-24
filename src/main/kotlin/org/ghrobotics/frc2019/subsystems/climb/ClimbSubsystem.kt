@@ -31,7 +31,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     private val rampsSolenoid = Solenoid(Constants.kPCMId, Constants.kRampsSolenoidId)
 
-    val rollingAverage = CircularBuffer(20)
+    private val rollingAverage = CircularBuffer(20)
 
     private val canifier = CANifier(Constants.kCanifier)
 
@@ -116,7 +116,6 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         }
 
         allMasters.forEach { master ->
-            // TODO configure soft limits
             master.softLimitForward = 24.inch.toNativeUnitPosition(Constants.kClimbWinchNativeUnitModel)
             master.softLimitForwardEnabled = false
 

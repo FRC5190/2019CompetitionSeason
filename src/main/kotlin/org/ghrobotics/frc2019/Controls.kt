@@ -8,20 +8,13 @@ package org.ghrobotics.frc2019
 import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
-import org.ghrobotics.frc2019.subsystems.climb.ClimbSubsystem
-import org.ghrobotics.frc2019.subsystems.climb.ClimbWheelCommand
-import org.ghrobotics.frc2019.subsystems.climb.ClosedLoopClimbCommand
-import org.ghrobotics.frc2019.subsystems.climb.ResetWinchCommand
+import org.ghrobotics.frc2019.subsystems.climb.autoL3Climb
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
 import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.lib.commands.PeriodicRunnableCommand
-import org.ghrobotics.lib.commands.parallel
-import org.ghrobotics.lib.commands.sequential
-import org.ghrobotics.lib.mathematics.units.second
-import org.ghrobotics.lib.utils.Source
 import org.ghrobotics.lib.utils.map
 import org.ghrobotics.lib.wrappers.hid.*
 import kotlin.math.pow
@@ -37,8 +30,7 @@ object Controls {
 
         state({ !isClimbing }) {
             // Vision align
-//            button(kY).change(VisionDriveCommand())
-            //button(kY).change(DriveSubsystem.followTrajectory(OTFTrajectoryGenerator.generateForwardOTFTrajectory()!!))
+            button(kY).change(VisionDriveCommand())
 
             // Shifting
             button(kA).changeOn { DriveSubsystem.lowGear = true }
@@ -132,25 +124,7 @@ object Controls {
             button(kBumperRight).changeOn(Superstructure.kStowedPosition)
         }
         state({ isClimbing }) {
-            button(kA).changeOn(sequential {
-                +ClosedLoopClimbCommand(Constants.kClimbFrontL3Ticks, Constants.kClimbBackL3Ticks)
-                +parallel {
-                    +PeriodicRunnableCommand({
-                        val output =
-                            if (ClimbSubsystem.frontWinchMaster.sensorCollection.isRevLimitSwitchClosed) -0.40 else -0.40
-                        DriveSubsystem.tankDrive(output, output)
-                    }, { false })
-                    +sequential {
-                        +ClimbWheelCommand(Source(1.0)).withExit { ClimbSubsystem.lidarRaw < 500 }
-                        +parallel {
-                            +ClimbWheelCommand(Source(0.2))
-                            +ResetWinchCommand(ClimbSubsystem.Winch.BACK)
-                        }.withExit { ClimbSubsystem.backWinchMaster.sensorCollection.isRevLimitSwitchClosed }
-                        +ClimbWheelCommand(Source(1.0)).withTimeout(1.5.second)
-                        +ResetWinchCommand(ClimbSubsystem.Winch.FRONT)
-                    }
-                }
-            })
+            button(kA).change(autoL3Climb())
         }
     }
 
