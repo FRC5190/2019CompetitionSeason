@@ -289,10 +289,10 @@ object Constants {
 
     // DIGITAL INPUT
     const val kIntakeExtensionLimitSwitch = 0
-    const val kLeftDriveEncoder1 = 1
-    const val kLeftDriveEncoder2 = 2
-    const val kRightDriveEncoder1 = 3
-    const val kRightDriveEncoder2 = 4
+    const val kLeftDriveEncoderA = 1
+    const val kLeftDriveEncoderB = 2
+    const val kRightDriveEncoderA = 3
+    const val kRightDriveEncoderB = 4
 
 
     // GYROS

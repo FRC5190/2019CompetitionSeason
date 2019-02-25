@@ -29,8 +29,8 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     private val rightGearbox = DriveGearbox(Constants.kDriveRightMasterId, Constants.kDriveRightSlaveId, true)
 
     // Shaft encoders
-//    private val lEncoder = Encoder(Constants.kLeftDriveEncoder1, Constants.kLeftDriveEncoder2, false)
-//    private val rEncoder = Encoder(Constants.kRightDriveEncoder1, Constants.kRightDriveEncoder2, true)
+//    private val lEncoder = Encoder(Constants.kLeftDriveEncoderA, Constants.kLeftDriveEncoderB, false)
+//    private val rEncoder = Encoder(Constants.kRightDriveEncoderA, Constants.kRightDriveEncoderB, true)
 
     // Master motors
     override val leftMotor get() = leftGearbox.master
