@@ -2,10 +2,7 @@ package org.ghrobotics.frc2019.subsystems.climb
 
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
-import org.ghrobotics.lib.commands.DelayCommand
-import org.ghrobotics.lib.commands.PeriodicRunnableCommand
-import org.ghrobotics.lib.commands.parallel
-import org.ghrobotics.lib.commands.sequential
+import org.ghrobotics.lib.commands.*
 import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.Source
 
@@ -22,7 +19,15 @@ fun autoL3Climb() = sequential {
             +ResetWinchCommand(ClimbSubsystem.Winch.FRONT)
             +DelayCommand(1.second)
         }
-        +PeriodicRunnableCommand({ DriveSubsystem.tankDrive(-.4, -.4) }, { group.wrappedValue.isCompleted })
+        +object : FalconCommand(DriveSubsystem) {
+            init {
+                finishCondition += group.wrappedValue::isCompleted
+            }
+
+            override suspend fun execute() {
+                DriveSubsystem.tankDrive(-.4, -.4)
+            }
+        }
         +group
     }
 }
