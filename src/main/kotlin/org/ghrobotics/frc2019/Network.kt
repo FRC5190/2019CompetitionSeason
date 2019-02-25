@@ -88,8 +88,6 @@ object Network {
     private val frontClimbWinchPosition = climbSubsystemLayout.add("Front Winch Position (in)", 0.0).entry
     private val backClimbWinchPosition = climbSubsystemLayout.add("Back Winch Position (in)", 0.0).entry
     private val climbLidarRaw = climbSubsystemLayout.add("Lidar Raw", 0.0).entry
-    private val frontClimbWinchHeight = climbSubsystemLayout.add("Front Winch Height (in)", 0.0).entry
-    private val backClimbWinchHeight = climbSubsystemLayout.add("Back Winch Height (in)", 0.0).entry
     private val frontClimbWinchCurrent = climbSubsystemLayout.add("Front Winch Current", 0.0).entry
     private val backClimbWinchCurrent = climbSubsystemLayout.add("Back Winch Current", 0.0).entry
 
@@ -150,8 +148,6 @@ object Network {
         frontClimbWinchPosition.setDouble(ClimbSubsystem.frontWinchPosition.value)
         backClimbWinchPosition.setDouble(ClimbSubsystem.backWinchPosition.value)
         climbLidarRaw.setDouble(ClimbSubsystem.lidarRaw)
-        frontClimbWinchHeight.setDouble(ClimbSubsystem.frontWinchHeightFromLidar.inch)
-        backClimbWinchHeight.setDouble(ClimbSubsystem.backWinchHeightFromLidar.inch)
         frontClimbWinchCurrent.setDouble(ClimbSubsystem.frontWinchCurrent)
         backClimbWinchCurrent.setDouble(ClimbSubsystem.backWinchCurrent)
 

@@ -24,8 +24,8 @@ class ManualClimbCommand : FalconCommand(ClimbSubsystem) {
                 ClimbSubsystem.wheelPercentOutput = wheelPercent
                 set = false
             } else if (!set) {
-                ClimbSubsystem.frontWinchMaster.set(ControlMode.MotionMagic, ClimbSubsystem.rawFront.toDouble())
-                ClimbSubsystem.backWinchMaster.set(ControlMode.MotionMagic, ClimbSubsystem.rawBack.toDouble())
+                ClimbSubsystem.Winch.FRONT.motor.set(ControlMode.MotionMagic, ClimbSubsystem.rawFront.toDouble())
+                ClimbSubsystem.Winch.BACK.motor.set(ControlMode.MotionMagic, ClimbSubsystem.rawBack.toDouble())
                 set = true
             }
         } else {

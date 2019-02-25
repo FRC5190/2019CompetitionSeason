@@ -1,31 +1,29 @@
 package org.ghrobotics.frc2019.subsystems.climb
 
 import com.ctre.phoenix.CANifier
-import com.ctre.phoenix.motorcontrol.ControlMode
-import com.ctre.phoenix.motorcontrol.FeedbackDevice
-import com.ctre.phoenix.motorcontrol.NeutralMode
-import com.ctre.phoenix.motorcontrol.RemoteSensorSource
+import com.ctre.phoenix.motorcontrol.*
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
-import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.commands.FalconSubsystem
-import org.ghrobotics.lib.mathematics.units.*
+import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
+import org.ghrobotics.lib.mathematics.units.feet
+import org.ghrobotics.lib.mathematics.units.inch
+import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.mathematics.units.nativeunits.toNativeUnitAcceleration
 import org.ghrobotics.lib.mathematics.units.nativeunits.toNativeUnitPosition
 import org.ghrobotics.lib.mathematics.units.nativeunits.toNativeUnitVelocity
 import org.ghrobotics.lib.util.CircularBuffer
 import org.ghrobotics.lib.wrappers.ctre.AbstractFalconSRX
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
-import kotlin.properties.Delegates
 
 object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
 
-    val frontWinchMaster = NativeFalconSRX(Constants.kClimbFrontWinchMasterId)
-    val backWinchMaster = NativeFalconSRX(Constants.kClimbBackWinchMasterId)
+    private val frontWinchMaster = NativeFalconSRX(Constants.kClimbFrontWinchMasterId)
+    private val backWinchMaster = NativeFalconSRX(Constants.kClimbBackWinchMasterId)
 
     private val wheelMaster = NativeFalconSRX(Constants.kClimbWheelId)
 
@@ -42,21 +40,6 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     val rawBack get() = backWinchMaster.selectedSensorPosition
 
     var lidarRaw = 0.0
-        private set
-
-    var lidarRawHeight = 0.0
-        private set
-
-    var lidarHeight = 0.meter
-        private set
-
-    var frontWinchHeightFromLidar = 0.meter
-        private set
-
-    var backWinchHeightFromLidar = 0.meter
-        private set
-
-    var robotHeight = 0.meter
         private set
 
     var wheelPercentOutput
@@ -89,7 +72,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
             backWinchMaster.set(ControlMode.MotionMagic, value)
         }
 
-    var ramps by Delegates.observable(false) { _, _, newValue -> rampsSolenoid.set(newValue) }
+//    var ramps by Delegates.observable(false) { _, _, newValue -> rampsSolenoid.set(newValue) }
 
     val frontWinchCurrent get() = frontWinchMaster.outputCurrent
     val backWinchCurrent get() = backWinchMaster.outputCurrent
@@ -159,16 +142,11 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         canifier.getPWMInput(CANifier.PWMChannel.PWMChannel0, tempPWMData)
         rollingAverage.add(tempPWMData[0])
         lidarRaw = rollingAverage.average
+    }
 
-
-        lidarRawHeight = (lidarRaw - Constants.kClimbLidarZero) * DriveSubsystem.pitch.cos
-
-        lidarHeight = Constants.kClimbLidarScale * lidarRawHeight
-        frontWinchHeightFromLidar =
-            (lidarHeight.value + Constants.kClimbDistanceBetweenLegs.value * DriveSubsystem.pitch.sin).meter
-        backWinchHeightFromLidar = lidarHeight
-
-        robotHeight = Length((frontWinchHeightFromLidar.value + backWinchHeightFromLidar.value) / 2.0)
+    fun climbToHeight(frontPosition: Double, backPosition: Double) {
+        frontWinchMaster.set(ControlMode.MotionMagic, frontPosition, DemandType.AuxPID, 0.0)
+        backWinchMaster.set(ControlMode.MotionMagic, backPosition, DemandType.AuxPID, 0.0)
     }
 
     private fun setClosedLoopGains() {

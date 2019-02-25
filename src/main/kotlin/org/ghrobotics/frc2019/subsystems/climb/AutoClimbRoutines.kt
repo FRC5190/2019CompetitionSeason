@@ -14,7 +14,7 @@ fun autoL3Climb() = sequential {
             +parallel {
                 +ClimbWheelCommand(Source(0.2))
                 +ResetWinchCommand(ClimbSubsystem.Winch.BACK)
-            }.withExit { ClimbSubsystem.backWinchMaster.sensorCollection.isRevLimitSwitchClosed }
+            }.withExit { ClimbSubsystem.Winch.BACK.motor.sensorCollection.isRevLimitSwitchClosed }
             +ClimbWheelCommand(Source(1.0)).withTimeout(1.5.second)
             +ResetWinchCommand(ClimbSubsystem.Winch.FRONT)
             +DelayCommand(1.second)

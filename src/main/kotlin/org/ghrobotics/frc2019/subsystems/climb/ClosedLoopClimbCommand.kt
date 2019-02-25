@@ -2,7 +2,6 @@ package org.ghrobotics.frc2019.subsystems.climb
 
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.lib.commands.FalconCommand
-import org.ghrobotics.lib.mathematics.units.nativeunits.nativeUnits
 import kotlin.math.absoluteValue
 
 class ClosedLoopClimbCommand(
@@ -18,8 +17,7 @@ class ClosedLoopClimbCommand(
     }
 
     override suspend fun initialize() {
-        ClimbSubsystem.frontWinchPosition = frontTarget.nativeUnits
-        ClimbSubsystem.backWinchPosition = backTarget.nativeUnits
+        ClimbSubsystem.climbToHeight(frontTarget, backTarget)
     }
 
     override suspend fun dispose() {
