@@ -41,6 +41,10 @@ class FalconMAX<T : SIUnit<T>>(
         idleMode = newValue
     }
 
+    var voltageCompensationSaturation by Delegates.observable(12.volt) { _, _, newValue ->
+        enableVoltageCompensation(newValue.value)
+    }
+
     var currentLimit by Delegates.observable(0.amp) { _, _, newValue -> setSmartCurrentLimit(newValue.value.toInt()) }
 
     override var velocity: Velocity<T>

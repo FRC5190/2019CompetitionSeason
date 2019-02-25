@@ -68,3 +68,46 @@ class DriveGearbox(
         }
     }
 }
+
+//class DriveGearbox(
+//    masterId: Int,
+//    slaveOneId: Int,
+//    inverted: Boolean
+//) {
+//    val master = FalconMAX(masterId, model = Constants.kDriveNativeUnitModel)
+//    private val slaveOne = FalconMAX(slaveOneId, model = Constants.kDriveNativeUnitModel)
+//
+//    private val allMotors = listOf(master, slaveOne)
+//
+//    init {
+//        slaveOne.follow(master)
+//        // Configure Inversion
+//        master.inverted = inverted
+//        slaveOne.inverted = inverted
+//
+//        // Configure Encoder
+//        master.setEncPosition(0.0)
+//
+//        allMotors.forEach { motor ->
+//            motor.brakeMode = CANSparkMax.IdleMode.kBrake
+//            motor.voltageCompensationSaturation = 12.volt
+//            motor.currentLimit = Constants.kDriveCurrentLimit
+//        }
+//
+//        setClosedLoopGains()
+//    }
+//
+//    fun setClosedLoopGains() {
+//        allMotors.forEach { motor ->
+//            motor.kP = Constants.kDriveKp
+//            motor.kD = Constants.kDriveKd
+//        }
+//    }
+//
+//    fun zeroClosedLoopGains() {
+//        allMotors.forEach { motor ->
+//            motor.kP = 0.0
+//            motor.kD = 0.0
+//        }
+//    }
+//}
