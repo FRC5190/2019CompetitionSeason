@@ -83,7 +83,6 @@ class DriveGearbox(
 //        slaveOne.follow(master)
 //        // Configure Inversion
 //        master.inverted = inverted
-//        slaveOne.inverted = inverted
 //
 //        // Configure Encoder
 //        master.setEncPosition(0.0)
