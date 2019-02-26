@@ -30,7 +30,7 @@ object Controls {
 
         state({ !isClimbing }) {
             // Vision align
-            button(kY).change(VisionDriveCommand())
+//            button(kY).change(VisionDriveCommand())
 
             // Shifting
             button(kA).changeOn { DriveSubsystem.lowGear = true }
