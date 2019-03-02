@@ -6,6 +6,7 @@
 package org.ghrobotics.frc2019.subsystems.drive
 
 import com.ctre.phoenix.sensors.PigeonIMU
+import com.revrobotics.CANSparkMax
 import edu.wpi.first.wpilibj.Encoder
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
@@ -29,8 +30,8 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     private val rightGearbox = DriveGearbox(Constants.kDriveRightMasterId, Constants.kDriveRightSlaveId, true)
 
     // Shaft encoders
-//    private val lEncoder = Encoder(Constants.kLeftDriveEncoderA, Constants.kLeftDriveEncoderB, false)
-//    private val rEncoder = Encoder(Constants.kRightDriveEncoderA, Constants.kRightDriveEncoderB, true)
+    val lEncoder = Encoder(Constants.kLeftDriveEncoderA, Constants.kLeftDriveEncoderB, true)
+    val rEncoder = Encoder(Constants.kRightDriveEncoderA, Constants.kRightDriveEncoderB, false)
 
     // Master motors
     override val leftMotor get() = leftGearbox.master
@@ -52,17 +53,17 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
         private set
 
     // Type of localization to determine position on the field
-    override val localization = TankEncoderLocalization(
-        pigeon.asSource(),
-        leftMotor::sensorPosition,
-        rightMotor::sensorPosition
-    )
-
 //    override val localization = TankEncoderLocalization(
 //        pigeon.asSource(),
-//        { lEncoder.distance.meter },
-//        { rEncoder.distance.meter }
+//        leftMotor::sensorPosition,
+//        rightMotor::sensorPosition
 //    )
+
+    override val localization = TankEncoderLocalization(
+        pigeon.asSource(),
+        { lEncoder.distance.meter },
+        { rEncoder.distance.meter }
+    )
 
     // Shift up and down
     var lowGear by observable(false) { _, _, wantLow ->
@@ -78,9 +79,19 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
         defaultCommand = ManualDriveCommand()
         pigeon.setTemperatureCompensationDisable(true)
 
-//        listOf(lEncoder, rEncoder).forEach {
-//            it.distancePerPulse = 2 * PI * Constants.kDriveNativeUnitModel.wheelRadius(7.29.nativeUnits).value / 360
-//        }
+        listOf(lEncoder, rEncoder).forEach {
+            it.distancePerPulse = 2 * PI * Constants.kDriveNativeUnitModel.wheelRadius(7.29.nativeUnits).value / 1440
+        }
+    }
+
+    fun setCoastMode() {
+        leftGearbox.setCoastMode()
+        rightGearbox.setCoastMode()
+    }
+
+    fun setBrakeMode() {
+        leftGearbox.setBrakeMode()
+        rightGearbox.setBrakeMode()
     }
 
     private val tempYPR = DoubleArray(3)

@@ -6,7 +6,6 @@ import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.duration
 import org.ghrobotics.lib.mathematics.units.Time
-import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.utils.withEquals
 
 class TestTrajectoriesRoutine : AutoRoutine() {

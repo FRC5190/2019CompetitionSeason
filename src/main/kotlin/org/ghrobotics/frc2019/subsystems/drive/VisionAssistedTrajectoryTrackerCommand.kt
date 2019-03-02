@@ -58,9 +58,9 @@ class VisionAssistedTrajectoryTrackerCommand(
             if (referencePose.distance(endpoint) < outerRadius.value) {
                 if (referencePose.distance(endpoint) > innerRadius.value) {
                     val bestTargetFromTargetTracker =
-                        TargetTracker.trackedTargets.minBy { DriveSubsystem.robotPosition.distance(it.averagePose) }
+                        TargetTracker.targets.minBy { DriveSubsystem.robotPosition.distance(it.averagedPose2d) }
                     if (bestTargetFromTargetTracker != null) {
-                        target = bestTargetFromTargetTracker.averagePose
+                        target = bestTargetFromTargetTracker.averagedPose2d
                         println("USING VISION")
                         isActive = true
                     } else {

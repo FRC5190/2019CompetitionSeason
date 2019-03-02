@@ -123,8 +123,8 @@ object Network {
         globalYEntry.setDouble(DriveSubsystem.localization().translation.y.feet)
         globalAEntry.setDouble(DriveSubsystem.localization().rotation.degree)
 
-        leftPositionEntry.setDouble(DriveSubsystem.leftMotor.getSelectedSensorPosition(0).toDouble())
-        rightPositionEntry.setDouble(DriveSubsystem.rightMotor.getSelectedSensorPosition(0).toDouble())
+        leftPositionEntry.setDouble(DriveSubsystem.lEncoder.raw.toDouble())
+        rightPositionEntry.setDouble(DriveSubsystem.rEncoder.raw.toDouble())
 
         leftAmperageEntry.setDouble(DriveSubsystem.leftMotor.outputCurrent)
         rightAmperageEntry.setDouble(DriveSubsystem.rightMotor.outputCurrent)

@@ -3,13 +3,13 @@ package org.ghrobotics.frc2019.subsystems.drive
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.Network
 import org.ghrobotics.frc2019.vision.TargetTracker
-import org.ghrobotics.frc2019.vision.TrackedTarget
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.mathematics.units.Rotation2d
+import org.ghrobotics.lib.mathematics.units.meter
 
-class VisionDriveCommand : FalconCommand(DriveSubsystem) {
+class VisionDriveCommand(private val targetSide: TargetSide) : FalconCommand(DriveSubsystem) {
 
-    private var currentTarget: TrackedTarget? = null
+    private var currentTarget: TargetTracker.TrackedTarget? = null
 
     init {
         finishCondition += { currentTarget == null }
@@ -32,13 +32,20 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
         val currentTarget = this.currentTarget
         // find new target
         if (currentTarget != null) {
-            val newTarget = TargetTracker.trackedTargets.minBy {
-                it.averagePose.translation.distance(currentTarget.averagePose.translation)
-            } ?: return
+            val newTarget =
+                TargetTracker.targets.filter {
+                    if (targetSide == TargetSide.FRONT)
+                        it.averagedPose2d.translation.x > 0.meter
+                    else
+                        it.averagedPose2d.translation.x < 0.meter
+                }
+                    .minBy {
+                        it.averagedPose2d.translation.distance(currentTarget.averagedPose2d.translation)
+                    } ?: return
 
             // switch over to new target if its close enough to original
-            if (newTarget.averagePose.translation.distance(currentTarget.averagePose.translation)
-                < Constants.kMaxTargetTrackingDistance.value * 2
+            if (newTarget.averagedPose2d.translation.distance(currentTarget.averagedPose2d.translation)
+                < Constants.kTargetTrackingDistanceErrorTolerance.value * 2
             ) {
                 this.currentTarget = newTarget
             }
@@ -51,7 +58,7 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
         updateTarget()
         val currentTarget = this.currentTarget ?: return
 
-        val transform = currentTarget.averagePose inFrameOfReferenceOf DriveSubsystem.localization()
+        val transform = currentTarget.averagedPose2d inFrameOfReferenceOf DriveSubsystem.localization()
         val angle = Rotation2d(transform.translation.x.value, transform.translation.y.value, true)
 
         Network.visionDriveAngle.setDouble(angle.degree)
@@ -67,6 +74,8 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
         this.currentTarget = null
         isActive = false
     }
+
+    enum class TargetSide { FRONT, BACK }
 
     companion object {
         const val kCorrectionKp = 0.5

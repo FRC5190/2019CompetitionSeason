@@ -335,8 +335,12 @@ object Constants {
 
 
     // VISION
-    val kMaxTargetTrackingDistance = 16.inch
-    val kMaxTargetTrackingLifetime = 1.second
+    const val kVisionCameraFPS = 30.0
+    val kVisionCameraPing = 0.75.second
+    val kVisionCameraTimeout = 2.second
+    val kTargetTrackingDistanceErrorTolerance = 16.inch
+    val kTargetTrackingMinLifetime = 0.1.second
+    val kTargetTrackingMaxLifetime = 0.5.second
 
 
     // DRIVE

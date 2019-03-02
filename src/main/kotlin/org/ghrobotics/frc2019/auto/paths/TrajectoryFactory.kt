@@ -17,17 +17,17 @@ object TrajectoryFactory {
     /** Constraints **/
 
     private val kMaxVelocity = 12.feet.velocity
-    private val kMaxAcceleration = 6.feet.acceleration
+    private val kMaxAcceleration = 8.feet.acceleration
 
     private val kMaxHabitatVelocity = 3.feet.velocity
 
-    private val kFirstPathMaxAcceleration = 4.feet.acceleration
+    private val kFirstPathMaxAcceleration = 8.feet.acceleration
 
     private val kVelocityRadiusConstraintRadius = 3.feet
     private val kVelocityRadiusConstraintVelocity = 4.feet.velocity
 
-    private val kMaxCentripetalAccelerationElevatorUp = 4.feet.acceleration
-    private val kMaxCentripetalAccelerationElevatorDown = 4.feet.acceleration
+    private val kMaxCentripetalAccelerationElevatorUp = 6.feet.acceleration
+    private val kMaxCentripetalAccelerationElevatorDown = 8.feet.acceleration
 
     private val kMaxVoltage = 10.volt
 
@@ -207,7 +207,6 @@ object TrajectoryFactory {
         false,
         listOf(
             TrajectoryWaypoints.kSideStart.asWaypoint(),
-            TrajectoryWaypoints.kSideStart.transformBy(Pose2d(30.inch, 0.inch, 0.degree)).asWaypoint(),
             rocketNAdjusted.position.transformBy(Pose2d(2.inch, 2.inch)).asWaypoint()
         ),
         getConstraints(true, rocketNAdjusted), kMaxVelocity, kFirstPathMaxAcceleration, kMaxVoltage
@@ -215,7 +214,7 @@ object TrajectoryFactory {
 
     /** Generation **/
 
-    private fun getConstraints(elevatorUp: Boolean, trajectoryEndpoint: Pose2d) = listOf(
+    private fun getConstraints(elevatorUp: Boolean, trajectoryEndpoint: Pose2d) = listOf<TimingConstraint<Pose2dWithCurvature>>(
         CentripetalAccelerationConstraint(
             if (elevatorUp)
                 kMaxCentripetalAccelerationElevatorUp

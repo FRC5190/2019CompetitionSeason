@@ -7,12 +7,14 @@ package org.ghrobotics.frc2019.subsystems.drive
 
 import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.DemandType
+import com.revrobotics.ControlType
 import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.Controls
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.feet
+import org.ghrobotics.lib.mathematics.units.meter
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
 import org.ghrobotics.lib.utils.withDeadband
 import org.ghrobotics.lib.wrappers.hid.getRawButton
@@ -28,25 +30,28 @@ class ManualDriveCommand : FalconCommand(DriveSubsystem) {
 //    private var armStowedRange = (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)
 
     override suspend fun execute() {
-//        DriveSubsystem.tankDrive(
-//            -leftSource(),
-//            -rightSource()
-//        )
+        DriveSubsystem.tankDrive(
+            -leftSource(),
+            -rightSource()
+        )
         // TODO add conditions that make placing the hatch easier
         val curvature = rotationSource()
         val linear = -speedSource()
-        if (curvature != 0.0 || linear != 0.0) {
-            curvatureDrive(
-                linear,
-                curvature,
-                quickTurnSource()
-            )
-        } else if (DriveSubsystem.leftMotor.velocity.absoluteValue < kLockVelocityTolerance
-            && DriveSubsystem.rightMotor.velocity.absoluteValue < kLockVelocityTolerance
-        ) {
-            DriveSubsystem.leftMotor.set(ControlMode.Velocity, 0.0)
-            DriveSubsystem.rightMotor.set(ControlMode.Velocity, 0.0)
-        }
+
+//        curvatureDrive(
+//            linear,
+//            curvature,
+//            quickTurnSource()
+//        )
+
+//        if (curvature != 0.0 || linear != 0.0) {
+//
+//        } else if (DriveSubsystem.leftMotor.velocity.absoluteValue < kLockVelocityTolerance
+//            && DriveSubsystem.rightMotor.velocity.absoluteValue < kLockVelocityTolerance
+//        ) {
+////            DriveSubsystem.leftMotor.velocity = 0.meter.velocity
+////            DriveSubsystem.rightMotor.velocity = 0.meter.velocity
+//        }
     }
 
     /**
@@ -122,16 +127,10 @@ class ManualDriveCommand : FalconCommand(DriveSubsystem) {
         rightPercent: Double
     ) {
         DriveSubsystem.leftMotor.set(
-            ControlMode.PercentOutput,
-            leftPercent,
-            DemandType.ArbitraryFeedForward,
-            Constants.kDriveLeftKs.withSign(leftPercent) / 12.0
+            leftPercent
         )
         DriveSubsystem.rightMotor.set(
-            ControlMode.PercentOutput,
-            rightPercent,
-            DemandType.ArbitraryFeedForward,
-            Constants.kDriveRightKs.withSign(rightPercent) / 12.0
+            rightPercent
         )
     }
 
@@ -140,7 +139,7 @@ class ManualDriveCommand : FalconCommand(DriveSubsystem) {
         private var quickStopAccumulator = 0.0
         private const val kQuickStopThreshold = TankDriveSubsystem.kQuickStopThreshold
         private const val kQuickStopAlpha = TankDriveSubsystem.kQuickStopAlpha
-        private const val kDeadband = 0.02
+        private const val kDeadband = 0.05
         val speedSource = Controls.driverXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband)
         val rightSource = Controls.driverXbox.getY(GenericHID.Hand.kRight).withDeadband(kDeadband)
         val leftSource = Controls.driverXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband)
