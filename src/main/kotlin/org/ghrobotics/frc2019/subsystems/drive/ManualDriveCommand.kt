@@ -5,16 +5,11 @@
 
 package org.ghrobotics.frc2019.subsystems.drive
 
-import com.ctre.phoenix.motorcontrol.ControlMode
-import com.ctre.phoenix.motorcontrol.DemandType
-import com.revrobotics.ControlType
 import edu.wpi.first.wpilibj.GenericHID
-import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.Controls
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.feet
-import org.ghrobotics.lib.mathematics.units.meter
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
 import org.ghrobotics.lib.utils.withDeadband
 import org.ghrobotics.lib.wrappers.hid.getRawButton
@@ -23,26 +18,25 @@ import org.ghrobotics.lib.wrappers.hid.getY
 import org.ghrobotics.lib.wrappers.hid.kX
 import kotlin.math.absoluteValue
 import kotlin.math.max
-import kotlin.math.withSign
 
 class ManualDriveCommand : FalconCommand(DriveSubsystem) {
 
 //    private var armStowedRange = (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)
 
     override suspend fun execute() {
-        DriveSubsystem.tankDrive(
-            -leftSource(),
-            -rightSource()
-        )
+//        DriveSubsystem.tankDrive(
+//            -leftSource(),
+//            -rightSource()
+//        )
         // TODO add conditions that make placing the hatch easier
         val curvature = rotationSource()
         val linear = -speedSource()
 
-//        curvatureDrive(
-//            linear,
-//            curvature,
-//            quickTurnSource()
-//        )
+        curvatureDrive(
+            linear,
+            curvature,
+            quickTurnSource()
+        )
 
 //        if (curvature != 0.0 || linear != 0.0) {
 //
@@ -140,10 +134,10 @@ class ManualDriveCommand : FalconCommand(DriveSubsystem) {
         private const val kQuickStopThreshold = TankDriveSubsystem.kQuickStopThreshold
         private const val kQuickStopAlpha = TankDriveSubsystem.kQuickStopAlpha
         private const val kDeadband = 0.05
-        val speedSource = Controls.driverXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband)
-        val rightSource = Controls.driverXbox.getY(GenericHID.Hand.kRight).withDeadband(kDeadband)
-        val leftSource = Controls.driverXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband)
-        private val rotationSource = Controls.driverXbox.getX(GenericHID.Hand.kLeft).withDeadband(kDeadband)
-        private val quickTurnSource = Controls.driverXbox.getRawButton(kX)
+        val speedSource by lazy { Controls.driverXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband) }
+        val rightSource by lazy { Controls.driverXbox.getY(GenericHID.Hand.kRight).withDeadband(kDeadband) }
+        val leftSource by lazy { Controls.driverXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband) }
+        private val rotationSource by lazy { Controls.driverXbox.getX(GenericHID.Hand.kLeft).withDeadband(kDeadband) }
+        private val quickTurnSource by lazy { Controls.driverXbox.getRawButton(kX) }
     }
 }

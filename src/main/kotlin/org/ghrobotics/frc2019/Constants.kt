@@ -330,8 +330,8 @@ object Constants {
     val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeProtrusion, kBadIntakeOffset, 0.degree)
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
 
-    val kCenterToFrontCamera = Pose2d(13.5.inch, (-11).inch, 0.degree)
-    val kCenterToBackCamera = Pose2d((-10.5).inch, (-9.5).inch, 180.degree)
+    val kCenterToFrontCamera = Pose2d((-1.75).inch, 0.inch, 0.degree)
+    val kCenterToBackCamera = Pose2d((-6.25).inch, 0.inch, 180.degree)
 
 
     // VISION
@@ -344,9 +344,14 @@ object Constants {
 
 
     // DRIVE
+//    val kDriveNativeUnitModel = SlopeNativeUnitModel(
+//        170.5.inch,
+//        12918.nativeUnits
+//    )
+
     val kDriveNativeUnitModel = SlopeNativeUnitModel(
-        170.5.inch,
-        12918.nativeUnits
+        112.inch,
+        45.25.nativeUnits
     )
 
     val kDriveSensorUnitsPerRotation = 1440.nativeUnits
@@ -357,15 +362,18 @@ object Constants {
 
     val kDriveCurrentLimit = 38.amp
 
-    const val kDriveKp = 1.5 // Talon SRX Units
-    const val kDriveKd = 5.0
+//    const val kDriveKp = 1.5 // Talon SRX Units
+//    const val kDriveKd = 5.0
+
+    const val kDriveKp = 0.0003 // Talon SRX Units
+    const val kDriveKd = 0.0
 
     const val kDriveLeftKv = 0.1489
-    const val kDriveLeftKa = 0.0716 // 0.0816
+    const val kDriveLeftKa = 0.05 // 0.0816
     const val kDriveLeftKs = 1.2423
 
     const val kDriveRightKv = 0.1475
-    const val kDriveRightKa = 0.1003 //
+    const val kDriveRightKa = 0.05 //
     const val kDriveRightKs = 1.2468
 
     const val kDriveBeta = 2.0 // Inverse meters squared

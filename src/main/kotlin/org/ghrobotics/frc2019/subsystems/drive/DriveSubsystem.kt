@@ -80,7 +80,7 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
         pigeon.setTemperatureCompensationDisable(true)
 
         listOf(lEncoder, rEncoder).forEach {
-            it.distancePerPulse = 2 * PI * Constants.kDriveNativeUnitModel.wheelRadius(7.29.nativeUnits).value / 1440
+            it.distancePerPulse = 3.353 / 9996.5 * 4
         }
     }
 

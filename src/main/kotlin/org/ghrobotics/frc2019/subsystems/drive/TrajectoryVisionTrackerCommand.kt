@@ -23,6 +23,7 @@ class TrajectoryVisionTrackerCommand(
 ) : FalconCommand(DriveSubsystem) {
 
     private var trajectoryFinished = false
+    private var hasGeneratedVisionPath = false
 
     @Suppress("LateinitUsage")
     private lateinit var trajectory: Trajectory<Time, TimedEntry<Pose2dWithCurvature>>
@@ -38,6 +39,7 @@ class TrajectoryVisionTrackerCommand(
         trajectory = trajectorySource()
         DriveSubsystem.trajectoryTracker.reset(trajectory)
         trajectoryFinished = false
+        hasGeneratedVisionPath = false
         LiveDashboard.isFollowingPath = true
     }
 
@@ -46,7 +48,9 @@ class TrajectoryVisionTrackerCommand(
 
         if (DriveSubsystem.localization().translation.distance(trajectory.lastState.state.pose.translation) < radiusFromEnd.value
             && visionTarget != null
+            && !hasGeneratedVisionPath
         ) {
+            hasGeneratedVisionPath = true
             trajectory = OTFTrajectoryGenerator.generateOTFTrajectory(
                 visionTarget,
                 trajectory.reversed,

@@ -32,8 +32,8 @@ object Robot : FalconRobot() {
 
     // Initialize all systems.
     init {
-        +ClimbSubsystem
         +DriveSubsystem
+        +ClimbSubsystem
         +ElevatorSubsystem
         +ArmSubsystem
         +IntakeSubsystem

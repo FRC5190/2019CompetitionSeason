@@ -68,11 +68,12 @@ class JeVois(
         try {
             val jsonData = kJevoisGson.fromJson<JsonObject>(receivedString)
 
+            val isFront = jsonData["is_front"].asBoolean
             val timestamp = (Timer.getFPGATimestamp() - jsonData["capture_ago"].asDouble).second
             val contours = jsonData["targets"].asJsonArray
                 .filterIsInstance<JsonObject>()
 
-            processData(VisionData(timestamp, contours))
+            processData(VisionData(isFront, timestamp, contours))
         } catch (e: JsonParseException) {
             e.printStackTrace()
             println("[JeVois] Got Invalid Data: $receivedString")
@@ -100,6 +101,7 @@ class JeVois(
 }
 
 data class VisionData(
+    val isFront: Boolean,
     val timestamp: Time,
     val targets: List<JsonObject>
 )

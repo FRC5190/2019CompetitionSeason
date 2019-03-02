@@ -2,14 +2,12 @@ package org.ghrobotics.frc2019.vision
 
 import com.fazecast.jSerialComm.SerialPort
 import com.google.gson.JsonObject
-import edu.wpi.first.wpilibj.Timer
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.inch
-import org.ghrobotics.lib.mathematics.units.second
 
 object VisionProcessing {
 
@@ -18,14 +16,10 @@ object VisionProcessing {
     init {
         val jevoisSerialPorts = SerialPort.getCommPorts()
             .filter { it.descriptivePortName.contains("JeVois", true) }
-        println("Found ${jevoisSerialPorts.size} jevoises")
+        println("Found ${jevoisSerialPorts.joinToString(",") { it.systemPortName }}")
         jevoisCameras = jevoisSerialPorts.map { serialPort ->
-            var lastTimestamp = 0.second
             JeVois(serialPort) { visionData ->
                 //                println("VD: ${visionData.timestamp.second} ROBOT: ${Timer.getFPGATimestamp()} DIFF: ${Timer.getFPGATimestamp() - visionData.timestamp.second}")
-
-                println("DT: ${(visionData.timestamp - lastTimestamp).second} L: ${Timer.getFPGATimestamp() - visionData.timestamp.second} Targets: ${visionData.targets.size}")
-                lastTimestamp = visionData.timestamp
 
                 val robotPose = DriveSubsystem.localization[visionData.timestamp]
 //                val robotPose = DriveSubsystem.localization()
@@ -34,7 +28,12 @@ object VisionProcessing {
                     visionData.timestamp,
                     visionData.targets
                         .asSequence()
-                        .mapNotNull { processReflectiveTape(it, Constants.kCenterToFrontCamera) }
+                        .mapNotNull {
+                            processReflectiveTape(
+                                it,
+                                if (visionData.isFront) Constants.kCenterToFrontCamera else Constants.kCenterToBackCamera
+                            )
+                        }
                         .map { robotPose + it }.toList()
                 )
             }
