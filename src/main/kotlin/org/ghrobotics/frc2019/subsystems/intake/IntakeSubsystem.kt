@@ -9,6 +9,7 @@ import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.utils.and
 import org.ghrobotics.lib.utils.greaterThan
 import org.ghrobotics.lib.utils.not
+import org.ghrobotics.lib.utils.or
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 
 object IntakeSubsystem : FalconSubsystem() {
@@ -26,7 +27,7 @@ object IntakeSubsystem : FalconSubsystem() {
 
     private val dio = DigitalOutput(Constants.kIntakeExtensionLimitSwitch)
 
-    val isSeeingCargo = sensor2::getAverageVoltage.greaterThan(1.7) and sensor1::getAverageVoltage.greaterThan(1.2)
+    val isSeeingCargo = sensor2::getAverageVoltage.greaterThan(1.7) or sensor1::getAverageVoltage.greaterThan(1.2)
 
     val isFullyExtended = dio::get
 

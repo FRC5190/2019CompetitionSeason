@@ -42,8 +42,8 @@ object Robot : FalconRobot() {
         Network
         Autonomous
 
-//        CameraServer.getInstance().startAutomaticCapture()
-//            .setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 15)
+        CameraServer.getInstance().startAutomaticCapture()
+            .setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 15)
         VisionProcessing
         Notifier {
             TargetTracker.update()

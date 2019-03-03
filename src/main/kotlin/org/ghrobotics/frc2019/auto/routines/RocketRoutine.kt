@@ -45,7 +45,7 @@ class RocketRoutine : AutoRoutine() {
             +parallel {
                 +followVisionAssistedTrajectory(path2, pathMirrored, 8.feet)
                 +sequential {
-                    +DelayCommand(0.25.second)
+                    +DelayCommand(0.5.second)
                     +Superstructure.kBackHatchFromLoadingStation.withTimeout(4.second)
                 }
             }
@@ -57,7 +57,6 @@ class RocketRoutine : AutoRoutine() {
             +parallel {
                 // Drive path to far rocket
                 +followVisionAssistedTrajectory(path3, pathMirrored, 5.feet)
-
                 +Superstructure.kFrontHatchFromLoadingStation.withTimeout(3.second)
 
             }
