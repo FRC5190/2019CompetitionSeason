@@ -5,6 +5,7 @@ import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.debug.LiveDashboard
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
+import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.Time
@@ -70,12 +71,12 @@ object TargetTracker {
         }
 
         bestTargetBack = targets.asSequence()
-            .filter { it.averagedPose2dRelativeToBot.translation.x.value < 0.0 }
+            .filter { it.isReal && it.averagedPose2dRelativeToBot.translation.x.value < 0.0 }
             .minBy { it.averagedPose2dRelativeToBot.translation.norm.value }
 
         // Sort the targets from best to worst
         val sortedFrontTargets = targets.asSequence()
-            .filter { it.averagedPose2dRelativeToBot.translation.x.value < 0.0 }
+            .filter { it.isReal && it.averagedPose2dRelativeToBot.translation.x.value > 0.0 }
             .toMutableList()
 
         sortedFrontTargets.sortBy { it.averagedPose2dRelativeToBot.translation.norm.value }
@@ -86,19 +87,19 @@ object TargetTracker {
 
         bestTargetFront = bestFrontTarget1
 
+        if (bestTargetFrontLeft?.isAlive == false) bestTargetFrontLeft = null
+        if (bestTargetFrontRight?.isAlive == false) bestTargetFrontRight = null
+
         // Make the left one best left and right one best right
-        if (bestFrontTarget1 == null || bestFrontTarget2 == null) {
-            this.bestTargetFrontLeft = null
-            this.bestTargetFrontRight = null
-        } else {
+        if (bestFrontTarget1 != null && bestFrontTarget2 != null) {
             if (bestFrontTarget1.averagedPose2dRelativeToBot.translation.y <
                 bestFrontTarget2.averagedPose2dRelativeToBot.translation.y
             ) {
-                bestTargetFrontLeft = bestFrontTarget2
-                bestTargetFrontRight = bestFrontTarget1
-            } else {
                 bestTargetFrontLeft = bestFrontTarget1
                 bestTargetFrontRight = bestFrontTarget2
+            } else {
+                bestTargetFrontLeft = bestFrontTarget2
+                bestTargetFrontRight = bestFrontTarget1
             }
         }
 
@@ -107,6 +108,15 @@ object TargetTracker {
             .filter { it.isReal }
             .map { it.averagedPose2d }
             .toList()
+    }
+
+    fun getAbsoluteTarget(translation2d: Translation2d) = synchronized(targets) {
+        targets.asSequence()
+            .filter {
+                it.isReal
+                    && translation2d.distance(it.averagedPose2d.translation) <= Constants.kTargetTrackingDistanceErrorTolerance.value
+            }
+            .minBy { it.averagedPose2d.translation.distance(translation2d) }
     }
 
     class TrackedTarget(
@@ -157,13 +167,7 @@ object TargetTracker {
             samples.removeIf { currentTime - it.creationTime >= Constants.kTargetTrackingMaxLifetime }
             // Update State
             isAlive = samples.isNotEmpty()
-            isReal = if (isAlive) {
-                @Suppress("UnsafeCallOnNullableType")
-                val lastSampleTime = samples.maxBy { it.creationTime.value }!!.creationTime
-                lastSampleTime - dateOfBirth >= Constants.kTargetTrackingMinLifetime
-            } else {
-                false
-            }
+            if(samples.size >= 2) isReal = true
             stability = (samples.size / (Constants.kVisionCameraFPS * Constants.kTargetTrackingMaxLifetime.value))
                 .coerceAtMost(1.0)
             // Update Averaged Pose

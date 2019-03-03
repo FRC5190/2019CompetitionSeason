@@ -41,8 +41,8 @@ object Robot : FalconRobot() {
         JeVoisManager
         TargetTracker
 
-        CameraServer.getInstance().startAutomaticCapture()
-            .setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 15)
+//        CameraServer.getInstance().startAutomaticCapture()
+//            .setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 15)
     }
 
     override fun periodic() {

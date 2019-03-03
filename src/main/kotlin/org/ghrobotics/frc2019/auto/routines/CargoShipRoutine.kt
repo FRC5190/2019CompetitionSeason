@@ -4,6 +4,7 @@ import org.ghrobotics.frc2019.auto.paths.TrajectoryFactory
 import org.ghrobotics.frc2019.auto.paths.TrajectoryWaypoints
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.subsystems.drive.VisionTrackerTargetType
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.DelayCommand
@@ -29,7 +30,7 @@ class CargoShipRoutine : AutoRoutine() {
             // Put hatch on FL cargo ship
             +parallel {
                 +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
-                +followVisionAssistedTrajectory(path1, { false }, 4.feet)
+                +followVisionAssistedTrajectory(path1, { false }, 4.feet, true)
                 +sequential {
                     +DelayCommand(path1.duration - 4.second)
                     +Superstructure.kFrontHatchFromLoadingStation.withTimeout(2.0.second)
@@ -56,7 +57,7 @@ class CargoShipRoutine : AutoRoutine() {
 
             // Go to FR cargo ship
             +parallel {
-                +followVisionAssistedTrajectory(path3, { false }, 3.feet)
+                +followVisionAssistedTrajectory(path3, { false }, 3.feet, true)
                 +sequential {
                     +executeFor(2.second, Superstructure.kFrontCargoFromLoadingStation)
                     +Superstructure.kFrontHatchFromLoadingStation.withTimeout(3.second)

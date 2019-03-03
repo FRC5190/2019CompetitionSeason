@@ -5,6 +5,7 @@ package org.ghrobotics.frc2019.vision
 import com.fazecast.jSerialComm.SerialPort
 import com.fazecast.jSerialComm.SerialPortDataListener
 import com.fazecast.jSerialComm.SerialPortEvent
+import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
@@ -26,8 +27,8 @@ object JeVoisManager {
 
             connectedJeVoisCameras.removeIf {
                 it.update(currentTime)
-                println("[JeVois Manager] Disconnected Camera: ${it.systemPortName}")
                 if (!it.isAlive) {
+                    println("[JeVois Manager] Disconnected Camera: ${it.systemPortName}")
                     it.dispose()
                     true
                 } else {
@@ -54,8 +55,7 @@ object JeVoisManager {
 
         val systemPortName = serialPort.systemPortName
 
-        private var lastPingSent = 0.second
-        private var lastPingReceived = 0.second
+        private var lastMessageReceived = 0.second
 
         var isAlive = true
             private set
@@ -90,17 +90,11 @@ object JeVoisManager {
 
                 override fun getListeningEvents() = SerialPort.LISTENING_EVENT_DATA_AVAILABLE
             })
-            lastPingReceived = Timer.getFPGATimestamp().second
+            lastMessageReceived = Timer.getFPGATimestamp().second
         }
 
         fun processMessage(message: String) {
-//        println(receivedString)
-            if (message.equals("ALIVE", true)) {
-                lastPingReceived = Timer.getFPGATimestamp().second
-//                val ping = lastPingReceived - lastPingSent
-//            println("[JeVois] Got Ping. Took ${ping.millisecond}ms")
-                return
-            }
+            lastMessageReceived = Timer.getFPGATimestamp().second
             if (!message.startsWith('{')) return
             try {
                 val jsonData = kJevoisGson.fromJson<JsonObject>(message)
@@ -118,12 +112,7 @@ object JeVoisManager {
         }
 
         fun update(currentTime: Time) {
-            if (currentTime - lastPingSent > Constants.kVisionCameraPing) {
-                lastPingSent = currentTime
-                serialPort.writeString("ping\n")
-            }
-
-            isAlive = lastPingSent - lastPingReceived <= Constants.kVisionCameraTimeout
+            isAlive = currentTime - lastMessageReceived <= Constants.kVisionCameraTimeout
         }
 
         fun dispose() {

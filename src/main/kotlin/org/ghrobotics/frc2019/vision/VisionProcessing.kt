@@ -24,11 +24,11 @@ object VisionProcessing {
                         if (visionData.isFront) Constants.kCenterToFrontCamera else Constants.kCenterToBackCamera
                     )
                 }
-                .filter {
-                    // We cannot be the vision target :)
-                    it.translation.x.value.absoluteValue > Constants.kRobotLength.value / 2.0
-                        && it.translation.y.value.absoluteValue > Constants.kRobotWidth.value / 2.0
-                }
+//                .filter {
+//                    // We cannot be the vision target :)
+//                    it.translation.x.value.absoluteValue > Constants.kRobotLength.value / 2.0
+//                        && it.translation.y.value.absoluteValue > Constants.kRobotWidth.value / 2.0
+//                }
                 .map { robotPose + it }.toList()
         )
     }

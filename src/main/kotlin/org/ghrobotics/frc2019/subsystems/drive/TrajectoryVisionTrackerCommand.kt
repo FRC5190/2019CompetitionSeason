@@ -1,5 +1,6 @@
 package org.ghrobotics.frc2019.subsystems.drive
 
+import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.Network
 import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.lib.commands.FalconCommand
@@ -22,7 +23,8 @@ import org.ghrobotics.lib.utils.Source
  */
 class TrajectoryVisionTrackerCommand(
     val trajectorySource: Source<Trajectory<Time, TimedEntry<Pose2dWithCurvature>>>,
-    val radiusFromEnd: Length
+    val radiusFromEnd: Length,
+    val useAbsoluteVision: Boolean = false
 ) : FalconCommand(DriveSubsystem) {
 
     private var trajectoryFinished = false
@@ -56,9 +58,13 @@ class TrajectoryVisionTrackerCommand(
             DriveSubsystem.localization().translation.distance(trajectory.lastState.state.pose.translation) < radiusFromEnd.value
 
         if (withinVisionRadius) {
-            val newTarget = (if (!trajectory.reversed) {
-                TargetTracker.bestTargetFront
-            } else TargetTracker.bestTargetBack)
+            val newTarget = if (!useAbsoluteVision) {
+                if (!trajectory.reversed) {
+                    TargetTracker.bestTargetFront
+                } else TargetTracker.bestTargetBack
+            } else {
+                TargetTracker.getAbsoluteTarget((trajectory.lastState.state.pose + Constants.kCenterToForwardIntake).translation)
+            }
 
             if (newTarget != null) currentTarget = newTarget
 
@@ -116,7 +122,7 @@ class TrajectoryVisionTrackerCommand(
     }
 
     companion object {
-        const val kCorrectionKp = 3.5
+        const val kCorrectionKp = 4.0
         var visionActive = false
     }
 }
