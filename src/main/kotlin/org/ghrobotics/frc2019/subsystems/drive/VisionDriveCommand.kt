@@ -1,65 +1,50 @@
 package org.ghrobotics.frc2019.subsystems.drive
 
-import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.Network
 import org.ghrobotics.frc2019.vision.TargetTracker
-import org.ghrobotics.frc2019.vision.TrackedTarget
 import org.ghrobotics.lib.commands.FalconCommand
+import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.units.Rotation2d
+import org.ghrobotics.lib.mathematics.units.radian
+import kotlin.math.absoluteValue
 
-class VisionDriveCommand : FalconCommand(DriveSubsystem) {
+class VisionDriveCommand(private val targetSide: TargetSide) : FalconCommand(DriveSubsystem) {
 
-    private var currentTarget: TrackedTarget? = null
-
-    init {
-        finishCondition += { currentTarget == null }
-    }
+    private var currentTarget: TargetTracker.TrackedTarget? = null
+    private var lastKnownPose: Pose2d? = null
 
     override suspend fun initialize() {
-        findNewTarget()
         isActive = true
     }
 
-    private fun updateTarget() {
-        val currentTarget = this.currentTarget ?: return
-        if (!currentTarget.isAlive) {
-            this.currentTarget = null
-            findNewTarget()
-        }
-    }
-
-    private fun findNewTarget() {
-        val currentTarget = this.currentTarget
-        // find new target
-        if (currentTarget != null) {
-            val newTarget = TargetTracker.trackedTargets.minBy {
-                it.averagePose.translation.distance(currentTarget.averagePose.translation)
-            } ?: return
-
-            // switch over to new target if its close enough to original
-            if (newTarget.averagePose.translation.distance(currentTarget.averagePose.translation)
-                < Constants.kMaxTargetTrackingDistance.value * 2
-            ) {
-                this.currentTarget = newTarget
-            }
-        } else {
-            this.currentTarget = TargetTracker.bestTargetFront
-        }
-    }
-
     override suspend fun execute() {
-        updateTarget()
-        val currentTarget = this.currentTarget ?: return
+        val newTarget = (if (targetSide == TargetSide.FRONT) {
+            TargetTracker.bestTargetFront
+        } else TargetTracker.bestTargetBack)
 
-        val transform = currentTarget.averagePose inFrameOfReferenceOf DriveSubsystem.localization()
-        val angle = Rotation2d(transform.translation.x.value, transform.translation.y.value, true)
+        if (newTarget != null) currentTarget = newTarget
 
-        Network.visionDriveAngle.setDouble(angle.degree)
-        Network.visionDriveActive.setBoolean(true)
-
-        val turn = kCorrectionKp * angle.radian
         val source = -ManualDriveCommand.speedSource()
-        DriveSubsystem.tankDrive(source - turn, source + turn)
+
+        val newPose = currentTarget?.averagedPose2d
+        if(currentTarget?.isAlive == true && newPose != null) lastKnownPose = newPose
+
+        val lastKnownPose = this.lastKnownPose
+
+        if (lastKnownPose == null) {
+            DriveSubsystem.tankDrive(source, source)
+        } else {
+            val transform = lastKnownPose inFrameOfReferenceOf DriveSubsystem.localization()
+            val angle = Rotation2d(transform.translation.x.value, transform.translation.y.value, true)
+
+            Network.visionDriveAngle.setDouble(angle.degree)
+            Network.visionDriveActive.setBoolean(true)
+
+//            val turn =
+//                kCorrectionKp * (transform.translation.y.value / transform.translation.x.value.absoluteValue) * (if (targetSide == TargetSide.FRONT) 1.0 else -1.0)
+            val turn = kCorrectionKp * (angle + if (targetSide == TargetSide.FRONT) Rotation2d.kZero else Math.PI.radian).radian
+            DriveSubsystem.tankDrive(source - turn, source + turn)
+        }
     }
 
     override suspend fun dispose() {
@@ -68,8 +53,10 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
         isActive = false
     }
 
+    enum class TargetSide { FRONT, BACK }
+
     companion object {
-        const val kCorrectionKp = 0.5
+        const val kCorrectionKp = 0.35
         var isActive = false
             private set
     }

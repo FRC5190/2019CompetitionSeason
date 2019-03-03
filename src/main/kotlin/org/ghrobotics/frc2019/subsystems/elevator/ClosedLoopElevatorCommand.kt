@@ -8,12 +8,12 @@ class ClosedLoopElevatorCommand(private val target: Length) : FalconCommand(Elev
 
     init {
         finishCondition += {
-            (ElevatorSubsystem.elevatorPosition - target).absoluteValue < Constants.kElevatorClosedLoopTolerance &&
+            (ElevatorSubsystem.position - target).absoluteValue < Constants.kElevatorClosedLoopTolerance &&
                 ElevatorSubsystem.velocity < Constants.kElevatorClosedLoopVelocityTolerance
         }
     }
 
     override suspend fun initialize() {
-        ElevatorSubsystem.elevatorPosition = target
+        ElevatorSubsystem.setPosition(target)
     }
 }

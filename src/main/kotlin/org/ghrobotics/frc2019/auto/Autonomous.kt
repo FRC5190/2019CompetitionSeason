@@ -3,7 +3,10 @@ package org.ghrobotics.frc2019.auto
 import org.ghrobotics.frc2019.Network
 import org.ghrobotics.frc2019.Robot
 import org.ghrobotics.frc2019.auto.paths.TrajectoryWaypoints
-import org.ghrobotics.frc2019.auto.routines.*
+import org.ghrobotics.frc2019.auto.routines.BaselineRoutine
+import org.ghrobotics.frc2019.auto.routines.CargoShipRoutine
+import org.ghrobotics.frc2019.auto.routines.RocketRoutine
+import org.ghrobotics.frc2019.auto.routines.TestTrajectoriesRoutine
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.commands.InstantRunnableCommand
 import org.ghrobotics.lib.commands.S3ND
@@ -68,13 +71,10 @@ object Autonomous {
     private val JUST = stateCommandGroup(startingPosition) {
         state(StartingPositions.LEFT, StartingPositions.RIGHT) {
             stateCommandGroup(autoMode) {
+
                 state(
-                    Mode.HIGH_HATCHES_ROCKET,
-                    HighHatchesRocketRoutine()
-                )
-                state(
-                    Mode.HATCH_AND_CARGO_ROCKET,
-                    HatchAndCargoRocketRoutine()
+                    Mode.ROCKET,
+                    RocketRoutine()
                 )
                 state(
                     Mode.BASELINE,
@@ -87,14 +87,14 @@ object Autonomous {
                     TestTrajectoriesRoutine()
                 )
 
-                state(Mode.FORWARD_CARGO_SHIP, invalidOptionRoutine)
+                state(Mode.CARGO_SHIP, invalidOptionRoutine)
             }
         }
         state(StartingPositions.CENTER) {
             stateCommandGroup(autoMode) {
                 state(
-                    Mode.FORWARD_CARGO_SHIP,
-                    ForwardCargoShipRoutine()()
+                    Mode.CARGO_SHIP,
+                    CargoShipRoutine()()
                 )
                 state(
                     Mode.BASELINE,
@@ -106,8 +106,7 @@ object Autonomous {
                     TestTrajectoriesRoutine()
                 )
 
-                state(Mode.HIGH_HATCHES_ROCKET, invalidOptionRoutine)
-                state(Mode.HATCH_AND_CARGO_ROCKET, invalidOptionRoutine)
+                state(Mode.ROCKET, invalidOptionRoutine)
             }
         }
     }
@@ -128,5 +127,5 @@ object Autonomous {
 
     enum class GamePiece { HATCH, CARGO }
 
-    enum class Mode { TEST_TRAJECTORIES, HIGH_HATCHES_ROCKET, HATCH_AND_CARGO_ROCKET, FORWARD_CARGO_SHIP, BASELINE }
+    enum class Mode { TEST_TRAJECTORIES, ROCKET, CARGO_SHIP, BASELINE }
 }

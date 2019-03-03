@@ -66,7 +66,7 @@
 //                        +ConditionalCommand(
 //                            Autonomous.cargoShipGamePiece2.withEquals(Autonomous.GamePiece.CARGO),
 //                            sequential {
-//                                +ConditionCommand { ArmSubsystem.armPosition > 105.degree }
+//                                +ConditionCommand { ArmSubsystem.position > 105.degree }
 //                                +IntakeCargoCommand(IntakeSubsystem.Direction.HOLD)
 //                            })
 //                        +ConditionalCommand(

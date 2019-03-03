@@ -8,6 +8,6 @@ class OpenLoopArmCommand(private val percentOutput: DoubleSource) : FalconComman
     constructor(percentOutput: Double) : this(Source(percentOutput))
 
     override suspend fun execute() {
-        ArmSubsystem.percentOutput = percentOutput()
+        ArmSubsystem.setPercentOutput(percentOutput())
     }
 }

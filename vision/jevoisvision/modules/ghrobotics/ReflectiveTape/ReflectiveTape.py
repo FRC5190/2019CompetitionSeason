@@ -1,9 +1,9 @@
-import libjevois as jevois
-import json
-import time
 import cv2
+import json
+import libjevois as jevois
 import math
 import numpy as np
+import time
 
 
 class ReflectiveTape:
@@ -22,7 +22,8 @@ class ReflectiveTape:
 
         # camera mount angle (radians)
         # NOTE: not sure if this should be positive or negative
-        self.tilt_angle = math.radians(0.0)
+        self.tilt_angle = math.radians(30.0)
+        self.is_front_camera = False
 
         self.target_coords = np.array([[-self.TARGET_WIDTH / 2.0, self.TARGET_HEIGHT / 2.0, 0.0],
                                        [-self.TARGET_WIDTH / 2.0, -self.TARGET_HEIGHT / 2.0, 0.0],
@@ -41,7 +42,7 @@ class ReflectiveTape:
             jevois.LFATAL("Failed to read camera parameters from file [{}]".format(cpf))
 
     def processAndSend(self, source0):
-        timestamp = time.time()
+        capture_timestamp = time.time()
         # numpy.array(source0, copy=True)
         self.reflectiveVision.process(source0)
         height, width, _ = source0.shape
@@ -73,7 +74,10 @@ class ReflectiveTape:
                     "distance": output[0]
                 })
 
-        jevois.sendSerial(json.dumps({"Epoch Time": timestamp, "Targets": json_pair_list}))
+        send_timestamp = time.time()
+        capture_ago = send_timestamp - capture_timestamp
+        jevois.sendSerial(
+            json.dumps({"is_front": self.is_front_camera, "capture_ago": capture_ago, "targets": json_pair_list}))
 
     def compute_output_values(self, rvec, tvec):
         # Compute the necessary output distance and angles

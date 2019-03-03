@@ -1,7 +1,7 @@
 package org.ghrobotics.frc2019
 
 import edu.wpi.first.wpilibj.SerialPort
-import org.ghrobotics.frc2019.subsystems.drive.VisionAssistedTrajectoryTrackerCommand
+import org.ghrobotics.frc2019.subsystems.drive.TrajectoryVisionTrackerCommand
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.wrappers.FalconRobot
@@ -43,10 +43,9 @@ object LEDs {
         wantedLEDMode = when {
             Robot.emergencyActive -> Mode.EMERGENCY
             Controls.isClimbing -> Mode.CLIMB
+            VisionDriveCommand.isActive || TrajectoryVisionTrackerCommand.visionActive -> Mode.VISION
             IntakeSubsystem.isHoldingCargo() || IntakeSubsystem.isHoldingHatch() -> Mode.HAS_OBTAINED
             Robot.lastRobotMode == FalconRobot.Mode.DISABLED -> Mode.DISABLED
-            VisionDriveCommand.isActive || VisionAssistedTrajectoryTrackerCommand.isActive -> Mode.VISION
-            Robot.lastRobotMode == FalconRobot.Mode.TELEOP && Robot.lastEnabledState -> Mode.TELEOP
             else -> Mode.NONE
         }
     }

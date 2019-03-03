@@ -8,14 +8,13 @@ package org.ghrobotics.frc2019
 import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
+import org.ghrobotics.frc2019.subsystems.climb.autoL3Climb
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
-import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.utils.map
 import org.ghrobotics.lib.wrappers.hid.*
 import kotlin.math.pow
@@ -31,7 +30,8 @@ object Controls {
 
         state({ !isClimbing }) {
             // Vision align
-            button(kY).change(VisionDriveCommand())
+            button(kY).change(VisionDriveCommand(VisionDriveCommand.TargetSide.FRONT))
+            button(kB).change(VisionDriveCommand(VisionDriveCommand.TargetSide.BACK))
 
             // Shifting
             button(kA).changeOn { DriveSubsystem.lowGear = true }
@@ -125,9 +125,7 @@ object Controls {
             button(kBumperRight).changeOn(Superstructure.kStowedPosition)
         }
         state({ isClimbing }) {
-            button(kA).change(sequential {
-                // Auto climbing logic here
-            })
+            button(kA).change(autoL3Climb())
         }
     }
 
