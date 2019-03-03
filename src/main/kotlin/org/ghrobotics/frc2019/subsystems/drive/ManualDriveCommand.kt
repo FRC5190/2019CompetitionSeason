@@ -5,6 +5,7 @@
 
 package org.ghrobotics.frc2019.subsystems.drive
 
+import com.ctre.phoenix.motorcontrol.ControlMode
 import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.Controls
 import org.ghrobotics.lib.commands.FalconCommand
@@ -121,9 +122,11 @@ class ManualDriveCommand : FalconCommand(DriveSubsystem) {
         rightPercent: Double
     ) {
         DriveSubsystem.leftMotor.set(
+            ControlMode.PercentOutput,
             leftPercent
         )
         DriveSubsystem.rightMotor.set(
+            ControlMode.PercentOutput,
             rightPercent
         )
     }

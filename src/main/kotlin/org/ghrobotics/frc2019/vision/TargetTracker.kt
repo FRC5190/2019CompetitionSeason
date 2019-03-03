@@ -9,13 +9,11 @@ import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.second
-import java.util.concurrent.CopyOnWriteArraySet
 
 
 object TargetTracker {
 
-    private val _targets = CopyOnWriteArraySet<TrackedTarget>()
-    val targets: Set<TrackedTarget> = _targets
+    private val targets = mutableSetOf<TrackedTarget>()
 
     var bestTargetFront: TrackedTarget? = null
         private set
@@ -26,30 +24,32 @@ object TargetTracker {
     fun addSamples(creationTime: Time, samples: Iterable<Pose2d>) =
         addSamples(samples.map { TrackedTargetSample(creationTime, it) })
 
-    fun addSamples(samples: Iterable<TrackedTargetSample>) = samples.forEach(::addSample)
+    fun addSamples(samples: Iterable<TrackedTargetSample>) = samples.forEach {
+        addSample(it)
+    }
 
-    fun addSample(sample: TrackedTargetSample) {
-        if (sample.creationTime.second >= Timer.getFPGATimestamp()) return // Cannot predict the future
+    fun addSample(sample: TrackedTargetSample) = synchronized(targets) {
+        if (sample.creationTime.second >= Timer.getFPGATimestamp()) return@synchronized // Cannot predict the future
 
-        val closestTarget = _targets.minBy {
+        val closestTarget = targets.minBy {
             it.averagedPose2d.translation.distance(sample.targetPose.translation)
         }
         if (closestTarget == null
             || closestTarget.averagedPose2d.translation.distance(sample.targetPose.translation) > Constants.kTargetTrackingDistanceErrorTolerance.value
         ) {
             // Create new target if no targets are within tolerance
-            _targets += TrackedTarget(sample)
+            targets += TrackedTarget(sample)
         } else {
             // Add sample to target within tolerance
             closestTarget.addSample(sample)
         }
     }
 
-    fun update() {
+    fun update() = synchronized(targets) {
         val currentTime = Timer.getFPGATimestamp().second
 
         // Update and remove old targets
-        _targets.removeIf {
+        targets.removeIf {
             it.update(currentTime)
             !it.isAlive
         }
@@ -62,7 +62,7 @@ object TargetTracker {
 
         val currentRobotPose = DriveSubsystem.localization()
 
-        for (target in _targets) {
+        for (target in targets) {
             if (!target.isReal) continue
 
             val targetRelativeToRobot = target.averagedPose2d inFrameOfReferenceOf currentRobotPose
@@ -86,7 +86,7 @@ object TargetTracker {
         bestTargetBack = newBackTarget
 
         // Publish to dashboard
-        LiveDashboard.visionTargets = _targets.asSequence()
+        LiveDashboard.visionTargets = targets.asSequence()
             .filter { it.isReal }
             .map { it.averagedPose2d }
             .toList()
@@ -96,7 +96,7 @@ object TargetTracker {
         initialTargetSample: TrackedTargetSample
     ) {
 
-        private val samples = CopyOnWriteArraySet<TrackedTargetSample>()
+        private val samples = mutableSetOf<TrackedTargetSample>()
 
         /**
          * The averaged pose2d for x time
@@ -128,11 +128,11 @@ object TargetTracker {
             addSample(initialTargetSample)
         }
 
-        fun addSample(newSamples: TrackedTargetSample) {
+        fun addSample(newSamples: TrackedTargetSample) = synchronized(samples) {
             samples.add(newSamples)
         }
 
-        fun update(currentTime: Time) {
+        fun update(currentTime: Time) = synchronized(samples) {
             // Remove expired samples
             samples.removeIf { currentTime - it.creationTime >= Constants.kTargetTrackingMaxLifetime }
             // Update State

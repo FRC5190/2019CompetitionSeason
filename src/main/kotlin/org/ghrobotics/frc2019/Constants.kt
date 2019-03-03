@@ -301,11 +301,11 @@ object Constants {
 
     // PNEUMATICS
     const val kPCMId = 41
-    const val kIntakeExtensionSolenoidForwardId = 4
-    const val kIntakeExtensionSolenoidReverseId = 5
-    const val kIntakeLauncherSolenoidId = 3
-    const val kDriveSolenoidId = 0
-    const val kRampsSolenoidId = 1
+    const val kIntakeExtensionSolenoidForwardId = 0
+    const val kIntakeExtensionSolenoidReverseId = 1
+    const val kIntakeLauncherSolenoidId = 5
+    const val kDriveSolenoidId = 4
+    const val kRampsSolenoidId = 3
 
 
     // ROBOT AND MECHANISM DIMENSIONS
@@ -313,7 +313,7 @@ object Constants {
     const val kRobotMomentOfInertia = 10.0 // kg m^2
     const val kRobotAngularDrag = 12.0 // Nm per rad/s
 
-    val kRobotWidth = 29.inch
+    val kRobotWidth = 30.inch
     val kRobotLength = 30.inch
 
     val kBumperThickness = 4.5.inch
@@ -344,15 +344,15 @@ object Constants {
 
 
     // DRIVE
-//    val kDriveNativeUnitModel = SlopeNativeUnitModel(
-//        170.5.inch,
-//        12918.nativeUnits
-//    )
-
     val kDriveNativeUnitModel = SlopeNativeUnitModel(
-        112.inch,
-        45.25.nativeUnits
+        170.5.inch,
+        12918.nativeUnits
     )
+
+//    val kDriveNativeUnitModel = SlopeNativeUnitModel(
+//        112.inch,
+//        45.25.nativeUnits
+//    )
 
     val kDriveSensorUnitsPerRotation = 1440.nativeUnits
     val kDriveWheelRadius = kDriveNativeUnitModel.wheelRadius(kDriveSensorUnitsPerRotation)
@@ -362,11 +362,11 @@ object Constants {
 
     val kDriveCurrentLimit = 38.amp
 
-//    const val kDriveKp = 1.5 // Talon SRX Units
-//    const val kDriveKd = 5.0
+    const val kDriveKp = 3.0 // Talon SRX Units
+    const val kDriveKd = 2.0
 
-    const val kDriveKp = 0.0003 // Talon SRX Units
-    const val kDriveKd = 0.0
+//    const val kDriveKp = 0.001 // Talon SRX Units
+//    const val kDriveKd = 0.0
 
     const val kDriveLeftKv = 0.1489
     const val kDriveLeftKa = 0.05 // 0.0816
@@ -404,10 +404,10 @@ object Constants {
 
     // ELEVATOR
     // from elevator zero (measured from bottom of second stage)
-    val kElevatorSwitchHeight = 8.inch
-    val kElevatorSwitchNativeUnit = 2310.nativeUnits
-    val kElevatorAfterSwitchHeightSample = 58.inch
-    val kElevatorAfterSwitchNativeUnitSample = 10845.nativeUnits
+    val kElevatorSwitchHeight = 7.inch
+    val kElevatorSwitchNativeUnit = 2027.nativeUnits
+    val kElevatorAfterSwitchHeightSample = 45.inch
+    val kElevatorAfterSwitchNativeUnitSample = 7834.nativeUnits
 
     val kElevatorNativeUnitModel = SpringCascadeNativeUnitModel(
         switchHeight = kElevatorSwitchHeight,
@@ -422,7 +422,7 @@ object Constants {
 
     val kElevatorSafeFlipHeight = 3.inch
 
-    val kElevatorCurrentLimit = 15.amp
+    val kElevatorCurrentLimit = 25.amp
 
     val kElevatorClosedLoopVelocityTolerance = 1.inch.velocity
     val kElevatorClosedLoopTolerance = 1.inch
@@ -440,7 +440,7 @@ object Constants {
 
     // ARM
     val kArmSensorUnitsPerRotation = 1024.nativeUnits
-    val kArmUpTicks = (-562).nativeUnits
+    val kArmUpTicks = (-502).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,
@@ -450,23 +450,24 @@ object Constants {
     )
 
     val kArmFlipTolerance = 40.degree
+    val kArmSafeFlipAngle = 30.degree
 
     val kArmCurrentLimit = 15.amp
 
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
     val kArmClosedLoopTolerance = 5.degree
-    val kArmCruiseVelocity = 380.0 * 1.0.degree.velocity
-    val kArmAcceleration = 372.0 * 1.0.degree.acceleration
+    val kArmCruiseVelocity = 450.0 * 1.0.degree.velocity
+    val kArmAcceleration = 400.0 * 1.0.degree.acceleration
 
     const val kArmEmptyHoldVoltage = 1.9
 
     val kArmEmptyKg = kArmEmptyHoldVoltage / kAccelerationDueToGravity / 12.0
-    const val kArmHatchKg = 3.0 / kAccelerationDueToGravity / 12.0
+    const val kArmHatchKg = 4.0 / kAccelerationDueToGravity / 12.0
 
-    const val kArmKp = 7.0
-    const val kArmKd = 140.0
+    const val kArmKp = 5.0
+    const val kArmKd = 80.0
     const val kArmKv = 0.0 / 12.0
-    val kArmKf = kArmNativeUnitModel.calculatekF(11.366 - kArmEmptyHoldVoltage, Math.toRadians(260.1562))
+    val kArmKf = 0.0 //kArmNativeUnitModel.calculatekF(11.366 - kArmEmptyHoldVoltage, Math.toRadians(200.1562))
 
     // CLIMB
     val kClimbWinchNativeUnitModel = SlopeNativeUnitModel(

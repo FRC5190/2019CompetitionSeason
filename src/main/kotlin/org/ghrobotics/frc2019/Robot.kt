@@ -7,6 +7,7 @@ package org.ghrobotics.frc2019
 
 import edu.wpi.cscore.VideoMode
 import edu.wpi.first.cameraserver.CameraServer
+import edu.wpi.first.wpilibj.Notifier
 import kotlinx.coroutines.GlobalScope
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
@@ -44,14 +45,17 @@ object Robot : FalconRobot() {
 //        CameraServer.getInstance().startAutomaticCapture()
 //            .setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 15)
         VisionProcessing
+        Notifier {
+            TargetTracker.update()
+        }.startPeriodic(.02)
     }
 
     override fun periodic() {
         Controls.update()
+//        LEDs.update()
         Autonomous.update()
-        LEDs.update()
-        TargetTracker.update()
-        VisionProcessing.update()
+//        TargetTracker.update()
+//        VisionProcessing.update()
     }
 
     override fun periodicNetwork() {

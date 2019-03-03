@@ -6,8 +6,6 @@
 package org.ghrobotics.frc2019.subsystems.drive
 
 import com.ctre.phoenix.sensors.PigeonIMU
-import com.revrobotics.CANSparkMax
-import edu.wpi.first.wpilibj.Encoder
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
@@ -15,12 +13,8 @@ import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
 import org.ghrobotics.lib.mathematics.units.degree
-import org.ghrobotics.lib.mathematics.units.meter
-import org.ghrobotics.lib.mathematics.units.nativeunits.nativeUnits
-import org.ghrobotics.lib.mathematics.units.nativeunits.wheelRadius
 import org.ghrobotics.lib.sensors.asSource
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
-import java.lang.Math.PI
 import kotlin.properties.Delegates.observable
 
 object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
@@ -30,8 +24,8 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     private val rightGearbox = DriveGearbox(Constants.kDriveRightMasterId, Constants.kDriveRightSlaveId, true)
 
     // Shaft encoders
-    val lEncoder = Encoder(Constants.kLeftDriveEncoderA, Constants.kLeftDriveEncoderB, true)
-    val rEncoder = Encoder(Constants.kRightDriveEncoderA, Constants.kRightDriveEncoderB, false)
+//    val lEncoder = Encoder(Constants.kLeftDriveEncoderA, Constants.kLeftDriveEncoderB, true)
+//    val rEncoder = Encoder(Constants.kRightDriveEncoderA, Constants.kRightDriveEncoderB, false)
 
     // Master motors
     override val leftMotor get() = leftGearbox.master
@@ -53,17 +47,17 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
         private set
 
     // Type of localization to determine position on the field
-//    override val localization = TankEncoderLocalization(
-//        pigeon.asSource(),
-//        leftMotor::sensorPosition,
-//        rightMotor::sensorPosition
-//    )
-
     override val localization = TankEncoderLocalization(
         pigeon.asSource(),
-        { lEncoder.distance.meter },
-        { rEncoder.distance.meter }
+        leftMotor::sensorPosition,
+        rightMotor::sensorPosition
     )
+
+//    override val localization = TankEncoderLocalization(
+//        pigeon.asSource(),
+//        { lEncoder.distance.meter },
+//        { rEncoder.distance.meter }
+//    )
 
     // Shift up and down
     var lowGear by observable(false) { _, _, wantLow ->
@@ -79,22 +73,33 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
         defaultCommand = ManualDriveCommand()
         pigeon.setTemperatureCompensationDisable(true)
 
-        listOf(lEncoder, rEncoder).forEach {
-            it.distancePerPulse = 3.353 / 9996.5 * 4
-        }
-    }
-
-    fun setCoastMode() {
-        leftGearbox.setCoastMode()
-        rightGearbox.setCoastMode()
-    }
-
-    fun setBrakeMode() {
-        leftGearbox.setBrakeMode()
-        rightGearbox.setBrakeMode()
+//        listOf(lEncoder, rEncoder).forEach {
+//            it.distancePerPulse = 3.353 / 9996.5 * 4
+//        }
     }
 
     private val tempYPR = DoubleArray(3)
+
+//    const val kP = 4.0 / 12.0
+//
+//    override fun setOutput(output: TrajectoryTrackerOutput) {
+//        setOutputFromKinematics(output.differentialDriveVelocity)
+//    }
+//
+//    override fun setOutput(wheelVelocities: DifferentialDrive.WheelState, wheelVoltages: DifferentialDrive.WheelState) {
+//        val leftDesired = wheelVelocities.left * Constants.kDriveWheelRadius.value
+//        val rightDesired = wheelVelocities.right * Constants.kDriveWheelRadius.value
+//
+//        val leftCurrent = leftMotor.velocity.value
+//        val rightCurrent = rightMotor.velocity.value
+//
+//        val lError = (leftDesired - leftCurrent)
+//        val rError = (rightDesired - rightCurrent)
+//
+//        val (l, r) = lError * kP to rError * kP
+//        leftMotor.percentOutput = l + wheelVoltages.left / 12.0
+//        rightMotor.percentOutput = r + wheelVoltages.right / 12.0
+//    }
 
     override fun periodic() {
         super.periodic()

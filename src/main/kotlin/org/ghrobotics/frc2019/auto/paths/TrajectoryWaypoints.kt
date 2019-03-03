@@ -26,7 +26,7 @@ object TrajectoryWaypoints {
     val kCargoShipS3 = Pose2d(304.25.inch, 133.13.inch, 90.degree)
 
     // Rocket
-    val kRocketN = Pose2d(216.57.inch, 19.0.inch, (-033.748).degree)
+    val kRocketN = Pose2d(216.57.inch, 19.0.inch, (-025.748).degree)
     val kRocketF = Pose2d(241.69.inch, 17.0.inch, (-147.252).degree)
     val kRocketBay = Pose2d(229.13.inch, 27.44.inch, (-90).degree)
 
@@ -43,7 +43,9 @@ object TrajectoryWaypoints {
     private val kStartX = kHabitatL2RX + Constants.kBumperThickness + Constants.kRobotLength / 2.0 - kRampHypotenuse
 
     // Starting on Level 1 HAB on the right side.
-    val kSideStart = Pose2d(kStartX, kHabitatL2BY + Constants.kBumperThickness + Constants.kRobotWidth / 2.0,
+    val kSideStart = Pose2d(
+        kHabitatL2RX + Constants.kBumperThickness + Constants.kRobotWidth / 2.0,
+        kHabitatL2BY + Constants.kBumperThickness + Constants.kRobotLength / 2.0 + kRampHypotenuse,
         (-90).degree
     )
 

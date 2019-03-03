@@ -120,7 +120,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
             motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, kMainLoopDt.millisecond.toInt())
             motor.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_20Ms)
 
-            motor.configMotionSCurveStrength(3)
+//            motor.configMotionSCurveStrength(3)
         }
 
         // Default command to hold the current position
@@ -200,7 +200,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         synchronized(closedLoopSync) {
             if (isClosedLoop) {
                 elevatorMaster.set(
-                    ControlMode.Disabled, closedLoopGoal,
+                    ControlMode.MotionMagic, closedLoopGoal,
                     DemandType.ArbitraryFeedForward, arbitraryFeedForward
                 )
             }

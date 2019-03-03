@@ -60,6 +60,7 @@ class FalconMAX<T : SIUnit<T>>(
         get() = appliedOutput.volt
 
     override fun setVelocityAndArbitraryFeedForward(velocity: Velocity<T>, arbitraryFeedForward: Double) {
+        println(arbitraryFeedForward * 12)
         controller.setReference(
             model.toNativeUnitVelocity(velocity).value * 60,
             ControlType.kVelocity,

@@ -2,12 +2,14 @@ package org.ghrobotics.frc2019.vision
 
 import com.fazecast.jSerialComm.SerialPort
 import com.google.gson.JsonObject
+import edu.wpi.first.wpilibj.Timer
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.inch
+import kotlin.math.absoluteValue
 
 object VisionProcessing {
 
@@ -19,7 +21,9 @@ object VisionProcessing {
         println("Found ${jevoisSerialPorts.joinToString(",") { it.systemPortName }}")
         jevoisCameras = jevoisSerialPorts.map { serialPort ->
             JeVois(serialPort) { visionData ->
-                //                println("VD: ${visionData.timestamp.second} ROBOT: ${Timer.getFPGATimestamp()} DIFF: ${Timer.getFPGATimestamp() - visionData.timestamp.second}")
+//                println("VD: ${visionData.timestamp.second} ROBOT: ${Timer.getFPGATimestamp()} DIFF: ${Timer.getFPGATimestamp() - visionData.timestamp.second}")
+//
+//                println(visionData.targets.size)
 
                 val robotPose = DriveSubsystem.localization[visionData.timestamp]
 //                val robotPose = DriveSubsystem.localization()
@@ -34,6 +38,11 @@ object VisionProcessing {
                                 if (visionData.isFront) Constants.kCenterToFrontCamera else Constants.kCenterToBackCamera
                             )
                         }
+//                        .filter {
+//                            // We cannot be the vision target :)
+//                            it.translation.x.value.absoluteValue > Constants.kRobotLength.value / 2.0
+//                                && it.translation.y.value.absoluteValue > Constants.kRobotWidth.value / 2.0
+//                        }
                         .map { robotPose + it }.toList()
                 )
             }

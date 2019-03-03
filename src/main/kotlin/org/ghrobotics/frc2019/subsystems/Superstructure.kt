@@ -23,7 +23,7 @@ object Superstructure {
         (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)
 
 
-    val kFrontHighRocketHatch get() = goToHeightWithAngle(76.inch, 15.degree)
+    val kFrontHighRocketHatch get() = goToHeightWithAngle(73.inch, 15.degree)
     val kFrontMiddleRocketHatch get() = goToHeightWithAngle(50.inch, 5.degree)
 
     val kFrontHighRocketCargo get() = goToHeightWithAngle(83.inch, 15.degree)
@@ -31,8 +31,8 @@ object Superstructure {
     val kFrontLowRocketCargo get() = goToHeightWithAngle(26.inch, 15.degree)
     val kBackLowRocketCargo get() = goToHeightWithAngle(25.inch, 135.degree)
 
-    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 0.degree)
-    val kBackHatchFromLoadingStation get() = goToHeightWithAngle(17.inch, 180.degree)
+    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, -5.degree)
+    val kBackHatchFromLoadingStation get() = goToHeightWithAngle(17.inch, 175.degree)
 
     val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, (-20).degree)
     val kBackCargoIntake get() = elevatorAndArmHeight(0.inch, (-160).degree)
@@ -73,7 +73,7 @@ object Superstructure {
     ): FalconCommand {
         // Values that store the side of the robot the arm is currently in and the side of the robot that the arm
         // wants to be in.
-        val isFrontWanted = armAngle.cos >= 0
+        val isFrontWanted = armAngle.cos > 0
 
         // Check if the configuration is valid.
         return sequential {
@@ -81,7 +81,7 @@ object Superstructure {
             // Flip arm vs. don't flip arm.
             +ConditionalCommand(
                 {
-                    val isFrontCurrent = ArmSubsystem.position.cos >= 0
+                    val isFrontCurrent = ArmSubsystem.position.cos > 0
                     isFrontWanted != isFrontCurrent || ArmSubsystem.position in outOfToleranceRange
                 },
 
@@ -149,16 +149,23 @@ object Superstructure {
                             // Wait for elevator to come down to safe height
                             +ConditionCommand(waitCondition)
 
-                            val safeFlipAngle = if (isFrontWanted) {
-                                90.degree - Constants.kArmFlipTolerance - Constants.kArmClosedLoopTolerance / 2.0
-                            } else {
-                                90.degree + Constants.kArmFlipTolerance + Constants.kArmClosedLoopTolerance / 2.0
+                            if(elevatorHeightWanted > Constants.kElevatorSafeFlipHeight + Constants.kElevatorClosedLoopTolerance) {
+                                // Consider safe flip if elevator goes up
+                                if (isFrontWanted) {
+                                    if (armAngle < Constants.kArmSafeFlipAngle) {
+                                        //  Use safe flip if it goes near floor
+                                        +ClosedLoopArmCommand(Constants.kArmSafeFlipAngle)
+                                            .overrideExit { ElevatorSubsystem.position > Constants.kElevatorSafeFlipHeight }
+                                    }
+                                } else {
+                                    if (armAngle < 180.degree - Constants.kArmSafeFlipAngle) {
+                                        //  Use safe flip if it goes near floor
+                                        +ClosedLoopArmCommand(180.degree - Constants.kArmSafeFlipAngle)
+                                            .overrideExit { ElevatorSubsystem.position > Constants.kElevatorSafeFlipHeight }
+                                    }
+                                }
                             }
 
-                            if (elevatorHeightWanted > Constants.kElevatorSafeFlipHeight + Constants.kElevatorClosedLoopTolerance) {
-                                +ClosedLoopArmCommand(safeFlipAngle)
-                                    .overrideExit { ElevatorSubsystem.position > Constants.kElevatorSafeFlipHeight }
-                            }
                             +ClosedLoopArmCommand(armAngle)
                         }
                     }

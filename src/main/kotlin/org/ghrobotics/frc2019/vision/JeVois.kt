@@ -58,10 +58,11 @@ class JeVois(
     }
 
     private fun onStringReceived(receivedString: String) {
+//        println(receivedString)
         if (receivedString.equals("ALIVE", true)) {
             lastPingReceived = Timer.getFPGATimestamp().second
             ping = lastPingReceived - lastPingSent
-            println("[JeVois] Got Ping. Took ${ping.millisecond}ms")
+//            println("[JeVois] Got Ping. Took ${ping.millisecond}ms")
             return
         }
         if (!receivedString.startsWith('{')) return
@@ -75,7 +76,7 @@ class JeVois(
 
             processData(VisionData(isFront, timestamp, contours))
         } catch (e: JsonParseException) {
-            e.printStackTrace()
+//            e.printStackTrace()
             println("[JeVois] Got Invalid Data: $receivedString")
         }
     }
