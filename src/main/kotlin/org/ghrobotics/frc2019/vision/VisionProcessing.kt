@@ -1,8 +1,6 @@
 package org.ghrobotics.frc2019.vision
 
-import com.fazecast.jSerialComm.SerialPort
 import com.google.gson.JsonObject
-import edu.wpi.first.wpilibj.Timer
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
@@ -13,68 +11,26 @@ import kotlin.math.absoluteValue
 
 object VisionProcessing {
 
-    private val jevoisCameras: List<JeVois>
+    fun processData(visionData: VisionData) {
+        val robotPose = DriveSubsystem.localization[visionData.timestamp]
 
-    init {
-        val jevoisSerialPorts = SerialPort.getCommPorts()
-            .filter { it.descriptivePortName.contains("JeVois", true) }
-        println("Found ${jevoisSerialPorts.joinToString(",") { it.systemPortName }}")
-        jevoisCameras = jevoisSerialPorts.map { serialPort ->
-            JeVois(serialPort) { visionData ->
-//                println("VD: ${visionData.timestamp.second} ROBOT: ${Timer.getFPGATimestamp()} DIFF: ${Timer.getFPGATimestamp() - visionData.timestamp.second}")
-//
-//                println(visionData.targets.size)
-
-                val robotPose = DriveSubsystem.localization[visionData.timestamp]
-//                val robotPose = DriveSubsystem.localization()
-
-                TargetTracker.addSamples(
-                    visionData.timestamp,
-                    visionData.targets
-                        .asSequence()
-                        .mapNotNull {
-                            processReflectiveTape(
-                                it,
-                                if (visionData.isFront) Constants.kCenterToFrontCamera else Constants.kCenterToBackCamera
-                            )
-                        }
-//                        .filter {
-//                            // We cannot be the vision target :)
-//                            it.translation.x.value.absoluteValue > Constants.kRobotLength.value / 2.0
-//                                && it.translation.y.value.absoluteValue > Constants.kRobotWidth.value / 2.0
-//                        }
-                        .map { robotPose + it }.toList()
-                )
-            }
-        }
-//        JeVois(SerialPort.Port.kUSB1) { visionData ->
-//            val robotPose = DriveSubsystem.localization[visionData.timestamp]
-//
-//            TargetTracker.addSamples(
-//                visionData.timestamp,
-//                visionData.targets
-//                    .asSequence()
-//                    .mapNotNull { processReflectiveTape(it, Constants.kCenterToFrontCamera) }
-//                    .map { robotPose + it }.toList()
-//            )
-//        }
-//        JeVois(SerialPort.Port.kUSB1) { visionData ->
-//            val robotPose = DriveSubsystem.localization[visionData.timestamp]
-//
-//            TargetTracker.addSamples(
-//                visionData.timestamp,
-//                visionData.targets
-//                    .asSequence()
-//                    .mapNotNull { processReflectiveTape(it, Constants.kCenterToBackCamera) }
-//                    .map { robotPose + it }.toList()
-//            )
-//        }
-    }
-
-    fun update() {
-        jevoisCameras.forEach {
-            it.update()
-        }
+        TargetTracker.addSamples(
+            visionData.timestamp,
+            visionData.targets
+                .asSequence()
+                .mapNotNull {
+                    processReflectiveTape(
+                        it,
+                        if (visionData.isFront) Constants.kCenterToFrontCamera else Constants.kCenterToBackCamera
+                    )
+                }
+                .filter {
+                    // We cannot be the vision target :)
+                    it.translation.x.value.absoluteValue > Constants.kRobotLength.value / 2.0
+                        && it.translation.y.value.absoluteValue > Constants.kRobotWidth.value / 2.0
+                }
+                .map { robotPose + it }.toList()
+        )
     }
 
     private fun processReflectiveTape(data: JsonObject, transform: Pose2d): Pose2d? {

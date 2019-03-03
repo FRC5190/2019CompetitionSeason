@@ -9,6 +9,7 @@ import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.second
+import kotlin.concurrent.fixedRateTimer
 
 
 object TargetTracker {
@@ -18,8 +19,20 @@ object TargetTracker {
     var bestTargetFront: TrackedTarget? = null
         private set
 
+    var bestTargetFrontLeft: TrackedTarget? = null
+        private set
+
+    var bestTargetFrontRight: TrackedTarget? = null
+        private set
+
     var bestTargetBack: TrackedTarget? = null
         private set
+
+    init {
+        fixedRateTimer(period = 20L) {
+            update()
+        }
+    }
 
     fun addSamples(creationTime: Time, samples: Iterable<Pose2d>) =
         addSamples(samples.map { TrackedTargetSample(creationTime, it) })
@@ -48,42 +61,46 @@ object TargetTracker {
     fun update() = synchronized(targets) {
         val currentTime = Timer.getFPGATimestamp().second
 
+        val currentRobotPose = DriveSubsystem.localization()
+
         // Update and remove old targets
         targets.removeIf {
-            it.update(currentTime)
+            it.update(currentTime, currentRobotPose)
             !it.isAlive
         }
 
-        // Update the new best front and back targets
-        var newFrontTarget: TrackedTarget? = null
-        var tempFrontDistance = 0.0
-        var newBackTarget: TrackedTarget? = null
-        var tempBackDistance = 0.0
+        bestTargetBack = targets.asSequence()
+            .filter { it.averagedPose2dRelativeToBot.translation.x.value < 0.0 }
+            .minBy { it.averagedPose2dRelativeToBot.translation.norm.value }
 
-        val currentRobotPose = DriveSubsystem.localization()
+        // Sort the targets from best to worst
+        val sortedFrontTargets = targets.asSequence()
+            .filter { it.averagedPose2dRelativeToBot.translation.x.value < 0.0 }
+            .toMutableList()
 
-        for (target in targets) {
-            if (!target.isReal) continue
+        sortedFrontTargets.sortBy { it.averagedPose2dRelativeToBot.translation.norm.value }
 
-            val targetRelativeToRobot = target.averagedPose2d inFrameOfReferenceOf currentRobotPose
-            val newDistance = targetRelativeToRobot.translation.norm.value
-            if (targetRelativeToRobot.translation.x.value > 0.0) {
-                // Front Target
-                if (newFrontTarget == null || newDistance < tempFrontDistance) {
-                    newFrontTarget = target
-                    tempFrontDistance = newDistance
-                }
+        // Choose the top two best targets
+        val bestFrontTarget1 = sortedFrontTargets.getOrNull(0)
+        val bestFrontTarget2 = sortedFrontTargets.getOrNull(1)
+
+        bestTargetFront = bestFrontTarget1
+
+        // Make the left one best left and right one best right
+        if (bestFrontTarget1 == null || bestFrontTarget2 == null) {
+            this.bestTargetFrontLeft = null
+            this.bestTargetFrontRight = null
+        } else {
+            if (bestFrontTarget1.averagedPose2dRelativeToBot.translation.y <
+                bestFrontTarget2.averagedPose2dRelativeToBot.translation.y
+            ) {
+                bestTargetFrontLeft = bestFrontTarget2
+                bestTargetFrontRight = bestFrontTarget1
             } else {
-                // Back Target
-                if (newBackTarget == null || newDistance < tempBackDistance) {
-                    newBackTarget = target
-                    tempBackDistance = newDistance
-                }
+                bestTargetFrontLeft = bestFrontTarget1
+                bestTargetFrontRight = bestFrontTarget2
             }
         }
-
-        bestTargetFront = newFrontTarget
-        bestTargetBack = newBackTarget
 
         // Publish to dashboard
         LiveDashboard.visionTargets = targets.asSequence()
@@ -102,6 +119,9 @@ object TargetTracker {
          * The averaged pose2d for x time
          */
         var averagedPose2d = initialTargetSample.targetPose
+            private set
+
+        var averagedPose2dRelativeToBot = Pose2d()
             private set
 
         /**
@@ -132,7 +152,7 @@ object TargetTracker {
             samples.add(newSamples)
         }
 
-        fun update(currentTime: Time) = synchronized(samples) {
+        fun update(currentTime: Time, currentRobotPose: Pose2d) = synchronized(samples) {
             // Remove expired samples
             samples.removeIf { currentTime - it.creationTime >= Constants.kTargetTrackingMaxLifetime }
             // Update State
@@ -160,6 +180,7 @@ object TargetTracker {
                 Length(accumulatedY / samples.size),
                 Rotation2d(accumulatedAngle / samples.size)
             )
+            averagedPose2dRelativeToBot = averagedPose2d inFrameOfReferenceOf currentRobotPose
         }
 
     }
