@@ -8,7 +8,6 @@ import org.ghrobotics.frc2019.auto.routines.CargoShipRoutine
 import org.ghrobotics.frc2019.auto.routines.RocketRoutine
 import org.ghrobotics.frc2019.auto.routines.TestTrajectoriesRoutine
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
-import org.ghrobotics.lib.commands.InstantRunnableCommand
 import org.ghrobotics.lib.commands.S3ND
 import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.commands.stateCommandGroup
@@ -41,29 +40,17 @@ object Autonomous {
     private val isReady =
         { Robot.lastRobotMode == FalconRobot.Mode.AUTONOMOUS && Robot.lastEnabledState } and configValid
 
-    /**
-     * Routine that gets executed if an invalid starting position + routine is selected.
-     */
-    private val invalidOptionRoutine
-        get() = sequential {
-            +InstantRunnableCommand {
-                println("[Autonomous] Invalid Option for this Starting Configuration. Running Baseline.")
-            }
-            +BaselineRoutine()()
-        }
-
+    // Update the autonomous listener.
     fun update() {
         // Update localization.
         startingPositionMonitor.onChange { if (!Robot.lastEnabledState) DriveSubsystem.localization.reset(it.pose) }
 
-        // Just send it when everything is ready.
-        isReadyMonitor.onChangeToTrue {
-            JUST S3ND IT
-        }
-
-        // Stop the auto routine when we are not in autonomous anymore.
         modeMonitor.onChange { newValue ->
             if (newValue != FalconRobot.Mode.AUTONOMOUS) JUST.stop()
+        }
+
+        isReadyMonitor.onChangeToTrue {
+            JUST S3ND IT
         }
     }
 
@@ -72,41 +59,19 @@ object Autonomous {
         state(StartingPositions.LEFT, StartingPositions.RIGHT) {
             stateCommandGroup(autoMode) {
 
-                state(
-                    Mode.ROCKET,
-                    RocketRoutine()
-                )
-                state(
-                    Mode.BASELINE,
-                    BaselineRoutine()
-                )
-//                state(Mode.SIDE_CARGO_SHIP, SideCargoShipRoutine())
-
-                state(
-                    Mode.TEST_TRAJECTORIES,
-                    TestTrajectoriesRoutine()
-                )
-
-                state(Mode.CARGO_SHIP, invalidOptionRoutine)
+                state(Mode.ROCKET, RocketRoutine()())
+                state(Mode.BASELINE, BaselineRoutine())
+                state(Mode.TEST_TRAJECTORIES, TestTrajectoriesRoutine())
+                state(Mode.CARGO_SHIP, sequential {})
+                state(Mode.DO_NOTHING, sequential {})
             }
         }
         state(StartingPositions.CENTER) {
             stateCommandGroup(autoMode) {
-                state(
-                    Mode.CARGO_SHIP,
-                    CargoShipRoutine()()
-                )
-                state(
-                    Mode.BASELINE,
-                    BaselineRoutine()
-                )
-
-                state(
-                    Mode.TEST_TRAJECTORIES,
-                    TestTrajectoriesRoutine()
-                )
-
-                state(Mode.ROCKET, invalidOptionRoutine)
+                state(Mode.CARGO_SHIP, CargoShipRoutine()())
+                state(Mode.BASELINE, BaselineRoutine())
+                state(Mode.TEST_TRAJECTORIES, TestTrajectoriesRoutine())
+                state(Mode.ROCKET, sequential {})
             }
         }
     }
@@ -127,5 +92,5 @@ object Autonomous {
 
     enum class GamePiece { HATCH, CARGO }
 
-    enum class Mode { TEST_TRAJECTORIES, ROCKET, CARGO_SHIP, BASELINE }
+    enum class Mode { TEST_TRAJECTORIES, ROCKET, CARGO_SHIP, BASELINE, DO_NOTHING }
 }
