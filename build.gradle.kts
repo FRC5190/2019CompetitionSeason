@@ -96,7 +96,7 @@ dependencies {
     compile("com.github.salomonbrys.kotson", "kotson", "2.5.0")
 
     // Serial Communication
-    compile("com.fazecast", "jSerialComm", "[2.0.0,3.0.0)")
+    compile("com.fazecast", "jSerialComm", "2.4.1")
 
     // XChart for Simulations and Tests
     testCompile("org.knowm.xchart", "xchart", "3.2.2")
