@@ -21,6 +21,12 @@ object JeVoisManager {
 
     private val connectedJeVoisCameras = mutableListOf<JeVois>()
 
+    var isFrontJeVoisConnected = false
+        private set
+
+    var isBackJeVoisConnected = false
+        private set
+
     init {
         fixedRateTimer(period = 1000L) {
             val currentTime = Timer.getFPGATimestamp().second
@@ -40,12 +46,15 @@ object JeVoisManager {
                 .filter { it.descriptivePortName.contains("JeVois", true) }
 
             for (serialPort in jeVoisSerialPorts) {
-                if(connectedJeVoisCameras.any { it.systemPortName.equals(serialPort.systemPortName, true) }) {
+                if (connectedJeVoisCameras.any { it.systemPortName.equals(serialPort.systemPortName, true) }) {
                     continue
                 }
                 println("[JeVois Manager] Found new camera: ${serialPort.systemPortName}")
                 connectedJeVoisCameras.add(JeVois(serialPort))
             }
+
+            isFrontJeVoisConnected = connectedJeVoisCameras.any { it.isFront == true }
+            isBackJeVoisConnected = connectedJeVoisCameras.any { it.isFront == false }
         }
     }
 
@@ -53,7 +62,10 @@ object JeVoisManager {
         private val serialPort: SerialPort
     ) {
 
-        val systemPortName = serialPort.systemPortName
+        var isFront: Boolean? = null
+            private set
+
+        val systemPortName: String = serialPort.systemPortName
 
         private var lastMessageReceived = 0.second
 
@@ -103,6 +115,8 @@ object JeVoisManager {
                 val timestamp = (Timer.getFPGATimestamp() - jsonData["capture_ago"].asDouble).second
                 val contours = jsonData["targets"].asJsonArray
                     .filterIsInstance<JsonObject>()
+
+                this.isFront = isFront
 
                 VisionProcessing.processData(VisionData(isFront, timestamp, contours))
             } catch (e: JsonParseException) {

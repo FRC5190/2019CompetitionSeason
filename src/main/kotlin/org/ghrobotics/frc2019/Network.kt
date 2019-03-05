@@ -14,6 +14,7 @@ import org.ghrobotics.frc2019.subsystems.climb.ClimbSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
+import org.ghrobotics.frc2019.vision.JeVoisManager
 import org.ghrobotics.lib.mathematics.units.derivedunits.inchesPerSecond
 import org.ghrobotics.lib.wrappers.networktables.enumSendableChooser
 
@@ -65,10 +66,12 @@ object Network {
     private val leftAmperageEntry = driveSubsystemLayout.add("Left Current", 0.0).entry
     private val rightAmperageEntry = driveSubsystemLayout.add("Right Current", 0.0).entry
 
-    private val visionTargetX = visionLayout.add("Vision Target X", 0.0).entry
-    val visionLastUpdate = visionLayout.add("Vision Last Update", 0.0).entry
-    private val visionTargetY = visionLayout.add("Vision Target Y", 0.0).entry
-    private val visionTargetRotation = visionLayout.add("Vision Target Rotation", 0.0).entry
+    private val visionFrontCameraConnected = visionLayout.add("Front Camera Connected", false).entry
+    private val visionBackCameraConnected = visionLayout.add("Back Camera Connected", false).entry
+//    private val visionTargetX = visionLayout.add("Vision Target X", 0.0).entry
+//    val visionLastUpdate = visionLayout.add("Vision Last Update", 0.0).entry
+//    private val visionTargetY = visionLayout.add("Vision Target Y", 0.0).entry
+//    private val visionTargetRotation = visionLayout.add("Vision Target Rotation", 0.0).entry
 
     private val elevatorRawPosition = elevatorSubsystemLayout.add("Raw Position", 0.0).entry
     private val elevatorPosition = elevatorSubsystemLayout.add("Position (in)", 0.0).entry
@@ -150,6 +153,9 @@ object Network {
         climbLidarRaw.setDouble(ClimbSubsystem.lidarRaw)
         frontClimbWinchCurrent.setDouble(ClimbSubsystem.frontWinchCurrent)
         backClimbWinchCurrent.setDouble(ClimbSubsystem.backWinchCurrent)
+
+        visionFrontCameraConnected.setBoolean(JeVoisManager.isFrontJeVoisConnected)
+        visionBackCameraConnected.setBoolean(JeVoisManager.isBackJeVoisConnected)
 
 //        val trackedObject = TargetTracker.bestTarget
 //        if (trackedObject != null) {
