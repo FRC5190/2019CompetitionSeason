@@ -5,7 +5,6 @@ import org.ghrobotics.frc2019.Robot
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.TrajectoryVisionTrackerCommand
-import org.ghrobotics.frc2019.subsystems.drive.VisionTrackerTargetType
 import org.ghrobotics.lib.commands.DelayCommand
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.InstantRunnableCommand

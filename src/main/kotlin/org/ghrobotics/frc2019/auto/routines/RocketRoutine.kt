@@ -33,7 +33,7 @@ class RocketRoutine : AutoRoutine() {
                 +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
                 +followVisionAssistedTrajectory(path1, pathMirrored, 5.feet)
                 +sequential {
-                    +DelayCommand(path1.duration - 4.second)
+                    +DelayCommand(path1.duration - 3.5.second)
                     +Superstructure.kFrontHighRocketHatch.withTimeout(4.second)
                 }
             }
