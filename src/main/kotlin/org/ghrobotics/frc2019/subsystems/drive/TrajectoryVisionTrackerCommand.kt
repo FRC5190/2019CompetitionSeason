@@ -48,14 +48,15 @@ class TrajectoryVisionTrackerCommand(
         LiveDashboard.isFollowingPath = true
     }
 
-    private var currentTarget: TargetTracker.TrackedTarget? = null
-    private var lastKnownPose: Pose2d? = null
+    private var lastKnownTargetPose: Pose2d? = null
 
     override suspend fun execute() {
-        val nextState = DriveSubsystem.trajectoryTracker.nextState(DriveSubsystem.robotPosition)
+        val robotPosition = DriveSubsystem.robotPosition
+
+        val nextState = DriveSubsystem.trajectoryTracker.nextState(robotPosition)
 
         val withinVisionRadius =
-            DriveSubsystem.localization().translation.distance(trajectory.lastState.state.pose.translation) < radiusFromEnd.value
+            robotPosition.translation.distance(trajectory.lastState.state.pose.translation) < radiusFromEnd.value
 
         if (withinVisionRadius) {
             val newTarget = if (!useAbsoluteVision) {
@@ -66,18 +67,16 @@ class TrajectoryVisionTrackerCommand(
                 TargetTracker.getAbsoluteTarget((trajectory.lastState.state.pose + Constants.kCenterToForwardIntake).translation)
             }
 
-            if (newTarget != null) currentTarget = newTarget
-
-            val newPose = currentTarget?.averagedPose2d
-            if (currentTarget?.isAlive == true && newPose != null) lastKnownPose = newPose
+            val newPose = newTarget?.averagedPose2d
+            if (newTarget?.isAlive == true && newPose != null) lastKnownTargetPose = newPose
         }
 
-        val lastKnownVisionPose = this.lastKnownPose
+        val lastKnownTargetPose = this.lastKnownTargetPose
 
-        if (lastKnownVisionPose != null) {
+        if (lastKnownTargetPose != null) {
             println("VISION")
 
-            val transform = lastKnownVisionPose inFrameOfReferenceOf DriveSubsystem.localization()
+            val transform = lastKnownTargetPose inFrameOfReferenceOf robotPosition
             val angle = Rotation2d(transform.translation.x.value, transform.translation.y.value, true)
 
             Network.visionDriveAngle.setDouble(angle.degree)

@@ -20,18 +20,36 @@ object TargetTracker {
     var bestTargetFront: TrackedTarget? = null
         private set
 
-    var bestTargetFrontLeft: TrackedTarget? = null
-        private set
-
-    var bestTargetFrontRight: TrackedTarget? = null
-        private set
-
     var bestTargetBack: TrackedTarget? = null
         private set
 
     init {
         fixedRateTimer(period = 20L) {
-            update()
+            synchronized(targets) {
+                val currentTime = Timer.getFPGATimestamp().second
+
+                val currentRobotPose = DriveSubsystem.localization()
+
+                // Update and remove old targets
+                targets.removeIf {
+                    it.update(currentTime, currentRobotPose)
+                    !it.isAlive
+                }
+
+                bestTargetBack = targets.asSequence()
+                    .filter { it.isReal && it.averagedPose2dRelativeToBot.translation.x.value < 0.0 }
+                    .minBy { it.averagedPose2dRelativeToBot.translation.norm.value }
+
+                bestTargetFront = targets.asSequence()
+                    .filter { it.isReal && it.averagedPose2dRelativeToBot.translation.x.value > 0.0 }
+                    .minBy { it.averagedPose2dRelativeToBot.translation.norm.value }
+
+                // Publish to dashboard
+                LiveDashboard.visionTargets = targets.asSequence()
+                    .filter { it.isReal }
+                    .map { it.averagedPose2d }
+                    .toList()
+            }
         }
     }
 
@@ -59,55 +77,14 @@ object TargetTracker {
         }
     }
 
-    fun update() = synchronized(targets) {
-        val currentTime = Timer.getFPGATimestamp().second
-
-        val currentRobotPose = DriveSubsystem.localization()
-
-        // Update and remove old targets
-        targets.removeIf {
-            it.update(currentTime, currentRobotPose)
-            !it.isAlive
-        }
-
-        bestTargetBack = targets.asSequence()
-            .filter { it.isReal && it.averagedPose2dRelativeToBot.translation.x.value < 0.0 }
-            .minBy { it.averagedPose2dRelativeToBot.translation.norm.value }
-
-        // Sort the targets from best to worst
-        val sortedFrontTargets = targets.asSequence()
-            .filter { it.isReal && it.averagedPose2dRelativeToBot.translation.x.value > 0.0 }
-            .toMutableList()
-
-        sortedFrontTargets.sortBy { it.averagedPose2dRelativeToBot.translation.norm.value }
-
-        // Choose the top two best targets
-        val bestFrontTarget1 = sortedFrontTargets.getOrNull(0)
-        val bestFrontTarget2 = sortedFrontTargets.getOrNull(1)
-
-        bestTargetFront = bestFrontTarget1
-
-        if (bestTargetFrontLeft?.isAlive == false) bestTargetFrontLeft = null
-        if (bestTargetFrontRight?.isAlive == false) bestTargetFrontRight = null
-
-        // Make the left one best left and right one best right
-        if (bestFrontTarget1 != null && bestFrontTarget2 != null) {
-            if (bestFrontTarget1.averagedPose2dRelativeToBot.translation.y <
-                bestFrontTarget2.averagedPose2dRelativeToBot.translation.y
-            ) {
-                bestTargetFrontLeft = bestFrontTarget1
-                bestTargetFrontRight = bestFrontTarget2
-            } else {
-                bestTargetFrontLeft = bestFrontTarget2
-                bestTargetFrontRight = bestFrontTarget1
+    fun getBestTargetUsingReference(referencePose: Pose2d, isFrontTarget: Boolean) = synchronized(targets) {
+        targets.asSequence()
+            .associateWith { it.averagedPose2d inFrameOfReferenceOf referencePose }
+            .filter {
+                val x = it.value.translation.x.value
+                it.key.isReal && if (isFrontTarget) x > 0.0 else x < 0.0
             }
-        }
-
-        // Publish to dashboard
-        LiveDashboard.visionTargets = targets.asSequence()
-            .filter { it.isReal }
-            .map { it.averagedPose2d }
-            .toList()
+            .minBy { it.value.translation.norm.value }?.key
     }
 
     fun getAbsoluteTarget(translation2d: Translation2d) = synchronized(targets) {
@@ -167,7 +144,7 @@ object TargetTracker {
             samples.removeIf { currentTime - it.creationTime >= Constants.kTargetTrackingMaxLifetime }
             // Update State
             isAlive = samples.isNotEmpty()
-            if(samples.size >= 2) isReal = true
+            if (samples.size >= 2) isReal = true
             stability = (samples.size / (Constants.kVisionCameraFPS * Constants.kTargetTrackingMaxLifetime.value))
                 .coerceAtMost(1.0)
             // Update Averaged Pose
