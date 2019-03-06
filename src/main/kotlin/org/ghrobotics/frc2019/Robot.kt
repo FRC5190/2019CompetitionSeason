@@ -47,7 +47,7 @@ object Robot : FalconRobot() {
 
     override fun periodic() {
         Controls.update()
-//        LEDs.update()
+        LEDs.update()
         Autonomous.update()
     }
 

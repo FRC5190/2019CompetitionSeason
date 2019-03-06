@@ -75,7 +75,7 @@ class TrajectoryVisionTrackerCommand(
 
         if (lastKnownTargetPose != null) {
             println("VISION")
-
+            visionActive = true
             val transform = lastKnownTargetPose inFrameOfReferenceOf robotPosition
             val angle = Rotation2d(transform.translation.x.value, transform.translation.y.value, true)
 

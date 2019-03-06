@@ -1,9 +1,6 @@
 package org.ghrobotics.frc2019.subsystems.arm
 
-import com.ctre.phoenix.motorcontrol.ControlMode
-import com.ctre.phoenix.motorcontrol.DemandType
-import com.ctre.phoenix.motorcontrol.FeedbackDevice
-import com.ctre.phoenix.motorcontrol.NeutralMode
+import com.ctre.phoenix.motorcontrol.*
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.Robot
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
@@ -84,6 +81,8 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
 
             softLimitReverse = (-40).degree.toNativeUnitPosition(Constants.kArmNativeUnitModel)
             softLimitReverseEnabled = false
+
+            setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10)
 
             kF = Constants.kArmKf
 

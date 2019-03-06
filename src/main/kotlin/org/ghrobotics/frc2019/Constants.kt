@@ -344,8 +344,8 @@ object Constants {
     val kCenterToForwardIntake = Pose2d((kRobotLength / 2.0) + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
 
-    val kCenterToFrontCamera = Pose2d((-1.75).inch, 0.inch, 0.degree)
-    val kCenterToBackCamera = Pose2d((-6.25).inch, 0.inch, 180.degree)
+    val kCenterToFrontCamera = Pose2d((-1.75).inch, 1.inch, 0.degree)
+    val kCenterToBackCamera = Pose2d((-6.25).inch, 1.inch, 180.degree)
 
 
     // VISION
@@ -461,10 +461,10 @@ object Constants {
         true
     )
 
-    val kArmFlipTolerance = 40.degree
+    val kArmFlipTolerance = 30.degree
     val kArmSafeFlipAngle = 30.degree
 
-    val kArmCurrentLimit = 15.amp
+    val kArmCurrentLimit = 20.amp
 
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
     val kArmClosedLoopTolerance = 5.degree
