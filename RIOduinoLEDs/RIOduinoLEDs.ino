@@ -18,12 +18,12 @@ void setup() {
 }
 
 void loop() {
-
-  if(ledmode == 1 || ledmode == 6) {
-    FastLED.setBrightness(255 / 2);
-  }else {
-    FastLED.setBrightness(255);
-  }
+  FastLED.setBrightness(255 * .3);
+//  if(ledmode == 1 || ledmode == 6) {
+//    FastLED.setBrightness(255 / 2);
+//  }else {
+//    FastLED.setBrightness(255);
+//  }
   
   unsigned long currentMillis = millis();
   switch(ledmode) {
