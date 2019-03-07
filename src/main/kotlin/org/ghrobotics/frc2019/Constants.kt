@@ -452,7 +452,7 @@ object Constants {
 
     // ARM
     val kArmSensorUnitsPerRotation = 1024.nativeUnits
-    val kArmUpTicks = (-502).nativeUnits
+    val kArmUpTicks = (-506.5).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,
@@ -468,8 +468,8 @@ object Constants {
 
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
     val kArmClosedLoopTolerance = 5.degree
-    val kArmCruiseVelocity = 450.0 * 1.0.degree.velocity
-    val kArmAcceleration = 400.0 * 1.0.degree.acceleration
+    val kArmCruiseVelocity = 4.54 * 1.0.radian.velocity
+    val kArmAcceleration = 11.95 * 1.0.radian.acceleration
 
     const val kArmEmptyHoldVoltage = 1.9
 

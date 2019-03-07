@@ -28,7 +28,7 @@ object JeVoisManager {
         private set
 
     init {
-        fixedRateTimer(period = 1000L) {
+        fixedRateTimer(period = 10000L) {
             val currentTime = Timer.getFPGATimestamp().second
 
             connectedJeVoisCameras.removeIf {

@@ -109,10 +109,19 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
             closedLoopGoal = newPosition
         }
 
-    fun setPercentOutput(newOutput: Double) =
+    fun setPercentOutput(newOutput: Double, applyFeedForward: Boolean = true) =
         synchronized(closedLoopSync) {
             isClosedLoop = false
-            armMaster.set(ControlMode.PercentOutput, newOutput, DemandType.ArbitraryFeedForward, arbitraryFeedForward)
+            if (applyFeedForward) {
+                armMaster.set(
+                    ControlMode.PercentOutput,
+                    newOutput,
+                    DemandType.ArbitraryFeedForward,
+                    arbitraryFeedForward
+                )
+            } else {
+                armMaster.set(ControlMode.PercentOutput, newOutput)
+            }
         }
 
     /**
@@ -153,8 +162,7 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
 
             Kg * position.cos * experiencedAcceleration
         } else {
-            // Feedforward for 45 degree angle on arm
-            Constants.kAccelerationDueToGravity * Constants.kArmEmptyKg * 0.5
+           0.0
         }
 
         synchronized(closedLoopSync) {
