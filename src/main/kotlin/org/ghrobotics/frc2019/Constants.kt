@@ -81,7 +81,7 @@ object Constants {
     const val kRobotMomentOfInertia = 10.0 // kg m^2
     const val kRobotAngularDrag = 12.0 // Nm per rad/s
 
-    val kRobotWidth = 29.inch
+    val kRobotWidth = 30.inch
     val kRobotLength = 30.inch
 
     val kBumperThickness = 4.5.inch
