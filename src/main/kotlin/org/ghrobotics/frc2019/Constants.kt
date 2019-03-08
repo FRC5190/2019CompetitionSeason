@@ -96,6 +96,7 @@ object Constants {
     val kFrontBumperToCenter = Pose2d(-(kRobotLength / 2.0) - kBumperThickness, 0.meter, 0.degree)
     val kBackBumperToCenter = Pose2d((kRobotLength / 2.0) + kBumperThickness, 0.meter, 0.degree)
     val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeProtrusion, kBadIntakeOffset, 0.degree)
+    val kCenterToForwardIntake = Pose2d((kRobotLength / 2.0) + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
 
     val kCenterToFrontCamera = Pose2d((-1.75).inch, 0.inch, 0.degree)
@@ -292,7 +293,7 @@ object Constants {
 //    const val kClimbBackWinchSlaveId = 15
 //    const val kClimbWheelId = 16
 //
-//    const val kCanifier = 16
+//    const val kCanifierId = 16
 //
 //    // ANALOG INPUT
 //    const val kLeftBallSensorId = 0
@@ -341,18 +342,17 @@ object Constants {
 //    val kFrontBumperToCenter = Pose2d(-(kRobotLength / 2.0) - kBumperThickness, 0.meter, 0.degree)
 //    val kBackBumperToCenter = Pose2d((kRobotLength / 2.0) + kBumperThickness, 0.meter, 0.degree)
 //    val kForwardIntakeToCenter = Pose2d(-(kRobotLength / 2.0) - kIntakeProtrusion, kBadIntakeOffset, 0.degree)
+//    val kCenterToForwardIntake = Pose2d((kRobotLength / 2.0) + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
 //    val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
 //
-//    val kCenterToFrontCamera = Pose2d((-1.75).inch, 0.inch, 0.degree)
-//    val kCenterToBackCamera = Pose2d((-6.25).inch, 0.inch, 180.degree)
+//    val kCenterToFrontCamera = Pose2d((-1.75).inch, 1.inch, 0.degree)
+//    val kCenterToBackCamera = Pose2d((-6.25).inch, 1.inch, 180.degree)
 //
 //
 //    // VISION
 //    const val kVisionCameraFPS = 30.0
-//    val kVisionCameraPing = 0.75.second
 //    val kVisionCameraTimeout = 2.second
 //    val kTargetTrackingDistanceErrorTolerance = 16.inch
-//    val kTargetTrackingMinLifetime = 0.1.second
 //    val kTargetTrackingMaxLifetime = 0.5.second
 //
 //
@@ -453,7 +453,7 @@ object Constants {
 //
 //    // ARM
 //    val kArmSensorUnitsPerRotation = 1024.nativeUnits
-//    val kArmUpTicks = (-502).nativeUnits
+//    val kArmUpTicks = (-506.5).nativeUnits
 //
 //    val kArmNativeUnitModel = ArmNativeUnitModel(
 //        kArmUpTicks,
@@ -462,15 +462,15 @@ object Constants {
 //        true
 //    )
 //
-//    val kArmFlipTolerance = 40.degree
+//    val kArmFlipTolerance = 30.degree
 //    val kArmSafeFlipAngle = 30.degree
 //
-//    val kArmCurrentLimit = 15.amp
+//    val kArmCurrentLimit = 20.amp
 //
 //    val kArmClosedLoopVelocityTolerance = 2.degree.velocity
 //    val kArmClosedLoopTolerance = 5.degree
-//    val kArmCruiseVelocity = 450.0 * 1.0.degree.velocity
-//    val kArmAcceleration = 400.0 * 1.0.degree.acceleration
+//    val kArmCruiseVelocity = 4.54 * 1.0.radian.velocity
+//    val kArmAcceleration = 11.95 * 1.0.radian.acceleration
 //
 //    const val kArmEmptyHoldVoltage = 1.9
 //
@@ -487,6 +487,8 @@ object Constants {
 //        12.5.inch,
 //        8900.nativeUnits
 //    )
+//
+//    val kClimbFrontWinchNativeUnitModel = kClimbBackWinchNativeUnitModel
 //
 //    val kClimbWinchCurrentLimit = 20.amp
 //

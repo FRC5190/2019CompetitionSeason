@@ -20,7 +20,7 @@ import org.ghrobotics.lib.wrappers.hid.kX
 import kotlin.math.absoluteValue
 import kotlin.math.max
 
-class ManualDriveCommand : FalconCommand(DriveSubsystem) {
+open class ManualDriveCommand : FalconCommand(DriveSubsystem) {
 
 //    private var armStowedRange = (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)
 
@@ -117,7 +117,7 @@ class ManualDriveCommand : FalconCommand(DriveSubsystem) {
     /**
      * Tank drive control
      */
-    private fun tankDrive(
+    protected fun tankDrive(
         leftPercent: Double,
         rightPercent: Double
     ) {

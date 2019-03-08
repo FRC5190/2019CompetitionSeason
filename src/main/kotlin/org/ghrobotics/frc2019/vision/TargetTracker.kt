@@ -5,10 +5,12 @@ import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.debug.LiveDashboard
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
+import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.second
+import kotlin.concurrent.fixedRateTimer
 
 
 object TargetTracker {
@@ -20,6 +22,36 @@ object TargetTracker {
 
     var bestTargetBack: TrackedTarget? = null
         private set
+
+    init {
+        fixedRateTimer(period = 20L) {
+            synchronized(targets) {
+                val currentTime = Timer.getFPGATimestamp().second
+
+                val currentRobotPose = DriveSubsystem.localization()
+
+                // Update and remove old targets
+                targets.removeIf {
+                    it.update(currentTime, currentRobotPose)
+                    !it.isAlive
+                }
+
+                bestTargetBack = targets.asSequence()
+                    .filter { it.isReal && it.averagedPose2dRelativeToBot.translation.x.value < 0.0 }
+                    .minBy { it.averagedPose2dRelativeToBot.translation.norm.value }
+
+                bestTargetFront = targets.asSequence()
+                    .filter { it.isReal && it.averagedPose2dRelativeToBot.translation.x.value > 0.0 }
+                    .minBy { it.averagedPose2dRelativeToBot.translation.norm.value }
+
+                // Publish to dashboard
+                LiveDashboard.visionTargets = targets.asSequence()
+                    .filter { it.isReal }
+                    .map { it.averagedPose2d }
+                    .toList()
+            }
+        }
+    }
 
     fun addSamples(creationTime: Time, samples: Iterable<Pose2d>) =
         addSamples(samples.map { TrackedTargetSample(creationTime, it) })
@@ -45,51 +77,23 @@ object TargetTracker {
         }
     }
 
-    fun update() = synchronized(targets) {
-        val currentTime = Timer.getFPGATimestamp().second
-
-        // Update and remove old targets
-        targets.removeIf {
-            it.update(currentTime)
-            !it.isAlive
-        }
-
-        // Update the new best front and back targets
-        var newFrontTarget: TrackedTarget? = null
-        var tempFrontDistance = 0.0
-        var newBackTarget: TrackedTarget? = null
-        var tempBackDistance = 0.0
-
-        val currentRobotPose = DriveSubsystem.localization()
-
-        for (target in targets) {
-            if (!target.isReal) continue
-
-            val targetRelativeToRobot = target.averagedPose2d inFrameOfReferenceOf currentRobotPose
-            val newDistance = targetRelativeToRobot.translation.norm.value
-            if (targetRelativeToRobot.translation.x.value > 0.0) {
-                // Front Target
-                if (newFrontTarget == null || newDistance < tempFrontDistance) {
-                    newFrontTarget = target
-                    tempFrontDistance = newDistance
-                }
-            } else {
-                // Back Target
-                if (newBackTarget == null || newDistance < tempBackDistance) {
-                    newBackTarget = target
-                    tempBackDistance = newDistance
-                }
+    fun getBestTargetUsingReference(referencePose: Pose2d, isFrontTarget: Boolean) = synchronized(targets) {
+        targets.asSequence()
+            .associateWith { it.averagedPose2d inFrameOfReferenceOf referencePose }
+            .filter {
+                val x = it.value.translation.x.value
+                it.key.isReal && if (isFrontTarget) x > 0.0 else x < 0.0
             }
-        }
+            .minBy { it.value.translation.norm.value }?.key
+    }
 
-        bestTargetFront = newFrontTarget
-        bestTargetBack = newBackTarget
-
-        // Publish to dashboard
-        LiveDashboard.visionTargets = targets.asSequence()
-            .filter { it.isReal }
-            .map { it.averagedPose2d }
-            .toList()
+    fun getAbsoluteTarget(translation2d: Translation2d) = synchronized(targets) {
+        targets.asSequence()
+            .filter {
+                it.isReal
+                    && translation2d.distance(it.averagedPose2d.translation) <= Constants.kTargetTrackingDistanceErrorTolerance.value
+            }
+            .minBy { it.averagedPose2d.translation.distance(translation2d) }
     }
 
     class TrackedTarget(
@@ -102,6 +106,9 @@ object TargetTracker {
          * The averaged pose2d for x time
          */
         var averagedPose2d = initialTargetSample.targetPose
+            private set
+
+        var averagedPose2dRelativeToBot = Pose2d()
             private set
 
         /**
@@ -132,18 +139,12 @@ object TargetTracker {
             samples.add(newSamples)
         }
 
-        fun update(currentTime: Time) = synchronized(samples) {
+        fun update(currentTime: Time, currentRobotPose: Pose2d) = synchronized(samples) {
             // Remove expired samples
             samples.removeIf { currentTime - it.creationTime >= Constants.kTargetTrackingMaxLifetime }
             // Update State
             isAlive = samples.isNotEmpty()
-            isReal = if (isAlive) {
-                @Suppress("UnsafeCallOnNullableType")
-                val lastSampleTime = samples.maxBy { it.creationTime.value }!!.creationTime
-                lastSampleTime - dateOfBirth >= Constants.kTargetTrackingMinLifetime
-            } else {
-                false
-            }
+            if (samples.size >= 2) isReal = true
             stability = (samples.size / (Constants.kVisionCameraFPS * Constants.kTargetTrackingMaxLifetime.value))
                 .coerceAtMost(1.0)
             // Update Averaged Pose
@@ -160,6 +161,7 @@ object TargetTracker {
                 Length(accumulatedY / samples.size),
                 Rotation2d(accumulatedAngle / samples.size)
             )
+            averagedPose2dRelativeToBot = averagedPose2d inFrameOfReferenceOf currentRobotPose
         }
 
     }

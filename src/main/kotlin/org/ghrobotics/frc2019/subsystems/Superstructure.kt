@@ -136,8 +136,10 @@ object Superstructure {
                         }
                         // Arm
                         +sequential {
-                            val waitCondition =
-                                { ElevatorSubsystem.position < Constants.kElevatorSafeFlipHeight }
+                            val waitCondition = {
+                                ElevatorSubsystem.position < Constants.kElevatorSafeFlipHeight
+                                    || ElevatorSubsystem.isBottomLimitSwitchPressed
+                            }
                             // Prepare arm to flip through elevator
                             +ClosedLoopArmCommand(
                                 if (isFrontWanted) {
@@ -145,11 +147,11 @@ object Superstructure {
                                 } else {
                                     90.degree - Constants.kArmFlipTolerance
                                 }
-                            ).withExit(waitCondition)
+                            ).overrideExit(waitCondition)
                             // Wait for elevator to come down to safe height
                             +ConditionCommand(waitCondition)
 
-                            if(elevatorHeightWanted > Constants.kElevatorSafeFlipHeight + Constants.kElevatorClosedLoopTolerance) {
+                            if (elevatorHeightWanted > Constants.kElevatorSafeFlipHeight + Constants.kElevatorClosedLoopTolerance) {
                                 // Consider safe flip if elevator goes up
                                 if (isFrontWanted) {
                                     if (armAngle < Constants.kArmSafeFlipAngle) {
