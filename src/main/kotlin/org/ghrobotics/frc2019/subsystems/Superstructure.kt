@@ -31,13 +31,13 @@ object Superstructure {
     val kFrontLowRocketCargo get() = goToHeightWithAngle(26.inch, 15.degree)
     val kBackLowRocketCargo get() = goToHeightWithAngle(25.inch, 135.degree)
 
-    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 0.degree)
+    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 10.degree)
     val kBackHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 180.degree)
 
-    val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, (-20).degree)
-    val kBackCargoIntake get() = elevatorAndArmHeight(0.inch, (-160).degree)
+    val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, (-25).degree)
+    val kBackCargoIntake get() = elevatorAndArmHeight(0.inch, (-155).degree)
 
-    val kFrontCargoFromLoadingStation get() = elevatorAndArmHeight(0.inch, 45.degree)
+    val kFrontCargoFromLoadingStation get() = elevatorAndArmHeight(25.inch, 5.degree)
     val kBackCargoFromLoadingStation get() = elevatorAndArmHeight(0.inch, 135.degree)
 
     val kStowedPosition get() = elevatorAndArmHeight(0.inch, 90.degree)
@@ -67,7 +67,7 @@ object Superstructure {
     }
 
     @Suppress("ComplexMethod")
-    private fun elevatorAndArmHeight(
+    fun elevatorAndArmHeight(
         elevatorHeightWanted: Length,
         armAngle: Rotation2d
     ): FalconCommand {

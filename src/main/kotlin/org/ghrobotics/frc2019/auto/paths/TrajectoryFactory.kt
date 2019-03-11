@@ -23,7 +23,7 @@ object TrajectoryFactory {
     private val kFirstPathMaxAcceleration = 6.feet.acceleration
 
     private val kVelocityRadiusConstraintRadius = 4.feet
-    private val kVelocityRadiusConstraintVelocity = 4.feet.velocity
+    private val kVelocityRadiusConstraintVelocity = 3.feet.velocity
 
     private val kMaxCentripetalAccelerationElevatorUp = 6.feet.acceleration
     private val kMaxCentripetalAccelerationElevatorDown = 8.feet.acceleration

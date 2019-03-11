@@ -99,7 +99,7 @@ object Constants {
     val kCenterToForwardIntake = Pose2d((kRobotLength / 2.0) + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
 
-    val kCenterToFrontCamera = Pose2d((-1.75).inch, 0.inch, 0.degree)
+    val kCenterToFrontCamera = Pose2d((-1.75).inch, 0.5.inch, 0.degree)
     val kCenterToBackCamera = Pose2d((-6.25).inch, 0.inch, 180.degree)
 
 
@@ -214,7 +214,7 @@ object Constants {
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
     val kArmClosedLoopTolerance = 5.degree
     val kArmCruiseVelocity = 260.156 * 1.0.degree.velocity
-    val kArmAcceleration = 218.0 * 1.0.degree.acceleration
+    val kArmAcceleration = 250.0 * 1.0.degree.acceleration
 
     const val kArmEmptyHoldVoltage = 1.0
 
@@ -227,16 +227,16 @@ object Constants {
 
     // CLIMB
     val kClimbBackWinchNativeUnitModel = SlopeNativeUnitModel(
-        12.5.inch,
-        8900.nativeUnits
+        12.inch,
+        12140.nativeUnits
     )
 
     val kClimbFrontWinchNativeUnitModel = SlopeNativeUnitModel(
         12.5.inch,
-        8900.nativeUnits
+        21680.nativeUnits
     )
 
-    val kClimbWinchCurrentLimit = 20.amp
+    val kClimbWinchCurrentLimit = 40.amp
 
     const val kClimbWinchClosedLoopTolerance = 2000
 
@@ -258,7 +258,8 @@ object Constants {
     val kClimbDisableLevelingHeight = 3.inch
 
     const val kClimbWinchPositionKp = 0.85
-    const val kClimbWinchLevelingKp = 4.0
+    const val kClimbWinchLevelingKp = 5.0
+    const val kClimbWinchLevelingKd = 150.0
 
     private fun NativeUnitModel<*>.calculatekF(voltage: Double, velocity: Double) =
         (voltage / 12.0 * 1023.0) / (toNativeUnitVelocity(velocity) / 10.0)

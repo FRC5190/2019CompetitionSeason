@@ -21,6 +21,6 @@ class ClosedLoopClimbCommand(
     }
 
     override suspend fun dispose() {
-        ClimbSubsystem.zeroOutputs()
+//        ClimbSubsystem.zeroOutputs()
     }
 }

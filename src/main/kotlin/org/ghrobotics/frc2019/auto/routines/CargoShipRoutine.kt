@@ -29,7 +29,7 @@ class CargoShipRoutine : AutoRoutine() {
             // Put hatch on FL cargo ship
             +parallel {
                 +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
-                +followVisionAssistedTrajectory(path1, { false }, 4.feet, true)
+                +DriveSubsystem.followTrajectory(path1, { false })
                 +sequential {
                     +DelayCommand(path1.duration - 3.5.second)
                     +Superstructure.kFrontHatchFromLoadingStation.withTimeout(2.0.second)

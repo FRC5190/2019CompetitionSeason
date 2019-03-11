@@ -85,8 +85,6 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
             setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10)
 
             kF = Constants.kArmKf
-
-            configMotionSCurveStrength(3)
         }
         defaultCommand = object : FalconCommand(this@ArmSubsystem) {
             override suspend fun initialize() {
