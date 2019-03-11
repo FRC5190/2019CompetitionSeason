@@ -54,7 +54,7 @@ object Network {
         .withPosition(8, 0)
 
     private val climbSubsystemLayout = mainShuffleboardDisplay.getLayout("Climb", BuiltInLayouts.kGrid)
-        .withSize(2, 2)
+        .withSize(3, 2)
         .withPosition(10, 0)
 
     private val globalXEntry = localizationLayout.add("Robot X", 0.0).entry
@@ -93,6 +93,8 @@ object Network {
     private val climbLidarRaw = climbSubsystemLayout.add("Lidar Raw", 0.0).entry
     private val frontClimbWinchCurrent = climbSubsystemLayout.add("Front Winch Current", 0.0).entry
     private val backClimbWinchCurrent = climbSubsystemLayout.add("Back Winch Current", 0.0).entry
+    private val frontLimitSwitch = climbSubsystemLayout.add("F Limit", false).entry
+    private val backLimitSwitch = climbSubsystemLayout.add("R Limit", false).entry
 
     val visionDriveAngle = visionLayout.add("Vision Drive Angle", 0.0).entry
     val visionDriveActive = visionLayout.add("Vision Drive Active", false).entry
@@ -153,6 +155,11 @@ object Network {
         climbLidarRaw.setDouble(ClimbSubsystem.lidarRaw)
         frontClimbWinchCurrent.setDouble(ClimbSubsystem.frontWinchCurrent)
         backClimbWinchCurrent.setDouble(ClimbSubsystem.backWinchCurrent)
+        frontLimitSwitch.setBoolean(ClimbSubsystem.Winch.FRONT.motor.sensorCollection.isRevLimitSwitchClosed)
+        backLimitSwitch.setBoolean(ClimbSubsystem.Winch.BACK.motor.sensorCollection.isRevLimitSwitchClosed)
+
+        visionFrontCameraConnected.setBoolean(JeVoisManager.isFrontJeVoisConnected)
+        visionBackCameraConnected.setBoolean(JeVoisManager.isBackJeVoisConnected)
 
         visionFrontCameraConnected.setBoolean(JeVoisManager.isFrontJeVoisConnected)
         visionBackCameraConnected.setBoolean(JeVoisManager.isBackJeVoisConnected)

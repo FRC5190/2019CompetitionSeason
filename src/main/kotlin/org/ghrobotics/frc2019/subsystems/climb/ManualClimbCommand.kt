@@ -4,40 +4,51 @@ import com.ctre.phoenix.motorcontrol.ControlMode
 import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.Controls
 import org.ghrobotics.lib.commands.FalconCommand
+import org.ghrobotics.lib.utils.withDeadband
 import org.ghrobotics.lib.wrappers.hid.getY
 import kotlin.math.absoluteValue
 
 class ManualClimbCommand : FalconCommand(ClimbSubsystem) {
 
-    var set = false
+    var frontset = false
+    var backset = false
 
     override suspend fun execute() {
         if (Controls.isClimbing) {
 
             val frontWinch = -frontWinchSource()
             val backWinch = -backWinchSource()
-            val wheelPercent = wheelSource()
+            val wheelPercent = -wheelSource()
 
-            if (frontWinch.absoluteValue > 0.1 || backWinch.absoluteValue > 0.2 || wheelPercent.absoluteValue > 0.2) {
+            ClimbSubsystem.wheelPercentOutput = wheelPercent
+
+            if (frontWinch.absoluteValue > 0.1) {
                 ClimbSubsystem.frontWinchPercentOutput = frontWinch
-                ClimbSubsystem.backWinchPercentOutput = backWinch
-                ClimbSubsystem.wheelPercentOutput = wheelPercent
-                set = false
-            } else if (!set) {
+                frontset = false
+            } else if (!frontset) {
                 ClimbSubsystem.Winch.FRONT.motor.set(ControlMode.MotionMagic, ClimbSubsystem.rawFront.toDouble())
+                frontset = true
+            }
+
+            if (backWinch.absoluteValue > 0.2) {
+                ClimbSubsystem.backWinchPercentOutput = backWinch
+                backset = false
+            } else if (!backset) {
                 ClimbSubsystem.Winch.BACK.motor.set(ControlMode.MotionMagic, ClimbSubsystem.rawBack.toDouble())
-                set = true
+                backset = true
             }
         } else {
             ClimbSubsystem.frontWinchPercentOutput = 0.0
             ClimbSubsystem.backWinchPercentOutput = 0.0
             ClimbSubsystem.wheelPercentOutput = 0.0
+            backset = false
+            frontset = false
         }
     }
 
     private companion object {
         val frontWinchSource = Controls.operatorXbox.getY(GenericHID.Hand.kLeft)
         val backWinchSource = Controls.operatorXbox.getY(GenericHID.Hand.kRight)
-        val wheelSource = Controls.driverXbox.getY(GenericHID.Hand.kRight)
+        val wheelSource = Controls.driverXbox.getY(GenericHID.Hand.kRight).withDeadband(0.1)
     }
 }

@@ -8,6 +8,7 @@ package org.ghrobotics.frc2019
 import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
+import org.ghrobotics.frc2019.subsystems.climb.autoL2Climb
 import org.ghrobotics.frc2019.subsystems.climb.autoL3Climb
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
@@ -90,7 +91,7 @@ object Controls {
 
             // LOW ROCKET, CARGO SHIP, AND LOADING STATION
             pov(180).changeOn {
-                if (backModifier.source() > 0.5) {
+                if (backModifier.source() > 0.35) {
                     if (IntakeSubsystem.isSeeingCargo()) {
                         Superstructure.kBackLowRocketCargo.start()
                     } else {
@@ -107,7 +108,7 @@ object Controls {
 
             // CARGO INTAKE
             pov(270).changeOn {
-                if (backModifier.source() > 0.5) {
+                if (backModifier.source() > 0.35) {
                     Superstructure.kBackCargoIntake.start()
                 } else {
                     Superstructure.kFrontCargoIntake.start()
@@ -115,7 +116,7 @@ object Controls {
             }
 
             triggerAxisButton(GenericHID.Hand.kRight).changeOn {
-                if (backModifier.source() > 0.5) {
+                if (backModifier.source() > 0.35) {
                     Superstructure.kBackCargoFromLoadingStation.start()
                 } else {
                     Superstructure.kFrontCargoFromLoadingStation.start()
@@ -126,6 +127,7 @@ object Controls {
         }
         state({ isClimbing }) {
             button(kA).change(autoL3Climb())
+            button(kY).change(autoL2Climb())
         }
     }
 

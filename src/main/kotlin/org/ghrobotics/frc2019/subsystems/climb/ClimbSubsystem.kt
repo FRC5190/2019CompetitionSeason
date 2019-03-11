@@ -89,6 +89,9 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         frontWinchSlave.follow(frontWinchMaster)
         backWinchSlave.follow(backWinchMaster)
 
+        frontWinchMaster.inverted = true
+        frontWinchSlave.inverted = true
+
         allMotors.forEach { motor ->
             motor.brakeMode = NeutralMode.Brake
 
@@ -114,23 +117,21 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
             master.selectProfileSlot(0, 0)
             master.selectProfileSlot(1, 1)
 
-            master.clearPositionOnReverseLimitSwitch = true
 
-            master.inverted = false
             master.encoderPhase = false
 
             master.selectedSensorPosition = 0
         }
 
         frontWinchMaster.motionAcceleration =
-            1.5.feet.acceleration.toNativeUnitAcceleration(Constants.kClimbFrontWinchNativeUnitModel)
+            0.5.feet.acceleration.toNativeUnitAcceleration(Constants.kClimbFrontWinchNativeUnitModel)
         frontWinchMaster.motionCruiseVelocity =
-            1.0.feet.velocity.toNativeUnitVelocity(Constants.kClimbFrontWinchNativeUnitModel)
+            0.5.feet.velocity.toNativeUnitVelocity(Constants.kClimbFrontWinchNativeUnitModel)
 
         backWinchMaster.motionAcceleration =
-            1.5.feet.acceleration.toNativeUnitAcceleration(Constants.kClimbBackWinchNativeUnitModel)
+            0.5.feet.acceleration.toNativeUnitAcceleration(Constants.kClimbBackWinchNativeUnitModel)
         backWinchMaster.motionCruiseVelocity =
-            1.0.feet.velocity.toNativeUnitVelocity(Constants.kClimbBackWinchNativeUnitModel)
+            0.5.feet.velocity.toNativeUnitVelocity(Constants.kClimbBackWinchNativeUnitModel)
 
         frontWinchMaster.configAuxPIDPolarity(false)
         backWinchMaster.configAuxPIDPolarity(true)
@@ -159,6 +160,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         allMasters.forEach {
             it.config_kP(0, Constants.kClimbWinchPositionKp, 10)
             it.config_kP(1, Constants.kClimbWinchLevelingKp, 10)
+            it.config_kD(1, Constants.kClimbWinchLevelingKd, 10)
         }
     }
 
@@ -166,6 +168,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         allMasters.forEach {
             it.config_kP(0, 0.0, 10)
             it.config_kP(1, 0.0, 10)
+            it.config_kD(1, 0.0, 10)
         }
     }
 
