@@ -38,7 +38,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
     private var closedLoopGoal = Length(0.0)
 
     // Used to retrieve the current elevator position and to set the desired elevator position.
-    var position = elevatorMaster.sensorPosition
+    var _position = elevatorMaster.sensorPosition
         private set
 
     // Velocity of the elevator.
@@ -128,9 +128,9 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
             override suspend fun initialize() {
                 synchronized(closedLoopSync) {
                     val lockedPosition = when {
-                        isClosedLoop && (position - closedLoopGoal).absoluteValue < Constants.kElevatorClosedLoopTolerance -> closedLoopGoal
+                        isClosedLoop && (_position - closedLoopGoal).absoluteValue < Constants.kElevatorClosedLoopTolerance -> closedLoopGoal
                         elevatorMaster.controlMode == ControlMode.MotionMagic -> elevatorMaster.activeTrajectoryPosition
-                        else -> position
+                        else -> _position
                     }
                     setPosition(lockedPosition)
                 }
@@ -182,7 +182,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
     override fun periodic() {
         val previousVelocity = velocity
 
-        position = elevatorMaster.sensorPosition
+        _position = elevatorMaster.sensorPosition
         velocity = elevatorMaster.sensorVelocity
         acceleration = (velocity - previousVelocity) / kMainLoopDt
 
@@ -191,7 +191,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         }
 
         arbitraryFeedForward =
-            if (position >= Constants.kElevatorSwitchHeight || Robot.emergencyActive) {
+            if (_position >= Constants.kElevatorSwitchHeight || Robot.emergencyActive) {
                 Constants.kElevatorAfterSwitchKg
             } else {
                 Constants.kElevatorBelowSwitchKg

@@ -3,10 +3,7 @@ package org.ghrobotics.frc2019.auto
 import org.ghrobotics.frc2019.Network
 import org.ghrobotics.frc2019.Robot
 import org.ghrobotics.frc2019.auto.paths.TrajectoryWaypoints
-import org.ghrobotics.frc2019.auto.routines.BaselineRoutine
-import org.ghrobotics.frc2019.auto.routines.CargoShipRoutine
-import org.ghrobotics.frc2019.auto.routines.RocketRoutine
-import org.ghrobotics.frc2019.auto.routines.TestTrajectoriesRoutine
+import org.ghrobotics.frc2019.auto.routines.*
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.commands.S3ND
 import org.ghrobotics.lib.commands.sequential
@@ -28,10 +25,6 @@ object Autonomous {
 
     // Starting position of the robot
     val startingPosition = { Network.startingPositionChooser.selected }
-
-//    val cargoShipGamePiece1 = { Network.cargoShip1Chooser.selected }
-//    val cargoShipGamePiece2 = { Network.cargoShip2Chooser.selected }
-//    val cargoShipGamePiece3 = { Network.cargoShip3Chooser.selected }
 
     // Stores whether the current config is valid.
     private var configValid = Source(true)
@@ -59,19 +52,21 @@ object Autonomous {
         state(StartingPositions.LEFT, StartingPositions.RIGHT) {
             stateCommandGroup(autoMode) {
 
-                state(Mode.ROCKET, RocketRoutine()())
+                state(Mode.NEAR_ROCKET, NearRocketRoutine()())
                 state(Mode.BASELINE, BaselineRoutine())
                 state(Mode.TEST_TRAJECTORIES, TestTrajectoriesRoutine())
-                state(Mode.CARGO_SHIP, sequential {})
+                state(Mode.FORWARD_CARGO_SHIP, sequential {})
                 state(Mode.DO_NOTHING, sequential {})
+                state(Mode.BOTTOM_ROCKET, BottomRocketRoutine()())
             }
         }
         state(StartingPositions.CENTER) {
             stateCommandGroup(autoMode) {
-                state(Mode.CARGO_SHIP, CargoShipRoutine()())
+                state(Mode.FORWARD_CARGO_SHIP, ForwardCargoShipRoutine()())
                 state(Mode.BASELINE, BaselineRoutine())
                 state(Mode.TEST_TRAJECTORIES, TestTrajectoriesRoutine())
-                state(Mode.ROCKET, sequential {})
+                state(Mode.NEAR_ROCKET, sequential {})
+                state(Mode.BOTTOM_ROCKET, sequential {})
             }
         }
     }
@@ -90,7 +85,5 @@ object Autonomous {
         RIGHT(TrajectoryWaypoints.kSideStart)
     }
 
-    enum class GamePiece { HATCH, CARGO }
-
-    enum class Mode { TEST_TRAJECTORIES, ROCKET, CARGO_SHIP, BASELINE, DO_NOTHING }
+    enum class Mode { TEST_TRAJECTORIES, NEAR_ROCKET, BOTTOM_ROCKET, FORWARD_CARGO_SHIP, BASELINE, DO_NOTHING }
 }

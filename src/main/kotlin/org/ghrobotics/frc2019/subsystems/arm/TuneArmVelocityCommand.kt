@@ -6,7 +6,7 @@ class TuneArmVelocityCommand : FalconCommand(ArmSubsystem) {
 
     init {
         finishCondition += {
-            ArmSubsystem.position.cos <= 0.0
+            ArmSubsystem._position.cos <= 0.0
         }
     }
 

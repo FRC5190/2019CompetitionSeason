@@ -16,7 +16,7 @@ import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.withEquals
 
-class RocketRoutine : AutoRoutine() {
+class NearRocketRoutine : AutoRoutine() {
     private val path1 = TrajectoryFactory.sideStartToRocketN
     private val path2 = TrajectoryFactory.rocketNToLoadingStation
     private val path3 = TrajectoryFactory.loadingStationToRocketN
@@ -53,9 +53,7 @@ class RocketRoutine : AutoRoutine() {
             +relocalize(TrajectoryWaypoints.kLoadingStation, false)
             +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
 
-            // Place hatch on near rocket
             +parallel {
-                // Drive path to far rocket
                 +followVisionAssistedTrajectory(path3, pathMirrored, 5.feet)
                 +Superstructure.kFrontHatchFromLoadingStation.withTimeout(3.second)
 

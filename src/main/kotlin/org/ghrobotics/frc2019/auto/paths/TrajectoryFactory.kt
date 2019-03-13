@@ -15,18 +15,18 @@ object TrajectoryFactory {
 
     /** Constraints **/
 
-    private val kMaxVelocity = 8.feet.velocity
-    private val kMaxAcceleration = 6.feet.acceleration
+    private val kMaxVelocity = 12.feet.velocity
+    private val kMaxAcceleration = 8.feet.acceleration
 
     private val kMaxHabitatVelocity = 3.feet.velocity
 
     private val kFirstPathMaxAcceleration = 6.feet.acceleration
 
-    private val kVelocityRadiusConstraintRadius = 4.feet
-    private val kVelocityRadiusConstraintVelocity = 4.feet.velocity
+    private val kVelocityRadiusConstraintRadius = 3.feet
+    private val kVelocityRadiusConstraintVelocity = 3.feet.velocity
 
     private val kMaxCentripetalAccelerationElevatorUp = 6.feet.acceleration
-    private val kMaxCentripetalAccelerationElevatorDown = 8.feet.acceleration
+    private val kMaxCentripetalAccelerationElevatorDown = 9.feet.acceleration
 
     private val kMaxVoltage = 10.volt
 
@@ -179,6 +179,16 @@ object TrajectoryFactory {
         getConstraints(false, depotAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
     )
 
+    val rocketFToLoadingStation = generateTrajectory(
+        true,
+        listOf(
+            rocketFAdjusted,
+            Pose2d(19.216.feet, 5.345.feet, 5.degree).asWaypoint(),
+            loadingStationAdjusted
+        ),
+        getConstraints(false, depotAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
+    )
+
     val rocketNToLoadingStation = generateTrajectory(
         true,
         listOf(
@@ -206,10 +216,19 @@ object TrajectoryFactory {
         getConstraints(true, rocketNAdjusted), kMaxVelocity, kFirstPathMaxAcceleration, kMaxVoltage
     )
 
+    val sideStartToRocketF = generateTrajectory(
+        false,
+        listOf(
+            Pose2d(TrajectoryWaypoints.kSideStart.translation).asWaypoint(),
+            rocketFAdjusted
+        ),
+        getConstraints(false, rocketNAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
+    )
+
     /** Generation **/
 
     private fun getConstraints(elevatorUp: Boolean, trajectoryEndpoint: Pose2d) =
-        listOf<TimingConstraint<Pose2dWithCurvature>>(
+        listOf(
             CentripetalAccelerationConstraint(
                 if (elevatorUp)
                     kMaxCentripetalAccelerationElevatorUp

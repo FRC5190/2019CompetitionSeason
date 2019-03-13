@@ -7,7 +7,7 @@ import org.ghrobotics.lib.mathematics.units.Rotation2d
 class ClosedLoopArmCommand(private val target: Rotation2d) : FalconCommand(ArmSubsystem) {
     init {
         finishCondition += {
-            (ArmSubsystem.position - target).absoluteValue < Constants.kArmClosedLoopTolerance &&
+            (ArmSubsystem._position - target).absoluteValue < Constants.kArmClosedLoopTolerance &&
                 ArmSubsystem.velocity.absoluteValue < Constants.kArmClosedLoopVelocityTolerance
         }
     }
