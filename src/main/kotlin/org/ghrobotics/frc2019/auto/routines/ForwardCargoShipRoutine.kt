@@ -14,7 +14,7 @@ import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.second
 
-class CargoShipRoutine : AutoRoutine() {
+class ForwardCargoShipRoutine : AutoRoutine() {
 
     private val path1 = TrajectoryFactory.centerStartToCargoShipFL
     private val path2 = TrajectoryFactory.cargoShipFLToLoadingStation

@@ -30,7 +30,7 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     private var closedLoopGoal = Rotation2d(0.0)
 
     // Used to retrieve the current arm position and to set the arm elevator position.
-    var position = armMaster.sensorPosition
+    var _position = armMaster.sensorPosition
         private set
 
     // Velocity of the arm.
@@ -90,9 +90,9 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
             override suspend fun initialize() {
                 synchronized(closedLoopSync) {
                     val lockedPosition = when {
-                        isClosedLoop && (position - closedLoopGoal).absoluteValue < Constants.kArmClosedLoopTolerance -> closedLoopGoal
+                        isClosedLoop && (_position - closedLoopGoal).absoluteValue < Constants.kArmClosedLoopTolerance -> closedLoopGoal
                         armMaster.controlMode == ControlMode.MotionMagic -> armMaster.activeTrajectoryPosition
-                        else -> position
+                        else -> _position
                     }
                     setPosition(lockedPosition)
                 }
@@ -147,7 +147,7 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
      * Used to calculate the acceleration of the arm.
      */
     override fun periodic() {
-        this.position = armMaster.sensorPosition
+        this._position = armMaster.sensorPosition
         this.velocity = armMaster.sensorVelocity
 
         arbitraryFeedForward = if (!Robot.emergencyActive) {
@@ -158,7 +158,7 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
                 Constants.kArmHatchKg
             } else Constants.kArmEmptyKg
 
-            Kg * position.cos * experiencedAcceleration
+            Kg * _position.cos * experiencedAcceleration
         } else {
            0.0
         }

@@ -23,10 +23,6 @@ object Network {
     val startingPositionChooser = enumSendableChooser<Autonomous.StartingPositions>()
     val autoModeChooser = enumSendableChooser<Autonomous.Mode>()
 
-//    val cargoShip1Chooser = enumSendableChooser<Autonomous.GamePiece>()
-//    val cargoShip2Chooser = enumSendableChooser<Autonomous.GamePiece>()
-//    val cargoShip3Chooser = enumSendableChooser<Autonomous.GamePiece>()
-
     private val mainShuffleboardDisplay: ShuffleboardTab = Shuffleboard.getTab("5190")
 
     private val autoLayout = mainShuffleboardDisplay.getLayout("Autonomous", BuiltInLayouts.kList)
@@ -109,15 +105,6 @@ object Network {
             "Starting Position",
             startingPositionChooser
         )
-//        autoLayout.add(
-//            "Cargo Ship 1", cargoShip1Chooser
-//        )
-//        autoLayout.add(
-//            "Cargo Ship 2", cargoShip2Chooser
-//        )
-//        autoLayout.add(
-//            "Cargo Ship 3", cargoShip3Chooser
-//        )
 
         //mainShuffleboardDisplay.add(VisionProcessing.cameraSource).withPosition(3, 2).withSize(3, 3)
     }
@@ -135,14 +122,14 @@ object Network {
         rightAmperageEntry.setDouble(DriveSubsystem.rightMotor.outputCurrent)
 
         elevatorRawPosition.setDouble(ElevatorSubsystem.rawEncoder.toDouble())
-        elevatorPosition.setDouble(ElevatorSubsystem.position.inch)
+        elevatorPosition.setDouble(ElevatorSubsystem._position.inch)
         elevatorCurrent.setDouble(ElevatorSubsystem.current)
         elevatorVoltage.setDouble(ElevatorSubsystem.voltage)
         elevatorVelocity.setDouble(ElevatorSubsystem.velocity.inchesPerSecond)
         elevatorLimitSwitch.setBoolean(ElevatorSubsystem.isBottomLimitSwitchPressed)
 
         armRawPosition.setDouble(ArmSubsystem.rawEncoder.toDouble())
-        armPosition.setDouble(ArmSubsystem.position.degree)
+        armPosition.setDouble(ArmSubsystem._position.degree)
         armCurrent.setDouble(ArmSubsystem.current)
         armVoltage.setDouble(ArmSubsystem.voltage)
         armVelocity.setDouble(ArmSubsystem.velocity.value * 180 / Math.PI)
