@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.Timer
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.second
+import java.lang.StringBuilder
 import kotlin.concurrent.fixedRateTimer
 
 object JeVoisManager {
@@ -75,8 +76,7 @@ object JeVoisManager {
         init {
             serialPort.openPort()
             serialPort.addDataListener(object : SerialPortDataListener {
-                private var byteBuffer = ByteArray(1024)
-                private var bufferIndex = 0
+                private var stringBuffer = StringBuilder(1024)
 
                 override fun serialEvent(event: SerialPortEvent) {
                     try {
@@ -85,14 +85,13 @@ object JeVoisManager {
                         val newData = ByteArray(serialPort.bytesAvailable())
                         serialPort.readBytes(newData, newData.size.toLong())
                         for (newByte in newData) {
-                            if (newByte.toChar() != '\n') {
-                                byteBuffer[bufferIndex++] = newByte
+                            val newChar = newByte.toChar()
+                            if (newChar != '\n') {
+                                stringBuffer.append(newChar)
                                 continue
                             }
-                            processMessage(String(byteBuffer, 0, bufferIndex).trim())
-                            while (bufferIndex > 0) {
-                                byteBuffer[--bufferIndex] = 0
-                            }
+                            processMessage(stringBuffer.toString())
+                            stringBuffer.clear()
                         }
                     } catch (e: Throwable) {
                         println("[JeVois] ${e.localizedMessage}")
