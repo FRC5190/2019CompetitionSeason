@@ -146,9 +146,18 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         isClosedLoop = true
     }
 
-    fun setPercentOutput(newOutput: Double) = synchronized(closedLoopSync) {
+    fun setPercentOutput(newOutput: Double, useFeedForward: Boolean = true) = synchronized(closedLoopSync) {
         isClosedLoop = false
-        elevatorMaster.set(ControlMode.PercentOutput, newOutput, DemandType.ArbitraryFeedForward, arbitraryFeedForward)
+        if (useFeedForward) {
+            elevatorMaster.set(
+                ControlMode.PercentOutput,
+                newOutput,
+                DemandType.ArbitraryFeedForward,
+                arbitraryFeedForward
+            )
+        } else {
+            elevatorMaster.set(ControlMode.PercentOutput, newOutput)
+        }
     }
 
     /**

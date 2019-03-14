@@ -8,6 +8,7 @@ import org.ghrobotics.lib.utils.Source
 import kotlin.math.withSign
 
 class OpenLoopElevatorCommand(
+    private val useFeedForward: Boolean = true,
     private val percentOutput: DoubleSource
 ) : FalconCommand(ElevatorSubsystem) {
     constructor(
@@ -16,13 +17,13 @@ class OpenLoopElevatorCommand(
 
     override suspend fun execute() {
         var output = percentOutput()
-        if (!(output epsilonEquals 0.0)) {
+        if (useFeedForward && !(output epsilonEquals 0.0)) {
             output += (if (ElevatorSubsystem._position < Constants.kElevatorSwitchHeight) {
                 Constants.kElevatorBelowSwitchKs
             } else {
                 Constants.kElevatorAfterSwitchKs
             }).withSign(output)
         }
-        ElevatorSubsystem.setPercentOutput(output)
+        ElevatorSubsystem.setPercentOutput(output, useFeedForward)
     }
 }

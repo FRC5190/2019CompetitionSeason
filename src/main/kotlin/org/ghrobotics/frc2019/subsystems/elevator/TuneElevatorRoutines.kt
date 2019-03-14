@@ -26,23 +26,14 @@ object TuneElevatorRoutines {
             var goingUpAfterSwitchKg = 0.0
             var goingDownAfterSwitchKg = 0.0
 
-            +InstantRunnableCommand {
-                goingUpBeforeSwitchKg = 0.0
-                goingDownBeforeSwitchKg = 0.0
-                goingUpAfterSwitchKg = 0.0
-                goingDownAfterSwitchKg = 0.0
-                println("STARTING")
-            }
             // BEFORE SWITCH Kg that allows elevator to go up
             +ClosedLoopElevatorCommand(Constants.kElevatorSwitchHeight / 2.0)
+            +InstantRunnableCommand { goingUpBeforeSwitchKg = ElevatorSubsystem.voltage }
             +parallel {
-                var voltageOutput = 0.0
-                +InstantRunnableCommand { voltageOutput = ElevatorSubsystem.voltage }
                 +PeriodicRunnableCommand({
-                    voltageOutput += voltageStepUp
-                    goingUpBeforeSwitchKg = voltageOutput / Constants.kAccelerationDueToGravity / 12.0
+                    goingUpBeforeSwitchKg += voltageStepUp
                 }, Source(false))
-                +OpenLoopElevatorCommand { voltageOutput / 12.0 }
+                +OpenLoopElevatorCommand(false) { goingUpBeforeSwitchKg / 12.0 }
             }.withExit {
                 ElevatorSubsystem.velocity.inchesPerSecond > 2
                     || (ElevatorSubsystem._position - Constants.kElevatorSwitchHeight / 2.0).absoluteValue > 5.inch
@@ -50,19 +41,12 @@ object TuneElevatorRoutines {
 
             // BEFORE SWITCH Kg that allows elevator to go down
             +ClosedLoopElevatorCommand(Constants.kElevatorSwitchHeight / 2.0)
+            +InstantRunnableCommand { goingDownBeforeSwitchKg = goingUpBeforeSwitchKg }
             +parallel {
-                var voltageOutput = 0.0
-                +InstantRunnableCommand {
-                    voltageOutput = Math.max(
-                        ElevatorSubsystem.voltage,
-                        goingUpBeforeSwitchKg * Constants.kAccelerationDueToGravity
-                    )
-                }
                 +PeriodicRunnableCommand({
-                    voltageOutput -= voltageStepDown
-                    goingDownBeforeSwitchKg = voltageOutput / Constants.kAccelerationDueToGravity / 12.0
+                    goingDownBeforeSwitchKg -= voltageStepDown
                 }, Source(false))
-                +OpenLoopElevatorCommand { voltageOutput / 12.0 }
+                +OpenLoopElevatorCommand(false)  { goingDownBeforeSwitchKg / 12.0 }
             }.withExit {
                 ElevatorSubsystem.velocity.inchesPerSecond < -2
                     || (ElevatorSubsystem._position - Constants.kElevatorSwitchHeight / 2.0).absoluteValue > 5.inch
@@ -71,14 +55,12 @@ object TuneElevatorRoutines {
 
             // AFTER SWITCH Kg that allows elevator to go up
             +ClosedLoopElevatorCommand((Constants.kElevatorSwitchHeight + Constants.kMaxElevatorHeightFromZero) / 2.0)
+            +InstantRunnableCommand { goingUpAfterSwitchKg = ElevatorSubsystem.voltage }
             +parallel {
-                var voltageOutput = 0.0
-                +InstantRunnableCommand { voltageOutput = ElevatorSubsystem.voltage }
                 +PeriodicRunnableCommand({
-                    voltageOutput += voltageStepUp
-                    goingUpAfterSwitchKg = voltageOutput / Constants.kAccelerationDueToGravity / 12.0
+                    goingUpAfterSwitchKg += voltageStepUp
                 }, Source(false))
-                +OpenLoopElevatorCommand { voltageOutput / 12.0 }
+                +OpenLoopElevatorCommand(false)  { goingUpAfterSwitchKg / 12.0 }
             }.withExit {
                 ElevatorSubsystem.velocity.inchesPerSecond > 2
                     || (ElevatorSubsystem._position - (Constants.kElevatorSwitchHeight + Constants.kMaxElevatorHeightFromZero) / 2.0).absoluteValue > 5.inch
@@ -86,19 +68,12 @@ object TuneElevatorRoutines {
 
             // BEFORE SWITCH Kg that allows elevator to go down
             +ClosedLoopElevatorCommand((Constants.kElevatorSwitchHeight + Constants.kMaxElevatorHeightFromZero) / 2.0)
+            +InstantRunnableCommand { goingDownAfterSwitchKg = goingUpAfterSwitchKg }
             +parallel {
-                var voltageOutput = 0.0
-                +InstantRunnableCommand {
-                    voltageOutput = Math.max(
-                        ElevatorSubsystem.voltage,
-                        goingUpAfterSwitchKg * Constants.kAccelerationDueToGravity
-                    )
-                }
                 +PeriodicRunnableCommand({
-                    voltageOutput -= voltageStepDown
-                    goingDownAfterSwitchKg = voltageOutput / Constants.kAccelerationDueToGravity / 12.0
+                    goingDownAfterSwitchKg -= voltageStepDown
                 }, Source(false))
-                +OpenLoopElevatorCommand { voltageOutput / 12.0 }
+                +OpenLoopElevatorCommand(false)  { goingDownAfterSwitchKg / 12.0 }
             }.withExit {
                 ElevatorSubsystem.velocity.inchesPerSecond < -2
                     || (ElevatorSubsystem._position - (Constants.kElevatorSwitchHeight + Constants.kMaxElevatorHeightFromZero) / 2.0).absoluteValue > 5.inch
