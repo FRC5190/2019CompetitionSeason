@@ -13,6 +13,7 @@ import org.ghrobotics.frc2019.subsystems.climb.autoL3Climb
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
 import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
+import org.ghrobotics.frc2019.subsystems.elevator.TuneElevatorRoutines
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
@@ -28,6 +29,8 @@ object Controls {
 
     val driverXbox = xboxController(0) {
         registerEmergencyMode()
+
+        pov(90).changeOn(TuneElevatorRoutines.tuneKgRoutine)
 
         state({ !isClimbing }) {
             // Vision align
@@ -59,11 +62,11 @@ object Controls {
 
         state({ !isClimbing }) {
             // Elevator
-            axisButton(1, 0.15) {
+            axisButton(1, 0.1) {
                 change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * 0.5 }))
             }
             // Arm
-            axisButton(5, 0.15) {
+            axisButton(5, 0.1) {
                 change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * 0.5 }))
             }
 

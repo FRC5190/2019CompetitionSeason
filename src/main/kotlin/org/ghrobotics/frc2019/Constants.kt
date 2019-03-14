@@ -346,8 +346,8 @@ object Constants {
     val kCenterToForwardIntake = Pose2d((kRobotLength / 2.0) + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
 
-    val kCenterToFrontCamera = Pose2d((-1.75).inch, 1.inch, 0.degree)
-    val kCenterToBackCamera = Pose2d((-6.25).inch, 1.inch, 180.degree)
+    val kCenterToFrontCamera = Pose2d((-1.75).inch, 0.inch, 0.degree)
+    val kCenterToBackCamera = Pose2d((-6.25).inch, 0.inch, 180.degree)
 
 
     // VISION
@@ -443,13 +443,13 @@ object Constants {
     val kElevatorAcceleration = 122.5.inch.acceleration
     val kElevatorCruiseVelocity = 70.inch.velocity
 
-    const val kElevatorHoldVoltage = 1.07
-
     const val kElevatorKp = 1.0
     const val kElevatorKd = 0.0
-    val kElevatorKf = kElevatorNativeUnitModel.calculatekF(11.1 - kElevatorHoldVoltage, 65.inch.velocity.value)
-    const val kElevatorBelowSwitchKg = 0.0 / 12
-    const val kElevatorAfterSwitchKg = kElevatorHoldVoltage / 12.0
+    const val kElevatorBelowSwitchKg = 0.009004660669602324
+    const val kElevatorAfterSwitchKg = 0.005366962630409441
+    const val kElevatorBelowSwitchKs = 0.007650704142370518
+    const val kElevatorAfterSwitchKs = 0.004604027838837399
+    val kElevatorKf = kElevatorNativeUnitModel.calculatekF(11.1 - (kElevatorAfterSwitchKg * 12.0), 65.inch.velocity.value)
 
 
     // ARM

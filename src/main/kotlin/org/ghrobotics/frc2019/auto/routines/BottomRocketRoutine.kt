@@ -2,7 +2,10 @@ package org.ghrobotics.frc2019.auto.routines
 
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.auto.paths.TrajectoryFactory
+import org.ghrobotics.frc2019.auto.paths.TrajectoryWaypoints
 import org.ghrobotics.frc2019.subsystems.Superstructure
+import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.subsystems.elevator.ClosedLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.DelayCommand
@@ -11,6 +14,7 @@ import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.duration
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.feet
+import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.withEquals
 
@@ -33,39 +37,43 @@ class BottomRocketRoutine : AutoRoutine() {
 
     override val routine
         get() = sequential {
+            +ClosedLoopElevatorCommand(3.inch)
             +parallel {
-                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+//                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
                 +super.followVisionAssistedTrajectory(
                     path1,
                     Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
                     4.feet, true
                 )
-                +sequential {
-                    +DelayCommand(path1.duration - 3.second)
-                    +Superstructure.kFrontHatchFromLoadingStation
-                }
+//                +sequential {
+//                    +DelayCommand(path1.duration - 3.second)
+//                    +Superstructure.kFrontHatchFromLoadingStation
+//                }
             }
+            +relocalize(TrajectoryWaypoints.kRocketF, true)
             +parallel {
-                +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+//                +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
                 +super.followVisionAssistedTrajectory(
                     path2,
                     Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
                     4.feet, false
                 )
-                +sequential {
-                    +DelayCommand(path2.duration - 3.second)
-                    +Superstructure.kBackHatchFromLoadingStation
-                }
+//                +sequential {
+//                    +DelayCommand(path2.duration - 3.second)
+//                    +Superstructure.kBackHatchFromLoadingStation
+//                }
             }
+            +relocalize(TrajectoryWaypoints.kLoadingStation, false)
             +parallel {
-                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+//                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
                 +super.followVisionAssistedTrajectory(
                     path3,
                     Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
-                    4.feet, false
+                    6.feet, true
                 )
-                +Superstructure.kFrontHatchFromLoadingStation
+//                +Superstructure.kFrontHatchFromLoadingStation
             }
-            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+            +DriveSubsystem.followTrajectory(TrajectoryFactory.rocketNToLoadingStation)
+//            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
         }
 }

@@ -6,16 +6,19 @@ import org.ghrobotics.lib.commands.InstantRunnableCommand
 import org.ghrobotics.lib.commands.PeriodicRunnableCommand
 import org.ghrobotics.lib.commands.parallel
 import org.ghrobotics.lib.commands.sequential
+import org.ghrobotics.lib.mathematics.units.derivedunits.inchesPerSecond
+import org.ghrobotics.lib.mathematics.units.inch
+import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.Source
 
 object TuneElevatorRoutines {
 
-    private const val voltageStepUp = 0.05 / 50.0
-    private const val voltageStepDown = 0.75 / 50.0
+    private const val voltageStepUp = 0.2 / 50.0
+    private const val voltageStepDown = 0.2 / 50.0
 
     val tuneKgRoutine
         get() = sequential {
-            +Superstructure.kFrontHatchFromLoadingStation
+            +Superstructure.kFrontHatchFromLoadingStation.withTimeout(5.second)
 
             var goingUpBeforeSwitchKg = 0.0
             var goingDownBeforeSwitchKg = 0.0
@@ -28,6 +31,7 @@ object TuneElevatorRoutines {
                 goingDownBeforeSwitchKg = 0.0
                 goingUpAfterSwitchKg = 0.0
                 goingDownAfterSwitchKg = 0.0
+                println("STARTING")
             }
             // BEFORE SWITCH Kg that allows elevator to go up
             +ClosedLoopElevatorCommand(Constants.kElevatorSwitchHeight / 2.0)
@@ -39,7 +43,10 @@ object TuneElevatorRoutines {
                     goingUpBeforeSwitchKg = voltageOutput / Constants.kAccelerationDueToGravity / 12.0
                 }, Source(false))
                 +OpenLoopElevatorCommand { voltageOutput / 12.0 }
-            }.withExit { ElevatorSubsystem.velocity.value > 0.5 }
+            }.withExit {
+                ElevatorSubsystem.velocity.inchesPerSecond > 2
+                    || (ElevatorSubsystem._position - Constants.kElevatorSwitchHeight / 2.0).absoluteValue > 5.inch
+            }
 
             // BEFORE SWITCH Kg that allows elevator to go down
             +ClosedLoopElevatorCommand(Constants.kElevatorSwitchHeight / 2.0)
@@ -56,7 +63,10 @@ object TuneElevatorRoutines {
                     goingDownBeforeSwitchKg = voltageOutput / Constants.kAccelerationDueToGravity / 12.0
                 }, Source(false))
                 +OpenLoopElevatorCommand { voltageOutput / 12.0 }
-            }.withExit { ElevatorSubsystem.velocity.value < -0.5 }
+            }.withExit {
+                ElevatorSubsystem.velocity.inchesPerSecond < -2
+                    || (ElevatorSubsystem._position - Constants.kElevatorSwitchHeight / 2.0).absoluteValue > 5.inch
+            }
 
 
             // AFTER SWITCH Kg that allows elevator to go up
@@ -69,7 +79,10 @@ object TuneElevatorRoutines {
                     goingUpAfterSwitchKg = voltageOutput / Constants.kAccelerationDueToGravity / 12.0
                 }, Source(false))
                 +OpenLoopElevatorCommand { voltageOutput / 12.0 }
-            }.withExit { ElevatorSubsystem.velocity.value > 0.5 }
+            }.withExit {
+                ElevatorSubsystem.velocity.inchesPerSecond > 2
+                    || (ElevatorSubsystem._position - (Constants.kElevatorSwitchHeight + Constants.kMaxElevatorHeightFromZero) / 2.0).absoluteValue > 5.inch
+            }
 
             // BEFORE SWITCH Kg that allows elevator to go down
             +ClosedLoopElevatorCommand((Constants.kElevatorSwitchHeight + Constants.kMaxElevatorHeightFromZero) / 2.0)
@@ -86,7 +99,10 @@ object TuneElevatorRoutines {
                     goingDownAfterSwitchKg = voltageOutput / Constants.kAccelerationDueToGravity / 12.0
                 }, Source(false))
                 +OpenLoopElevatorCommand { voltageOutput / 12.0 }
-            }.withExit { ElevatorSubsystem.velocity.value < -0.5 }
+            }.withExit {
+                ElevatorSubsystem.velocity.inchesPerSecond < -2
+                    || (ElevatorSubsystem._position - (Constants.kElevatorSwitchHeight + Constants.kMaxElevatorHeightFromZero) / 2.0).absoluteValue > 5.inch
+            }
 
             +InstantRunnableCommand {
                 val actualBeforeSwitchKg = (goingUpBeforeSwitchKg + goingDownBeforeSwitchKg) / 2.0
