@@ -50,7 +50,7 @@ class ForwardCargoShipRoutine : AutoRoutine() {
             }
 
             // Pickup hatch
-            +relocalize(TrajectoryWaypoints.kLoadingStation, false)
+            +relocalize(TrajectoryWaypoints.kLoadingStation, false, { false })
             +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
 
 

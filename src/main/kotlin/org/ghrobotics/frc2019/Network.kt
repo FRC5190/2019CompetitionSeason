@@ -15,6 +15,7 @@ import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.frc2019.vision.JeVoisManager
+import org.ghrobotics.lib.mathematics.units.SILengthConstants
 import org.ghrobotics.lib.mathematics.units.derivedunits.inchesPerSecond
 import org.ghrobotics.lib.wrappers.networktables.enumSendableChooser
 
@@ -111,8 +112,8 @@ object Network {
 
     @Suppress("LongMethod")
     fun update() {
-        globalXEntry.setDouble(DriveSubsystem.localization().translation.x.feet)
-        globalYEntry.setDouble(DriveSubsystem.localization().translation.y.feet)
+        globalXEntry.setDouble(DriveSubsystem.localization().translation.x / SILengthConstants.kFeetToMeter)
+        globalYEntry.setDouble(DriveSubsystem.localization().translation.y / SILengthConstants.kFeetToMeter)
         globalAEntry.setDouble(DriveSubsystem.localization().rotation.degree)
 
         leftPositionEntry.setDouble(DriveSubsystem.leftMotor.getSelectedSensorPosition(0).toDouble())

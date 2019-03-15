@@ -37,12 +37,12 @@ object TargetTracker {
                 }
 
                 bestTargetBack = targets.asSequence()
-                    .filter { it.isReal && it.averagedPose2dRelativeToBot.translation.x.value < 0.0 }
-                    .minBy { it.averagedPose2dRelativeToBot.translation.norm.value }
+                    .filter { it.isReal && it.averagedPose2dRelativeToBot.translation.x < 0.0 }
+                    .minBy { it.averagedPose2dRelativeToBot.translation.norm }
 
                 bestTargetFront = targets.asSequence()
-                    .filter { it.isReal && it.averagedPose2dRelativeToBot.translation.x.value > 0.0 }
-                    .minBy { it.averagedPose2dRelativeToBot.translation.norm.value }
+                    .filter { it.isReal && it.averagedPose2dRelativeToBot.translation.x > 0.0 }
+                    .minBy { it.averagedPose2dRelativeToBot.translation.norm }
 
                 // Publish to dashboard
                 LiveDashboard.visionTargets = targets.asSequence()
@@ -81,10 +81,10 @@ object TargetTracker {
         targets.asSequence()
             .associateWith { it.averagedPose2d inFrameOfReferenceOf referencePose }
             .filter {
-                val x = it.value.translation.x.value
+                val x = it.value.translation.x
                 it.key.isReal && if (isFrontTarget) x > 0.0 else x < 0.0
             }
-            .minBy { it.value.translation.norm.value }?.key
+            .minBy { it.value.translation.norm }?.key
     }
 
     fun getAbsoluteTarget(translation2d: Translation2d) = synchronized(targets) {
@@ -152,8 +152,8 @@ object TargetTracker {
             var accumulatedY = 0.0
             var accumulatedAngle = 0.0
             for (sample in samples) {
-                accumulatedX += sample.targetPose.translation.x.value
-                accumulatedY += sample.targetPose.translation.y.value
+                accumulatedX += sample.targetPose.translation.x
+                accumulatedY += sample.targetPose.translation.y
                 accumulatedAngle += sample.targetPose.rotation.value
             }
             averagedPose2d = Pose2d(

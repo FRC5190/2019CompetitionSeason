@@ -304,10 +304,7 @@ object Constants {
 
     // DIGITAL INPUT
     const val kIntakeExtensionLimitSwitch = 0
-    const val kLeftDriveEncoderA = 1
-    const val kLeftDriveEncoderB = 2
-    const val kRightDriveEncoderA = 3
-    const val kRightDriveEncoderB = 4
+    const val kClimberHallEffectSensor = 1
 
 
     // GYROS
@@ -332,7 +329,7 @@ object Constants {
     val kRobotLength = 30.inch
 
     val kBumperThickness = 4.5.inch
-    val kIntakeProtrusion = 5.inch       // Out of frame protrusion.
+    val kIntakeProtrusion = 10.inch       // Out of frame protrusion.
     val kElevatorCrossbarHeightFromGround = 46.inch
     val kIntakeCradleHeight = 6.inch
     val kArmLength = 24.5.inch
@@ -445,11 +442,12 @@ object Constants {
 
     const val kElevatorKp = 1.0
     const val kElevatorKd = 0.0
-    const val kElevatorBelowSwitchKg = 0.009004660669602324
-    const val kElevatorAfterSwitchKg = 0.005366962630409441
-    const val kElevatorBelowSwitchKs = 0.007650704142370518
-    const val kElevatorAfterSwitchKs = 0.004604027838837399
-    val kElevatorKf = kElevatorNativeUnitModel.calculatekF(11.1 - (kElevatorAfterSwitchKg * 12.0), 65.inch.velocity.value)
+    const val kElevatorBelowSwitchKg = 0.6923519061583577 / 12.0
+    const val kElevatorAfterSwitchKg = 0.909258064516122 / 12.0
+    const val kElevatorBelowSwitchKs = 1.266000000000001 / 12.0
+    const val kElevatorAfterSwitchKs = 1.472999999999994 / 12.0
+    val kElevatorKf =
+        kElevatorNativeUnitModel.calculatekF(11.1 - (kElevatorAfterSwitchKg * 12.0), 65.inch.velocity.value)
 
 
     // ARM

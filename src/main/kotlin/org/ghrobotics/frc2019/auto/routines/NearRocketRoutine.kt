@@ -40,7 +40,7 @@ class NearRocketRoutine : AutoRoutine() {
 
             +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
             +DelayCommand(0.1.second)
-            +relocalize(TrajectoryWaypoints.kRocketN, true)
+            +relocalize(TrajectoryWaypoints.kRocketN, true, pathMirrored)
 
             +parallel {
                 +followVisionAssistedTrajectory(path2, pathMirrored, 8.feet)
@@ -50,7 +50,7 @@ class NearRocketRoutine : AutoRoutine() {
                 }
             }
 
-            +relocalize(TrajectoryWaypoints.kLoadingStation, false)
+            +relocalize(TrajectoryWaypoints.kLoadingStation, false, pathMirrored)
             +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
 
             +parallel {

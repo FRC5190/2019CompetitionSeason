@@ -77,7 +77,7 @@ class TrajectoryVisionTrackerCommand(
             println("VISION")
             visionActive = true
             val transform = lastKnownTargetPose inFrameOfReferenceOf robotPosition
-            val angle = Rotation2d(transform.translation.x.value, transform.translation.y.value, true)
+            val angle = Rotation2d(transform.translation.x, transform.translation.y, true)
 
             Network.visionDriveAngle.setDouble(angle.degree)
             Network.visionDriveActive.setBoolean(true)
@@ -103,8 +103,8 @@ class TrajectoryVisionTrackerCommand(
             val referencePose = referencePoint.state.state.pose
 
             // Update Current Path Location on Live Dashboard
-            LiveDashboard.pathX = referencePose.translation.x.feet
-            LiveDashboard.pathY = referencePose.translation.y.feet
+            LiveDashboard.pathX = referencePose.translation.x / SILengthConstants.kFeetToMeter
+            LiveDashboard.pathY = referencePose.translation.y / SILengthConstants.kFeetToMeter
             LiveDashboard.pathHeading = referencePose.rotation.radian
         }
 

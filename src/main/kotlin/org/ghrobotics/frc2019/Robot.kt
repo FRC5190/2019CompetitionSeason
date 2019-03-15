@@ -5,8 +5,6 @@
 
 package org.ghrobotics.frc2019
 
-import edu.wpi.cscore.VideoMode
-import edu.wpi.first.cameraserver.CameraServer
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
@@ -49,9 +47,6 @@ object Robot : FalconRobot() {
         Controls.update()
         LEDs.update()
         Autonomous.update()
-    }
-
-    override fun periodicNetwork() {
         Network.update()
     }
 

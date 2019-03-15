@@ -3,6 +3,7 @@ package org.ghrobotics.frc2019.subsystems.climb
 import com.ctre.phoenix.CANifier
 import com.ctre.phoenix.motorcontrol.*
 import edu.wpi.first.wpilibj.AnalogInput
+import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
@@ -80,6 +81,8 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     val frontWinchCurrent get() = frontWinchMaster.outputCurrent
     val backWinchCurrent get() = backWinchMaster.outputCurrent
 
+    val hallEffect = DigitalInput(Constants.kClimberHallEffectSensor)
+
     init {
         val backWinchSlave = NativeFalconSRX(Constants.kClimbBackWinchSlaveId)
         val frontWinchSlave = NativeFalconSRX(Constants.kClimbFrontWinchSlaveId)
@@ -147,6 +150,8 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         canifier.getPWMInput(CANifier.PWMChannel.PWMChannel0, tempPWMData)
         rollingAverage.add(tempPWMData[0])
         lidarRaw = rollingAverage.average
+
+//        println(hallEffect.get())
 
 //        println("F: ${frontWinchMaster.selectedSensorPosition}, B: ${backWinchMaster.selectedSensorPosition}")
     }

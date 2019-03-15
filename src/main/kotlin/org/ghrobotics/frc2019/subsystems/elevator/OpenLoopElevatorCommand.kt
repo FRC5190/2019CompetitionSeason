@@ -8,9 +8,13 @@ import org.ghrobotics.lib.utils.Source
 import kotlin.math.withSign
 
 class OpenLoopElevatorCommand(
-    private val useFeedForward: Boolean = true,
+    private val useFeedForward: Boolean,
     private val percentOutput: DoubleSource
 ) : FalconCommand(ElevatorSubsystem) {
+    constructor(
+        percentOutput: DoubleSource
+    ) : this(true, percentOutput)
+
     constructor(
         percentOutput: Double
     ) : this(Source(percentOutput))

@@ -3,19 +3,14 @@ package org.ghrobotics.frc2019.auto.routines
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.auto.paths.TrajectoryFactory
 import org.ghrobotics.frc2019.auto.paths.TrajectoryWaypoints
-import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ClosedLoopElevatorCommand
-import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
-import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.lib.commands.DelayCommand
 import org.ghrobotics.lib.commands.parallel
 import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.duration
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.inch
-import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.withEquals
 
 class BottomRocketRoutine : AutoRoutine() {
@@ -39,7 +34,7 @@ class BottomRocketRoutine : AutoRoutine() {
         get() = sequential {
             +ClosedLoopElevatorCommand(3.inch)
             +parallel {
-//                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+                //                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
                 +super.followVisionAssistedTrajectory(
                     path1,
                     Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
@@ -50,9 +45,13 @@ class BottomRocketRoutine : AutoRoutine() {
 //                    +Superstructure.kFrontHatchFromLoadingStation
 //                }
             }
-            +relocalize(TrajectoryWaypoints.kRocketF, true)
+            +relocalize(
+                TrajectoryWaypoints.kRocketF,
+                true,
+                Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
+            )
             +parallel {
-//                +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+                //                +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
                 +super.followVisionAssistedTrajectory(
                     path2,
                     Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
@@ -63,9 +62,13 @@ class BottomRocketRoutine : AutoRoutine() {
 //                    +Superstructure.kBackHatchFromLoadingStation
 //                }
             }
-            +relocalize(TrajectoryWaypoints.kLoadingStation, false)
+            +relocalize(
+                TrajectoryWaypoints.kLoadingStation,
+                false,
+                Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
+            )
             +parallel {
-//                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+                //                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
                 +super.followVisionAssistedTrajectory(
                     path3,
                     Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
@@ -73,7 +76,10 @@ class BottomRocketRoutine : AutoRoutine() {
                 )
 //                +Superstructure.kFrontHatchFromLoadingStation
             }
-            +DriveSubsystem.followTrajectory(TrajectoryFactory.rocketNToLoadingStation)
+            +DriveSubsystem.followTrajectory(
+                TrajectoryFactory.rocketNToLoadingStation,
+                Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
+            )
 //            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
         }
 }

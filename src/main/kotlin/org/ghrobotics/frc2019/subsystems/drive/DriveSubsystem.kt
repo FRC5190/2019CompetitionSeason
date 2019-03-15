@@ -49,8 +49,8 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     // Type of localization to determine position on the field
     override val localization = TankEncoderLocalization(
         pigeon.asSource(),
-        leftMotor::sensorPosition,
-        rightMotor::sensorPosition
+        { leftMotor.sensorPosition.value },
+        { rightMotor.sensorPosition.value }
     )
 
 //    override val localization = TankEncoderLocalization(

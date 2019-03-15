@@ -11,6 +11,7 @@ import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.inch
+import org.ghrobotics.lib.mathematics.units.meter
 
 object OTFTrajectoryGenerator {
 
@@ -30,7 +31,13 @@ object OTFTrajectoryGenerator {
             endpoint
         )
         return DefaultTrajectoryGenerator.generateTrajectory(
-            waypoints, listOf(), DriveSubsystem.velocity, 0.feet.velocity, kMaxVelocity, kMaxAcceleration, reversed
+            waypoints,
+            listOf(),
+            DriveSubsystem.velocity.meter.velocity,
+            0.feet.velocity,
+            kMaxVelocity,
+            kMaxAcceleration,
+            reversed
         )
     }
 }

@@ -30,7 +30,7 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
             super.execute()
         } else {
             val transform = lastKnownTargetPose inFrameOfReferenceOf DriveSubsystem.localization()
-            val angle = Rotation2d(transform.translation.x.value, transform.translation.y.value, true)
+            val angle = Rotation2d(transform.translation.x, transform.translation.y, true)
 
             Network.visionDriveAngle.setDouble(angle.degree)
             Network.visionDriveActive.setBoolean(true)
