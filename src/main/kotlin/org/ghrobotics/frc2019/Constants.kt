@@ -286,6 +286,7 @@ object Constants {
     const val kElevatorSlave2Id = 7
     const val kElevatorSlave3Id = 8
     const val kArmId = 9
+    //    const val kIntakeCargoId = 10
     const val kIntakeLeftId = 10
     const val kIntakeRightId = 11
     const val kClimbFrontWinchMasterId = 12
@@ -309,13 +310,17 @@ object Constants {
 
     // GYROS
     const val kPigeonIMUId = kIntakeLeftId
+//    const val kPigeonIMUId = kIntakeCargoId
 
 
     // PNEUMATICS
     const val kPCMId = 41
     const val kIntakeExtensionSolenoidForwardId = 0
     const val kIntakeExtensionSolenoidReverseId = 1
+    //    const val kIntakePushHatchSolenoidForwardId = 0
+//    const val kIntakePushHatchSolenoidReverseId = 1
     const val kIntakeLauncherSolenoidId = 5
+    //    const val kIntakeHoldHatchSolenoidId = 5
     const val kDriveSolenoidId = 4
     const val kRampsSolenoidId = 3
 
@@ -329,7 +334,7 @@ object Constants {
     val kRobotLength = 30.inch
 
     val kBumperThickness = 4.5.inch
-    val kIntakeProtrusion = 10.inch       // Out of frame protrusion.
+    val kIntakeProtrusion = 9.inch       // Out of frame protrusion.
     val kElevatorCrossbarHeightFromGround = 46.inch
     val kIntakeCradleHeight = 6.inch
     val kArmLength = 24.5.inch
@@ -442,17 +447,17 @@ object Constants {
 
     const val kElevatorKp = 1.0
     const val kElevatorKd = 0.0
-    const val kElevatorBelowSwitchKg = 0.6923519061583577 / 12.0
-    const val kElevatorAfterSwitchKg = 0.909258064516122 / 12.0
-    const val kElevatorBelowSwitchKs = 1.266000000000001 / 12.0
-    const val kElevatorAfterSwitchKs = 1.472999999999994 / 12.0
+    const val kElevatorBelowSwitchKg = 0.7889999999999985 / 12.0
+    const val kElevatorAfterSwitchKg = 1.5089999999999901 / 12.0
+    const val kElevatorBelowSwitchKs = 1.3169999999999993 / 12.0
+    const val kElevatorAfterSwitchKs = 1.0709999999999904 / 12.0
     val kElevatorKf =
         kElevatorNativeUnitModel.calculatekF(11.1 - (kElevatorAfterSwitchKg * 12.0), 65.inch.velocity.value)
 
 
     // ARM
     val kArmSensorUnitsPerRotation = 1024.nativeUnits
-    val kArmUpTicks = (-506.5).nativeUnits
+    val kArmUpTicks = (-524).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,

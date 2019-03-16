@@ -6,7 +6,6 @@ import org.ghrobotics.frc2019.auto.paths.TrajectoryWaypoints
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
-import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.DelayCommand
 import org.ghrobotics.lib.commands.parallel
 import org.ghrobotics.lib.commands.sequential
@@ -36,7 +35,8 @@ class BottomRocketRoutine : AutoRoutine() {
     override val routine
         get() = sequential {
             +parallel {
-                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+                +IntakeHatchCommand(false)
+//                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
                 +super.followVisionAssistedTrajectory(
                     path1,
                     Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
@@ -53,7 +53,8 @@ class BottomRocketRoutine : AutoRoutine() {
                 Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
             )
             +parallel {
-                +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+                +IntakeHatchCommand(true)
+//                +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
                 +super.followVisionAssistedTrajectory(
                     path2,
                     Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
@@ -62,7 +63,7 @@ class BottomRocketRoutine : AutoRoutine() {
                 +sequential {
                     +DelayCommand(path2.duration - 3.second)
                     +Superstructure.kBackHatchFromLoadingStation
-                }.withTimeout(2.second)
+                }.withTimeout(3.second)
             }
             +relocalize(
                 TrajectoryWaypoints.kLoadingStation,
@@ -70,7 +71,8 @@ class BottomRocketRoutine : AutoRoutine() {
                 Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
             )
             +parallel {
-                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+                //                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+                +IntakeHatchCommand(false)
                 +super.followVisionAssistedTrajectory(
                     path3,
                     Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
@@ -82,6 +84,7 @@ class BottomRocketRoutine : AutoRoutine() {
                 TrajectoryFactory.rocketNToLoadingStation,
                 Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
             )
-            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+            +IntakeHatchCommand(true)
+//            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
         }
 }

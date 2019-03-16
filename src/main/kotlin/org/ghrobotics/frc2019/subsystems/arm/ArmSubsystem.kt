@@ -6,7 +6,6 @@ import org.ghrobotics.frc2019.Robot
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.amp
@@ -17,7 +16,6 @@ import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.mathematics.units.nativeunits.toNativeUnitPosition
 import org.ghrobotics.lib.utils.Source
 import org.ghrobotics.lib.wrappers.ctre.FalconSRX
-import kotlin.math.absoluteValue
 
 /**
  * Represents the arm of the robot.
@@ -28,7 +26,8 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     private val armMaster = FalconSRX(Constants.kArmId, Constants.kArmNativeUnitModel)
 
     var wantedState: ArmState = ArmState.Nothing
-    private var currentState: ArmState = ArmState.Nothing
+    var currentState: ArmState = ArmState.Nothing
+        private set
 
     // PERIODIC
     var position = 0.degree
@@ -48,7 +47,7 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     init {
         // Configure startup settings
-        armMaster.run {
+        with(armMaster) {
             // Configure feedback sensor and sensor phase
             feedbackSensor = FeedbackDevice.Analog
             encoderPhase = true
@@ -81,20 +80,8 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
 
             setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10)
         }
-        defaultCommand = object : FalconCommand(this@ArmSubsystem) {
-            override suspend fun initialize() {
-                val currentState = this@ArmSubsystem.currentState
-                val currentPosition = position
-                val wantedPosition = if (currentState is ArmState.SetPointState
-                    && (currentState.position - currentPosition).value.absoluteValue <= Constants.kElevatorClosedLoopTolerance.value
-                ) {
-                    currentState.position
-                } else {
-                    currentPosition
-                }
-                wantedState = ArmState.Position(wantedPosition)
-            }
-        }
+        defaultCommand = DefaultArmCommand
+
         setClosedLoopGains()
     }
 
@@ -139,7 +126,7 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
         arbitraryFeedForward = if (!Robot.emergencyActive) {
             val experiencedAcceleration = Constants.kAccelerationDueToGravity + ElevatorSubsystem.acceleration
 
-            val Kg = if (IntakeSubsystem.isHoldingHatch()) {
+            val Kg = if (IntakeSubsystem.isHoldingHatch) {
                 Constants.kArmHatchKg
             } else Constants.kArmEmptyKg
 
@@ -149,9 +136,11 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
         }
 
         // DEBUG PERIODIC
-        voltage = armMaster.motorOutputPercent * 12.0
-        current = armMaster.outputCurrent
-        rawSensorPosition = armMaster.getSelectedSensorPosition(0)
+        if (Robot.shouldDebug) {
+            voltage = armMaster.motorOutputPercent * 12.0
+            current = armMaster.outputCurrent
+            rawSensorPosition = armMaster.getSelectedSensorPosition(0)
+        }
 
         // UPDATE STATE
         val wantedState = this.wantedState

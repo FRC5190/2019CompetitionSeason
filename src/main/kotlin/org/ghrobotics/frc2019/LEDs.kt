@@ -44,7 +44,7 @@ object LEDs {
             Robot.emergencyActive -> Mode.EMERGENCY
             Controls.isClimbing -> Mode.CLIMB
             VisionDriveCommand.isActive || TrajectoryVisionTrackerCommand.visionActive -> Mode.VISION
-            IntakeSubsystem.isHoldingCargo() || IntakeSubsystem.isHoldingHatch() -> Mode.HAS_OBTAINED
+            IntakeSubsystem.isHoldingCargo || IntakeSubsystem.isHoldingHatch -> Mode.HAS_OBTAINED
             Robot.lastRobotMode == FalconRobot.Mode.DISABLED -> Mode.DISABLED
             else -> Mode.NONE
         }

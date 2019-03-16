@@ -1,11 +1,31 @@
 package org.ghrobotics.frc2019.subsystems.intake
 
-import edu.wpi.first.wpilibj.DoubleSolenoid
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.mathematics.units.millisecond
 
+//class IntakeHatchCommand(
+//    private val releasing: Boolean
+//) : FalconCommand(IntakeSubsystem) {
+//
+//    override suspend fun initialize() {
+//        if (releasing) {
+//            IntakeSubsystem.wantedHoldHatchSolenoidState = IntakeSubsystem.HoldHatchSolenoidState.PLACE
+//            IntakeSubsystem.wantedPushHatchSolenoidState = IntakeSubsystem.PushHatchSolenoidState.USEFUL
+//        } else {
+//            IntakeSubsystem.wantedHoldHatchSolenoidState = IntakeSubsystem.HoldHatchSolenoidState.HOLD
+//            IntakeSubsystem.wantedPushHatchSolenoidState = IntakeSubsystem.PushHatchSolenoidState.EXIST
+//        }
+//    }
+//
+//    override suspend fun dispose() {
+//        IntakeSubsystem.wantedHoldHatchSolenoidState = IntakeSubsystem.HoldHatchSolenoidState.HOLD
+//        IntakeSubsystem.wantedPushHatchSolenoidState = IntakeSubsystem.PushHatchSolenoidState.EXIST
+//    }
+//
+//}
+
 class IntakeHatchCommand(
-    private val direction: IntakeSubsystem.Direction
+    private val releasing: Boolean
 ) : FalconCommand(IntakeSubsystem) {
 
     init {
@@ -13,11 +33,11 @@ class IntakeHatchCommand(
     }
 
     override suspend fun initialize() {
-        if (direction == IntakeSubsystem.Direction.HOLD) {
-            IntakeSubsystem.extensionSolenoid.set(DoubleSolenoid.Value.kForward)
-            IntakeSubsystem.percentOutput = 0.25
+        if (releasing) {
+            IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
         } else {
-            IntakeSubsystem.extensionSolenoid.set(DoubleSolenoid.Value.kReverse)
+            IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.EXTENDED
+            IntakeSubsystem.wantedPercentOutput = 0.25
         }
     }
 

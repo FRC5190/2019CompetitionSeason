@@ -9,7 +9,7 @@ class SpringCascadeNativeUnitModel(
     switchNativeUnit: NativeUnit,
     afterSwitchHeightSample: Length,
     afterSwitchNativeUnitSample: NativeUnit
-) : NativeUnitModel<Length>(Length(0.0)) {
+) : NativeUnitModel<Length>(Length.kZero) {
 
     private val switchHeight = switchHeight.value
     private val switchNativeUnit = switchNativeUnit.value

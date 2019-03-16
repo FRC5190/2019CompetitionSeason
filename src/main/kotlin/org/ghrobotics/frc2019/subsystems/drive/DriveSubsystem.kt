@@ -41,14 +41,9 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     // Shifter for two-speed gearbox
     private val shifter = Solenoid(Constants.kPCMId, Constants.kDriveSolenoidId)
 
-    // YPR of drivetrain
-    private val pigeon = PigeonIMU(IntakeSubsystem.intakeMaster)
-    var pitch = 0.degree
-        private set
-
     // Type of localization to determine position on the field
     override val localization = TankEncoderLocalization(
-        pigeon.asSource(),
+        IntakeSubsystem.pigeonSource,
         { leftMotor.sensorPosition.value },
         { rightMotor.sensorPosition.value }
     )
@@ -71,14 +66,12 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     init {
         lowGear = false
         defaultCommand = ManualDriveCommand()
-        pigeon.setTemperatureCompensationDisable(true)
 
 //        listOf(lEncoder, rEncoder).forEach {
 //            it.distancePerPulse = 3.353 / 9996.5 * 4
 //        }
     }
 
-    private val tempYPR = DoubleArray(3)
 
 //    const val kP = 4.0 / 12.0
 //
@@ -100,12 +93,6 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
 //        leftMotor.percentOutput = l + wheelVoltages.left / 12.0
 //        rightMotor.percentOutput = r + wheelVoltages.right / 12.0
 //    }
-
-    override fun periodic() {
-        super.periodic()
-        pigeon.getYawPitchRoll(tempYPR)
-        pitch = tempYPR[2].degree
-    }
 
     override fun activateEmergency() {
         zeroOutputs()

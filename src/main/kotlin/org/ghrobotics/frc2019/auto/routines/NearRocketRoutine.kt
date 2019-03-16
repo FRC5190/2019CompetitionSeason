@@ -6,7 +6,6 @@ import org.ghrobotics.frc2019.auto.paths.TrajectoryWaypoints
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
-import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.DelayCommand
 import org.ghrobotics.lib.commands.parallel
 import org.ghrobotics.lib.commands.sequential
@@ -30,7 +29,8 @@ class NearRocketRoutine : AutoRoutine() {
             val pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
 
             +parallel {
-                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+                //                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+                +IntakeHatchCommand(false)
                 +followVisionAssistedTrajectory(path1, pathMirrored, 5.feet)
                 +sequential {
                     +DelayCommand(path1.duration - 3.5.second)
@@ -38,7 +38,8 @@ class NearRocketRoutine : AutoRoutine() {
                 }
             }
 
-            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+//            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+            +IntakeHatchCommand(true)
             +DelayCommand(0.1.second)
             +relocalize(TrajectoryWaypoints.kRocketN, true, pathMirrored)
 
@@ -51,7 +52,8 @@ class NearRocketRoutine : AutoRoutine() {
             }
 
             +relocalize(TrajectoryWaypoints.kLoadingStation, false, pathMirrored)
-            +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+//            +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+            +IntakeHatchCommand(false)
 
             +parallel {
                 +followVisionAssistedTrajectory(path3, pathMirrored, 5.feet)
@@ -59,7 +61,8 @@ class NearRocketRoutine : AutoRoutine() {
 
             }
 
-            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+//            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+            +IntakeHatchCommand(true)
             +DriveSubsystem.followTrajectory(TrajectoryFactory.rocketNToLoadingStation)
         }
 }

@@ -134,8 +134,8 @@ object Network {
         armVoltage.setDouble(ArmSubsystem.voltage)
         armVelocity.setDouble(ArmSubsystem.velocity.value * 180 / Math.PI)
 
-        isHoldingCargo.setBoolean(IntakeSubsystem.isSeeingCargo())
-        intakeFullyExtended.setBoolean(IntakeSubsystem.isFullyExtended())
+        isHoldingCargo.setBoolean(IntakeSubsystem.isSeeingCargo)
+//        intakeFullyExtended.setBoolean(IntakeSubsystem.isFullyExtended)
 
         frontClimbWinchPosition.setDouble(ClimbSubsystem.frontWinchPosition)
         backClimbWinchPosition.setDouble(ClimbSubsystem.backWinchPosition)

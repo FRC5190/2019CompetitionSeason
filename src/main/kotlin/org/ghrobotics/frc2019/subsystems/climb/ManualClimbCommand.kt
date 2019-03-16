@@ -47,8 +47,8 @@ class ManualClimbCommand : FalconCommand(ClimbSubsystem) {
     }
 
     private companion object {
-        val frontWinchSource = Controls.operatorXbox.getY(GenericHID.Hand.kLeft)
-        val backWinchSource = Controls.operatorXbox.getY(GenericHID.Hand.kRight)
-        val wheelSource = Controls.driverXbox.getY(GenericHID.Hand.kRight).withDeadband(0.1)
+        val frontWinchSource = Controls.operatorFalconXbox.getY(GenericHID.Hand.kLeft)
+        val backWinchSource = Controls.operatorFalconXbox.getY(GenericHID.Hand.kRight)
+        val wheelSource = Controls.driverFalconXbox.getY(GenericHID.Hand.kRight).withDeadband(0.1)
     }
 }
