@@ -19,15 +19,17 @@ class OpenLoopElevatorCommand(
         percentOutput: Double
     ) : this(Source(percentOutput))
 
-    override suspend fun execute() {
-        var output = percentOutput()
-        if (useFeedForward && !(output epsilonEquals 0.0)) {
-            output += (if (ElevatorSubsystem._position < Constants.kElevatorSwitchHeight) {
-                Constants.kElevatorBelowSwitchKs
-            } else {
-                Constants.kElevatorAfterSwitchKs
-            }).withSign(output)
-        }
-        ElevatorSubsystem.setPercentOutput(output, useFeedForward)
+    override suspend fun initialize() {
+        ElevatorSubsystem.wantedState = ElevatorSubsystem.ElevatorState.OpenLoop({
+            var output = percentOutput()
+            if (useFeedForward && !(output epsilonEquals 0.0)) {
+                output += (if (ElevatorSubsystem.position < Constants.kElevatorSwitchHeight) {
+                    Constants.kElevatorBelowSwitchKs
+                } else {
+                    Constants.kElevatorAfterSwitchKs
+                }).withSign(output)
+            }
+            output
+        }, useFeedForward)
     }
 }

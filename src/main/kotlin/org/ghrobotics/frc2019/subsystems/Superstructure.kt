@@ -16,7 +16,7 @@ import kotlin.math.pow
 object Superstructure {
 
     val heightAboveGround
-        get() = Constants.kElevatorHeightFromGround + ElevatorSubsystem._position +
+        get() = Constants.kElevatorHeightFromGround + ElevatorSubsystem.position +
             (Constants.kArmLength * ArmSubsystem._position.sin)
 
     private val outOfToleranceRange =
@@ -31,7 +31,7 @@ object Superstructure {
     val kFrontLowRocketCargo get() = goToHeightWithAngle(26.inch, 15.degree)
     val kBackLowRocketCargo get() = goToHeightWithAngle(25.inch, 135.degree)
 
-    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 10.degree)
+    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 0.degree)
     val kBackHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 180.degree)
 
     val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, (-25).degree)
@@ -137,7 +137,7 @@ object Superstructure {
                         // Arm
                         +sequential {
                             val waitCondition = {
-                                ElevatorSubsystem._position < Constants.kElevatorSafeFlipHeight
+                                ElevatorSubsystem.position < Constants.kElevatorSafeFlipHeight
                                     || ElevatorSubsystem.isBottomLimitSwitchPressed
                             }
                             // Prepare arm to flip through elevator
@@ -157,13 +157,13 @@ object Superstructure {
                                     if (armAngle < Constants.kArmSafeFlipAngle) {
                                         //  Use safe flip if it goes near floor
                                         +ClosedLoopArmCommand(Constants.kArmSafeFlipAngle)
-                                            .overrideExit { ElevatorSubsystem._position > Constants.kElevatorSafeFlipHeight }
+                                            .overrideExit { ElevatorSubsystem.position > Constants.kElevatorSafeFlipHeight }
                                     }
                                 } else {
                                     if (armAngle < 180.degree - Constants.kArmSafeFlipAngle) {
                                         //  Use safe flip if it goes near floor
                                         +ClosedLoopArmCommand(180.degree - Constants.kArmSafeFlipAngle)
-                                            .overrideExit { ElevatorSubsystem._position > Constants.kElevatorSafeFlipHeight }
+                                            .overrideExit { ElevatorSubsystem.position > Constants.kElevatorSafeFlipHeight }
                                     }
                                 }
                             }

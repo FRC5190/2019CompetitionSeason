@@ -18,8 +18,8 @@ class PolarPostureStabilizerTest {
 
         val drive = SimDifferentialDrive(
             Constants.kDriveModel,
-            SimFalconMotor(0.meter),
-            SimFalconMotor(0.meter),
+            SimFalconMotor(),
+            SimFalconMotor(),
             FeedForwardTracker(),
             1.05
         )
@@ -42,8 +42,8 @@ class PolarPostureStabilizerTest {
             drive.setOutput(polarPostureStabilizer.nextState(drive.robotPosition, currentTime))
             drive.update(deltaTime)
 
-            xList += drive.robotPosition.translation.x.feet
-            yList += drive.robotPosition.translation.y.feet
+            xList += drive.robotPosition.translation.x / SILengthConstants.kFeetToMeter
+            yList += drive.robotPosition.translation.y / SILengthConstants.kFeetToMeter
         }
 
         val chart = XYChartBuilder().width(1800).height(1520).title("Polar Posture Stabilizer")

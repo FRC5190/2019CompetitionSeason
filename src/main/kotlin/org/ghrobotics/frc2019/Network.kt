@@ -123,7 +123,7 @@ object Network {
         rightAmperageEntry.setDouble(DriveSubsystem.rightMotor.outputCurrent)
 
         elevatorRawPosition.setDouble(ElevatorSubsystem.rawEncoder.toDouble())
-        elevatorPosition.setDouble(ElevatorSubsystem._position.inch)
+        elevatorPosition.setDouble(ElevatorSubsystem.position.inch)
         elevatorCurrent.setDouble(ElevatorSubsystem.current)
         elevatorVoltage.setDouble(ElevatorSubsystem.voltage)
         elevatorVelocity.setDouble(ElevatorSubsystem.velocity.inchesPerSecond)
@@ -143,8 +143,8 @@ object Network {
         climbLidarRaw.setDouble(ClimbSubsystem.lidarRaw)
         frontClimbWinchCurrent.setDouble(ClimbSubsystem.frontWinchCurrent)
         backClimbWinchCurrent.setDouble(ClimbSubsystem.backWinchCurrent)
-        frontLimitSwitch.setBoolean(ClimbSubsystem.Winch.FRONT.motor.sensorCollection.isRevLimitSwitchClosed)
-        backLimitSwitch.setBoolean(ClimbSubsystem.Winch.BACK.motor.sensorCollection.isRevLimitSwitchClosed)
+        frontLimitSwitch.setBoolean(ClimbSubsystem.isFrontReverseLimitSwitchClosed)
+        backLimitSwitch.setBoolean(ClimbSubsystem.isBackReverseLimitSwitchClosed)
 
         visionFrontCameraConnected.setBoolean(JeVoisManager.isFrontJeVoisConnected)
         visionBackCameraConnected.setBoolean(JeVoisManager.isBackJeVoisConnected)

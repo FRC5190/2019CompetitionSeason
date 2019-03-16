@@ -5,6 +5,7 @@
 
 package org.ghrobotics.frc2019
 
+import edu.wpi.first.wpilibj.livewindow.LiveWindow
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
@@ -28,6 +29,8 @@ object Robot : FalconRobot() {
 
     // Initialize all systems.
     init {
+        LiveWindow.disableAllTelemetry()
+
         +DriveSubsystem
         +ClimbSubsystem
         +ElevatorSubsystem

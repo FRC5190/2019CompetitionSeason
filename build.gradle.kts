@@ -26,6 +26,16 @@ deploy {
         // Send the JAR to the RoboRIO
         artifact("frcJava", FRCJavaArtifact::class.java, closureOf<FRCJavaArtifact> {
             targets.add(roborioTargetName)
+            jvmArgs = listOf(
+                "-Xmx20M",
+                "-XX:+UseG1GC",
+                "-Dcom.sun.management.jmxremote=true",
+                "-Dcom.sun.management.jmxremote.port=1099",
+                "-Dcom.sun.management.jmxremote.local.only=false",
+                "-Dcom.sun.management.jmxremote.ssl=false",
+                "-Dcom.sun.management.jmxremote.authenticate=false",
+                "-Djava.rmi.server.hostname=10.51.90.2"
+            )
         })
 
         // Deploy Vision files in src/main/jevois-vision to the JeVois Smart Camera
@@ -81,7 +91,7 @@ dependencies {
     compile("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.1.1")
 
     // FalconLibrary
-    compile("org.ghrobotics", "FalconLibrary", "2019.2.17")
+    compile("org.ghrobotics", "FalconLibrary", "2019.3.14")
 
     // Apache Commons Math
     compile("org.apache.commons", "commons-math3", "3.6.1")

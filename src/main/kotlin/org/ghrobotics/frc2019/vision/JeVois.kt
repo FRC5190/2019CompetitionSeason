@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.Timer
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.second
-import java.lang.StringBuilder
 import kotlin.concurrent.fixedRateTimer
 
 object JeVoisManager {
@@ -29,7 +28,7 @@ object JeVoisManager {
         private set
 
     init {
-        fixedRateTimer(period = 10000L) {
+        fixedRateTimer(name = "JevoisManager", period = 10000L) {
             val currentTime = Timer.getFPGATimestamp().second
 
             connectedJeVoisCameras.removeIf {

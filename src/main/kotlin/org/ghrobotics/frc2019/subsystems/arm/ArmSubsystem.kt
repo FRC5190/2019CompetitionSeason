@@ -44,7 +44,8 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     val rawEncoder get() = armMaster.getSelectedSensorPosition(0)
 
     // Voltage draw per motor.
-    val voltage get() = armMaster.motorOutputPercent * 12.0
+    var voltage = 0.0
+        private set
 
     var arbitraryFeedForward = 0.0
         private set
@@ -147,6 +148,8 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
      * Used to calculate the acceleration of the arm.
      */
     override fun periodic() {
+        this.voltage = armMaster.motorOutputPercent * 12.0
+
         this._position = armMaster.sensorPosition
         this.velocity = armMaster.sensorVelocity
 

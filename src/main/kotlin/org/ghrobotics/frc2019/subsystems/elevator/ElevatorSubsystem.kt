@@ -7,16 +7,17 @@ import org.ghrobotics.frc2019.kMainLoopDt
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
-import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.mathematics.units.nativeunits.nativeUnits
+import org.ghrobotics.lib.utils.Source
 import org.ghrobotics.lib.wrappers.ctre.AbstractFalconSRX
 import org.ghrobotics.lib.wrappers.ctre.LinearFalconSRX
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
+import kotlin.math.absoluteValue
 
 /**
  * Represents the elevator of the robot.
@@ -32,13 +33,11 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
     // List of all motors.
     private val allMotors: List<AbstractFalconSRX<*>>
 
-    // Store the state so we can dynamically update the feedforward
-    private val closedLoopSync = Any()
-    private var isClosedLoop = false
-    private var closedLoopGoal = Length(0.0)
+    var wantedState: ElevatorState = ElevatorState.Nothing
+    private var currentState: ElevatorState = ElevatorState.Nothing
 
     // Used to retrieve the current elevator position and to set the desired elevator position.
-    var _position = elevatorMaster.sensorPosition
+    var position = elevatorMaster.sensorPosition
         private set
 
     // Velocity of the elevator.
@@ -115,8 +114,6 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
             motor.motionCruiseVelocity = Constants.kElevatorCruiseVelocity
             motor.motionAcceleration = Constants.kElevatorAcceleration
 
-            motor.kF = Constants.kElevatorKf
-
             motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, kMainLoopDt.millisecond.toInt())
             motor.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_20Ms)
 
@@ -126,14 +123,20 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         // Default command to hold the current position
         defaultCommand = object : FalconCommand(this@ElevatorSubsystem) {
             override suspend fun initialize() {
-                synchronized(closedLoopSync) {
-                    val lockedPosition = when {
-                        isClosedLoop && (_position - closedLoopGoal).absoluteValue < Constants.kElevatorClosedLoopTolerance -> closedLoopGoal
-                        elevatorMaster.controlMode == ControlMode.MotionMagic -> elevatorMaster.activeTrajectoryPosition
-                        else -> _position
-                    }
-                    setPosition(lockedPosition)
+                val currentState = this@ElevatorSubsystem.currentState
+                val currentPosition = position.value
+                val wantedPosition = if (currentState is ElevatorState.Position
+                    && (currentState.position - currentPosition).absoluteValue <= Constants.kElevatorClosedLoopTolerance.value
+                ) {
+                    currentState.position
+                } else if (currentState is ElevatorState.MotionMagic
+                    && (currentState.position - currentPosition).absoluteValue <= Constants.kElevatorClosedLoopTolerance.value
+                ) {
+                    currentState.position
+                } else {
+                    currentPosition
                 }
+                wantedState = ElevatorState.Position(wantedPosition)
             }
         }
 
@@ -141,32 +144,18 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         setClosedLoopGains()
     }
 
-    fun setPosition(newPosition: Length) = synchronized(closedLoopSync) {
-        closedLoopGoal = newPosition
-        isClosedLoop = true
-    }
-
-    fun setPercentOutput(newOutput: Double, useFeedForward: Boolean = true) = synchronized(closedLoopSync) {
-        isClosedLoop = false
-        if (useFeedForward) {
-            elevatorMaster.set(
-                ControlMode.PercentOutput,
-                newOutput,
-                DemandType.ArbitraryFeedForward,
-                arbitraryFeedForward
-            )
-        } else {
-            elevatorMaster.set(ControlMode.PercentOutput, newOutput)
-        }
-    }
-
     /**
      * Configures closed loop gains for the elevator.
      */
     private fun setClosedLoopGains() {
         allMotors.forEach { motor ->
-            motor.kP = Constants.kElevatorKp
-            motor.kD = Constants.kElevatorKd
+            motor.config_kP(0, Constants.kElevatorKp)
+            motor.config_kD(0, Constants.kElevatorKd)
+            motor.config_kF(0, Constants.kElevatorKf)
+
+            motor.config_kP(1, Constants.kElevatorKp)
+            motor.config_kD(1, Constants.kElevatorKd)
+            motor.config_kF(1, 0.0)
         }
     }
 
@@ -175,13 +164,16 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
      */
     private fun zeroClosedLoopGains() {
         allMotors.forEach { motor ->
-            motor.kP = 0.0
-            motor.kD = 0.0
+            motor.config_kP(0, 0.0)
+            motor.config_kD(0, 0.0)
+
+            motor.config_kP(1, 0.0)
+            motor.config_kD(1, 0.0)
         }
     }
 
     override fun zeroOutputs() {
-        setPercentOutput(0.0)
+        wantedState = ElevatorState.Nothing
     }
 
     /**
@@ -191,7 +183,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
     override fun periodic() {
         val previousVelocity = velocity
 
-        _position = elevatorMaster.sensorPosition
+        position = elevatorMaster.sensorPosition
         velocity = elevatorMaster.sensorVelocity
         acceleration = (velocity - previousVelocity) / kMainLoopDt
 
@@ -200,18 +192,52 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         }
 
         arbitraryFeedForward =
-            if (_position >= Constants.kElevatorSwitchHeight || Robot.emergencyActive) {
+            if (position >= Constants.kElevatorSwitchHeight || Robot.emergencyActive) {
                 Constants.kElevatorAfterSwitchKg
             } else {
                 Constants.kElevatorBelowSwitchKg
             }
 
-        synchronized(closedLoopSync) {
-            if (isClosedLoop) {
+        val wantedState = this.wantedState
+        val previousState = this.currentState
+        this.currentState = wantedState
+        when (wantedState) {
+            is ElevatorState.Nothing -> {
+                elevatorMaster.set(ControlMode.Disabled, 0.0)
+            }
+            is ElevatorState.MotionMagic -> {
+                if (previousState !is ElevatorState.MotionMagic) {
+                    elevatorMaster.selectProfileSlot(0, 0)
+                }
                 elevatorMaster.set(
-                    ControlMode.MotionMagic, closedLoopGoal,
-                    DemandType.ArbitraryFeedForward, arbitraryFeedForward
+                    ControlMode.MotionMagic,
+                    Constants.kElevatorNativeUnitModel.toNativeUnitPosition(wantedState.position),
+                    DemandType.ArbitraryFeedForward,
+                    arbitraryFeedForward
                 )
+            }
+            is ElevatorState.Position -> {
+                if (previousState !is ElevatorState.Position) {
+                    elevatorMaster.selectProfileSlot(1, 0)
+                }
+                elevatorMaster.set(
+                    ControlMode.Position,
+                    Constants.kElevatorNativeUnitModel.toNativeUnitPosition(wantedState.position),
+                    DemandType.ArbitraryFeedForward,
+                    arbitraryFeedForward
+                )
+            }
+            is ElevatorState.OpenLoop -> {
+                if (wantedState.useFeedForward) {
+                    elevatorMaster.set(
+                        ControlMode.PercentOutput,
+                        wantedState.output(),
+                        DemandType.ArbitraryFeedForward,
+                        arbitraryFeedForward
+                    )
+                } else {
+                    elevatorMaster.set(ControlMode.PercentOutput, wantedState.output())
+                }
             }
         }
     }
@@ -223,4 +249,13 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
     }
 
     override fun recoverFromEmergency() = setClosedLoopGains()
+
+    sealed class ElevatorState {
+        object Nothing : ElevatorState()
+        class MotionMagic(val position: Double) : ElevatorState()
+        class Position(val position: Double) : ElevatorState()
+        class OpenLoop(val output: Source<Double>, val useFeedForward: Boolean) : ElevatorState() {
+            constructor(output: Double, useFeedForward: Boolean) : this(Source(output), useFeedForward)
+        }
+    }
 }

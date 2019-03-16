@@ -38,7 +38,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     private val allMotors: List<AbstractFalconSRX<*>>
     private val allMasters = listOf(frontWinchMaster, backWinchMaster)
 
-    val sensor = AnalogInput(Constants.kClimberSensorId)
+    private val sensor = AnalogInput(Constants.kClimberSensorId)
 
     val rawFront get() = frontWinchMaster.selectedSensorPosition
     val rawBack get() = backWinchMaster.selectedSensorPosition
@@ -82,6 +82,12 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     val backWinchCurrent get() = backWinchMaster.outputCurrent
 
     val hallEffect = DigitalInput(Constants.kClimberHallEffectSensor)
+
+    var isFrontReverseLimitSwitchClosed = false
+        private set
+
+    var isBackReverseLimitSwitchClosed = false
+        private set
 
     init {
         val backWinchSlave = NativeFalconSRX(Constants.kClimbBackWinchSlaveId)
@@ -147,6 +153,9 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     private val tempPWMData = DoubleArray(2)
 
     override fun periodic() {
+        isFrontReverseLimitSwitchClosed = frontWinchMaster.sensorCollection.isRevLimitSwitchClosed
+        isBackReverseLimitSwitchClosed = backWinchMaster.sensorCollection.isRevLimitSwitchClosed
+
         canifier.getPWMInput(CANifier.PWMChannel.PWMChannel0, tempPWMData)
         rollingAverage.add(tempPWMData[0])
         lidarRaw = rollingAverage.average
