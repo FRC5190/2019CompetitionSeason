@@ -23,7 +23,7 @@ class OpenLoopElevatorCommand(
         ElevatorSubsystem.wantedState = ElevatorSubsystem.ElevatorState.OpenLoop({
             var output = percentOutput()
             if (useFeedForward && !(output epsilonEquals 0.0)) {
-                output += (if (ElevatorSubsystem.position < Constants.kElevatorSwitchHeight) {
+                output += (if (ElevatorSubsystem.position < Constants.kElevatorSwitchHeight.value) {
                     Constants.kElevatorBelowSwitchKs
                 } else {
                     Constants.kElevatorAfterSwitchKs

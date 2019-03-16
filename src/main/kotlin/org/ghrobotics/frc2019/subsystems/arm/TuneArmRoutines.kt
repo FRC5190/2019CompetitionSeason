@@ -48,11 +48,11 @@ object TuneArmRoutines {
                     } else if (!isMoving) {
                         isMoving = true
                         goingUpKg =
-                            voltageOutput / ArmSubsystem._position.cos / Constants.kAccelerationDueToGravity / 12.0
+                            voltageOutput / ArmSubsystem.position.cos / Constants.kAccelerationDueToGravity / 12.0
                     }
                 }, Source(false))
                 +OpenLoopArmCommand { voltageOutput / 12.0 }
-            }.withExit { ArmSubsystem._position.sin > 0 }
+            }.withExit { ArmSubsystem.position.sin > 0 }
 
             // Find the Kg that allows the arm to start going down
             +ClosedLoopArmCommand(deltaArea)
@@ -62,7 +62,7 @@ object TuneArmRoutines {
                 +InstantRunnableCommand {
                     voltageOutput = Math.max(
                         ArmSubsystem.voltage,
-                        goingUpKg * ArmSubsystem._position.cos * Constants.kAccelerationDueToGravity
+                        goingUpKg * ArmSubsystem.position.cos * Constants.kAccelerationDueToGravity
                     )
                     isMoving = false
                 }
@@ -73,11 +73,11 @@ object TuneArmRoutines {
                     } else if (!isMoving) {
                         isMoving = true
                         goingDownKg =
-                            voltageOutput / ArmSubsystem._position.cos / Constants.kAccelerationDueToGravity / 12.0
+                            voltageOutput / ArmSubsystem.position.cos / Constants.kAccelerationDueToGravity / 12.0
                     }
                 }, Source(false))
                 +OpenLoopArmCommand { voltageOutput / 12.0 }
-            }.withExit { ArmSubsystem._position.sin < 0 }
+            }.withExit { ArmSubsystem.position.sin < 0 }
 
             +InstantRunnableCommand {
                 val actualKg = (goingUpKg + goingDownKg) / 2.0
@@ -103,16 +103,16 @@ object TuneArmRoutines {
             +parallel {
                 +PeriodicRunnableCommand({
                     maxVelocity = max(ArmSubsystem.velocity, maxVelocity)
-                    if (ArmSubsystem._position.cos >= 0) {
+                    if (ArmSubsystem.position.cos >= 0) {
                         maxVelocityAt90 = maxVelocity
                     }
                 }, Source(true))
                 +OpenLoopArmCommand(100.0)
             }.withExit {
-                val position = ArmSubsystem._position
+                val position = ArmSubsystem.position
                 position.cos < 0 && position.sin < 0
             }
-            +ClosedLoopArmCommand(ArmSubsystem._position)
+            +ClosedLoopArmCommand(ArmSubsystem.position)
 
             +InstantRunnableCommand {
                 println("Arm had a max velocity of ${maxVelocity.value} rad/s and a max velocity at 90 of ${maxVelocityAt90.value} rad/s")

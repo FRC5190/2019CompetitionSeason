@@ -8,9 +8,7 @@ import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.amp
-import org.ghrobotics.lib.mathematics.units.derivedunits.acceleration
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
-import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.mathematics.units.nativeunits.nativeUnits
 import org.ghrobotics.lib.utils.Source
@@ -36,35 +34,26 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
     var wantedState: ElevatorState = ElevatorState.Nothing
     private var currentState: ElevatorState = ElevatorState.Nothing
 
-    // Used to retrieve the current elevator position and to set the desired elevator position.
-    var position = elevatorMaster.sensorPosition
+    // PERIODIC VALUES
+    var position: Double = 0.0
+        private set
+    var velocity: Double = 0.0
+        private set
+    var acceleration: Double = 0.0
+        private set
+    var isBottomLimitSwitchPressed: Boolean = false
+        private set
+    var isZeroed: Boolean = false
+        private set
+    var arbitraryFeedForward: Double = 0.0
         private set
 
-    // Velocity of the elevator.
-    var velocity = elevatorMaster.sensorVelocity
+    // DEBUG VALUES
+    var current: Double = 0.0
         private set
-
-    // Acceleration of the elevator.
-    var acceleration = 0.inch.acceleration
+    var rawSensorPosition: Int = 0
         private set
-
-    // Current draw per motor.
-    val current get() = elevatorMaster.outputCurrent
-
-    // Raw encoder value.
-    val rawEncoder get() = elevatorMaster.getSelectedSensorPosition(0)
-
-    // Voltage draw per motor.
-    val voltage get() = elevatorMaster.motorOutputPercent * 12.0
-
-    // Checks if the limit switch is engaged
-    val isBottomLimitSwitchPressed get() = elevatorMaster.sensorCollection.isRevLimitSwitchClosed
-
-    var isZeroed = false
-        private set
-
-    var arbitraryFeedForward = 0.0
-        private set
+    var voltage: Double = 0.0
 
     init {
         val elevatorSlave1 = NativeFalconSRX(Constants.kElevatorSlave1Id)
@@ -124,12 +113,8 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         defaultCommand = object : FalconCommand(this@ElevatorSubsystem) {
             override suspend fun initialize() {
                 val currentState = this@ElevatorSubsystem.currentState
-                val currentPosition = position.value
-                val wantedPosition = if (currentState is ElevatorState.Position
-                    && (currentState.position - currentPosition).absoluteValue <= Constants.kElevatorClosedLoopTolerance.value
-                ) {
-                    currentState.position
-                } else if (currentState is ElevatorState.MotionMagic
+                val currentPosition = position
+                val wantedPosition = if (currentState is ElevatorState.SetPointState
                     && (currentState.position - currentPosition).absoluteValue <= Constants.kElevatorClosedLoopTolerance.value
                 ) {
                     currentState.position
@@ -181,23 +166,29 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
      * Used to calculate the acceleration of the elevator.
      */
     override fun periodic() {
+        // PERIODIC
         val previousVelocity = velocity
 
-        position = elevatorMaster.sensorPosition
-        velocity = elevatorMaster.sensorVelocity
-        acceleration = (velocity - previousVelocity) / kMainLoopDt
+        position = elevatorMaster.sensorPosition.value
+        velocity = elevatorMaster.sensorVelocity.value
+        acceleration = (velocity - previousVelocity) / kMainLoopDt.value
 
-        if (isBottomLimitSwitchPressed) {
-            isZeroed = true
-        }
+        isBottomLimitSwitchPressed = elevatorMaster.sensorCollection.isRevLimitSwitchClosed
+        if (isBottomLimitSwitchPressed) isZeroed = true
 
         arbitraryFeedForward =
-            if (position >= Constants.kElevatorSwitchHeight || Robot.emergencyActive) {
+            if (position >= Constants.kElevatorSwitchHeight.value || Robot.emergencyActive) {
                 Constants.kElevatorAfterSwitchKg
             } else {
                 Constants.kElevatorBelowSwitchKg
             }
 
+        // DEBUG PERIODIC
+        current = elevatorMaster.outputCurrent
+        voltage = elevatorMaster.motorOutputPercent * 12.0
+        rawSensorPosition = elevatorMaster.getSelectedSensorPosition(0)
+
+        // UPDATE STATE
         val wantedState = this.wantedState
         val previousState = this.currentState
         this.currentState = wantedState
@@ -252,10 +243,9 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
 
     sealed class ElevatorState {
         object Nothing : ElevatorState()
-        class MotionMagic(val position: Double) : ElevatorState()
-        class Position(val position: Double) : ElevatorState()
-        class OpenLoop(val output: Source<Double>, val useFeedForward: Boolean) : ElevatorState() {
-            constructor(output: Double, useFeedForward: Boolean) : this(Source(output), useFeedForward)
-        }
+        abstract class SetPointState(val position: Double) : ElevatorState()
+        class MotionMagic(position: Double) : SetPointState(position)
+        class Position(position: Double) : SetPointState(position)
+        class OpenLoop(val output: Source<Double>, val useFeedForward: Boolean) : ElevatorState()
     }
 }

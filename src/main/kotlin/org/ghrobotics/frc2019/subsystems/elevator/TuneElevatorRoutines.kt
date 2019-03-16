@@ -6,7 +6,7 @@ import org.ghrobotics.lib.commands.InstantRunnableCommand
 import org.ghrobotics.lib.commands.PeriodicRunnableCommand
 import org.ghrobotics.lib.commands.parallel
 import org.ghrobotics.lib.commands.sequential
-import org.ghrobotics.lib.mathematics.units.derivedunits.inchesPerSecond
+import org.ghrobotics.lib.mathematics.units.SILengthConstants
 import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.Source
 
@@ -36,7 +36,7 @@ object TuneElevatorRoutines {
                 }, Source(false))
                 +OpenLoopElevatorCommand(false) { goingUpBeforeSwitchKg / 12.0 }
             }.withExit {
-                ElevatorSubsystem.velocity.inchesPerSecond > movementVelocity
+                ElevatorSubsystem.velocity / SILengthConstants.kInchToMeter > movementVelocity
             }
 
             // BEFORE SWITCH Kg that allows elevator to go down
@@ -47,7 +47,7 @@ object TuneElevatorRoutines {
                 }, Source(false))
                 +OpenLoopElevatorCommand(false) { goingDownBeforeSwitchKg / 12.0 }
             }.withExit {
-                ElevatorSubsystem.velocity.inchesPerSecond < -movementVelocity
+                ElevatorSubsystem.velocity / SILengthConstants.kInchToMeter < -movementVelocity
             }
 
 
@@ -60,7 +60,7 @@ object TuneElevatorRoutines {
                 }, Source(false))
                 +OpenLoopElevatorCommand(false) { goingUpAfterSwitchKg / 12.0 }
             }.withExit {
-                ElevatorSubsystem.velocity.inchesPerSecond > movementVelocity
+                ElevatorSubsystem.velocity / SILengthConstants.kInchToMeter > movementVelocity
             }
 
             // BEFORE SWITCH Kg that allows elevator to go down
@@ -71,7 +71,7 @@ object TuneElevatorRoutines {
                 }, Source(false))
                 +OpenLoopElevatorCommand(false) { goingDownAfterSwitchKg / 12.0 }
             }.withExit {
-                ElevatorSubsystem.velocity.inchesPerSecond < -movementVelocity
+                ElevatorSubsystem.velocity / SILengthConstants.kInchToMeter < -movementVelocity
             }
 
             +InstantRunnableCommand {
