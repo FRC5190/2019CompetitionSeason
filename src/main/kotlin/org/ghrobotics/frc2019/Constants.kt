@@ -347,8 +347,8 @@ object Constants {
     val kCenterToForwardIntake = Pose2d((kRobotLength / 2.0) + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
 
-    val kCenterToFrontCamera = Pose2d((-1.75).inch, 0.inch, 0.degree)
-    val kCenterToBackCamera = Pose2d((-6.25).inch, 0.inch, 180.degree)
+    val kCenterToFrontCamera = Pose2d((-1.75).inch, -2.inch, 0.degree)
+    val kCenterToBackCamera = Pose2d((-6.25).inch, -2.inch, 180.degree)
 
 
     // VISION
@@ -456,7 +456,7 @@ object Constants {
 
     // ARM
     val kArmSensorUnitsPerRotation = 1024.nativeUnits
-    val kArmUpTicks = (-524).nativeUnits
+    val kArmUpTicks = (-582).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,

@@ -3,8 +3,6 @@ package org.ghrobotics.frc2019.subsystems.intake
 import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.NeutralMode
 import com.ctre.phoenix.sensors.PigeonIMU
-import edu.wpi.first.wpilibj.AnalogInput
-import edu.wpi.first.wpilibj.DigitalOutput
 import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
@@ -14,6 +12,7 @@ import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
 import org.ghrobotics.lib.sensors.asSource
+import org.ghrobotics.lib.util.CircularBuffer
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 
 object IntakeSubsystem : FalconSubsystem() {
@@ -27,6 +26,8 @@ object IntakeSubsystem : FalconSubsystem() {
         Constants.kIntakePushHatchSolenoidReverseId
     )
     private val holdHatchSolenoid = Solenoid(Constants.kPCMId, Constants.kIntakeHoldHatchSolenoidId)
+
+    private val rollingAverageCargoCurrent = CircularBuffer(30)
 
     var wantedPercentOutput = 0.0
     var wantedHoldHatchSolenoidState = HoldHatchSolenoidState.HOLD
@@ -54,19 +55,22 @@ object IntakeSubsystem : FalconSubsystem() {
         pigeon.setTemperatureCompensationDisable(true)
 
         with(intakeCargoMaster) {
+            inverted = false
             voltageCompensationSaturation = 12.volt
             voltageCompensationEnabled = true
 
             continuousCurrentLimit = 18.amp
             currentLimitingEnabled = true
 
-            brakeMode = NeutralMode.Coast
+            brakeMode = NeutralMode.Brake
         }
     }
 
     override fun periodic() {
         // PERIODIC
-        isSeeingCargo = intakeCargoMaster.outputCurrent > 7.0
+        rollingAverageCargoCurrent.add(intakeCargoMaster.outputCurrent)
+        println("Average Current: ${rollingAverageCargoCurrent.average}")
+        isSeeingCargo = rollingAverageCargoCurrent.average > 11.0
         if (isSeeingCargo) {
             isHoldingCargo = true
         } else if (wantedPercentOutput < 0) {

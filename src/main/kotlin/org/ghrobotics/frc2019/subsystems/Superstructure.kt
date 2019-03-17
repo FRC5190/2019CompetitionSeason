@@ -6,6 +6,7 @@ import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.elevator.ClosedLoopElevatorCommand
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
+import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.*
 import org.ghrobotics.lib.mathematics.units.*
 import kotlin.math.absoluteValue
@@ -31,10 +32,10 @@ object Superstructure {
     val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(17.inch, 0.degree)
     val kBackHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 180.degree)
 
-    val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, 0.degree)
+    val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, -10.degree)
     val kBackCargoIntake get() = elevatorAndArmHeight(0.inch, 180.degree)
 
-    val kFrontCargoIntoCargoShip get() = elevatorAndArmHeight(25.inch, 5.degree)
+    val kFrontCargoIntoCargoShip get() = elevatorAndArmHeight(33.inch, 5.degree)
     val kBackCargoFromLoadingStation get() = elevatorAndArmHeight(0.inch, 135.degree)
 
     val kStowedPosition get() = elevatorAndArmHeight(0.inch, 90.degree)
@@ -84,7 +85,9 @@ object Superstructure {
 
                 // We now need to flip the arm
                 sequential {
-                    +InstantRunnableCommand { println("FLIPPING") }
+                    +InstantRunnableCommand {
+                        IntakeSubsystem.wantedPushHatchSolenoidState = IntakeSubsystem.PushHatchSolenoidState.USEFUL
+                    }
 
                     val elevatorLimit = (-2).inch
 
@@ -151,23 +154,9 @@ object Superstructure {
                             +ClosedLoopArmCommand(armAngle)
                         }
                     }
-
-//                    // Flip the arm. Take the elevator up to final position once the arm is out of the way.
-//                    +parallel {
-//                        +ClosedLoopArmCommand(armAngle)
-//                        +sequential {
-//                            +ConditionCommand {
-//                                if (isFrontWanted) {
-//                                    ArmSubsystem.position <= 90.degree - Constants.kArmFlipTolerance &&
-//                                        ArmSubsystem.position.cos > 0
-//                                } else {
-//                                    ArmSubsystem.position >= 90.degree + Constants.kArmFlipTolerance &&
-//                                        ArmSubsystem.position.cos < 0
-//                                }
-//                            }
-//                            +ClosedLoopElevatorCommand(elevatorHeightWanted)
-//                        }
-//                    }
+                    +InstantRunnableCommand {
+                        IntakeSubsystem.wantedPushHatchSolenoidState = IntakeSubsystem.PushHatchSolenoidState.EXIST
+                    }
                 },
 
                 // We don't need to flip the arm. Take the elevator and arm to desired locations.

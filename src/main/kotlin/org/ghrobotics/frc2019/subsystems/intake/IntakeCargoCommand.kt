@@ -40,18 +40,6 @@ class IntakeCargoCommand(
         IntakeSubsystem.zeroOutputs()
     }
 
-    companion object {
-        val routine
-            get() = sequential {
-                val intakeCommand = IntakeCargoCommand(false)
-                +intakeCommand
-                +ConditionalCommand(
-                    { intakeCommand.gotCargo },
-                    ClosedLoopArmCommand(75.degree)
-                )
-            }
-    }
-
 }
 
 //class IntakeCargoCommand(
