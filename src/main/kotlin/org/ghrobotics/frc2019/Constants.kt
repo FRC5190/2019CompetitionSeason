@@ -286,9 +286,9 @@ object Constants {
     const val kElevatorSlave2Id = 7
     const val kElevatorSlave3Id = 8
     const val kArmId = 9
-    //    const val kIntakeCargoId = 10
-    const val kIntakeLeftId = 10
-    const val kIntakeRightId = 11
+    const val kIntakeCargoId = 10
+    //    const val kIntakeLeftId = 10
+//    const val kIntakeRightId = 11
     const val kClimbFrontWinchMasterId = 12
     const val kClimbFrontWinchSlaveId = 13
     const val kClimbBackWinchMasterId = 14
@@ -309,18 +309,18 @@ object Constants {
 
 
     // GYROS
-    const val kPigeonIMUId = kIntakeLeftId
-//    const val kPigeonIMUId = kIntakeCargoId
+//    const val kPigeonIMUId = kIntakeLeftId
+    const val kPigeonIMUId = kIntakeCargoId
 
 
     // PNEUMATICS
     const val kPCMId = 41
     const val kIntakeExtensionSolenoidForwardId = 0
     const val kIntakeExtensionSolenoidReverseId = 1
-    //    const val kIntakePushHatchSolenoidForwardId = 0
-//    const val kIntakePushHatchSolenoidReverseId = 1
-    const val kIntakeLauncherSolenoidId = 5
-    //    const val kIntakeHoldHatchSolenoidId = 5
+    const val kIntakePushHatchSolenoidForwardId = 0
+    const val kIntakePushHatchSolenoidReverseId = 1
+    //    const val kIntakeLauncherSolenoidId = 5
+    const val kIntakeHoldHatchSolenoidId = 5
     const val kDriveSolenoidId = 4
     const val kRampsSolenoidId = 3
 
