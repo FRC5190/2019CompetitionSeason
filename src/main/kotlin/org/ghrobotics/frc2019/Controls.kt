@@ -45,7 +45,7 @@ object Controls {
             triggerAxisButton(GenericHID.Hand.kLeft).change(IntakeHatchCommand(true))
             button(kBumperLeft).change(IntakeHatchCommand(false))
             triggerAxisButton(GenericHID.Hand.kRight).change(IntakeCargoCommand(true))
-            button(kBumperRight).change(IntakeCargoCommand(false))
+            button(kBumperRight).change(IntakeCargoCommand.routine)
         }
     }
 
