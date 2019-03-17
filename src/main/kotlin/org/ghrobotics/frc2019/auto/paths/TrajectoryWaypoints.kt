@@ -44,9 +44,15 @@ object TrajectoryWaypoints {
 
     // Starting on Level 1 HAB on the right side.
     val kSideStart = Pose2d(
+        kHabitatL2RX + Constants.kBumperThickness + Constants.kRobotLength / 2.0 - kRampHypotenuse,
+        kHabitatL2BY + Constants.kBumperThickness + Constants.kRobotWidth / 2.0,
+        0.degree
+    )
+
+    val kSideStart90 = Pose2d(
         kHabitatL2RX + Constants.kBumperThickness + Constants.kRobotWidth / 2.0,
         kHabitatL2BY + Constants.kBumperThickness + Constants.kRobotLength / 2.0 + kRampHypotenuse,
-        (0).degree
+        (-90).degree
     )
 
     // Starting on Level 1 HAV in the center.

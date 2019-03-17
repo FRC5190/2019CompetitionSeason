@@ -81,8 +81,10 @@ object Autonomous {
 
     enum class StartingPositions(val pose: Pose2d) {
         LEFT(TrajectoryWaypoints.kSideStart.mirror),
+        LEFT_90(TrajectoryWaypoints.kSideStart90.mirror),
         CENTER(TrajectoryWaypoints.kCenterStart),
-        RIGHT(TrajectoryWaypoints.kSideStart)
+        RIGHT(TrajectoryWaypoints.kSideStart),
+        RIGHT_90(TrajectoryWaypoints.kSideStart90)
     }
 
     enum class Mode { TEST_TRAJECTORIES, NEAR_ROCKET, BOTTOM_ROCKET, FORWARD_CARGO_SHIP, BASELINE, DO_NOTHING }

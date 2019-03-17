@@ -212,7 +212,7 @@ object TrajectoryFactory {
     val sideStartToRocketN = generateTrajectory(
         false,
         listOf(
-            TrajectoryWaypoints.kSideStart.asWaypoint(),
+            TrajectoryWaypoints.kSideStart90.asWaypoint(),
             rocketNAdjusted
         ),
         getConstraints(true, rocketNAdjusted), kMaxVelocity, kFirstPathMaxAcceleration, kMaxVoltage
