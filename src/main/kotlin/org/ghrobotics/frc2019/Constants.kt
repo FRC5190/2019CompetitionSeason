@@ -322,7 +322,6 @@ object Constants {
     //    const val kIntakeLauncherSolenoidId = 5
     const val kIntakeHoldHatchSolenoidId = 5
     const val kDriveSolenoidId = 4
-    const val kRampsSolenoidId = 3
 
 
     // ROBOT AND MECHANISM DIMENSIONS
@@ -496,7 +495,7 @@ object Constants {
 
     val kClimbWinchCurrentLimit = 20.amp
 
-    const val kClimbWinchClosedLoopTolerance = 2000
+    val kClimbWinchClosedLoopTolerance = 1.inch
 
     const val kClimbFrontWinchLimitSwitchTicks = -1254
     const val kClimbBackWinchLimitSwitchTicks = -2220

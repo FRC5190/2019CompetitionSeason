@@ -2,22 +2,27 @@ package org.ghrobotics.frc2019.subsystems.climb
 
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.lib.commands.FalconCommand
+import org.ghrobotics.lib.mathematics.units.Length
 import kotlin.math.absoluteValue
 
 class ClosedLoopClimbCommand(
-    private val frontTarget: Double,
-    private val backTarget: Double
+    frontTarget: Length,
+    backTarget: Length
 ) : FalconCommand(ClimbSubsystem) {
+
+    private val frontTarget = frontTarget.value
+    private val backTarget = backTarget.value
 
     init {
         finishCondition += {
-            (ClimbSubsystem.rawFront - frontTarget).absoluteValue < Constants.kClimbWinchClosedLoopTolerance &&
-                (ClimbSubsystem.rawBack - backTarget).absoluteValue < Constants.kClimbWinchClosedLoopTolerance
+            (ClimbSubsystem.frontWinchPosition - this.frontTarget).absoluteValue < Constants.kClimbWinchClosedLoopTolerance.value &&
+                (ClimbSubsystem.backWinchPosition - this.backTarget).absoluteValue < Constants.kClimbWinchClosedLoopTolerance.value
         }
     }
 
     override suspend fun initialize() {
-        ClimbSubsystem.climbToHeight(frontTarget, backTarget)
+        ClimbSubsystem.wantedFrontWinchState = ClimbSubsystem.ClimbLegState.Climb(frontTarget)
+        ClimbSubsystem.wantedBackWinchState = ClimbSubsystem.ClimbLegState.Climb(backTarget)
     }
 
     override suspend fun dispose() {

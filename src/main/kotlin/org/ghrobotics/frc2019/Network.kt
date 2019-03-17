@@ -139,7 +139,7 @@ object Network {
 
         frontClimbWinchPosition.setDouble(ClimbSubsystem.frontWinchPosition)
         backClimbWinchPosition.setDouble(ClimbSubsystem.backWinchPosition)
-        climbLidarRaw.setDouble(ClimbSubsystem.lidarRaw)
+        climbLidarRaw.setDouble(ClimbSubsystem.lidarRawAveraged)
         frontClimbWinchCurrent.setDouble(ClimbSubsystem.frontWinchCurrent)
         backClimbWinchCurrent.setDouble(ClimbSubsystem.backWinchCurrent)
         frontLimitSwitch.setBoolean(ClimbSubsystem.isFrontReverseLimitSwitchClosed)

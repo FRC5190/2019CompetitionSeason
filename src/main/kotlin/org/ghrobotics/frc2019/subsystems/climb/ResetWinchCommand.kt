@@ -1,20 +1,42 @@
 package org.ghrobotics.frc2019.subsystems.climb
 
 import org.ghrobotics.lib.commands.FalconCommand
-import org.ghrobotics.lib.utils.and
+import org.ghrobotics.lib.utils.Source
 
-class ResetWinchCommand(private val winch: ClimbSubsystem.Winch) : FalconCommand(ClimbSubsystem) {
+class ResetWinchCommand(private val resetFront: Boolean) : FalconCommand(ClimbSubsystem) {
+
+    private val selectedSensorPosition: Source<Int>
+
     init {
-        finishCondition += winch.motor.sensorCollection::isRevLimitSwitchClosed and {
-            winch.motor.selectedSensorPosition < 2000
+        finishCondition += if (resetFront) {
+            selectedSensorPosition = ClimbSubsystem::rawFrontWinchPosition
+            {
+                ClimbSubsystem.isFrontReverseLimitSwitchClosed && ClimbSubsystem.rawFrontWinchPosition < 2000
+            }
+        } else {
+            selectedSensorPosition = ClimbSubsystem::rawBackWinchPosition
+            {
+                ClimbSubsystem.isBackReverseLimitSwitchClosed && ClimbSubsystem.rawBackWinchPosition < 2000
+            }
         }
     }
 
-    override suspend fun execute() {
-        winch.motor.percentOutput = if (winch.motor.selectedSensorPosition > 100) -1.0 else -0.5
+    override suspend fun initialize() {
+        val wantedState = ClimbSubsystem.ClimbLegState.OpenLoop {
+            if (selectedSensorPosition() > 100) -1.0 else -0.5
+        }
+        if (resetFront) {
+            ClimbSubsystem.wantedFrontWinchState = wantedState
+        } else {
+            ClimbSubsystem.wantedBackWinchState = wantedState
+        }
     }
 
     override suspend fun dispose() {
-        winch.motor.neutralOutput()
+        if (resetFront) {
+            ClimbSubsystem.wantedFrontWinchState = ClimbSubsystem.ClimbLegState.Nothing
+        } else {
+            ClimbSubsystem.wantedBackWinchState = ClimbSubsystem.ClimbLegState.Nothing
+        }
     }
 }
