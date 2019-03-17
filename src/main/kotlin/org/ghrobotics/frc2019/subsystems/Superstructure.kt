@@ -27,7 +27,6 @@ object Superstructure {
     val kFrontHighRocketCargo get() = goToHeightWithAngle(83.inch, 15.degree)
     val kFrontMiddleRocketCargo get() = goToHeightWithAngle(56.inch, 15.degree)
     val kFrontLowRocketCargo get() = goToHeightWithAngle(26.inch, 15.degree)
-    val kBackLowRocketCargo get() = goToHeightWithAngle(25.inch, 135.degree)
 
     val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(17.inch, 0.degree)
     val kBackHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 180.degree)
@@ -35,7 +34,7 @@ object Superstructure {
     val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, 0.degree)
     val kBackCargoIntake get() = elevatorAndArmHeight(0.inch, 180.degree)
 
-    val kFrontCargoFromLoadingStation get() = elevatorAndArmHeight(25.inch, 5.degree)
+    val kFrontCargoIntoCargoShip get() = elevatorAndArmHeight(25.inch, 5.degree)
     val kBackCargoFromLoadingStation get() = elevatorAndArmHeight(0.inch, 135.degree)
 
     val kStowedPosition get() = elevatorAndArmHeight(0.inch, 90.degree)

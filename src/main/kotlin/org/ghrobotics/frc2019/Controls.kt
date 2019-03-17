@@ -6,7 +6,6 @@
 package org.ghrobotics.frc2019
 
 import edu.wpi.first.wpilibj.GenericHID
-import edu.wpi.first.wpilibj.XboxController
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
 import org.ghrobotics.frc2019.subsystems.climb.autoL2Climb
@@ -45,17 +44,18 @@ object Controls {
             // Intake
             triggerAxisButton(GenericHID.Hand.kLeft).change(IntakeHatchCommand(true))
             button(kBumperLeft).change(IntakeHatchCommand(false))
-
             triggerAxisButton(GenericHID.Hand.kRight).change(IntakeCargoCommand(true))
             button(kBumperRight).change(IntakeCargoCommand(false))
         }
     }
 
-    val operatorXbox = XboxController(1)
-    val operatorFalconXbox = operatorXbox.mapControls {
+    var backModifier = false
+        private set
+
+    val operatorFalconXbox = xboxController(1) {
         registerEmergencyMode()
 
-        // Enter climb mode
+        // Climb
         button(kB).changeOn {
             isClimbing = !isClimbing
             DriveSubsystem.lowGear = true
@@ -63,73 +63,43 @@ object Controls {
         }
 
         state({ !isClimbing }) {
-            // Elevator
-            axisButton(1, 0.1) {
-                change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * 0.5 }))
+
+            /** MANUAL CONTROL **/
+            axisButton(1, 0.1) { change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * 0.5 })) }
+            axisButton(5, 0.1) { change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * 0.5 })) }
+
+            /** PRESETS **/
+            triggerAxisButton(GenericHID.Hand.kLeft, 0.20) {
+                changeOn { backModifier = true }
+                changeOff { backModifier = false }
             }
-            // Arm
-            axisButton(5, 0.1) {
-                change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * 0.5 }))
-            }
 
-            val backModifier = triggerAxisButton(GenericHID.Hand.kLeft)
-
-            // Superstructure
-
-            // HIGH NEAR_ROCKET
             pov(0).changeOn {
-                if (IntakeSubsystem.isSeeingCargo) {
-                    Superstructure.kFrontHighRocketCargo.start()
-                } else {
-                    Superstructure.kFrontHighRocketHatch.start()
-                }
+                if (IntakeSubsystem.isHoldingCargo) Superstructure.kFrontHighRocketCargo.start()
+                else Superstructure.kFrontHighRocketHatch.start()
             }
-
-            // MIDDLE NEAR_ROCKET
             pov(90).changeOn {
-                if (IntakeSubsystem.isSeeingCargo) {
-                    Superstructure.kFrontMiddleRocketCargo.start()
-                } else {
-                    Superstructure.kFrontMiddleRocketHatch.start()
-                }
+                if (IntakeSubsystem.isHoldingCargo) Superstructure.kFrontMiddleRocketCargo.start()
+                else Superstructure.kFrontMiddleRocketHatch.start()
             }
-
-            // LOW NEAR_ROCKET, CARGO SHIP, AND LOADING STATION
             pov(180).changeOn {
-                if (backModifier.source() > 0.35) {
-                    if (IntakeSubsystem.isSeeingCargo) {
-                        Superstructure.kBackLowRocketCargo.start()
-                    } else {
-                        Superstructure.kBackHatchFromLoadingStation.start()
-                    }
-                } else {
-                    if (IntakeSubsystem.isSeeingCargo) {
-                        Superstructure.kFrontLowRocketCargo.start()
-                    } else {
-                        Superstructure.kFrontHatchFromLoadingStation.start()
-                    }
+                when {
+                    backModifier -> Superstructure.kBackHatchFromLoadingStation.start()
+                    IntakeSubsystem.isHoldingCargo -> Superstructure.kFrontLowRocketCargo.start()
+                    else -> Superstructure.kFrontHatchFromLoadingStation.start()
                 }
             }
-
-            // CARGO INTAKE
             pov(270).changeOn {
-                if (backModifier.source() > 0.35) {
-                    Superstructure.kBackCargoIntake.start()
-                } else {
-                    Superstructure.kFrontCargoIntake.start()
-                }
+                // if (backModifier) Superstructure.kBackCargoIntake.start()
+                /* else */ Superstructure.kFrontCargoIntake.start()
             }
-
             triggerAxisButton(GenericHID.Hand.kRight).changeOn {
-                if (backModifier.source() > 0.35) {
-                    Superstructure.kBackCargoFromLoadingStation.start()
-                } else {
-                    Superstructure.kFrontCargoFromLoadingStation.start()
-                }
+                if (backModifier) Superstructure.kBackCargoFromLoadingStation.start()
+                else Superstructure.kFrontCargoIntoCargoShip.start()
             }
-
             button(kBumperRight).changeOn(Superstructure.kStowedPosition)
         }
+
         state({ isClimbing }) {
             button(kA).change(autoL3Climb())
             button(kY).change(autoL2Climb())
@@ -147,21 +117,8 @@ object Controls {
         }
     }
 
-
-    var iterations = 0
-
     fun update() {
         driverFalconXbox.update()
         operatorFalconXbox.update()
-//
-//        if (IntakeSubsystem.isHoldingHatch && iterations < 50) {
-//            operatorXbox.setRumble(GenericHID.RumbleType.kLeftRumble, 1.0)
-//            operatorXbox.setRumble(GenericHID.RumbleType.kRightRumble, 1.0)
-//            iterations += 1
-//        } else {
-//            iterations = 0
-//            operatorXbox.setRumble(GenericHID.RumbleType.kLeftRumble, 0.0)
-//            operatorXbox.setRumble(GenericHID.RumbleType.kRightRumble, 0.0)
-//        }
     }
 }
