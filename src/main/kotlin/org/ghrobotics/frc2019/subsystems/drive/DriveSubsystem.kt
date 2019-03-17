@@ -5,15 +5,14 @@
 
 package org.ghrobotics.frc2019.subsystems.drive
 
-import com.ctre.phoenix.sensors.PigeonIMU
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
+import org.ghrobotics.lib.commands.ConditionCommand
 import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
-import org.ghrobotics.lib.mathematics.units.degree
-import org.ghrobotics.lib.sensors.asSource
+import org.ghrobotics.lib.mathematics.twodim.geometry.Rectangle2d
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
 import kotlin.properties.Delegates.observable
 
@@ -93,6 +92,9 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
 //        leftMotor.percentOutput = l + wheelVoltages.left / 12.0
 //        rightMotor.percentOutput = r + wheelVoltages.right / 12.0
 //    }
+
+    fun notWithinRegion(region: Rectangle2d) =
+        ConditionCommand { !region.contains(robotPosition.translation) }
 
     override fun activateEmergency() {
         zeroOutputs()
