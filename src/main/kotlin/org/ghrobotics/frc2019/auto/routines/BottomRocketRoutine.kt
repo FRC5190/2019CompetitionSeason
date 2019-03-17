@@ -11,6 +11,7 @@ import org.ghrobotics.lib.commands.parallel
 import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.duration
 import org.ghrobotics.lib.mathematics.units.feet
+import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.withEquals
 
@@ -68,7 +69,7 @@ class BottomRocketRoutine : AutoRoutine() {
                     Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
                     4.feet, false
                 )
-                // Take the superstructure to scoring height and arm hatch intake 3 seconds before arrival.
+                // Take the superstructure to pickup position and arm hatch intake 3 seconds before arrival.
                 +sequential {
                     +DelayCommand(path2.duration - 3.second)
                     +IntakeHatchCommand(false)
@@ -106,6 +107,11 @@ class BottomRocketRoutine : AutoRoutine() {
                     TrajectoryFactory.rocketNToLoadingStation,
                     Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
                 )
+                // Take the superstructure to a position to pick up the next hatch.
+                +sequential {
+                    +DelayCommand(100.millisecond)
+                    +Superstructure.kBackHatchFromLoadingStation
+                }
             }
         }
 }
