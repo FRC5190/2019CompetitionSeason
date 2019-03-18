@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.3.21"
-    id("edu.wpi.first.GradleRIO") version "2019.3.2"
+    id("edu.wpi.first.GradleRIO") version "2019.4.1"
     id("io.gitlab.arturbosch.detekt") version "1.0.0-RC13"
 }
 
@@ -91,7 +91,7 @@ dependencies {
     compile("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.1.1")
 
     // FalconLibrary
-    compile("org.ghrobotics", "FalconLibrary", "2019.3.14")
+    compile("org.ghrobotics", "FalconLibrary", "2019.3.18")
 
     // Apache Commons Math
     compile("org.apache.commons", "commons-math3", "3.6.1")
