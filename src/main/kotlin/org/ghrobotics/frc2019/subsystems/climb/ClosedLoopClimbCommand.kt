@@ -24,8 +24,4 @@ class ClosedLoopClimbCommand(
         ClimbSubsystem.wantedFrontWinchState = ClimbSubsystem.ClimbLegState.Climb(frontTarget)
         ClimbSubsystem.wantedBackWinchState = ClimbSubsystem.ClimbLegState.Climb(backTarget)
     }
-
-    override suspend fun dispose() {
-//        ClimbSubsystem.zeroOutputs()
-    }
 }

@@ -8,8 +8,7 @@ package org.ghrobotics.frc2019
 import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
-import org.ghrobotics.frc2019.subsystems.climb.autoL2Climb
-import org.ghrobotics.frc2019.subsystems.climb.autoL3Climb
+import org.ghrobotics.frc2019.subsystems.climb.AutoClimbRoutines
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
 import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
@@ -101,8 +100,8 @@ object Controls {
         }
 
         state({ isClimbing }) {
-            button(kA).change(autoL3Climb())
-            button(kY).change(autoL2Climb())
+            button(kA).change(AutoClimbRoutines.autoL3Climb)
+            button(kY).change(AutoClimbRoutines.autoL2Climb)
         }
     }
 

@@ -69,7 +69,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     var backWinchCurrent = 0.0
         private set
 
-    val hallEffect = DigitalInput(Constants.kClimberHallEffectSensor)
+    private val backHallEffectSensor = DigitalInput(Constants.kClimberHallEffectSensor)
 
     init {
         val backWinchSlave = NativeFalconSRX(Constants.kClimbBackWinchSlaveId)
@@ -148,7 +148,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         lidarRawAveraged = rollingLidarAverage.average
 
         isFrontReverseLimitSwitchClosed = frontWinchMaster.sensorCollection.isRevLimitSwitchClosed
-        isBackReverseLimitSwitchClosed = backWinchMaster.sensorCollection.isRevLimitSwitchClosed
+        isBackReverseLimitSwitchClosed = !backHallEffectSensor.get()
 
         frontOnPlatform = frontOnPlatformSensor.averageVoltage > 1.0
 
@@ -168,7 +168,9 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
             currentFrontWinchState
         )
 
-        val wantedBackWinchState = this.wantedBackWinchState
+        val wantedBackWinchState =
+            if (!isBackReverseLimitSwitchClosed) this.wantedBackWinchState else ClimbLegState.Nothing
+
         val currentBackWinchState = this.currentBackWinchState
         this.currentBackWinchState = wantedBackWinchState
         updateLeg(
@@ -178,11 +180,10 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
             currentBackWinchState
         )
 
+        if (isFrontReverseLimitSwitchClosed) frontWinchMaster.selectedSensorPosition = 0
+        if (isBackReverseLimitSwitchClosed) backWinchMaster.selectedSensorPosition = 0
+
         wheelMaster.set(ControlMode.PercentOutput, wantedWheelPercentOutput)
-
-        println(hallEffect.get())
-
-//        println("F: ${frontWinchMaster.selectedSensorPosition}, B: ${backWinchMaster.selectedSensorPosition}")
     }
 
     private fun updateLeg(
