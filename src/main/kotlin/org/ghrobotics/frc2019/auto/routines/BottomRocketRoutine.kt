@@ -72,7 +72,7 @@ class BottomRocketRoutine : AutoRoutine() {
                 // Take the superstructure to pickup position and arm hatch intake 3 seconds before arrival.
                 +sequential {
                     +DelayCommand(path2.duration - 3.second)
-                    +IntakeHatchCommand(false)
+                    // +IntakeHatchCommand(false)
                     +Superstructure.kBackHatchFromLoadingStation
                 }.withTimeout(3.second)
             }

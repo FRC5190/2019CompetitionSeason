@@ -90,8 +90,8 @@ object Controls {
                 }
             }
             pov(270).changeOn {
-                // if (backModifier) Superstructure.kBackCargoIntake.start()
-                /* else */ Superstructure.kFrontCargoIntake.start()
+                if (backModifier) Superstructure.kBackCargoIntake.start()
+                else Superstructure.kFrontCargoIntake.start()
             }
             triggerAxisButton(GenericHID.Hand.kRight).changeOn {
                 if (backModifier) Superstructure.kBackCargoFromLoadingStation.start()

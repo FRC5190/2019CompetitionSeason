@@ -15,7 +15,7 @@ class ManualClimbCommand : FalconCommand(ClimbSubsystem) {
 
     override suspend fun execute() {
         if (Controls.isClimbing) {
-            ClimbSubsystem.wantedWheelPercentOutput = -wheelSource()
+            ClimbSubsystem.wantedWheelPercentOutput = wheelSource()
 
             if (frontWinchSource().absoluteValue > 0.1) {
                 if (ClimbSubsystem.currentFrontWinchState !is ClimbSubsystem.ClimbLegState.OpenLoop) {
@@ -23,7 +23,7 @@ class ManualClimbCommand : FalconCommand(ClimbSubsystem) {
                         ClimbSubsystem.ClimbLegState.OpenLoop { -frontWinchSource() }
                 }
             } else {
-                if (ClimbSubsystem.currentFrontWinchState !is ClimbSubsystem.ClimbLegState.OpenLoop) {
+                if (ClimbSubsystem.currentFrontWinchState !is ClimbSubsystem.ClimbLegState.Position) {
                     ClimbSubsystem.wantedFrontWinchState =
                         ClimbSubsystem.ClimbLegState.Position(ClimbSubsystem.frontWinchPosition)
                 }
@@ -35,7 +35,7 @@ class ManualClimbCommand : FalconCommand(ClimbSubsystem) {
                         ClimbSubsystem.ClimbLegState.OpenLoop { -backWinchSource() }
                 }
             } else {
-                if (ClimbSubsystem.currentBackWinchState !is ClimbSubsystem.ClimbLegState.OpenLoop) {
+                if (ClimbSubsystem.currentBackWinchState !is ClimbSubsystem.ClimbLegState.Position) {
                     ClimbSubsystem.wantedBackWinchState =
                         ClimbSubsystem.ClimbLegState.Position(ClimbSubsystem.backWinchPosition)
                 }

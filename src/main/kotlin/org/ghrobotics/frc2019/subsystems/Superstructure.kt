@@ -29,13 +29,13 @@ object Superstructure {
     val kFrontMiddleRocketCargo get() = goToHeightWithAngle(56.inch, 15.degree)
     val kFrontLowRocketCargo get() = goToHeightWithAngle(26.inch, 15.degree)
 
-    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(17.inch, 0.degree)
+    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 10.degree)
     val kBackHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 180.degree)
 
-    val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, -10.degree)
-    val kBackCargoIntake get() = elevatorAndArmHeight(0.inch, 180.degree)
+    val kFrontCargoIntake get() = elevatorAndArmHeight(1.inch, (-35).degree)
+    val kBackCargoIntake get() = elevatorAndArmHeight(1.inch, (-145).degree)
 
-    val kFrontCargoIntoCargoShip get() = elevatorAndArmHeight(33.inch, 5.degree)
+    val kFrontCargoIntoCargoShip get() = elevatorAndArmHeight(25.inch, 5.degree)
     val kBackCargoFromLoadingStation get() = elevatorAndArmHeight(0.inch, 135.degree)
 
     val kStowedPosition get() = elevatorAndArmHeight(0.inch, 90.degree)
@@ -85,13 +85,24 @@ object Superstructure {
 
                 // We now need to flip the arm
                 sequential {
-                    +InstantRunnableCommand {
-                        IntakeSubsystem.wantedPushHatchSolenoidState = IntakeSubsystem.PushHatchSolenoidState.USEFUL
-                    }
-
                     val elevatorLimit = (-2).inch
 
+                    var intakeSafeToOpen = false
+
                     +parallel {
+                        +object : FalconCommand() {
+                            init {
+                                finishCondition += { intakeSafeToOpen }
+                            }
+
+                            override suspend fun execute() {
+                                if (IntakeSubsystem.isFullyExtended) {
+                                    IntakeSubsystem.wantedExtensionSolenoidState =
+                                        IntakeSubsystem.ExtensionSolenoidState.RETRACTED
+                                    IntakeSubsystem.wantedLauncherSolenoidState = false
+                                }
+                            }
+                        }
                         // Elevator
                         +sequential {
                             val elevatorWaitCondition = {
@@ -114,6 +125,9 @@ object Superstructure {
                             }.overrideExit(elevatorWaitCondition)
                             // Wait for arm to flip
                             +ConditionCommand(elevatorWaitCondition)
+
+                            // Allow intake to open
+                            +InstantRunnableCommand { intakeSafeToOpen = true }
 
                             +ClosedLoopElevatorCommand(elevatorHeightWanted)
                         }
@@ -153,9 +167,6 @@ object Superstructure {
 
                             +ClosedLoopArmCommand(armAngle)
                         }
-                    }
-                    +InstantRunnableCommand {
-                        IntakeSubsystem.wantedPushHatchSolenoidState = IntakeSubsystem.PushHatchSolenoidState.EXIST
                     }
                 },
 

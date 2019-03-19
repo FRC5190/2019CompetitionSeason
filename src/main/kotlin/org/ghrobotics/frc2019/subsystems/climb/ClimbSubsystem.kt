@@ -3,6 +3,7 @@ package org.ghrobotics.frc2019.subsystems.climb
 import com.ctre.phoenix.CANifier
 import com.ctre.phoenix.motorcontrol.*
 import edu.wpi.first.wpilibj.AnalogInput
+import edu.wpi.first.wpilibj.DigitalInput
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.Robot
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
@@ -68,7 +69,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     var backWinchCurrent = 0.0
         private set
 
-//    val hallEffect = DigitalInput(Constants.kClimberHallEffectSensor)
+    val hallEffect = DigitalInput(Constants.kClimberHallEffectSensor)
 
     init {
         val backWinchSlave = NativeFalconSRX(Constants.kClimbBackWinchSlaveId)
@@ -79,8 +80,8 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         frontWinchSlave.follow(frontWinchMaster)
         backWinchSlave.follow(backWinchMaster)
 
-        frontWinchMaster.inverted = true
-        frontWinchSlave.inverted = true
+        frontWinchMaster.inverted = false
+        frontWinchSlave.inverted = false
 
         allMotors.forEach { motor ->
             motor.brakeMode = NeutralMode.Brake
@@ -179,7 +180,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
 
         wheelMaster.set(ControlMode.PercentOutput, wantedWheelPercentOutput)
 
-//        println(hallEffect.get())
+        println(hallEffect.get())
 
 //        println("F: ${frontWinchMaster.selectedSensorPosition}, B: ${backWinchMaster.selectedSensorPosition}")
     }
