@@ -95,6 +95,8 @@ object Network {
     val visionDriveAngle = visionLayout.add("Vision Drive Angle", 0.0).entry
     val visionDriveActive = visionLayout.add("Vision Drive Active", false).entry
 
+    private var debugEnabled = mainShuffleboardDisplay.add("Debug Active", Robot.debugActive).entry
+
     init {
         // Put choosers on dashboard
         autoLayout.add(
@@ -150,6 +152,8 @@ object Network {
 
         visionFrontCameraConnected.setBoolean(JeVoisManager.isFrontJeVoisConnected)
         visionBackCameraConnected.setBoolean(JeVoisManager.isBackJeVoisConnected)
+
+        Robot.debugActive = debugEnabled.getBoolean(Robot.debugActive)
 
 //        val trackedObject = TargetTracker.bestTarget
 //        if (trackedObject != null) {

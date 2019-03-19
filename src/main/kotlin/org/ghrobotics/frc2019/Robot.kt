@@ -26,7 +26,7 @@ object Robot : FalconRobot() {
     val emergencyReadySystems = ArrayList<EmergencyHandleable>()
 
     var emergencyActive = false
-    var debugActive = true
+    var debugActive = false
 
     val shouldDebug get() = debugActive || !lastEnabledState
 
