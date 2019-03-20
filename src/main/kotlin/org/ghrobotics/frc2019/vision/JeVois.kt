@@ -68,6 +68,7 @@ object JeVoisManager {
         val systemPortName: String = serialPort.systemPortName
 
         private var lastMessageReceived = 0.second
+        private var wasUnplugged = false
 
         var isAlive = true
             private set
@@ -81,7 +82,12 @@ object JeVoisManager {
                     try {
                         if (event.eventType != SerialPort.LISTENING_EVENT_DATA_AVAILABLE)
                             return
-                        val newData = ByteArray(serialPort.bytesAvailable())
+                        val bytesAvailable = serialPort.bytesAvailable()
+                        if (bytesAvailable < 0) {
+                            wasUnplugged = true
+                            return
+                        }
+                        val newData = ByteArray(bytesAvailable)
                         serialPort.readBytes(newData, newData.size.toLong())
                         for (newByte in newData) {
                             val newChar = newByte.toChar()
@@ -124,7 +130,7 @@ object JeVoisManager {
         }
 
         fun update(currentTime: Time) {
-            isAlive = currentTime - lastMessageReceived <= Constants.kVisionCameraTimeout
+            isAlive = !wasUnplugged && currentTime - lastMessageReceived <= Constants.kVisionCameraTimeout
         }
 
         fun dispose() {
