@@ -100,7 +100,7 @@ object Constants {
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
 
     val kCenterToFrontCamera = Pose2d((-1.75).inch, 0.5.inch, 0.degree)
-    val kCenterToBackCamera = Pose2d((-6.25).inch, 0.inch, 180.degree)
+    val kCenterToBackCamera = Pose2d((-6.25).inch, 0.5.inch, 180.degree)
 
 
     // VISION
@@ -198,7 +198,7 @@ object Constants {
 
     // ARM
     val kArmSensorUnitsPerRotation = 1024.nativeUnits
-    val kArmUpTicks = (-529).nativeUnits
+    val kArmUpTicks = (-499).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,
@@ -228,13 +228,13 @@ object Constants {
 
     // CLIMB
     val kClimbBackWinchNativeUnitModel = SlopeNativeUnitModel(
-        12.inch,
-        12140.nativeUnits
+        14.inch,
+        14782.nativeUnits
     )
 
     val kClimbFrontWinchNativeUnitModel = SlopeNativeUnitModel(
-        12.5.inch,
-        21680.nativeUnits
+        16.inch,
+        12677.nativeUnits
     )
 
     val kClimbWinchCurrentLimit = 40.amp
@@ -259,15 +259,15 @@ object Constants {
     val kClimbDisableLevelingHeight = 3.inch
 
     const val kClimbWinchPositionKp = 0.85
-    const val kClimbWinchLevelingKp = 5.0
-    const val kClimbWinchLevelingKd = 150.0
+    const val kClimbWinchLevelingKp = 4.5
+    const val kClimbWinchLevelingKd = 25.0
 
     private fun NativeUnitModel<*>.calculatekF(voltage: Double, velocity: Double) =
         (voltage / 12.0 * 1023.0) / (toNativeUnitVelocity(velocity) / 10.0)
 }
 
 // Curiosity
-
+//
 //@Suppress("MemberVisibilityCanBePrivate")
 //object Constants {
 //
@@ -334,7 +334,7 @@ object Constants {
 //    val kRobotLength = 30.inch
 //
 //    val kBumperThickness = 4.5.inch
-//    val kIntakeProtrusion = 9.inch       // Out of frame protrusion.
+//    val kIntakeProtrusion = 8.inch       // Out of frame protrusion.
 //    val kElevatorCrossbarHeightFromGround = 46.inch
 //    val kIntakeCradleHeight = 6.inch
 //    val kArmLength = 24.5.inch
@@ -348,8 +348,8 @@ object Constants {
 //    val kCenterToForwardIntake = Pose2d((kRobotLength / 2.0) + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
 //    val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
 //
-//    val kCenterToFrontCamera = Pose2d((-1.75).inch, -2.inch, 0.degree)
-//    val kCenterToBackCamera = Pose2d((-6.25).inch, -2.inch, 180.degree)
+//    val kCenterToFrontCamera = Pose2d((-1.75).inch, 0.5.inch, 0.degree)
+//    val kCenterToBackCamera = Pose2d((-6.25).inch, 0.5.inch, 180.degree)
 //
 //
 //    // VISION

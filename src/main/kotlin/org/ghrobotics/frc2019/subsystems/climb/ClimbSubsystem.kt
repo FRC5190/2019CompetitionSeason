@@ -69,6 +69,8 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
     var backWinchCurrent = 0.0
         private set
 
+    private var setLimits = false
+
     private val backHallEffectSensor = DigitalInput(Constants.kClimberHallEffectSensor)
 
     init {
@@ -114,14 +116,14 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         }
 
         frontWinchMaster.motionAcceleration =
-            0.5.feet.acceleration.toNativeUnitAcceleration(Constants.kClimbFrontWinchNativeUnitModel)
+            0.8.feet.acceleration.toNativeUnitAcceleration(Constants.kClimbFrontWinchNativeUnitModel)
         frontWinchMaster.motionCruiseVelocity =
-            0.5.feet.velocity.toNativeUnitVelocity(Constants.kClimbFrontWinchNativeUnitModel)
+            1.4.feet.velocity.toNativeUnitVelocity(Constants.kClimbFrontWinchNativeUnitModel)
 
         backWinchMaster.motionAcceleration =
             0.5.feet.acceleration.toNativeUnitAcceleration(Constants.kClimbBackWinchNativeUnitModel)
         backWinchMaster.motionCruiseVelocity =
-            0.5.feet.velocity.toNativeUnitVelocity(Constants.kClimbBackWinchNativeUnitModel)
+            1.0.feet.velocity.toNativeUnitVelocity(Constants.kClimbBackWinchNativeUnitModel)
 
         frontWinchMaster.configAuxPIDPolarity(false)
         backWinchMaster.configAuxPIDPolarity(true)
@@ -150,7 +152,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         isFrontReverseLimitSwitchClosed = frontWinchMaster.sensorCollection.isRevLimitSwitchClosed
         isBackReverseLimitSwitchClosed = !backHallEffectSensor.get()
 
-        frontOnPlatform = frontOnPlatformSensor.averageVoltage > 1.0
+        frontOnPlatform = frontOnPlatformSensor.averageVoltage > 1.27
 
         // DEBUG PERIODIC
         if (Robot.shouldDebug) {
@@ -168,11 +170,21 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
             currentFrontWinchState
         )
 
-        val wantedBackWinchState =
-            if (!isBackReverseLimitSwitchClosed) this.wantedBackWinchState else ClimbLegState.Nothing
-
+        val wantedBackWinchState = this.wantedBackWinchState
         val currentBackWinchState = this.currentBackWinchState
         this.currentBackWinchState = wantedBackWinchState
+
+        if (isBackReverseLimitSwitchClosed && !setLimits) {
+            backWinchMaster.nominalReverseOutput = 0.0
+            backWinchMaster.peakReverseOutput = 0.0
+            setLimits = true
+        }
+        if (!isBackReverseLimitSwitchClosed && setLimits) {
+            backWinchMaster.nominalReverseOutput = 0.0
+            backWinchMaster.peakReverseOutput = -1.0
+            setLimits = false
+        }
+
         updateLeg(
             backWinchMaster,
             Constants.kClimbBackWinchNativeUnitModel,

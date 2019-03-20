@@ -130,7 +130,7 @@ object IntakeSubsystem : FalconSubsystem() {
     private val extensionLimitSwitch = DigitalOutput(Constants.kIntakeExtensionLimitSwitch)
 
     var wantedPercentOutput = 0.0
-    var wantedExtensionSolenoidState = ExtensionSolenoidState.EXTENDED
+    var wantedExtensionSolenoidState = ExtensionSolenoidState.RETRACTED
     var wantedLauncherSolenoidState = false
 
     // PERIODIC
@@ -177,7 +177,7 @@ object IntakeSubsystem : FalconSubsystem() {
     override fun periodic() {
         // PERIODIC
         isSeeingCargo = leftBallSensor.averageVoltage > 1.7 || rightBallSensor.averageVoltage > 1.2
-        isFullyExtended = extensionLimitSwitch.get()
+        isFullyExtended = false
         isHoldingCargo = extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.RETRACTED && isSeeingCargo
         isHoldingHatch = extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.EXTENDED && !isFullyExtended
 

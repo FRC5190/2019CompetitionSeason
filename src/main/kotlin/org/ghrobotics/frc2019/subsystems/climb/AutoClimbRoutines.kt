@@ -8,21 +8,24 @@ import org.ghrobotics.lib.commands.parallel
 import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.inch
+import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.Source
 
 object AutoClimbRoutines {
 
-    private val group = sequential {
+    private val group get() = sequential {
         +parallel {
-            +ClimbWheelCommand(Source(1.0))
-            +ClosedLoopArmCommand(180.degree)
+            +ClimbWheelCommand(Source(0.5))
+            +ClosedLoopArmCommand(160.degree)
         }.withExit { ClimbSubsystem.lidarRawAveraged < 500 }
+
+        +ClimbWheelCommand(Source(0.5)).withTimeout(200.millisecond)
 
         val resetBack = ResetWinchCommand(resetFront = false)
 
         +parallel {
-            +ClosedLoopArmCommand(135.degree)
+            +ClosedLoopArmCommand(105.degree)
             +ClimbWheelCommand(Source(0.05))
             +resetBack
         }.withExit { resetBack.wrappedValue.isCompleted }
@@ -35,8 +38,8 @@ object AutoClimbRoutines {
     val autoL3Climb
         get() = sequential {
             +ClosedLoopClimbCommand(
-                18.inch,
-                21.inch
+                22.2.inch,
+                19.7.inch
             )
             +parallel {
                 +object : FalconCommand(DriveSubsystem) {
@@ -45,7 +48,11 @@ object AutoClimbRoutines {
                     }
 
                     override suspend fun execute() {
-                        DriveSubsystem.tankDrive(-.4, -.4)
+                        if (!ClimbSubsystem.isFrontReverseLimitSwitchClosed) {
+                            DriveSubsystem.tankDrive(-.2, -.2)
+                        } else {
+                            DriveSubsystem.tankDrive(-.5, -.5)
+                        }
                     }
                 }
                 +group

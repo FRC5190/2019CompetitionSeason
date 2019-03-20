@@ -52,9 +52,9 @@ class ForwardCargoShipRoutine : AutoRoutine() {
             }
 
             // Pickup hatch
-            +relocalize(TrajectoryWaypoints.kLoadingStation, false, { false })
 //            +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
             +IntakeHatchCommand(false)
+            +relocalize(TrajectoryWaypoints.kLoadingStation, false, { false })
 
 
             // Go to FR cargo ship

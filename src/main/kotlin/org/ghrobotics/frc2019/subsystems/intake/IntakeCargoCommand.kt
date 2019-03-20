@@ -53,7 +53,6 @@ class IntakeCargoCommand(
             finishCondition += { sensedBall != 0L && System.currentTimeMillis() - sensedBall > 500 }
         }
     }
-
     private var startTime = 0L
 
     override suspend fun initialize() {
@@ -80,10 +79,10 @@ class IntakeCargoCommand(
                 }
             }
             false -> {
-                if (IntakeSubsystem.isSeeingCargo && sensedBall == 0L) {
-                    IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
-                    sensedBall = System.currentTimeMillis()
-                }
+//                if (IntakeSubsystem.isSeeingCargo && sensedBall == 0L && System.currentTimeMillis() - startTime > 500) {
+//                    IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
+//                    sensedBall = System.currentTimeMillis()
+//                }
             }
         }
     }
