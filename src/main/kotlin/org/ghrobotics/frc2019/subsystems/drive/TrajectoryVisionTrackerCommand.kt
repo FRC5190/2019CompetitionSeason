@@ -18,7 +18,6 @@ import org.ghrobotics.lib.utils.Source
 /**
  * Command to follow a smooth trajectory using a trajectory following controller
  *
- * @param driveSubsystem Instance of the drive subsystem to use
  * @param trajectorySource Source that contains the trajectory to follow.
  */
 class TrajectoryVisionTrackerCommand(
@@ -60,9 +59,7 @@ class TrajectoryVisionTrackerCommand(
 
         if (withinVisionRadius) {
             val newTarget = if (!useAbsoluteVision) {
-                if (!trajectory.reversed) {
-                    TargetTracker.bestTargetFront
-                } else TargetTracker.bestTargetBack
+                TargetTracker.getBestTarget(!trajectory.reversed)
             } else {
                 TargetTracker.getAbsoluteTarget((trajectory.lastState.state.pose + Constants.kCenterToForwardIntake).translation)
             }

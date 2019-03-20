@@ -54,6 +54,7 @@ object Robot : FalconRobot() {
         LEDs.update()
         Autonomous.update()
         Network.update()
+        TargetTracker.update()
     }
 
     override operator fun FalconSubsystem.unaryPlus() {

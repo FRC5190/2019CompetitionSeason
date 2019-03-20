@@ -7,12 +7,13 @@ import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.inch
+import org.ghrobotics.lib.mathematics.units.second
 import kotlin.math.absoluteValue
 
 object VisionProcessing {
 
     fun processData(visionData: VisionData) {
-        val robotPose = DriveSubsystem.localization[visionData.timestamp]
+        val robotPose = DriveSubsystem.localization[visionData.timestamp.second]
 
         TargetTracker.addSamples(
             visionData.timestamp,

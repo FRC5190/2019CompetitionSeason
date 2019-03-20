@@ -116,7 +116,7 @@ object JeVoisManager {
                 val jsonData = kJevoisGson.fromJson<JsonObject>(message)
 
                 val isFront = jsonData["is_front"].asBoolean
-                val timestamp = (Timer.getFPGATimestamp() - jsonData["capture_ago"].asDouble).second
+                val timestamp = Timer.getFPGATimestamp() - jsonData["capture_ago"].asDouble
                 val contours = jsonData["targets"].asJsonArray
                     .filterIsInstance<JsonObject>()
 
@@ -146,6 +146,6 @@ object JeVoisManager {
 
 data class VisionData(
     val isFront: Boolean,
-    val timestamp: Time,
+    val timestamp: Double,
     val targets: List<JsonObject>
 )
