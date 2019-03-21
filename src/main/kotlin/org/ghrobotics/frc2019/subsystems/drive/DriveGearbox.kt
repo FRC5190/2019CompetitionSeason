@@ -28,7 +28,8 @@ class DriveGearbox(
 
         // Configure Encoder
         master.feedbackSensor = FeedbackDevice.QuadEncoder
-        master.encoderPhase = Constants.kDriveSensorPhase
+        master.encoderPhase =
+            if (!Constants.kDriveSensorPhase && inverted) Constants.kDriveSensorPhase else !Constants.kDriveSensorPhase
         master.sensorPosition = 0.meter
 
         allMotors.forEach { motor ->

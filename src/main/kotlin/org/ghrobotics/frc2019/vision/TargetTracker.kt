@@ -58,7 +58,7 @@ object TargetTracker {
     fun getBestTarget(isFrontTarget: Boolean) = synchronized(targets) {
         targets.asSequence()
             .filter {
-                if (it.isReal) return@filter false
+                if (!it.isReal) return@filter false
                 val x = it.averagedPose2dRelativeToBot.translation.x
                 if (isFrontTarget) x >= 0.0 else x <= 0.0
             }.minBy { it.averagedPose2dRelativeToBot.translation.norm }
