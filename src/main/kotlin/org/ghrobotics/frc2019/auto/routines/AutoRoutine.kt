@@ -48,9 +48,9 @@ abstract class AutoRoutine : Source<FalconCommand> {
         useAbsoluteVision
     )
 
-    protected fun relocalize(position: Pose2d, forward: Boolean) = InstantRunnableCommand {
+    protected fun relocalize(position: Pose2d, forward: Boolean, pathMirrored: BooleanSource) = InstantRunnableCommand {
         val newPosition = Pose2d(
-            position.translation,
+            pathMirrored.map(position.mirror, position)().translation,
             DriveSubsystem.localization().rotation
         ) + if (forward) Constants.kForwardIntakeToCenter else Constants.kBackwardIntakeToCenter
         DriveSubsystem.localization.reset(newPosition)

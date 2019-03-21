@@ -33,16 +33,19 @@ class PolarPostureStabilizer(
         previousAngularVelocity = 0.radian.velocity
     }
 
-    fun nextState(robotPose: Pose2d, currentTime: Time = System.currentTimeMillis().millisecond): TrajectoryTrackerOutput {
+    fun nextState(
+        robotPose: Pose2d,
+        currentTime: Time = System.currentTimeMillis().millisecond
+    ): TrajectoryTrackerOutput {
         val deltaTime = deltaTimeController.updateTime(currentTime)
 
         val robotRelativeToOrigin = robotPose inFrameOfReferenceOf target
         val theta = robotPose.rotation.radian
 
-        val row = robotRelativeToOrigin.translation.norm.meter
+        val row = robotRelativeToOrigin.translation.norm
         val gamma = (Math.atan2(
-            robotRelativeToOrigin.translation.y.value,
-            robotRelativeToOrigin.translation.x.value
+            robotRelativeToOrigin.translation.y,
+            robotRelativeToOrigin.translation.x
         ) - theta + Math.PI).radian.value
         val sigma = (gamma + theta).radian.value
 

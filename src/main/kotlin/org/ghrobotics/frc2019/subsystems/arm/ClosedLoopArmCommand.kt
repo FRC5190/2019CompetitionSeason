@@ -13,6 +13,6 @@ class ClosedLoopArmCommand(private val target: Rotation2d) : FalconCommand(ArmSu
     }
 
     override suspend fun initialize() {
-        ArmSubsystem.setPosition(target)
+        ArmSubsystem.wantedState = ArmSubsystem.ArmState.MotionMagic(target)
     }
 }

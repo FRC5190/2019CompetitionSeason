@@ -15,17 +15,13 @@ import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.frc2019.vision.JeVoisManager
-import org.ghrobotics.lib.mathematics.units.derivedunits.inchesPerSecond
+import org.ghrobotics.lib.mathematics.units.SILengthConstants
 import org.ghrobotics.lib.wrappers.networktables.enumSendableChooser
 
 object Network {
 
     val startingPositionChooser = enumSendableChooser<Autonomous.StartingPositions>()
     val autoModeChooser = enumSendableChooser<Autonomous.Mode>()
-
-//    val cargoShip1Chooser = enumSendableChooser<Autonomous.GamePiece>()
-//    val cargoShip2Chooser = enumSendableChooser<Autonomous.GamePiece>()
-//    val cargoShip3Chooser = enumSendableChooser<Autonomous.GamePiece>()
 
     private val mainShuffleboardDisplay: ShuffleboardTab = Shuffleboard.getTab("5190")
 
@@ -99,6 +95,8 @@ object Network {
     val visionDriveAngle = visionLayout.add("Vision Drive Angle", 0.0).entry
     val visionDriveActive = visionLayout.add("Vision Drive Active", false).entry
 
+    private var debugEnabled = mainShuffleboardDisplay.add("Debug Active", Robot.debugActive).entry
+
     init {
         // Put choosers on dashboard
         autoLayout.add(
@@ -109,23 +107,14 @@ object Network {
             "Starting Position",
             startingPositionChooser
         )
-//        autoLayout.add(
-//            "Cargo Ship 1", cargoShip1Chooser
-//        )
-//        autoLayout.add(
-//            "Cargo Ship 2", cargoShip2Chooser
-//        )
-//        autoLayout.add(
-//            "Cargo Ship 3", cargoShip3Chooser
-//        )
 
         //mainShuffleboardDisplay.add(VisionProcessing.cameraSource).withPosition(3, 2).withSize(3, 3)
     }
 
     @Suppress("LongMethod")
     fun update() {
-        globalXEntry.setDouble(DriveSubsystem.localization().translation.x.feet)
-        globalYEntry.setDouble(DriveSubsystem.localization().translation.y.feet)
+        globalXEntry.setDouble(DriveSubsystem.localization().translation.x / SILengthConstants.kFeetToMeter)
+        globalYEntry.setDouble(DriveSubsystem.localization().translation.y / SILengthConstants.kFeetToMeter)
         globalAEntry.setDouble(DriveSubsystem.localization().rotation.degree)
 
         leftPositionEntry.setDouble(DriveSubsystem.leftMotor.getSelectedSensorPosition(0).toDouble())
@@ -134,32 +123,37 @@ object Network {
         leftAmperageEntry.setDouble(DriveSubsystem.leftMotor.outputCurrent)
         rightAmperageEntry.setDouble(DriveSubsystem.rightMotor.outputCurrent)
 
-        elevatorRawPosition.setDouble(ElevatorSubsystem.rawEncoder.toDouble())
-        elevatorPosition.setDouble(ElevatorSubsystem.position.inch)
+        elevatorRawPosition.setDouble(ElevatorSubsystem.rawSensorPosition.toDouble())
+        elevatorPosition.setDouble(ElevatorSubsystem.position / SILengthConstants.kInchToMeter)
         elevatorCurrent.setDouble(ElevatorSubsystem.current)
         elevatorVoltage.setDouble(ElevatorSubsystem.voltage)
-        elevatorVelocity.setDouble(ElevatorSubsystem.velocity.inchesPerSecond)
+        elevatorVelocity.setDouble(ElevatorSubsystem.velocity / SILengthConstants.kInchToMeter)
         elevatorLimitSwitch.setBoolean(ElevatorSubsystem.isBottomLimitSwitchPressed)
 
-        armRawPosition.setDouble(ArmSubsystem.rawEncoder.toDouble())
+        armRawPosition.setDouble(ArmSubsystem.rawSensorPosition.toDouble())
         armPosition.setDouble(ArmSubsystem.position.degree)
         armCurrent.setDouble(ArmSubsystem.current)
         armVoltage.setDouble(ArmSubsystem.voltage)
         armVelocity.setDouble(ArmSubsystem.velocity.value * 180 / Math.PI)
 
-        isHoldingCargo.setBoolean(IntakeSubsystem.isSeeingCargo())
-        intakeFullyExtended.setBoolean(IntakeSubsystem.isFullyExtended())
+        isHoldingCargo.setBoolean(IntakeSubsystem.isSeeingCargo)
+//        intakeFullyExtended.setBoolean(IntakeSubsystem.isFullyExtended)
 
-        frontClimbWinchPosition.setDouble(ClimbSubsystem.frontWinchPosition)
-        backClimbWinchPosition.setDouble(ClimbSubsystem.backWinchPosition)
-        climbLidarRaw.setDouble(ClimbSubsystem.lidarRaw)
+        frontClimbWinchPosition.setDouble(ClimbSubsystem.rawFrontWinchPosition.toDouble())
+        backClimbWinchPosition.setDouble(ClimbSubsystem.rawBackWinchPosition.toDouble())
+        climbLidarRaw.setDouble(ClimbSubsystem.lidarRawAveraged)
         frontClimbWinchCurrent.setDouble(ClimbSubsystem.frontWinchCurrent)
         backClimbWinchCurrent.setDouble(ClimbSubsystem.backWinchCurrent)
-        frontLimitSwitch.setBoolean(ClimbSubsystem.Winch.FRONT.motor.sensorCollection.isRevLimitSwitchClosed)
-        backLimitSwitch.setBoolean(ClimbSubsystem.Winch.BACK.motor.sensorCollection.isRevLimitSwitchClosed)
+        frontLimitSwitch.setBoolean(ClimbSubsystem.isFrontReverseLimitSwitchClosed)
+        backLimitSwitch.setBoolean(ClimbSubsystem.isBackReverseLimitSwitchClosed)
 
         visionFrontCameraConnected.setBoolean(JeVoisManager.isFrontJeVoisConnected)
         visionBackCameraConnected.setBoolean(JeVoisManager.isBackJeVoisConnected)
+
+        visionFrontCameraConnected.setBoolean(JeVoisManager.isFrontJeVoisConnected)
+        visionBackCameraConnected.setBoolean(JeVoisManager.isBackJeVoisConnected)
+
+        Robot.debugActive = debugEnabled.getBoolean(Robot.debugActive)
 
 //        val trackedObject = TargetTracker.bestTarget
 //        if (trackedObject != null) {

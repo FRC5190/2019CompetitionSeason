@@ -1,6 +1,5 @@
 package org.ghrobotics.frc2019.subsystems
 
-import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.DriverStation
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
@@ -16,7 +15,7 @@ import kotlin.math.pow
 object Superstructure {
 
     val heightAboveGround
-        get() = Constants.kElevatorHeightFromGround + ElevatorSubsystem.position +
+        get() = Constants.kElevatorHeightFromGround + ElevatorSubsystem.position.meter +
             (Constants.kArmLength * ArmSubsystem.position.sin)
 
     private val outOfToleranceRange =
@@ -29,15 +28,13 @@ object Superstructure {
     val kFrontHighRocketCargo get() = goToHeightWithAngle(83.inch, 15.degree)
     val kFrontMiddleRocketCargo get() = goToHeightWithAngle(56.inch, 15.degree)
     val kFrontLowRocketCargo get() = goToHeightWithAngle(26.inch, 15.degree)
-    val kBackLowRocketCargo get() = goToHeightWithAngle(25.inch, 135.degree)
-
-    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 10.degree)
+    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 0.degree)
     val kBackHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 180.degree)
 
     val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, (-25).degree)
     val kBackCargoIntake get() = elevatorAndArmHeight(0.inch, (-155).degree)
 
-    val kFrontCargoFromLoadingStation get() = elevatorAndArmHeight(25.inch, 5.degree)
+    val kFrontCargoIntoCargoShip get() = elevatorAndArmHeight(25.inch, 5.degree)
     val kBackCargoFromLoadingStation get() = elevatorAndArmHeight(0.inch, 135.degree)
 
     val kStowedPosition get() = elevatorAndArmHeight(0.inch, 90.degree)
@@ -87,8 +84,6 @@ object Superstructure {
 
                 // We now need to flip the arm
                 sequential {
-                    +InstantRunnableCommand { println("FLIPPING") }
-
                     val elevatorLimit = (-2).inch
 
                     var intakeSafeToOpen = false
@@ -100,9 +95,10 @@ object Superstructure {
                             }
 
                             override suspend fun execute() {
-                                if (IntakeSubsystem.isFullyExtended()) {
-                                    IntakeSubsystem.extensionSolenoid.set(DoubleSolenoid.Value.kReverse)
-                                    IntakeSubsystem.launcherSolenoid.set(false)
+                                if (IntakeSubsystem.isFullyExtended) {
+                                    IntakeSubsystem.wantedExtensionSolenoidState =
+                                        IntakeSubsystem.ExtensionSolenoidState.RETRACTED
+                                    IntakeSubsystem.wantedLauncherSolenoidState = false
                                 }
                             }
                         }
@@ -137,7 +133,7 @@ object Superstructure {
                         // Arm
                         +sequential {
                             val waitCondition = {
-                                ElevatorSubsystem.position < Constants.kElevatorSafeFlipHeight
+                                ElevatorSubsystem.position < Constants.kElevatorSafeFlipHeight.value
                                     || ElevatorSubsystem.isBottomLimitSwitchPressed
                             }
                             // Prepare arm to flip through elevator
@@ -157,13 +153,13 @@ object Superstructure {
                                     if (armAngle < Constants.kArmSafeFlipAngle) {
                                         //  Use safe flip if it goes near floor
                                         +ClosedLoopArmCommand(Constants.kArmSafeFlipAngle)
-                                            .overrideExit { ElevatorSubsystem.position > Constants.kElevatorSafeFlipHeight }
+                                            .overrideExit { ElevatorSubsystem.position > Constants.kElevatorSafeFlipHeight.value }
                                     }
                                 } else {
                                     if (armAngle < 180.degree - Constants.kArmSafeFlipAngle) {
                                         //  Use safe flip if it goes near floor
                                         +ClosedLoopArmCommand(180.degree - Constants.kArmSafeFlipAngle)
-                                            .overrideExit { ElevatorSubsystem.position > Constants.kElevatorSafeFlipHeight }
+                                            .overrideExit { ElevatorSubsystem.position > Constants.kElevatorSafeFlipHeight.value }
                                     }
                                 }
                             }
@@ -171,23 +167,6 @@ object Superstructure {
                             +ClosedLoopArmCommand(armAngle)
                         }
                     }
-
-//                    // Flip the arm. Take the elevator up to final position once the arm is out of the way.
-//                    +parallel {
-//                        +ClosedLoopArmCommand(armAngle)
-//                        +sequential {
-//                            +ConditionCommand {
-//                                if (isFrontWanted) {
-//                                    ArmSubsystem.position <= 90.degree - Constants.kArmFlipTolerance &&
-//                                        ArmSubsystem.position.cos > 0
-//                                } else {
-//                                    ArmSubsystem.position >= 90.degree + Constants.kArmFlipTolerance &&
-//                                        ArmSubsystem.position.cos < 0
-//                                }
-//                            }
-//                            +ClosedLoopElevatorCommand(elevatorHeightWanted)
-//                        }
-//                    }
                 },
 
                 // We don't need to flip the arm. Take the elevator and arm to desired locations.

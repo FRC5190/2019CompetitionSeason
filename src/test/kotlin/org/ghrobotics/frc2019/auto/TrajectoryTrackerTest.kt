@@ -35,6 +35,6 @@ class TrajectoryTrackerTest {
         }
 
         val tErrorNorm = (pose.translation - path.lastState.state.pose.translation).norm
-        assert(tErrorNorm.value < 0.1)
+        assert(tErrorNorm < 0.1)
     }
 }

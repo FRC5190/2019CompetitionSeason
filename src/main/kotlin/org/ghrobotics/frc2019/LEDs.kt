@@ -42,16 +42,17 @@ object LEDs {
     fun update() {
         wantedLEDMode = when {
             Robot.emergencyActive -> Mode.EMERGENCY
+            Controls.backModifier -> Mode.BACK_MODIFIER
             Controls.isClimbing -> Mode.CLIMB
             VisionDriveCommand.isActive || TrajectoryVisionTrackerCommand.visionActive -> Mode.VISION
-            IntakeSubsystem.isHoldingCargo() || IntakeSubsystem.isHoldingHatch() -> Mode.HAS_OBTAINED
+            IntakeSubsystem.isHoldingCargo || IntakeSubsystem.isHoldingHatch -> Mode.HAS_OBTAINED
             Robot.lastRobotMode == FalconRobot.Mode.DISABLED -> Mode.DISABLED
             else -> Mode.NONE
         }
     }
 
     enum class Mode(val value: Int) {
-        TELEOP(6),
+        BACK_MODIFIER(6),
         HAS_OBTAINED(5),
         CLIMB(4),
         VISION(3),

@@ -5,15 +5,14 @@
 
 package org.ghrobotics.frc2019.subsystems.drive
 
-import com.ctre.phoenix.sensors.PigeonIMU
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
+import org.ghrobotics.lib.commands.ConditionCommand
 import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
-import org.ghrobotics.lib.mathematics.units.degree
-import org.ghrobotics.lib.sensors.asSource
+import org.ghrobotics.lib.mathematics.twodim.geometry.Rectangle2d
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
 import kotlin.properties.Delegates.observable
 
@@ -41,16 +40,11 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     // Shifter for two-speed gearbox
     private val shifter = Solenoid(Constants.kPCMId, Constants.kDriveSolenoidId)
 
-    // YPR of drivetrain
-    private val pigeon = PigeonIMU(IntakeSubsystem.intakeMaster)
-    var pitch = 0.degree
-        private set
-
     // Type of localization to determine position on the field
     override val localization = TankEncoderLocalization(
-        pigeon.asSource(),
-        leftMotor::sensorPosition,
-        rightMotor::sensorPosition
+        IntakeSubsystem.pigeonSource,
+        { leftMotor.sensorPosition.value },
+        { rightMotor.sensorPosition.value }
     )
 
 //    override val localization = TankEncoderLocalization(
@@ -71,14 +65,12 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
     init {
         lowGear = false
         defaultCommand = ManualDriveCommand()
-        pigeon.setTemperatureCompensationDisable(true)
 
 //        listOf(lEncoder, rEncoder).forEach {
 //            it.distancePerPulse = 3.353 / 9996.5 * 4
 //        }
     }
 
-    private val tempYPR = DoubleArray(3)
 
 //    const val kP = 4.0 / 12.0
 //
@@ -101,11 +93,8 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
 //        rightMotor.percentOutput = r + wheelVoltages.right / 12.0
 //    }
 
-    override fun periodic() {
-        super.periodic()
-        pigeon.getYawPitchRoll(tempYPR)
-        pitch = tempYPR[2].degree
-    }
+    fun notWithinRegion(region: Rectangle2d) =
+        ConditionCommand { !region.contains(robotPosition.translation) }
 
     override fun activateEmergency() {
         zeroOutputs()

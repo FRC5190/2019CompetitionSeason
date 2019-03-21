@@ -28,7 +28,7 @@ object JeVoisManager {
         private set
 
     init {
-        fixedRateTimer(period = 10000L) {
+        fixedRateTimer(name = "JevoisManager", period = 10000L) {
             val currentTime = Timer.getFPGATimestamp().second
 
             connectedJeVoisCameras.removeIf {
@@ -68,6 +68,7 @@ object JeVoisManager {
         val systemPortName: String = serialPort.systemPortName
 
         private var lastMessageReceived = 0.second
+        private var wasUnplugged = false
 
         var isAlive = true
             private set
@@ -75,24 +76,27 @@ object JeVoisManager {
         init {
             serialPort.openPort()
             serialPort.addDataListener(object : SerialPortDataListener {
-                private var byteBuffer = ByteArray(1024)
-                private var bufferIndex = 0
+                private var stringBuffer = StringBuilder(1024)
 
                 override fun serialEvent(event: SerialPortEvent) {
                     try {
                         if (event.eventType != SerialPort.LISTENING_EVENT_DATA_AVAILABLE)
                             return
-                        val newData = ByteArray(serialPort.bytesAvailable())
+                        val bytesAvailable = serialPort.bytesAvailable()
+                        if (bytesAvailable < 0) {
+                            wasUnplugged = true
+                            return
+                        }
+                        val newData = ByteArray(bytesAvailable)
                         serialPort.readBytes(newData, newData.size.toLong())
                         for (newByte in newData) {
-                            if (newByte.toChar() != '\n') {
-                                byteBuffer[bufferIndex++] = newByte
+                            val newChar = newByte.toChar()
+                            if (newChar != '\n') {
+                                stringBuffer.append(newChar)
                                 continue
                             }
-                            processMessage(String(byteBuffer, 0, bufferIndex).trim())
-                            while (bufferIndex > 0) {
-                                byteBuffer[--bufferIndex] = 0
-                            }
+                            processMessage(stringBuffer.toString())
+                            stringBuffer.clear()
                         }
                     } catch (e: Throwable) {
                         println("[JeVois] ${e.localizedMessage}")
@@ -112,7 +116,7 @@ object JeVoisManager {
                 val jsonData = kJevoisGson.fromJson<JsonObject>(message)
 
                 val isFront = jsonData["is_front"].asBoolean
-                val timestamp = (Timer.getFPGATimestamp() - jsonData["capture_ago"].asDouble).second
+                val timestamp = Timer.getFPGATimestamp() - jsonData["capture_ago"].asDouble
                 val contours = jsonData["targets"].asJsonArray
                     .filterIsInstance<JsonObject>()
 
@@ -126,7 +130,7 @@ object JeVoisManager {
         }
 
         fun update(currentTime: Time) {
-            isAlive = currentTime - lastMessageReceived <= Constants.kVisionCameraTimeout
+            isAlive = !wasUnplugged && currentTime - lastMessageReceived <= Constants.kVisionCameraTimeout
         }
 
         fun dispose() {
@@ -142,6 +146,6 @@ object JeVoisManager {
 
 data class VisionData(
     val isFront: Boolean,
-    val timestamp: Time,
+    val timestamp: Double,
     val targets: List<JsonObject>
 )

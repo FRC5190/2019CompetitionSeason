@@ -5,8 +5,7 @@
 
 package org.ghrobotics.frc2019
 
-import edu.wpi.cscore.VideoMode
-import edu.wpi.first.cameraserver.CameraServer
+import edu.wpi.first.wpilibj.livewindow.LiveWindow
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
@@ -27,9 +26,14 @@ object Robot : FalconRobot() {
     val emergencyReadySystems = ArrayList<EmergencyHandleable>()
 
     var emergencyActive = false
+    var debugActive = true
+
+    val shouldDebug get() = debugActive || !lastEnabledState
 
     // Initialize all systems.
     init {
+        LiveWindow.disableAllTelemetry()
+
         +DriveSubsystem
         +ClimbSubsystem
         +ElevatorSubsystem
@@ -49,10 +53,8 @@ object Robot : FalconRobot() {
         Controls.update()
         LEDs.update()
         Autonomous.update()
-    }
-
-    override fun periodicNetwork() {
         Network.update()
+        TargetTracker.update()
     }
 
     override operator fun FalconSubsystem.unaryPlus() {

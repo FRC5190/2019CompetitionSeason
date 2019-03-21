@@ -8,7 +8,6 @@ import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.meter
 import org.ghrobotics.lib.mathematics.units.second
 import org.junit.Test
-import org.knowm.xchart.QuickChart
 import kotlin.math.pow
 
 class DriveModelTest {
@@ -86,9 +85,9 @@ class DriveModelTest {
             iterator.advance(0.02.second)
         }
 
-        val chart = QuickChart.getChart(
-            "Velocity", "t", "v", "Velocity", t.toDoubleArray(), v.toDoubleArray()
-        )
+//        val chart = QuickChart.getChart(
+//            "Velocity", "t", "v", "Velocity", t.toDoubleArray(), v.toDoubleArray()
+//        )
 //
 //        SwingWrapper(chart).displayChart()
 //        Thread.sleep(1000000)

@@ -1,47 +1,161 @@
 package org.ghrobotics.frc2019.subsystems.intake
 
+import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.NeutralMode
-import edu.wpi.first.wpilibj.*
+import com.ctre.phoenix.sensors.PigeonIMU
+import edu.wpi.first.wpilibj.AnalogInput
+import edu.wpi.first.wpilibj.DigitalOutput
+import edu.wpi.first.wpilibj.DoubleSolenoid
+import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
+import org.ghrobotics.frc2019.Robot
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.amp
+import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
-import org.ghrobotics.lib.utils.and
-import org.ghrobotics.lib.utils.greaterThan
-import org.ghrobotics.lib.utils.not
-import org.ghrobotics.lib.utils.or
+import org.ghrobotics.lib.sensors.asSource
+import org.ghrobotics.lib.util.CircularBuffer
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 
-object IntakeSubsystem : FalconSubsystem() {
-    val intakeMaster = NativeFalconSRX(Constants.kIntakeLeftId)
+//object IntakeSubsystem : FalconSubsystem() {
+//    private val intakeCargoMaster = NativeFalconSRX(Constants.kIntakeCargoId)
+//    private val pigeon = PigeonIMU(intakeCargoMaster)
+//    val pigeonSource = pigeon.asSource()
+//
+//    private val pushHatchSolenoid = DoubleSolenoid(
+//        Constants.kPCMId,
+//        Constants.kIntakePushHatchSolenoidForwardId,
+//        Constants.kIntakePushHatchSolenoidReverseId
+//    )
+//    private val holdHatchSolenoid = Solenoid(Constants.kPCMId, Constants.kIntakeHoldHatchSolenoidId)
+//
+//    private val rollingAverageCargoCurrent = CircularBuffer(30)
+//
+//    var wantedPercentOutput = 0.0
+//    var wantedHoldHatchSolenoidState = HoldHatchSolenoidState.HOLD
+//    var wantedPushHatchSolenoidState = PushHatchSolenoidState.EXIST
+//
+//    // PERIODIC
+//    var isSeeingCargo: Boolean = false
+//        private set
+//    var isHoldingCargo: Boolean = false
+//        private set
+//    var isHoldingHatch: Boolean = false
+//        private set
+//    var holdHatchSolenoidState = HoldHatchSolenoidState.HOLD
+//        private set
+//    var pushHatchSolenoidState = PushHatchSolenoidState.USEFUL
+//        private set
+//
+//    // DEBUG PERIODIC
+//    var robotPitch = 0.degree
+//        private set
+//
+//    private val tempYPR = DoubleArray(3)
+//
+//    init {
+//        pigeon.setTemperatureCompensationDisable(true)
+//
+//        with(intakeCargoMaster) {
+//            inverted = false
+//            voltageCompensationSaturation = 12.volt
+//            voltageCompensationEnabled = true
+//
+//            continuousCurrentLimit = 18.amp
+//            currentLimitingEnabled = true
+//
+//            brakeMode = NeutralMode.Brake
+//        }
+//    }
+//
+//    override fun periodic() {
+//        // PERIODIC
+//        rollingAverageCargoCurrent.add(intakeCargoMaster.outputCurrent)
+//        println("Average Current: ${rollingAverageCargoCurrent.average}")
+//        isSeeingCargo = rollingAverageCargoCurrent.average > 11.0
+//        if (isSeeingCargo) {
+//            isHoldingCargo = true
+//        } else if (wantedPercentOutput < 0) {
+//            isHoldingCargo = false
+//        }
+//        isHoldingHatch = false
+//
+//        // DEBUG PERIODIC
+//        if (Robot.shouldDebug) {
+//            pigeon.getYawPitchRoll(tempYPR)
+//            robotPitch = tempYPR[2].degree
+//        }
+//
+//        intakeCargoMaster.set(ControlMode.PercentOutput, wantedPercentOutput)
+//        if (wantedHoldHatchSolenoidState != holdHatchSolenoidState) {
+//            holdHatchSolenoid.set(wantedHoldHatchSolenoidState == IntakeSubsystem.HoldHatchSolenoidState.HOLD)
+//            holdHatchSolenoidState = wantedHoldHatchSolenoidState
+//        }
+//        if (wantedPushHatchSolenoidState != pushHatchSolenoidState) {
+//            pushHatchSolenoid.set(
+//                if (wantedPushHatchSolenoidState == IntakeSubsystem.PushHatchSolenoidState.EXIST) {
+//                    DoubleSolenoid.Value.kForward
+//                } else {
+//                    DoubleSolenoid.Value.kReverse
+//                }
+//            )
+//            pushHatchSolenoidState = wantedPushHatchSolenoidState
+//        }
+//    }
+//
+//    override fun zeroOutputs() {
+//        wantedPercentOutput = 0.0
+//    }
+//
+//    enum class HoldHatchSolenoidState { HOLD, PLACE }
+//    enum class PushHatchSolenoidState { USEFUL, EXIST }
+//}
 
-    val extensionSolenoid = DoubleSolenoid(
+
+object IntakeSubsystem : FalconSubsystem() {
+    private val intakeMaster = NativeFalconSRX(Constants.kIntakeLeftId)
+    private val pigeon = PigeonIMU(intakeMaster)
+    val pigeonSource = pigeon.asSource()
+
+    private val extensionSolenoid = DoubleSolenoid(
         Constants.kPCMId,
         Constants.kIntakeExtensionSolenoidForwardId,
         Constants.kIntakeExtensionSolenoidReverseId
     )
-    val launcherSolenoid = Solenoid(Constants.kPCMId, Constants.kIntakeLauncherSolenoidId)
+    private val launcherSolenoid = Solenoid(Constants.kPCMId, Constants.kIntakeLauncherSolenoidId)
 
-    private val sensor1 = AnalogInput(Constants.kLeftBallSensorId)
-    private val sensor2 = AnalogInput(Constants.kRightBallSensorId)
+    private val leftBallSensor = AnalogInput(Constants.kLeftBallSensorId)
+    private val rightBallSensor = AnalogInput(Constants.kRightBallSensorId)
 
-    private val dio = DigitalOutput(Constants.kIntakeExtensionLimitSwitch)
+    private val extensionLimitSwitch = DigitalOutput(Constants.kIntakeExtensionLimitSwitch)
 
-    val isSeeingCargo = sensor2::getAverageVoltage.greaterThan(1.7) or sensor1::getAverageVoltage.greaterThan(1.2)
+    var wantedPercentOutput = 0.0
+    var wantedExtensionSolenoidState = ExtensionSolenoidState.RETRACTED
+    var wantedLauncherSolenoidState = false
 
-    val isFullyExtended = dio::get
+    // PERIODIC
+    var isSeeingCargo: Boolean = false
+        private set
+    var isFullyExtended: Boolean = false
+        private set
+    var isHoldingCargo: Boolean = false
+        private set
+    var isHoldingHatch: Boolean = false
+        private set
+    var extensionSolenoidState = ExtensionSolenoidState.RETRACTED
+        private set
+    var launcherSolenoidState: Boolean = true
+        private set
 
-    val isHoldingCargo = { extensionSolenoid.get() == DoubleSolenoid.Value.kReverse } and isSeeingCargo
-    val isHoldingHatch = { extensionSolenoid.get() == DoubleSolenoid.Value.kForward } and !isFullyExtended
+    // DEBUG PERIODIC
+    var robotPitch = 0.degree
+        private set
 
-    var percentOutput
-        get() = intakeMaster.percentOutput
-        set(value) {
-            intakeMaster.percentOutput = value
-        }
-
+    private val tempYPR = DoubleArray(3)
 
     init {
+        pigeon.setTemperatureCompensationDisable(true)
+
         val intakeSlave = NativeFalconSRX(Constants.kIntakeRightId)
 
         intakeSlave.follow(intakeMaster)
@@ -60,9 +174,39 @@ object IntakeSubsystem : FalconSubsystem() {
         }
     }
 
-    override fun zeroOutputs() {
-        percentOutput = 0.0
+    override fun periodic() {
+        // PERIODIC
+        isSeeingCargo = leftBallSensor.averageVoltage > 1.7 || rightBallSensor.averageVoltage > 1.2
+        isFullyExtended = false
+        isHoldingCargo = extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.RETRACTED && isSeeingCargo
+        isHoldingHatch = extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.EXTENDED && !isFullyExtended
+
+        // DEBUG PERIODIC
+        if (Robot.shouldDebug) {
+            pigeon.getYawPitchRoll(tempYPR)
+            robotPitch = tempYPR[2].degree
+        }
+
+        intakeMaster.set(ControlMode.PercentOutput, wantedPercentOutput)
+        if (wantedExtensionSolenoidState != extensionSolenoidState) {
+            extensionSolenoid.set(
+                if (wantedExtensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.EXTENDED) {
+                    DoubleSolenoid.Value.kForward
+                } else {
+                    DoubleSolenoid.Value.kReverse
+                }
+            )
+            extensionSolenoidState = wantedExtensionSolenoidState
+        }
+        if (wantedLauncherSolenoidState != launcherSolenoidState) {
+            launcherSolenoid.set(wantedLauncherSolenoidState)
+            launcherSolenoidState = wantedLauncherSolenoidState
+        }
     }
 
-    enum class Direction { HOLD, RELEASE }
+    override fun zeroOutputs() {
+        wantedPercentOutput = 0.0
+    }
+
+    enum class ExtensionSolenoidState { EXTENDED, RETRACTED }
 }

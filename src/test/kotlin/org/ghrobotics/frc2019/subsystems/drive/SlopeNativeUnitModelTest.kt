@@ -2,8 +2,8 @@ package org.ghrobotics.frc2019.subsystems.drive
 
 import org.ghrobotics.lib.mathematics.epsilonEquals
 import org.ghrobotics.lib.mathematics.units.feet
-import org.ghrobotics.lib.mathematics.units.nativeunits.STU
 import org.ghrobotics.lib.mathematics.units.nativeunits.SlopeNativeUnitModel
+import org.ghrobotics.lib.mathematics.units.nativeunits.nativeUnits
 import org.ghrobotics.lib.mathematics.units.nativeunits.wheelRadius
 import org.junit.Test
 
@@ -11,13 +11,13 @@ class SlopeNativeUnitModelTest {
 
     private val slopeNativeUnitModel = SlopeNativeUnitModel(
         1.5700931336.feet,
-        1440.STU
+        1440.nativeUnits
     )
 
     @Test
     fun testToPosition() {
-        val one = 720.STU
-        val two = 2160.STU
+        val one = 720.nativeUnits
+        val two = 2160.nativeUnits
 
         val onePosition = slopeNativeUnitModel.fromNativeUnitPosition(one)
         val twoPosition = slopeNativeUnitModel.fromNativeUnitPosition(two)
@@ -40,7 +40,7 @@ class SlopeNativeUnitModelTest {
 
     @Test
     fun testWheelRadius() {
-        val radius = slopeNativeUnitModel.wheelRadius(1440.STU)
+        val radius = slopeNativeUnitModel.wheelRadius(1440.nativeUnits)
 
         assert(radius.inch epsilonEquals 2.998657)
     }

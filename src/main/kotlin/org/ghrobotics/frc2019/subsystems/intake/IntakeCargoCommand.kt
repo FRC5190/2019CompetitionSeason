@@ -1,20 +1,58 @@
 package org.ghrobotics.frc2019.subsystems.intake
 
-import edu.wpi.first.wpilibj.DoubleSolenoid
+import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
+import org.ghrobotics.lib.commands.ConditionalCommand
 import org.ghrobotics.lib.commands.FalconCommand
+import org.ghrobotics.lib.commands.sequential
+import org.ghrobotics.lib.mathematics.units.degree
+
+//class IntakeCargoCommand(
+//    private val releasing: Boolean
+//) : FalconCommand(IntakeSubsystem) {
+//
+//    var gotCargo = false
+//        private set
+//
+//    init {
+//        if (!releasing) {
+//            finishCondition += { gotCargo }
+//        }
+//    }
+//
+//    override suspend fun initialize() {
+//        gotCargo = false
+//        if (releasing) {
+//            IntakeSubsystem.wantedPercentOutput = -1.0
+//        } else {
+//            IntakeSubsystem.wantedPercentOutput = 1.0
+//        }
+//    }
+//
+//    override suspend fun execute() {
+//        if (!releasing) {
+//            if (IntakeSubsystem.isSeeingCargo) {
+//                gotCargo = true
+//            }
+//        }
+//    }
+//
+//    override suspend fun dispose() {
+//        IntakeSubsystem.zeroOutputs()
+//    }
+//
+//}
 
 class IntakeCargoCommand(
-    private val direction: IntakeSubsystem.Direction
+    private val releasing: Boolean
 ) : FalconCommand(IntakeSubsystem) {
 
     private var sensedBall = 0L
 
     init {
-        if (direction == IntakeSubsystem.Direction.HOLD) {
+        if (!releasing) {
             finishCondition += { sensedBall != 0L && System.currentTimeMillis() - sensedBall > 500 }
         }
     }
-
     private var startTime = 0L
 
     override suspend fun initialize() {
@@ -22,33 +60,36 @@ class IntakeCargoCommand(
         startTime = System.currentTimeMillis()
 
         // Don't launch yet
-        IntakeSubsystem.launcherSolenoid.set(false)
+        IntakeSubsystem.wantedLauncherSolenoidState = false
 
-        if (direction == IntakeSubsystem.Direction.HOLD) {
-            IntakeSubsystem.extensionSolenoid.set(DoubleSolenoid.Value.kForward)
-            IntakeSubsystem.percentOutput = 1.0
+        if (releasing) {
+            IntakeSubsystem.wantedPercentOutput = -1.0
+            IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
         } else {
-            IntakeSubsystem.percentOutput = -1.0
-            IntakeSubsystem.extensionSolenoid.set(DoubleSolenoid.Value.kReverse)
+            IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.EXTENDED
+            IntakeSubsystem.wantedPercentOutput = 1.0
         }
     }
 
     override suspend fun execute() {
-        if (direction == IntakeSubsystem.Direction.RELEASE && (System.currentTimeMillis() - startTime > 250
-                && !IntakeSubsystem.launcherSolenoid.get())
-        ) {
-            IntakeSubsystem.launcherSolenoid.set(true)
-        }
-        if (IntakeSubsystem.isSeeingCargo() && sensedBall == 0L) {
-            IntakeSubsystem.extensionSolenoid.set(DoubleSolenoid.Value.kReverse)
-            sensedBall = System.currentTimeMillis()
+        when (releasing) {
+            true -> {
+                if ((System.currentTimeMillis() - startTime > 250 && !IntakeSubsystem.launcherSolenoidState)) {
+                    IntakeSubsystem.wantedLauncherSolenoidState = true
+                }
+            }
+            false -> {
+//                if (IntakeSubsystem.isSeeingCargo && sensedBall == 0L && System.currentTimeMillis() - startTime > 500) {
+//                    IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
+//                    sensedBall = System.currentTimeMillis()
+//                }
+            }
         }
     }
 
     override suspend fun dispose() {
-        IntakeSubsystem.launcherSolenoid.set(false)
-        IntakeSubsystem.extensionSolenoid.set(DoubleSolenoid.Value.kReverse)
+        IntakeSubsystem.wantedLauncherSolenoidState = false
+        IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
         IntakeSubsystem.zeroOutputs()
     }
-
 }

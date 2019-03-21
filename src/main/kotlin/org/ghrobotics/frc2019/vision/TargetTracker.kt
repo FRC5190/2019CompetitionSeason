@@ -8,83 +8,70 @@ import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.Rotation2d
-import org.ghrobotics.lib.mathematics.units.Time
-import org.ghrobotics.lib.mathematics.units.second
-import kotlin.concurrent.fixedRateTimer
 
 
 object TargetTracker {
 
     private val targets = mutableSetOf<TrackedTarget>()
 
-    var bestTargetFront: TrackedTarget? = null
-        private set
+    fun update() {
+        synchronized(targets) {
+            val currentTime = Timer.getFPGATimestamp()
 
-    var bestTargetBack: TrackedTarget? = null
-        private set
+            val currentRobotPose = DriveSubsystem.localization()
 
-    init {
-        fixedRateTimer(period = 20L) {
-            synchronized(targets) {
-                val currentTime = Timer.getFPGATimestamp().second
+            // Update and remove old targets
+            targets.removeIf {
+                it.update(currentTime, currentRobotPose)
+                !it.isAlive
+            }
+            // Publish to dashboard
+            LiveDashboard.visionTargets = targets.asSequence()
+                .filter { it.isReal }
+                .map { it.averagedPose2d }
+                .toList()
+        }
+    }
 
-                val currentRobotPose = DriveSubsystem.localization()
+    fun addSamples(creationTime: Double, samples: Iterable<Pose2d>) {
+        if (creationTime >= Timer.getFPGATimestamp()) return // Cannot predict the future
 
-                // Update and remove old targets
-                targets.removeIf {
-                    it.update(currentTime, currentRobotPose)
-                    !it.isAlive
+        synchronized(targets) {
+            for (samplePose in samples) {
+                val closestTarget = targets.minBy {
+                    it.averagedPose2d.translation.distance(samplePose.translation)
                 }
-
-                bestTargetBack = targets.asSequence()
-                    .filter { it.isReal && it.averagedPose2dRelativeToBot.translation.x.value < 0.0 }
-                    .minBy { it.averagedPose2dRelativeToBot.translation.norm.value }
-
-                bestTargetFront = targets.asSequence()
-                    .filter { it.isReal && it.averagedPose2dRelativeToBot.translation.x.value > 0.0 }
-                    .minBy { it.averagedPose2dRelativeToBot.translation.norm.value }
-
-                // Publish to dashboard
-                LiveDashboard.visionTargets = targets.asSequence()
-                    .filter { it.isReal }
-                    .map { it.averagedPose2d }
-                    .toList()
+                val sample = TrackedTargetSample(creationTime, samplePose)
+                if (closestTarget == null
+                    || closestTarget.averagedPose2d.translation.distance(samplePose.translation) > Constants.kTargetTrackingDistanceErrorTolerance.value
+                ) {
+                    // Create new target if no targets are within tolerance
+                    targets += TrackedTarget(sample)
+                } else {
+                    // Add sample to target within tolerance
+                    closestTarget.addSample(sample)
+                }
             }
         }
     }
 
-    fun addSamples(creationTime: Time, samples: Iterable<Pose2d>) =
-        addSamples(samples.map { TrackedTargetSample(creationTime, it) })
-
-    fun addSamples(samples: Iterable<TrackedTargetSample>) = samples.forEach {
-        addSample(it)
-    }
-
-    fun addSample(sample: TrackedTargetSample) = synchronized(targets) {
-        if (sample.creationTime.second >= Timer.getFPGATimestamp()) return@synchronized // Cannot predict the future
-
-        val closestTarget = targets.minBy {
-            it.averagedPose2d.translation.distance(sample.targetPose.translation)
-        }
-        if (closestTarget == null
-            || closestTarget.averagedPose2d.translation.distance(sample.targetPose.translation) > Constants.kTargetTrackingDistanceErrorTolerance.value
-        ) {
-            // Create new target if no targets are within tolerance
-            targets += TrackedTarget(sample)
-        } else {
-            // Add sample to target within tolerance
-            closestTarget.addSample(sample)
-        }
+    fun getBestTarget(isFrontTarget: Boolean) = synchronized(targets) {
+        targets.asSequence()
+            .filter {
+                if (!it.isReal) return@filter false
+                val x = it.averagedPose2dRelativeToBot.translation.x
+                if (isFrontTarget) x >= 0.0 else x <= 0.0
+            }.minBy { it.averagedPose2dRelativeToBot.translation.norm }
     }
 
     fun getBestTargetUsingReference(referencePose: Pose2d, isFrontTarget: Boolean) = synchronized(targets) {
         targets.asSequence()
             .associateWith { it.averagedPose2d inFrameOfReferenceOf referencePose }
             .filter {
-                val x = it.value.translation.x.value
+                val x = it.value.translation.x
                 it.key.isReal && if (isFrontTarget) x > 0.0 else x < 0.0
             }
-            .minBy { it.value.translation.norm.value }?.key
+            .minBy { it.value.translation.norm }?.key
     }
 
     fun getAbsoluteTarget(translation2d: Translation2d) = synchronized(targets) {
@@ -112,11 +99,6 @@ object TargetTracker {
             private set
 
         /**
-         * When the target was first encountered
-         */
-        val dateOfBirth = initialTargetSample.creationTime
-
-        /**
          * Targets will be "alive" when it has at least one data point for x time
          */
         var isAlive = true
@@ -139,9 +121,9 @@ object TargetTracker {
             samples.add(newSamples)
         }
 
-        fun update(currentTime: Time, currentRobotPose: Pose2d) = synchronized(samples) {
+        fun update(currentTime: Double, currentRobotPose: Pose2d) = synchronized(samples) {
             // Remove expired samples
-            samples.removeIf { currentTime - it.creationTime >= Constants.kTargetTrackingMaxLifetime }
+            samples.removeIf { currentTime - it.creationTime >= Constants.kTargetTrackingMaxLifetime.value }
             // Update State
             isAlive = samples.isNotEmpty()
             if (samples.size >= 2) isReal = true
@@ -152,8 +134,8 @@ object TargetTracker {
             var accumulatedY = 0.0
             var accumulatedAngle = 0.0
             for (sample in samples) {
-                accumulatedX += sample.targetPose.translation.x.value
-                accumulatedY += sample.targetPose.translation.y.value
+                accumulatedX += sample.targetPose.translation.x
+                accumulatedY += sample.targetPose.translation.y
                 accumulatedAngle += sample.targetPose.rotation.value
             }
             averagedPose2d = Pose2d(
@@ -167,7 +149,7 @@ object TargetTracker {
     }
 
     data class TrackedTargetSample(
-        val creationTime: Time,
+        val creationTime: Double,
         val targetPose: Pose2d
     )
 

@@ -14,7 +14,7 @@ import org.ghrobotics.lib.mathematics.units.Time
 import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.second
 
-class CargoShipRoutine : AutoRoutine() {
+class ForwardCargoShipRoutine : AutoRoutine() {
 
     private val path1 = TrajectoryFactory.centerStartToCargoShipFL
     private val path2 = TrajectoryFactory.cargoShipFLToLoadingStation
@@ -28,8 +28,9 @@ class CargoShipRoutine : AutoRoutine() {
             // Hold hatch
             // Put hatch on FL cargo ship
             +parallel {
-                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
-                +DriveSubsystem.followTrajectory(path1, { false })
+                +IntakeHatchCommand(false)
+//                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+                +followVisionAssistedTrajectory(path1, { false }, 4.feet, true)
                 +sequential {
                     +DelayCommand(path1.duration - 3.5.second)
                     +Superstructure.kFrontHatchFromLoadingStation.withTimeout(2.0.second)
@@ -37,7 +38,8 @@ class CargoShipRoutine : AutoRoutine() {
             }
 
             // Release hatch
-            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+            +IntakeHatchCommand(true)
+//            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
             +DelayCommand(0.1.second)
 
             // Go to loading station
@@ -50,8 +52,9 @@ class CargoShipRoutine : AutoRoutine() {
             }
 
             // Pickup hatch
-            +relocalize(TrajectoryWaypoints.kLoadingStation, false)
-            +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+//            +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+            +IntakeHatchCommand(false)
+            +relocalize(TrajectoryWaypoints.kLoadingStation, false, { false })
 
 
             // Go to FR cargo ship
@@ -64,7 +67,8 @@ class CargoShipRoutine : AutoRoutine() {
             }
 
             // Place hatch
-            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+//            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+            +IntakeHatchCommand(true)
             +DelayCommand(0.3.second)
 
             +DriveSubsystem.followTrajectory(TrajectoryFactory.cargoShipFLToLoadingStation)

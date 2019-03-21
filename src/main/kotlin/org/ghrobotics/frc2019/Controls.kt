@@ -8,11 +8,11 @@ package org.ghrobotics.frc2019
 import edu.wpi.first.wpilibj.GenericHID
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.arm.OpenLoopArmCommand
-import org.ghrobotics.frc2019.subsystems.climb.autoL2Climb
-import org.ghrobotics.frc2019.subsystems.climb.autoL3Climb
+import org.ghrobotics.frc2019.subsystems.climb.AutoClimbRoutines
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
 import org.ghrobotics.frc2019.subsystems.elevator.OpenLoopElevatorCommand
+import org.ghrobotics.frc2019.subsystems.elevator.TuneElevatorRoutines
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
@@ -26,8 +26,10 @@ object Controls {
     var isClimbing = false
         private set
 
-    val driverXbox = xboxController(0) {
+    val driverFalconXbox = xboxController(0) {
         registerEmergencyMode()
+
+//        pov(90).changeOn(TuneElevatorRoutines.tuneKgRoutine)
 
         state({ !isClimbing }) {
             // Vision align
@@ -39,18 +41,21 @@ object Controls {
             button(kA).changeOff { DriveSubsystem.lowGear = false }
 
             // Intake
-            triggerAxisButton(GenericHID.Hand.kLeft).change(IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE))
-            button(kBumperLeft).change(IntakeHatchCommand(IntakeSubsystem.Direction.HOLD))
+            triggerAxisButton(GenericHID.Hand.kLeft).change(IntakeHatchCommand(true))
+            button(kBumperLeft).change(IntakeHatchCommand(false))
 
-            triggerAxisButton(GenericHID.Hand.kRight).change(IntakeCargoCommand(IntakeSubsystem.Direction.RELEASE))
-            button(kBumperRight).change(IntakeCargoCommand(IntakeSubsystem.Direction.HOLD))
+            triggerAxisButton(GenericHID.Hand.kRight).change(IntakeCargoCommand(true))
+            button(kBumperRight).change(IntakeCargoCommand(false))
         }
     }
 
-    val operatorXbox = xboxController(1) {
+    var backModifier = false
+        private set
+
+    val operatorFalconXbox = xboxController(1) {
         registerEmergencyMode()
 
-        // Enter climb mode
+        // Climb
         button(kB).changeOn {
             isClimbing = !isClimbing
             DriveSubsystem.lowGear = true
@@ -58,76 +63,46 @@ object Controls {
         }
 
         state({ !isClimbing }) {
-            // Elevator
-            axisButton(1, 0.15) {
-                change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * 0.5 }))
+
+            /** MANUAL CONTROL **/
+            axisButton(1, 0.1) { change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * 0.5 })) }
+            axisButton(5, 0.1) { change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * 0.5 })) }
+
+            /** PRESETS **/
+            triggerAxisButton(GenericHID.Hand.kLeft, 0.20) {
+                changeOn { backModifier = true }
+                changeOff { backModifier = false }
             }
-            // Arm
-            axisButton(5, 0.15) {
-                change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * 0.5 }))
-            }
 
-            val backModifier = triggerAxisButton(GenericHID.Hand.kLeft)
-
-            // Superstructure
-
-            // HIGH ROCKET
             pov(0).changeOn {
-                if (IntakeSubsystem.isSeeingCargo()) {
-                    Superstructure.kFrontHighRocketCargo.start()
-                } else {
-                    Superstructure.kFrontHighRocketHatch.start()
-                }
+                if (IntakeSubsystem.isHoldingCargo) Superstructure.kFrontHighRocketCargo.start()
+                else Superstructure.kFrontHighRocketHatch.start()
             }
-
-            // MIDDLE ROCKET
             pov(90).changeOn {
-                if (IntakeSubsystem.isSeeingCargo()) {
-                    Superstructure.kFrontMiddleRocketCargo.start()
-                } else {
-                    Superstructure.kFrontMiddleRocketHatch.start()
-                }
+                if (IntakeSubsystem.isHoldingCargo) Superstructure.kFrontMiddleRocketCargo.start()
+                else Superstructure.kFrontMiddleRocketHatch.start()
             }
-
-            // LOW ROCKET, CARGO SHIP, AND LOADING STATION
             pov(180).changeOn {
-                if (backModifier.source() > 0.35) {
-                    if (IntakeSubsystem.isSeeingCargo()) {
-                        Superstructure.kBackLowRocketCargo.start()
-                    } else {
-                        Superstructure.kBackHatchFromLoadingStation.start()
-                    }
-                } else {
-                    if (IntakeSubsystem.isSeeingCargo()) {
-                        Superstructure.kFrontLowRocketCargo.start()
-                    } else {
-                        Superstructure.kFrontHatchFromLoadingStation.start()
-                    }
+                when {
+                    backModifier -> Superstructure.kBackHatchFromLoadingStation.start()
+                    IntakeSubsystem.isHoldingCargo -> Superstructure.kFrontLowRocketCargo.start()
+                    else -> Superstructure.kFrontHatchFromLoadingStation.start()
                 }
             }
-
-            // CARGO INTAKE
             pov(270).changeOn {
-                if (backModifier.source() > 0.35) {
-                    Superstructure.kBackCargoIntake.start()
-                } else {
-                    Superstructure.kFrontCargoIntake.start()
-                }
+                if (backModifier) Superstructure.kBackCargoIntake.start()
+                else Superstructure.kFrontCargoIntake.start()
             }
-
             triggerAxisButton(GenericHID.Hand.kRight).changeOn {
-                if (backModifier.source() > 0.35) {
-                    Superstructure.kBackCargoFromLoadingStation.start()
-                } else {
-                    Superstructure.kFrontCargoFromLoadingStation.start()
-                }
+                if (backModifier) Superstructure.kBackCargoFromLoadingStation.start()
+                else Superstructure.kFrontCargoIntoCargoShip.start()
             }
-
             button(kBumperRight).changeOn(Superstructure.kStowedPosition)
         }
+
         state({ isClimbing }) {
-            button(kA).change(autoL3Climb())
-            button(kY).change(autoL2Climb())
+            button(kA).change(AutoClimbRoutines.autoL3Climb)
+            button(kY).change(AutoClimbRoutines.autoL2Climb)
         }
     }
 
@@ -143,7 +118,7 @@ object Controls {
     }
 
     fun update() {
-        driverXbox.update()
-        operatorXbox.update()
+        driverFalconXbox.update()
+        operatorFalconXbox.update()
     }
 }

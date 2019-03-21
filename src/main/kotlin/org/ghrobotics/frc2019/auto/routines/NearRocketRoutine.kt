@@ -6,7 +6,6 @@ import org.ghrobotics.frc2019.auto.paths.TrajectoryWaypoints
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
-import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.lib.commands.DelayCommand
 import org.ghrobotics.lib.commands.parallel
 import org.ghrobotics.lib.commands.sequential
@@ -16,7 +15,7 @@ import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.withEquals
 
-class RocketRoutine : AutoRoutine() {
+class NearRocketRoutine : AutoRoutine() {
     private val path1 = TrajectoryFactory.sideStartToRocketN
     private val path2 = TrajectoryFactory.rocketNToLoadingStation
     private val path3 = TrajectoryFactory.loadingStationToRocketN
@@ -30,7 +29,8 @@ class RocketRoutine : AutoRoutine() {
             val pathMirrored = Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
 
             +parallel {
-                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+                //                +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+                +IntakeHatchCommand(false)
                 +followVisionAssistedTrajectory(path1, pathMirrored, 5.feet)
                 +sequential {
                     +DelayCommand(path1.duration - 3.5.second)
@@ -38,9 +38,10 @@ class RocketRoutine : AutoRoutine() {
                 }
             }
 
-            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+//            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+            +IntakeHatchCommand(true)
             +DelayCommand(0.1.second)
-            +relocalize(TrajectoryWaypoints.kRocketN, true)
+            +relocalize(TrajectoryWaypoints.kRocketN, true, pathMirrored)
 
             +parallel {
                 +followVisionAssistedTrajectory(path2, pathMirrored, 8.feet)
@@ -50,18 +51,18 @@ class RocketRoutine : AutoRoutine() {
                 }
             }
 
-            +relocalize(TrajectoryWaypoints.kLoadingStation, false)
-            +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+            +relocalize(TrajectoryWaypoints.kLoadingStation, false, pathMirrored)
+//            +IntakeHatchCommand(IntakeSubsystem.Direction.HOLD)
+            +IntakeHatchCommand(false)
 
-            // Place hatch on near rocket
             +parallel {
-                // Drive path to far rocket
                 +followVisionAssistedTrajectory(path3, pathMirrored, 5.feet)
                 +Superstructure.kFrontHatchFromLoadingStation.withTimeout(3.second)
 
             }
 
-            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+//            +IntakeHatchCommand(IntakeSubsystem.Direction.RELEASE)
+            +IntakeHatchCommand(true)
             +DriveSubsystem.followTrajectory(TrajectoryFactory.rocketNToLoadingStation)
         }
 }

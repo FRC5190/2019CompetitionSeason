@@ -137,10 +137,10 @@ open class ManualDriveCommand : FalconCommand(DriveSubsystem) {
         private const val kQuickStopThreshold = TankDriveSubsystem.kQuickStopThreshold
         private const val kQuickStopAlpha = TankDriveSubsystem.kQuickStopAlpha
         private const val kDeadband = 0.05
-        val speedSource by lazy { Controls.driverXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband) }
-        val rightSource by lazy { Controls.driverXbox.getY(GenericHID.Hand.kRight).withDeadband(kDeadband) }
-        val leftSource by lazy { Controls.driverXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband) }
-        private val rotationSource by lazy { Controls.driverXbox.getX(GenericHID.Hand.kLeft).withDeadband(kDeadband) }
-        private val quickTurnSource by lazy { Controls.driverXbox.getRawButton(kX) }
+        val speedSource by lazy { Controls.driverFalconXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband) }
+        val rightSource by lazy { Controls.driverFalconXbox.getY(GenericHID.Hand.kRight).withDeadband(kDeadband) }
+        val leftSource by lazy { Controls.driverFalconXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband) }
+        private val rotationSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kLeft).withDeadband(kDeadband) }
+        private val quickTurnSource by lazy { Controls.driverFalconXbox.getRawButton(kX) }
     }
 }

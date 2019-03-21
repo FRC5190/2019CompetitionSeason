@@ -4,16 +4,16 @@ import org.ghrobotics.lib.mathematics.epsilonEquals
 import org.ghrobotics.lib.mathematics.units.derivedunits.inchesPerSecond
 import org.ghrobotics.lib.mathematics.units.derivedunits.velocity
 import org.ghrobotics.lib.mathematics.units.inch
-import org.ghrobotics.lib.mathematics.units.nativeunits.STU
+import org.ghrobotics.lib.mathematics.units.nativeunits.nativeUnits
 import org.junit.Test
 
 class SpringCascadeNativeUnitModelTest {
 
     private val model = SpringCascadeNativeUnitModel(
         switchHeight = 8.inch,
-        switchNativeUnit = 2310.STU,
+        switchNativeUnit = 2310.nativeUnits,
         afterSwitchHeightSample = 40.inch,
-        afterSwitchNativeUnitSample = 6930.STU
+        afterSwitchNativeUnitSample = 6930.nativeUnits
     )
 
     @Test
@@ -33,9 +33,9 @@ class SpringCascadeNativeUnitModelTest {
 
     @Test
     fun testFromNativeUnit() {
-        val one = 1443.75.STU
-        val two = 6930.STU
-        val three = 5486.25.STU
+        val one = 1443.75.nativeUnits
+        val two = 6930.nativeUnits
+        val three = 5486.25.nativeUnits
 
         val oneLength = model.fromNativeUnitPosition(one)
         val twoLength = model.fromNativeUnitPosition(two)
@@ -63,9 +63,9 @@ class SpringCascadeNativeUnitModelTest {
 
     @Test
     fun testFromNativeUnitVelocity() {
-        val one = 721.875.STU.velocity
-        val two = 5775.STU.velocity
-        val three = 4331.25.STU.velocity
+        val one = 721.875.nativeUnits.velocity
+        val two = 5775.nativeUnits.velocity
+        val three = 4331.25.nativeUnits.velocity
 
         val oneLength = model.fromNativeUnitVelocity(one)
         val twoLength = model.fromNativeUnitVelocity(two)
