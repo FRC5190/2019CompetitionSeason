@@ -16,7 +16,7 @@ object AutoClimbRoutines {
 
     private val group get() = sequential {
         +parallel {
-            +ClimbWheelCommand(Source(0.5))
+            +ClimbWheelCommand(Source(0.75))
             +ClosedLoopArmCommand(160.degree)
         }.withExit { ClimbSubsystem.lidarRawAveraged < 500 }
 
@@ -30,7 +30,7 @@ object AutoClimbRoutines {
             +resetBack
         }.withExit { resetBack.wrappedValue.isCompleted }
 
-        +ClimbWheelCommand(Source(1.0)).withExit { ClimbSubsystem.frontOnPlatform }
+        +ClimbWheelCommand(Source(1.0)).withExit { ClimbSubsystem.frontOnPlatform }.withTimeout(2.5.second)
         +ResetWinchCommand(resetFront = true)
         +DelayCommand(1.second)
     }
@@ -38,7 +38,7 @@ object AutoClimbRoutines {
     val autoL3Climb
         get() = sequential {
             +ClosedLoopClimbCommand(
-                22.2.inch,
+                22.7.inch,
                 19.7.inch
             )
             +parallel {
@@ -49,7 +49,7 @@ object AutoClimbRoutines {
 
                     override suspend fun execute() {
                         if (!ClimbSubsystem.isFrontReverseLimitSwitchClosed) {
-                            DriveSubsystem.tankDrive(-.2, -.2)
+                            DriveSubsystem.tankDrive(-.4, -.4)
                         } else {
                             DriveSubsystem.tankDrive(-.5, -.5)
                         }

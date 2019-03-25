@@ -12,16 +12,16 @@ object DefaultArmCommand : FalconCommand(ArmSubsystem) {
     override suspend fun initialize() {
         lastHoldingCargoState = IntakeSubsystem.isHoldingCargo
 
-        val currentState = ArmSubsystem.currentState
+//        val currentState = ArmSubsystem.currentState
         val currentPosition = ArmSubsystem.position
-        val wantedPosition = if (currentState is ArmSubsystem.ArmState.SetPointState
-            && (currentState.position - currentPosition).value.absoluteValue <= Constants.kElevatorClosedLoopTolerance.value
-        ) {
-            currentState.position
-        } else {
-            currentPosition
-        }
-        ArmSubsystem.wantedState = ArmSubsystem.ArmState.Position(wantedPosition)
+//        val wantedPosition = if (currentState is ArmSubsystem.ArmState.SetPointState
+//            && (currentState.position - currentPosition).value.absoluteValue <= Constants.kArmClosedLoopTolerance.value
+//        ) {
+//            currentState.position
+//        } else {
+//            currentPosition
+//        }
+        ArmSubsystem.wantedState = ArmSubsystem.ArmState.Position(currentPosition)
     }
 
     override suspend fun execute() {

@@ -121,9 +121,9 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
             1.4.feet.velocity.toNativeUnitVelocity(Constants.kClimbFrontWinchNativeUnitModel)
 
         backWinchMaster.motionAcceleration =
-            0.5.feet.acceleration.toNativeUnitAcceleration(Constants.kClimbBackWinchNativeUnitModel)
+            0.6.feet.acceleration.toNativeUnitAcceleration(Constants.kClimbBackWinchNativeUnitModel)
         backWinchMaster.motionCruiseVelocity =
-            1.0.feet.velocity.toNativeUnitVelocity(Constants.kClimbBackWinchNativeUnitModel)
+            1.15.feet.velocity.toNativeUnitVelocity(Constants.kClimbBackWinchNativeUnitModel)
 
         frontWinchMaster.configAuxPIDPolarity(false)
         backWinchMaster.configAuxPIDPolarity(true)
@@ -152,7 +152,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         isFrontReverseLimitSwitchClosed = frontWinchMaster.sensorCollection.isRevLimitSwitchClosed
         isBackReverseLimitSwitchClosed = !backHallEffectSensor.get()
 
-        frontOnPlatform = frontOnPlatformSensor.averageVoltage > 1.27
+        frontOnPlatform = frontOnPlatformSensor.averageVoltage > 1.1
 
         // DEBUG PERIODIC
         if (Robot.shouldDebug) {

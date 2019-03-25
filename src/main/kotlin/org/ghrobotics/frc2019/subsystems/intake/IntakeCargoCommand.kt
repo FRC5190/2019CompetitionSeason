@@ -50,7 +50,7 @@ class IntakeCargoCommand(
 
     init {
         if (!releasing) {
-            finishCondition += { sensedBall != 0L && System.currentTimeMillis() - sensedBall > 500 }
+            finishCondition += { sensedBall != 0L && System.currentTimeMillis() - sensedBall > 1000 }
         }
     }
     private var startTime = 0L
@@ -79,10 +79,10 @@ class IntakeCargoCommand(
                 }
             }
             false -> {
-//                if (IntakeSubsystem.isSeeingCargo && sensedBall == 0L && System.currentTimeMillis() - startTime > 500) {
-//                    IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
-//                    sensedBall = System.currentTimeMillis()
-//                }
+                if (IntakeSubsystem.isSeeingCargo && sensedBall == 0L && System.currentTimeMillis() - startTime > 500) {
+                    IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
+                    sensedBall = System.currentTimeMillis()
+                }
             }
         }
     }

@@ -29,7 +29,7 @@ object Controls {
     val driverFalconXbox = xboxController(0) {
         registerEmergencyMode()
 
-//        pov(90).changeOn(TuneElevatorRoutines.tuneKgRoutine)
+        pov(90).changeOn(TuneElevatorRoutines.tuneKgRoutine)
 
         state({ !isClimbing }) {
             // Vision align
