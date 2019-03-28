@@ -65,8 +65,8 @@ object Controls {
         state({ !isClimbing }) {
 
             /** MANUAL CONTROL **/
-            axisButton(1, 0.1) { change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * 0.5 })) }
-            axisButton(5, 0.1) { change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * 0.5 })) }
+            axisButton(1, 0.1) { change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * 1.0 })) }
+            axisButton(5, 0.1) { change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * 1.0 })) }
 
             /** PRESETS **/
             triggerAxisButton(GenericHID.Hand.kLeft, 0.20) {

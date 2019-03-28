@@ -2,11 +2,13 @@ package org.ghrobotics.frc2019.subsystems.drive
 
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.Network
+import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.debug.LiveDashboard
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature
+import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedEntry
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.Trajectory
 import org.ghrobotics.lib.mathematics.units.*
@@ -50,12 +52,17 @@ class TrajectoryVisionTrackerCommand(
     private var lastKnownTargetPose: Pose2d? = null
 
     override suspend fun execute() {
-        val robotPosition = DriveSubsystem.robotPosition
+        val robotPositionWithIntakeOffset = IntakeSubsystem.robotPositionWithIntakeOffset
 
-        val nextState = DriveSubsystem.trajectoryTracker.nextState(robotPosition)
+        val nextState = DriveSubsystem.trajectoryTracker.nextState(DriveSubsystem.robotPosition)
 
         val withinVisionRadius =
-            robotPosition.translation.distance(trajectory.lastState.state.pose.translation) < radiusFromEnd.value
+            robotPositionWithIntakeOffset.translation.distance(
+                trajectory.lastState.state.pose.translation + Translation2d(
+                    Length.kZero,
+                    Constants.kBadIntakeOffset
+                )
+            ) < radiusFromEnd.value
 
         if (withinVisionRadius) {
             val newTarget = if (!useAbsoluteVision) {
@@ -73,7 +80,7 @@ class TrajectoryVisionTrackerCommand(
         if (lastKnownTargetPose != null) {
             println("VISION")
             visionActive = true
-            val transform = lastKnownTargetPose inFrameOfReferenceOf robotPosition
+            val transform = lastKnownTargetPose inFrameOfReferenceOf robotPositionWithIntakeOffset
             val angle = Rotation2d(transform.translation.x, transform.translation.y, true)
 
             Network.visionDriveAngle.setDouble(angle.degree)

@@ -3,6 +3,7 @@ package org.ghrobotics.frc2019.auto
 import org.ghrobotics.frc2019.auto.routines.BottomRocketRoutine
 import org.ghrobotics.frc2019.auto.routines.ForwardCargoShipRoutine
 import org.ghrobotics.frc2019.auto.routines.NearRocketRoutine
+import org.ghrobotics.frc2019.auto.routines.SideCargoShipRoutine
 import org.junit.Test
 
 class AutonomousTiming {

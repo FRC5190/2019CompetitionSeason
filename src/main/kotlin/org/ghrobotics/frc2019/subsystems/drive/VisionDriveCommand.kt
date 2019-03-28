@@ -1,6 +1,7 @@
 package org.ghrobotics.frc2019.subsystems.drive
 
 import org.ghrobotics.frc2019.Network
+import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.units.Rotation2d
@@ -10,6 +11,8 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
 
     private var referencePose = Pose2d()
     private var lastKnownTargetPose: Pose2d? = null
+
+    private var prevError = 0.0
 
     override suspend fun initialize() {
         isActive = true
@@ -29,15 +32,19 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
         if (lastKnownTargetPose == null) {
             super.execute()
         } else {
-            val transform = lastKnownTargetPose inFrameOfReferenceOf DriveSubsystem.localization()
+            val transform = lastKnownTargetPose inFrameOfReferenceOf IntakeSubsystem.robotPositionWithIntakeOffset
             val angle = Rotation2d(transform.translation.x, transform.translation.y, true)
 
             Network.visionDriveAngle.setDouble(angle.degree)
             Network.visionDriveActive.setBoolean(true)
 
+            val error = (angle + if (targetSide == TargetSide.FRONT) Rotation2d.kZero else Math.PI.radian).radian
+
             val turn =
-                kCorrectionKp * (angle + if (targetSide == TargetSide.FRONT) Rotation2d.kZero else Math.PI.radian).radian
+                kCorrectionKp * error + kCorrectionKd * (error - prevError)
             tankDrive(source - turn, source + turn)
+
+            prevError = error
         }
     }
 
@@ -50,7 +57,8 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
     enum class TargetSide { FRONT, BACK }
 
     companion object {
-        const val kCorrectionKp = 0.35
+        const val kCorrectionKp = 0.8
+        const val kCorrectionKd = 8.0
         var isActive = false
             private set
     }

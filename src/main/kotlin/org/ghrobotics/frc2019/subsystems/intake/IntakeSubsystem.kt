@@ -9,10 +9,14 @@ import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.Robot
+import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.commands.FalconSubsystem
+import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
+import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
+import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.sensors.asSource
 import org.ghrobotics.lib.util.CircularBuffer
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
@@ -147,6 +151,9 @@ object IntakeSubsystem : FalconSubsystem() {
     var launcherSolenoidState: Boolean = true
         private set
 
+    var robotPositionWithIntakeOffset = Pose2d()
+        private set
+
     // DEBUG PERIODIC
     var robotPitch = 0.degree
         private set
@@ -180,6 +187,8 @@ object IntakeSubsystem : FalconSubsystem() {
         isFullyExtended = false
         isHoldingCargo = extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.RETRACTED && isSeeingCargo
         isHoldingHatch = extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.EXTENDED && !isFullyExtended
+
+        robotPositionWithIntakeOffset = DriveSubsystem.robotPosition + Pose2d(Length.kZero, -Constants.kBadIntakeOffset)
 
         // DEBUG PERIODIC
         if (Robot.shouldDebug) {

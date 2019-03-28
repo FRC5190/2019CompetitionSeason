@@ -59,6 +59,7 @@ object Autonomous {
                 state(Mode.DO_NOTHING, sequential {})
                 state(Mode.BOTTOM_ROCKET, BottomRocketRoutine()())
                 state(Mode.FULL_ROCKET, FullRocketRoutine()())
+                state(Mode.SIDE_CARGO_SHIP, SideCargoShipRoutine()())
             }
         }
         state(StartingPositions.CENTER) {
@@ -69,6 +70,7 @@ object Autonomous {
                 state(Mode.NEAR_ROCKET, sequential {})
                 state(Mode.BOTTOM_ROCKET, sequential {})
                 state(Mode.FULL_ROCKET, sequential { })
+                state(Mode.SIDE_CARGO_SHIP, sequential {} )
             }
         }
     }
@@ -89,5 +91,5 @@ object Autonomous {
         RIGHT_90(TrajectoryWaypoints.kSideStart90)
     }
 
-    enum class Mode { TEST_TRAJECTORIES, NEAR_ROCKET, BOTTOM_ROCKET, FULL_ROCKET, FORWARD_CARGO_SHIP, BASELINE, DO_NOTHING }
+    enum class Mode { TEST_TRAJECTORIES, NEAR_ROCKET, BOTTOM_ROCKET, FULL_ROCKET, FORWARD_CARGO_SHIP, SIDE_CARGO_SHIP, BASELINE, DO_NOTHING }
 }
