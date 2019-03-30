@@ -100,6 +100,7 @@ object Superstructure {
                                         IntakeSubsystem.ExtensionSolenoidState.RETRACTED
                                     IntakeSubsystem.wantedLauncherSolenoidState = false
                                 }
+//                                IntakeSubsystem.wantedHoldHatchSolenoidState = IntakeSubsystem.HoldHatchSolenoidState.HOLD
                             }
                         }
                         // Elevator

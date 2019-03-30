@@ -10,18 +10,32 @@ import org.ghrobotics.lib.mathematics.units.millisecond
 //    override suspend fun initialize() {
 //        if (releasing) {
 //            IntakeSubsystem.wantedHoldHatchSolenoidState = IntakeSubsystem.HoldHatchSolenoidState.PLACE
-//            IntakeSubsystem.wantedPushHatchSolenoidState = IntakeSubsystem.PushHatchSolenoidState.USEFUL
 //        } else {
 //            IntakeSubsystem.wantedHoldHatchSolenoidState = IntakeSubsystem.HoldHatchSolenoidState.HOLD
-//            IntakeSubsystem.wantedPushHatchSolenoidState = IntakeSubsystem.PushHatchSolenoidState.EXIST
+//        }
+//    }
+//}
+
+//class IntakeHatchCommand(
+//    private val releasing: Boolean
+//) : FalconCommand(IntakeSubsystem) {
+//
+//    init {
+//        withTimeout(300.millisecond)
+//    }
+//
+//    override suspend fun initialize() {
+//        if (releasing) {
+//            IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
+//        } else {
+//            IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.EXTENDED
+//            IntakeSubsystem.wantedPercentOutput = 0.25
 //        }
 //    }
 //
 //    override suspend fun dispose() {
-//        IntakeSubsystem.wantedHoldHatchSolenoidState = IntakeSubsystem.HoldHatchSolenoidState.HOLD
-//        IntakeSubsystem.wantedPushHatchSolenoidState = IntakeSubsystem.PushHatchSolenoidState.EXIST
+//        IntakeSubsystem.zeroOutputs()
 //    }
-//
 //}
 
 class IntakeHatchCommand(
@@ -29,19 +43,23 @@ class IntakeHatchCommand(
 ) : FalconCommand(IntakeSubsystem) {
 
     init {
-        withTimeout(300.millisecond)
+//        withTimeout(300.millisecond)
     }
 
     override suspend fun initialize() {
         if (releasing) {
             IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
+            IntakeSubsystem.wantedPercentOutput = 1.0
         } else {
-            IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.EXTENDED
-            IntakeSubsystem.wantedPercentOutput = 0.25
+            IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
+            IntakeSubsystem.wantedPercentOutput = -1.0
         }
     }
 
     override suspend fun dispose() {
+        if (releasing) {
+            IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
+        }
         IntakeSubsystem.zeroOutputs()
     }
 }

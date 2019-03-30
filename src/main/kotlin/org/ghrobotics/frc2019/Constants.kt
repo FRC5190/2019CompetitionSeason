@@ -321,7 +321,7 @@ object Constants {
 //    const val kIntakePushHatchSolenoidForwardId = 0
 //    const val kIntakePushHatchSolenoidReverseId = 1
         const val kIntakeLauncherSolenoidId = 5
-//    const val kIntakeHoldHatchSolenoidId = 5
+    const val kIntakeHoldHatchSolenoidId = 5
     const val kDriveSolenoidId = 4
 
 
@@ -338,7 +338,7 @@ object Constants {
     val kElevatorCrossbarHeightFromGround = 46.inch
     val kIntakeCradleHeight = 6.inch
     val kArmLength = 24.5.inch
-    val kBadIntakeOffset = (-.5).inch
+    val kBadIntakeOffset = (-1).inch
 
 
     // TRANSFORMATIONS
@@ -457,7 +457,7 @@ object Constants {
 
     // ARM
     val kArmSensorUnitsPerRotation = 1024.nativeUnits
-    val kArmUpTicks = (-521).nativeUnits
+    val kArmUpTicks = (-510).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,
@@ -473,8 +473,8 @@ object Constants {
 
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
     val kArmClosedLoopTolerance = 5.degree
-    val kArmCruiseVelocity = 4.54 * 1.0.radian.velocity
-    val kArmAcceleration = 11.95 * 1.0.radian.acceleration
+    val kArmCruiseVelocity = 2.5 * 1.0.radian.velocity
+    val kArmAcceleration = 5.00 * 1.0.radian.acceleration
 
     const val kArmEmptyHoldVoltage = 1.9
 
@@ -482,9 +482,9 @@ object Constants {
     const val kArmHatchKg = 4.0 / kAccelerationDueToGravity / 12.0
 
     const val kArmKp = 5.0
-    const val kArmKd = 80.0
+    const val kArmKd = 150.0
     const val kArmKv = 0.0 / 12.0
-    val kArmKf = 0.0 //kArmNativeUnitModel.calculatekF(11.366 - kArmEmptyHoldVoltage, Math.toRadians(200.1562))
+    val kArmKf = kArmNativeUnitModel.calculatekF(11.718 - kArmEmptyHoldVoltage, Math.toRadians(350.156))
 
     // CLIMB
     val kClimbBackWinchNativeUnitModel = SlopeNativeUnitModel(

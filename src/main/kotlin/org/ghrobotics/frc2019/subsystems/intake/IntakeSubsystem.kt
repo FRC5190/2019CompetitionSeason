@@ -16,9 +16,7 @@ import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
-import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.sensors.asSource
-import org.ghrobotics.lib.util.CircularBuffer
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 
 //object IntakeSubsystem : FalconSubsystem() {
@@ -26,18 +24,16 @@ import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 //    private val pigeon = PigeonIMU(intakeCargoMaster)
 //    val pigeonSource = pigeon.asSource()
 //
-//    private val pushHatchSolenoid = DoubleSolenoid(
+//    private val holdHatchSolenoid = DoubleSolenoid(
 //        Constants.kPCMId,
 //        Constants.kIntakePushHatchSolenoidForwardId,
 //        Constants.kIntakePushHatchSolenoidReverseId
 //    )
-//    private val holdHatchSolenoid = Solenoid(Constants.kPCMId, Constants.kIntakeHoldHatchSolenoidId)
 //
 //    private val rollingAverageCargoCurrent = CircularBuffer(30)
 //
 //    var wantedPercentOutput = 0.0
 //    var wantedHoldHatchSolenoidState = HoldHatchSolenoidState.HOLD
-//    var wantedPushHatchSolenoidState = PushHatchSolenoidState.EXIST
 //
 //    // PERIODIC
 //    var isSeeingCargo: Boolean = false
@@ -48,7 +44,8 @@ import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 //        private set
 //    var holdHatchSolenoidState = HoldHatchSolenoidState.HOLD
 //        private set
-//    var pushHatchSolenoidState = PushHatchSolenoidState.USEFUL
+//
+//    var robotPositionWithIntakeOffset = Pose2d()
 //        private set
 //
 //    // DEBUG PERIODIC
@@ -76,13 +73,15 @@ import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 //        // PERIODIC
 //        rollingAverageCargoCurrent.add(intakeCargoMaster.outputCurrent)
 //        println("Average Current: ${rollingAverageCargoCurrent.average}")
-//        isSeeingCargo = rollingAverageCargoCurrent.average > 11.0
+//        isSeeingCargo = false // rollingAverageCargoCurrent.average > 11.0
 //        if (isSeeingCargo) {
 //            isHoldingCargo = true
 //        } else if (wantedPercentOutput < 0) {
 //            isHoldingCargo = false
 //        }
 //        isHoldingHatch = false
+//
+//        robotPositionWithIntakeOffset = DriveSubsystem.robotPosition + Pose2d(Length.kZero, -Constants.kBadIntakeOffset)
 //
 //        // DEBUG PERIODIC
 //        if (Robot.shouldDebug) {
@@ -92,18 +91,13 @@ import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 //
 //        intakeCargoMaster.set(ControlMode.PercentOutput, wantedPercentOutput)
 //        if (wantedHoldHatchSolenoidState != holdHatchSolenoidState) {
-//            holdHatchSolenoid.set(wantedHoldHatchSolenoidState == IntakeSubsystem.HoldHatchSolenoidState.HOLD)
+//            if (wantedHoldHatchSolenoidState == IntakeSubsystem.HoldHatchSolenoidState.HOLD) {
+//                holdHatchSolenoid.set(DoubleSolenoid.Value.kForward)
+//            } else {
+//                holdHatchSolenoid.set(DoubleSolenoid.Value.kReverse)
+//            }
+//
 //            holdHatchSolenoidState = wantedHoldHatchSolenoidState
-//        }
-//        if (wantedPushHatchSolenoidState != pushHatchSolenoidState) {
-//            pushHatchSolenoid.set(
-//                if (wantedPushHatchSolenoidState == IntakeSubsystem.PushHatchSolenoidState.EXIST) {
-//                    DoubleSolenoid.Value.kForward
-//                } else {
-//                    DoubleSolenoid.Value.kReverse
-//                }
-//            )
-//            pushHatchSolenoidState = wantedPushHatchSolenoidState
 //        }
 //    }
 //
@@ -112,7 +106,6 @@ import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 //    }
 //
 //    enum class HoldHatchSolenoidState { HOLD, PLACE }
-//    enum class PushHatchSolenoidState { USEFUL, EXIST }
 //}
 
 
@@ -174,7 +167,7 @@ object IntakeSubsystem : FalconSubsystem() {
             motor.voltageCompensationSaturation = 12.volt
             motor.voltageCompensationEnabled = true
 
-            motor.continuousCurrentLimit = 18.amp
+            motor.continuousCurrentLimit = 25.amp
             motor.currentLimitingEnabled = true
 
             motor.brakeMode = NeutralMode.Coast
