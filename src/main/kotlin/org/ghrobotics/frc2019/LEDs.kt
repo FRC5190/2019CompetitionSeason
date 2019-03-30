@@ -15,7 +15,10 @@ object LEDs {
         thread {
             while (true) {
                 try {
-                    val port = SerialPort(9600, SerialPort.Port.kMXP)
+                    val port = SerialPort(
+                        9600,
+                        if (Constants.kUseMXPForLEDs) SerialPort.Port.kMXP else SerialPort.Port.kMXP
+                    )
                     port.setTimeout(0.5190)
                     var currentLEDMode: Mode? = null
                     @Suppress("ConvertTryFinallyToUseCall")

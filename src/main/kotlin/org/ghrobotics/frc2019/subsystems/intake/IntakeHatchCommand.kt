@@ -48,7 +48,7 @@ class IntakeHatchCommand(
 
     override suspend fun initialize() {
         if (releasing) {
-            IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
+            IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.EXTENDED
             IntakeSubsystem.wantedPercentOutput = 1.0
         } else {
             IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED

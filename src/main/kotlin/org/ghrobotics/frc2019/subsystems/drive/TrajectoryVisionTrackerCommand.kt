@@ -31,6 +31,8 @@ class TrajectoryVisionTrackerCommand(
     private var trajectoryFinished = false
     private var hasGeneratedVisionPath = false
 
+    private var prevError = 0.0
+
     @Suppress("LateinitUsage")
     private lateinit var trajectory: Trajectory<Time, TimedEntry<Pose2dWithCurvature>>
 
@@ -86,10 +88,10 @@ class TrajectoryVisionTrackerCommand(
             Network.visionDriveAngle.setDouble(angle.degree)
             Network.visionDriveActive.setBoolean(true)
 
-//            val turn =
-//                kCorrectionKp * (transform.translation.y.value / transform.translation.x.value.absoluteValue) * (if (targetSide == TargetSide.FRONT) 1.0 else -1.0)
-            val turn =
-                kCorrectionKp * (angle + if (!trajectory.reversed) Rotation2d.kZero else Math.PI.radian).radian
+            val error = (angle + if (!trajectory.reversed) Rotation2d.kZero else Math.PI.radian).radian
+            val turn = kCorrectionKp * error + kCorrectionKd * (error - prevError)
+
+
             DriveSubsystem.setOutput(
                 TrajectoryTrackerOutput(
                     nextState.linearVelocity,
@@ -98,6 +100,9 @@ class TrajectoryVisionTrackerCommand(
                     0.radian.acceleration
                 )
             )
+
+            prevError = error
+            
         } else {
             DriveSubsystem.setOutput(nextState)
         }
@@ -126,6 +131,7 @@ class TrajectoryVisionTrackerCommand(
 
     companion object {
         const val kCorrectionKp = 5.5
+        const val kCorrectionKd = 0.0
         var visionActive = false
     }
 }

@@ -35,13 +35,11 @@ object TrajectoryFactory {
 
     private val cargoShipFLAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kCargoShipFL,
-        transform = Constants.kForwardIntakeToCenter,
-        translationalOffset = Translation2d((-0.75).inch, 0.inch)
+        transform = Constants.kForwardIntakeToCenter
     )
     private val cargoShipFRAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kCargoShipFR,
-        transform = Constants.kForwardIntakeToCenter,
-        translationalOffset = Translation2d(1.inch, 0.inch)
+        transform = Constants.kForwardIntakeToCenter
     )
     private val cargoShipS1Adjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kCargoShipS1,
@@ -279,5 +277,5 @@ object TrajectoryFactory {
         )
     }
 
-    fun Pose2d.asWaypoint() = TrajectoryWaypoints.Waypoint(this)
+    private fun Pose2d.asWaypoint() = TrajectoryWaypoints.Waypoint(this)
 }

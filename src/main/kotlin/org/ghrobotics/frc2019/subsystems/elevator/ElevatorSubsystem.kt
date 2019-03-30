@@ -33,6 +33,8 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
     var currentState: ElevatorState = ElevatorState.Nothing
         private set
 
+    var wantedVisionMode = false
+
     // PERIODIC VALUES
     var position: Double = 0.0
         private set
@@ -151,9 +153,17 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         }
 
         // UPDATE STATE
-        val wantedState = this.wantedState
+        var wantedState = this.wantedState
         val previousState = this.currentState
+
+        if (wantedState is ElevatorState.SetPointState && wantedVisionMode
+            && wantedState.position in Constants.kElevatorBlockingCameraRange
+        ) {
+            wantedState = ElevatorState.MotionMagic(Constants.kElevatorVisionPosition.value)
+        }
+
         this.currentState = wantedState
+
         when (wantedState) {
             is ElevatorState.Nothing -> {
                 elevatorMaster.set(ControlMode.Disabled, 0.0)

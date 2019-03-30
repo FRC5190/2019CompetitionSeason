@@ -65,6 +65,8 @@ import kotlin.math.pow
 //    // GYROS
 //    const val kPigeonIMUId = kIntakeLeftId
 //
+//    const val kUseMXPForLEDs = true
+//
 //
 //    // PNEUMATICS
 //    const val kPCMId = 41
@@ -313,6 +315,8 @@ object Constants {
     const val kPigeonIMUId = kIntakeLeftId
 //    const val kPigeonIMUId = kIntakeCargoId
 
+    const val kUseMXPForLEDs = false
+
 
     // PNEUMATICS
     const val kPCMId = 41
@@ -334,11 +338,11 @@ object Constants {
     val kRobotLength = 30.inch
 
     val kBumperThickness = 4.5.inch
-    val kIntakeProtrusion = 8.inch       // Out of frame protrusion.
+    val kIntakeProtrusion = 12.inch       // Out of frame protrusion.
     val kElevatorCrossbarHeightFromGround = 46.inch
     val kIntakeCradleHeight = 6.inch
     val kArmLength = 24.5.inch
-    val kBadIntakeOffset = (-1).inch
+    val kBadIntakeOffset = -1.inch
 
 
     // TRANSFORMATIONS
@@ -445,6 +449,9 @@ object Constants {
     val kElevatorAcceleration = 122.5.inch.acceleration
     val kElevatorCruiseVelocity = 70.inch.velocity
 
+    val kElevatorBlockingCameraRange = (29.inch.value)..(41.inch.value)
+    val kElevatorVisionPosition = 45.inch
+
     const val kElevatorKp = 1.0
     const val kElevatorKd = 0.0
     const val kElevatorBelowSwitchKg = 0.7889999999999985 / 12.0
@@ -457,7 +464,7 @@ object Constants {
 
     // ARM
     val kArmSensorUnitsPerRotation = 1024.nativeUnits
-    val kArmUpTicks = (-510).nativeUnits
+    val kArmUpTicks = (-520).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,
@@ -473,18 +480,18 @@ object Constants {
 
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
     val kArmClosedLoopTolerance = 5.degree
-    val kArmCruiseVelocity = 2.5 * 1.0.radian.velocity
-    val kArmAcceleration = 5.00 * 1.0.radian.acceleration
+    val kArmCruiseVelocity = 254 * 1.0.degree.velocity
+    val kArmAcceleration = 6.28 * 1.0.radian.acceleration
 
-    const val kArmEmptyHoldVoltage = 1.9
+    const val kArmEmptyHoldVoltage = 1.75
 
     val kArmEmptyKg = kArmEmptyHoldVoltage / kAccelerationDueToGravity / 12.0
     const val kArmHatchKg = 4.0 / kAccelerationDueToGravity / 12.0
 
-    const val kArmKp = 5.0
-    const val kArmKd = 150.0
+    const val kArmKp = 6.5
+    const val kArmKd = 650.0
     const val kArmKv = 0.0 / 12.0
-    val kArmKf = kArmNativeUnitModel.calculatekF(11.718 - kArmEmptyHoldVoltage, Math.toRadians(350.156))
+    val kArmKf = kArmNativeUnitModel.calculatekF(12 - kArmEmptyHoldVoltage, Math.toRadians(254.0))
 
     // CLIMB
     val kClimbBackWinchNativeUnitModel = SlopeNativeUnitModel(

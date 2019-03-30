@@ -1,6 +1,7 @@
 package org.ghrobotics.frc2019.subsystems.drive
 
 import org.ghrobotics.frc2019.Network
+import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
@@ -30,8 +31,10 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
         val source = -speedSource()
 
         if (lastKnownTargetPose == null) {
+            ElevatorSubsystem.wantedVisionMode = true
             super.execute()
         } else {
+            ElevatorSubsystem.wantedVisionMode = false
             val transform = lastKnownTargetPose inFrameOfReferenceOf IntakeSubsystem.robotPositionWithIntakeOffset
             val angle = Rotation2d(transform.translation.x, transform.translation.y, true)
 
@@ -51,6 +54,7 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
     override suspend fun dispose() {
         Network.visionDriveActive.setBoolean(false)
         this.lastKnownTargetPose = null
+        ElevatorSubsystem.wantedVisionMode = false
         isActive = false
     }
 
