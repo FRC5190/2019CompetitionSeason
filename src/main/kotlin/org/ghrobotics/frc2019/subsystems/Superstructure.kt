@@ -22,14 +22,31 @@ object Superstructure {
         (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)
 
 
-    val kFrontHighRocketHatch get() = goToHeightWithAngle(70.inch, 15.degree)
+//    val kFrontHighRocketHatch get() = goToHeightWithAngle(70.inch, 15.degree)
+//    val kFrontMiddleRocketHatch get() = goToHeightWithAngle(50.inch, 5.degree)
+//
+//    val kFrontHighRocketCargo get() = goToHeightWithAngle(83.inch, 15.degree)
+//    val kFrontMiddleRocketCargo get() = goToHeightWithAngle(56.inch, 15.degree)
+//    val kFrontLowRocketCargo get() = goToHeightWithAngle(26.inch, 15.degree)
+//    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(18.inch, 0.degree)
+//    val kBackHatchFromLoadingStation get() = goToHeightWithAngle(20.inch, 170.degree)
+//
+//    val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, (-25).degree)
+//    val kBackCargoIntake get() = elevatorAndArmHeight(0.inch, (-155).degree)
+//
+//    val kFrontCargoIntoCargoShip get() = elevatorAndArmHeight(25.inch, 5.degree)
+//    val kBackCargoFromLoadingStation get() = elevatorAndArmHeight(0.inch, 135.degree)
+//
+//    val kStowedPosition get() = elevatorAndArmHeight(0.inch, 90.degree)
+
+    val kFrontHighRocketHatch get() = goToHeightWithAngle(76.inch, 15.degree)
     val kFrontMiddleRocketHatch get() = goToHeightWithAngle(50.inch, 5.degree)
 
     val kFrontHighRocketCargo get() = goToHeightWithAngle(83.inch, 15.degree)
     val kFrontMiddleRocketCargo get() = goToHeightWithAngle(56.inch, 15.degree)
     val kFrontLowRocketCargo get() = goToHeightWithAngle(26.inch, 15.degree)
-    val kFrontHatchFromLoadingStation get() = elevatorAndArmHeight(2.0.inch, 6.degree)
-    val kBackHatchFromLoadingStation get() = elevatorAndArmHeight(2.0.inch, 175.degree)
+    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 0.degree)
+    val kBackHatchFromLoadingStation get() = goToHeightWithAngle(15.2.inch, 180.degree)
 
     val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, (-25).degree)
     val kBackCargoIntake get() = elevatorAndArmHeight(0.inch, (-155).degree)
@@ -95,12 +112,12 @@ object Superstructure {
                             }
 
                             override suspend fun execute() {
-                                if (IntakeSubsystem.isFullyExtended) {
-                                    IntakeSubsystem.wantedExtensionSolenoidState =
-                                        IntakeSubsystem.ExtensionSolenoidState.RETRACTED
-                                    IntakeSubsystem.wantedLauncherSolenoidState = false
-                                }
+                                IntakeSubsystem.wantedFlippingState = true
 //                                IntakeSubsystem.wantedHoldHatchSolenoidState = IntakeSubsystem.HoldHatchSolenoidState.HOLD
+                            }
+
+                            override suspend fun dispose() {
+                                IntakeSubsystem.wantedFlippingState = false
                             }
                         }
                         // Elevator

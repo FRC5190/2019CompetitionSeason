@@ -31,8 +31,8 @@ object Controls {
         registerEmergencyMode()
 
 //        pov(90).changeOn(TuneElevatorRoutines.tuneKgRoutine)
-        pov(270).changeOn { IntakeSubsystem.badIntakeOffset += .5.inch }
-        pov(90).changeOn { IntakeSubsystem.badIntakeOffset -= (-.5).inch }
+        pov(270).changeOn { IntakeSubsystem.badIntakeOffset += .25.inch }
+        pov(90).changeOn { IntakeSubsystem.badIntakeOffset -= .25.inch }
 
         state({ !isClimbing }) {
             // Vision align
@@ -68,8 +68,8 @@ object Controls {
         state({ !isClimbing }) {
 
             /** MANUAL CONTROL **/
-            axisButton(1, 0.1) { change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * 1.0 })) }
-            axisButton(5, 0.1) { change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * 1.0 })) }
+            axisButton(1, 0.1) { change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * .5 })) }
+            axisButton(5, 0.1) { change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * .5 })) }
 
             /** PRESETS **/
             triggerAxisButton(GenericHID.Hand.kLeft, 0.20) {

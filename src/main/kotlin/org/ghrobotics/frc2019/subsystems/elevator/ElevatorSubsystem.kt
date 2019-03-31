@@ -96,6 +96,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
             setStatusFramePeriod(StatusFrame.Status_2_Feedback0, kMainLoopDt.millisecond.toInt())
             configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_20Ms)
 
+            selectProfileSlot(0, 0)
 //            configMotionSCurveStrength(3)
         }
 
@@ -154,7 +155,6 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
 
         // UPDATE STATE
         var wantedState = this.wantedState
-        val previousState = this.currentState
 
         if (wantedState is ElevatorState.SetPointState && wantedVisionMode
             && wantedState.position in Constants.kElevatorBlockingCameraRange
@@ -169,22 +169,8 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
                 elevatorMaster.set(ControlMode.Disabled, 0.0)
             }
             is ElevatorState.MotionMagic -> {
-                if (previousState !is ElevatorState.MotionMagic) {
-                    elevatorMaster.selectProfileSlot(0, 0)
-                }
                 elevatorMaster.set(
                     ControlMode.MotionMagic,
-                    Constants.kElevatorNativeUnitModel.toNativeUnitPosition(wantedState.position),
-                    DemandType.ArbitraryFeedForward,
-                    arbitraryFeedForward
-                )
-            }
-            is ElevatorState.Position -> {
-                if (previousState !is ElevatorState.Position) {
-                    elevatorMaster.selectProfileSlot(1, 0)
-                }
-                elevatorMaster.set(
-                    ControlMode.Position,
                     Constants.kElevatorNativeUnitModel.toNativeUnitPosition(wantedState.position),
                     DemandType.ArbitraryFeedForward,
                     arbitraryFeedForward
@@ -213,10 +199,6 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
             motor.config_kP(0, Constants.kElevatorKp)
             motor.config_kD(0, Constants.kElevatorKd)
             motor.config_kF(0, Constants.kElevatorKf)
-
-            motor.config_kP(1, Constants.kElevatorKp)
-            motor.config_kD(1, Constants.kElevatorKd)
-            motor.config_kF(1, 0.0)
         }
     }
 
@@ -227,9 +209,6 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         allMotors.forEach { motor ->
             motor.config_kP(0, 0.0)
             motor.config_kD(0, 0.0)
-
-            motor.config_kP(1, 0.0)
-            motor.config_kD(1, 0.0)
         }
     }
 
@@ -249,7 +228,6 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
         object Nothing : ElevatorState()
         abstract class SetPointState(val position: Double) : ElevatorState()
         class MotionMagic(position: Double) : SetPointState(position)
-        class Position(position: Double) : SetPointState(position)
         class OpenLoop(val output: Source<Double>, val useFeedForward: Boolean) : ElevatorState()
     }
 }

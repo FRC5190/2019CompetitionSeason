@@ -128,16 +128,13 @@ object IntakeSubsystem : FalconSubsystem() {
     private val leftBallSensor = AnalogInput(Constants.kLeftBallSensorId)
     private val rightBallSensor = AnalogInput(Constants.kRightBallSensorId)
 
-    private val extensionLimitSwitch = DigitalOutput(Constants.kIntakeExtensionLimitSwitch)
-
     var wantedPercentOutput = 0.0
     var wantedExtensionSolenoidState = ExtensionSolenoidState.RETRACTED
     var wantedLauncherSolenoidState = false
+    var wantedFlippingState = false
 
     // PERIODIC
     var isSeeingCargo: Boolean = false
-        private set
-    var isFullyExtended: Boolean = false
         private set
     var isHoldingCargo: Boolean = false
         private set
@@ -174,16 +171,15 @@ object IntakeSubsystem : FalconSubsystem() {
             motor.continuousCurrentLimit = 25.amp
             motor.currentLimitingEnabled = true
 
-            motor.brakeMode = NeutralMode.Coast
+            motor.brakeMode = NeutralMode.Brake
         }
     }
 
     override fun periodic() {
         // PERIODIC
         isSeeingCargo = leftBallSensor.averageVoltage > 1.7 || rightBallSensor.averageVoltage > 1.2
-        isFullyExtended = false
         isHoldingCargo = extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.RETRACTED && isSeeingCargo
-        isHoldingHatch = extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.EXTENDED && !isFullyExtended
+        isHoldingHatch = false // extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.RETRACTED && !isFullyExtended
 
         robotPositionWithIntakeOffset = DriveSubsystem.robotPosition + Pose2d(Length.kZero, -badIntakeOffset)
 
@@ -194,6 +190,15 @@ object IntakeSubsystem : FalconSubsystem() {
         }
 
         intakeMaster.set(ControlMode.PercentOutput, wantedPercentOutput)
+
+        var wantedExtensionSolenoidState = this.wantedExtensionSolenoidState
+        var wantedLauncherSolenoidState = this.wantedLauncherSolenoidState
+
+        if(wantedFlippingState) {
+            wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
+            wantedLauncherSolenoidState = false
+        }
+
         if (wantedExtensionSolenoidState != extensionSolenoidState) {
             extensionSolenoid.set(
                 if (wantedExtensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.EXTENDED) {

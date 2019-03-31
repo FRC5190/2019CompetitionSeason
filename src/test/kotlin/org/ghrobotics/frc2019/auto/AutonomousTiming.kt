@@ -5,11 +5,6 @@ import org.ghrobotics.frc2019.auto.routines.NearRocketRoutine
 import org.junit.Test
 
 class AutonomousTiming {
-    @Test
-    fun forwardCargoShipTimer() {
-        val time = ForwardCargoShipRoutine().duration.second
-        println("Forward Cargo Ship Execution Time: $time")
-    }
 
     @Test
     fun hatchAndCargoRocketTimer() {

@@ -145,6 +145,8 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         backWinchPosition = Constants.kClimbBackWinchNativeUnitModel
             .fromNativeUnitPosition(rawBackWinchPosition.toDouble())
 
+        println(frontOnPlatformSensor.averageVoltage)
+
         canifier.getPWMInput(CANifier.PWMChannel.PWMChannel0, tempPWMData)
         rollingLidarAverage.add(tempPWMData[0])
         lidarRawAveraged = rollingLidarAverage.average

@@ -21,7 +21,9 @@ object DefaultArmCommand : FalconCommand(ArmSubsystem) {
 //        } else {
 //            currentPosition
 //        }
-        ArmSubsystem.wantedState = ArmSubsystem.ArmState.Position(currentPosition)
+        if(ArmSubsystem.currentState !is ArmSubsystem.ArmState.SetPointState) {
+            ArmSubsystem.wantedState = ArmSubsystem.ArmState.MotionMagic(currentPosition)
+        }
     }
 
     override suspend fun execute() {
