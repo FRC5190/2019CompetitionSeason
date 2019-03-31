@@ -94,6 +94,7 @@ object Network {
 
     val visionDriveAngle = visionLayout.add("Vision Drive Angle", 0.0).entry
     val visionDriveActive = visionLayout.add("Vision Drive Active", false).entry
+    val badIntakeOffset = visionLayout.add("Intake Offset", IntakeSubsystem.badIntakeOffset.inch).entry
 
     private var debugEnabled = mainShuffleboardDisplay.add("Debug Active", Robot.debugActive).entry
 
@@ -152,6 +153,8 @@ object Network {
 
         visionFrontCameraConnected.setBoolean(JeVoisManager.isFrontJeVoisConnected)
         visionBackCameraConnected.setBoolean(JeVoisManager.isBackJeVoisConnected)
+
+        badIntakeOffset.setDouble(IntakeSubsystem.badIntakeOffset.inch)
 
         Robot.debugActive = debugEnabled.getBoolean(Robot.debugActive)
 

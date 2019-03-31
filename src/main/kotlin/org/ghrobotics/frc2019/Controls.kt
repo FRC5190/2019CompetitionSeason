@@ -16,6 +16,7 @@ import org.ghrobotics.frc2019.subsystems.elevator.TuneElevatorRoutines
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
+import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.utils.map
 import org.ghrobotics.lib.wrappers.hid.*
 import kotlin.math.pow
@@ -29,7 +30,9 @@ object Controls {
     val driverFalconXbox = xboxController(0) {
         registerEmergencyMode()
 
-        pov(90).changeOn(TuneElevatorRoutines.tuneKgRoutine)
+//        pov(90).changeOn(TuneElevatorRoutines.tuneKgRoutine)
+        pov(90).changeOn { IntakeSubsystem.badIntakeOffset += .5.inch }
+        pov(270).changeOn { IntakeSubsystem.badIntakeOffset -= (-.5).inch }
 
         state({ !isClimbing }) {
             // Vision align

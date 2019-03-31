@@ -16,6 +16,7 @@ import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
+import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.sensors.asSource
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 
@@ -110,6 +111,9 @@ import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 
 
 object IntakeSubsystem : FalconSubsystem() {
+
+    var badIntakeOffset = 0.inch
+
     private val intakeMaster = NativeFalconSRX(Constants.kIntakeLeftId)
     private val pigeon = PigeonIMU(intakeMaster)
     val pigeonSource = pigeon.asSource()
@@ -181,7 +185,7 @@ object IntakeSubsystem : FalconSubsystem() {
         isHoldingCargo = extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.RETRACTED && isSeeingCargo
         isHoldingHatch = extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.EXTENDED && !isFullyExtended
 
-        robotPositionWithIntakeOffset = DriveSubsystem.robotPosition + Pose2d(Length.kZero, -Constants.kBadIntakeOffset)
+        robotPositionWithIntakeOffset = DriveSubsystem.robotPosition + Pose2d(Length.kZero, -badIntakeOffset)
 
         // DEBUG PERIODIC
         if (Robot.shouldDebug) {

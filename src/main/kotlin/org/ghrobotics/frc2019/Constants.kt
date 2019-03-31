@@ -289,8 +289,8 @@ object Constants {
     const val kElevatorSlave2Id = 7
     const val kElevatorSlave3Id = 8
     const val kArmId = 9
-//    const val kIntakeCargoId = 10
-        const val kIntakeLeftId = 10
+    //    const val kIntakeCargoId = 10
+    const val kIntakeLeftId = 10
     const val kIntakeRightId = 11
     const val kClimbFrontWinchMasterId = 12
     const val kClimbFrontWinchSlaveId = 13
@@ -322,9 +322,9 @@ object Constants {
     const val kPCMId = 41
     const val kIntakeExtensionSolenoidForwardId = 0
     const val kIntakeExtensionSolenoidReverseId = 1
-//    const val kIntakePushHatchSolenoidForwardId = 0
+    //    const val kIntakePushHatchSolenoidForwardId = 0
 //    const val kIntakePushHatchSolenoidReverseId = 1
-        const val kIntakeLauncherSolenoidId = 5
+    const val kIntakeLauncherSolenoidId = 5
     const val kIntakeHoldHatchSolenoidId = 5
     const val kDriveSolenoidId = 4
 
@@ -342,7 +342,7 @@ object Constants {
     val kElevatorCrossbarHeightFromGround = 46.inch
     val kIntakeCradleHeight = 6.inch
     val kArmLength = 24.5.inch
-    val kBadIntakeOffset = -1.inch
+    val kBadIntakeOffset = 0.inch
 
 
     // TRANSFORMATIONS

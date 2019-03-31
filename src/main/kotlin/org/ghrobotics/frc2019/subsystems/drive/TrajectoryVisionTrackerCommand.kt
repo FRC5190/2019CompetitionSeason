@@ -62,7 +62,7 @@ class TrajectoryVisionTrackerCommand(
             robotPositionWithIntakeOffset.translation.distance(
                 trajectory.lastState.state.pose.translation + Translation2d(
                     Length.kZero,
-                    Constants.kBadIntakeOffset
+                    IntakeSubsystem.badIntakeOffset
                 )
             ) < radiusFromEnd.value
 
