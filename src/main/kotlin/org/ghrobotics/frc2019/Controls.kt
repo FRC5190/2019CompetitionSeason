@@ -31,8 +31,8 @@ object Controls {
         registerEmergencyMode()
 
 //        pov(90).changeOn(TuneElevatorRoutines.tuneKgRoutine)
-        pov(90).changeOn { IntakeSubsystem.badIntakeOffset += .5.inch }
-        pov(270).changeOn { IntakeSubsystem.badIntakeOffset -= (-.5).inch }
+        pov(270).changeOn { IntakeSubsystem.badIntakeOffset += .5.inch }
+        pov(90).changeOn { IntakeSubsystem.badIntakeOffset -= (-.5).inch }
 
         state({ !isClimbing }) {
             // Vision align
