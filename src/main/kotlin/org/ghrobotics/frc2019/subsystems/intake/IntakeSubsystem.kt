@@ -9,12 +9,15 @@ import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.Robot
+import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.commands.FalconSubsystem
+import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
+import org.ghrobotics.lib.mathematics.units.Length
 import org.ghrobotics.lib.mathematics.units.amp
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.volt
+import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.sensors.asSource
-import org.ghrobotics.lib.util.CircularBuffer
 import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 
 //object IntakeSubsystem : FalconSubsystem() {
@@ -22,18 +25,16 @@ import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 //    private val pigeon = PigeonIMU(intakeCargoMaster)
 //    val pigeonSource = pigeon.asSource()
 //
-//    private val pushHatchSolenoid = DoubleSolenoid(
+//    private val holdHatchSolenoid = DoubleSolenoid(
 //        Constants.kPCMId,
 //        Constants.kIntakePushHatchSolenoidForwardId,
 //        Constants.kIntakePushHatchSolenoidReverseId
 //    )
-//    private val holdHatchSolenoid = Solenoid(Constants.kPCMId, Constants.kIntakeHoldHatchSolenoidId)
 //
 //    private val rollingAverageCargoCurrent = CircularBuffer(30)
 //
 //    var wantedPercentOutput = 0.0
 //    var wantedHoldHatchSolenoidState = HoldHatchSolenoidState.HOLD
-//    var wantedPushHatchSolenoidState = PushHatchSolenoidState.EXIST
 //
 //    // PERIODIC
 //    var isSeeingCargo: Boolean = false
@@ -44,7 +45,8 @@ import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 //        private set
 //    var holdHatchSolenoidState = HoldHatchSolenoidState.HOLD
 //        private set
-//    var pushHatchSolenoidState = PushHatchSolenoidState.USEFUL
+//
+//    var robotPositionWithIntakeOffset = Pose2d()
 //        private set
 //
 //    // DEBUG PERIODIC
@@ -72,13 +74,15 @@ import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 //        // PERIODIC
 //        rollingAverageCargoCurrent.add(intakeCargoMaster.outputCurrent)
 //        println("Average Current: ${rollingAverageCargoCurrent.average}")
-//        isSeeingCargo = rollingAverageCargoCurrent.average > 11.0
+//        isSeeingCargo = false // rollingAverageCargoCurrent.average > 11.0
 //        if (isSeeingCargo) {
 //            isHoldingCargo = true
 //        } else if (wantedPercentOutput < 0) {
 //            isHoldingCargo = false
 //        }
 //        isHoldingHatch = false
+//
+//        robotPositionWithIntakeOffset = DriveSubsystem.robotPosition + Pose2d(Length.kZero, -Constants.kBadIntakeOffset)
 //
 //        // DEBUG PERIODIC
 //        if (Robot.shouldDebug) {
@@ -88,18 +92,13 @@ import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 //
 //        intakeCargoMaster.set(ControlMode.PercentOutput, wantedPercentOutput)
 //        if (wantedHoldHatchSolenoidState != holdHatchSolenoidState) {
-//            holdHatchSolenoid.set(wantedHoldHatchSolenoidState == IntakeSubsystem.HoldHatchSolenoidState.HOLD)
+//            if (wantedHoldHatchSolenoidState == IntakeSubsystem.HoldHatchSolenoidState.HOLD) {
+//                holdHatchSolenoid.set(DoubleSolenoid.Value.kForward)
+//            } else {
+//                holdHatchSolenoid.set(DoubleSolenoid.Value.kReverse)
+//            }
+//
 //            holdHatchSolenoidState = wantedHoldHatchSolenoidState
-//        }
-//        if (wantedPushHatchSolenoidState != pushHatchSolenoidState) {
-//            pushHatchSolenoid.set(
-//                if (wantedPushHatchSolenoidState == IntakeSubsystem.PushHatchSolenoidState.EXIST) {
-//                    DoubleSolenoid.Value.kForward
-//                } else {
-//                    DoubleSolenoid.Value.kReverse
-//                }
-//            )
-//            pushHatchSolenoidState = wantedPushHatchSolenoidState
 //        }
 //    }
 //
@@ -108,11 +107,13 @@ import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 //    }
 //
 //    enum class HoldHatchSolenoidState { HOLD, PLACE }
-//    enum class PushHatchSolenoidState { USEFUL, EXIST }
 //}
 
 
 object IntakeSubsystem : FalconSubsystem() {
+
+    var badIntakeOffset = -1.inch
+
     private val intakeMaster = NativeFalconSRX(Constants.kIntakeLeftId)
     private val pigeon = PigeonIMU(intakeMaster)
     val pigeonSource = pigeon.asSource()
@@ -127,16 +128,13 @@ object IntakeSubsystem : FalconSubsystem() {
     private val leftBallSensor = AnalogInput(Constants.kLeftBallSensorId)
     private val rightBallSensor = AnalogInput(Constants.kRightBallSensorId)
 
-    private val extensionLimitSwitch = DigitalOutput(Constants.kIntakeExtensionLimitSwitch)
-
     var wantedPercentOutput = 0.0
     var wantedExtensionSolenoidState = ExtensionSolenoidState.RETRACTED
     var wantedLauncherSolenoidState = false
+    var wantedFlippingState = false
 
     // PERIODIC
     var isSeeingCargo: Boolean = false
-        private set
-    var isFullyExtended: Boolean = false
         private set
     var isHoldingCargo: Boolean = false
         private set
@@ -145,6 +143,9 @@ object IntakeSubsystem : FalconSubsystem() {
     var extensionSolenoidState = ExtensionSolenoidState.RETRACTED
         private set
     var launcherSolenoidState: Boolean = true
+        private set
+
+    var robotPositionWithIntakeOffset = Pose2d()
         private set
 
     // DEBUG PERIODIC
@@ -167,19 +168,20 @@ object IntakeSubsystem : FalconSubsystem() {
             motor.voltageCompensationSaturation = 12.volt
             motor.voltageCompensationEnabled = true
 
-            motor.continuousCurrentLimit = 18.amp
+            motor.continuousCurrentLimit = 25.amp
             motor.currentLimitingEnabled = true
 
-            motor.brakeMode = NeutralMode.Coast
+            motor.brakeMode = NeutralMode.Brake
         }
     }
 
     override fun periodic() {
         // PERIODIC
         isSeeingCargo = leftBallSensor.averageVoltage > 1.7 || rightBallSensor.averageVoltage > 1.2
-        isFullyExtended = false
         isHoldingCargo = extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.RETRACTED && isSeeingCargo
-        isHoldingHatch = extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.EXTENDED && !isFullyExtended
+        isHoldingHatch = false // extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.RETRACTED && !isFullyExtended
+
+        robotPositionWithIntakeOffset = DriveSubsystem.robotPosition + Pose2d(Length.kZero, -badIntakeOffset)
 
         // DEBUG PERIODIC
         if (Robot.shouldDebug) {
@@ -188,6 +190,15 @@ object IntakeSubsystem : FalconSubsystem() {
         }
 
         intakeMaster.set(ControlMode.PercentOutput, wantedPercentOutput)
+
+        var wantedExtensionSolenoidState = this.wantedExtensionSolenoidState
+        var wantedLauncherSolenoidState = this.wantedLauncherSolenoidState
+
+        if(wantedFlippingState) {
+            wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
+            wantedLauncherSolenoidState = false
+        }
+
         if (wantedExtensionSolenoidState != extensionSolenoidState) {
             extensionSolenoid.set(
                 if (wantedExtensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.EXTENDED) {

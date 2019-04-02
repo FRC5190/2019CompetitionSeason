@@ -51,24 +51,21 @@ object Autonomous {
     private val JUST = stateCommandGroup(startingPosition) {
         state(StartingPositions.LEFT, StartingPositions.RIGHT) {
             stateCommandGroup(autoMode) {
-
                 state(Mode.NEAR_ROCKET, NearRocketRoutine()())
-                state(Mode.BASELINE, BaselineRoutine())
                 state(Mode.TEST_TRAJECTORIES, TestTrajectoriesRoutine())
                 state(Mode.FORWARD_CARGO_SHIP, sequential {})
                 state(Mode.DO_NOTHING, sequential {})
                 state(Mode.BOTTOM_ROCKET, BottomRocketRoutine()())
-                state(Mode.FULL_ROCKET, FullRocketRoutine()())
+                state(Mode.SIDE_CARGO_SHIP, CargoShipRoutine(CargoShipRoutine.Mode.SIDE)())
             }
         }
         state(StartingPositions.CENTER) {
             stateCommandGroup(autoMode) {
-                state(Mode.FORWARD_CARGO_SHIP, ForwardCargoShipRoutine()())
-                state(Mode.BASELINE, BaselineRoutine())
+                state(Mode.FORWARD_CARGO_SHIP, CargoShipRoutine(CargoShipRoutine.Mode.FRONT)())
                 state(Mode.TEST_TRAJECTORIES, TestTrajectoriesRoutine())
                 state(Mode.NEAR_ROCKET, sequential {})
                 state(Mode.BOTTOM_ROCKET, sequential {})
-                state(Mode.FULL_ROCKET, sequential { })
+                state(Mode.SIDE_CARGO_SHIP, sequential {})
             }
         }
     }
@@ -89,5 +86,5 @@ object Autonomous {
         RIGHT_90(TrajectoryWaypoints.kSideStart90)
     }
 
-    enum class Mode { TEST_TRAJECTORIES, NEAR_ROCKET, BOTTOM_ROCKET, FULL_ROCKET, FORWARD_CARGO_SHIP, BASELINE, DO_NOTHING }
+    enum class Mode { TEST_TRAJECTORIES, NEAR_ROCKET, BOTTOM_ROCKET, FORWARD_CARGO_SHIP, SIDE_CARGO_SHIP, DO_NOTHING }
 }

@@ -65,6 +65,8 @@ object Constants {
     // GYROS
     const val kPigeonIMUId = kIntakeLeftId
 
+    const val kUseMXPForLEDs = true
+
 
     // PNEUMATICS
     const val kPCMId = 41
@@ -85,7 +87,7 @@ object Constants {
     val kRobotLength = 30.inch
 
     val kBumperThickness = 4.5.inch
-    val kIntakeProtrusion = 5.inch       // Out of frame protrusion.
+    val kIntakeProtrusion = 9.inch       // Out of frame protrusion.
     val kElevatorCrossbarHeightFromGround = 46.inch
     val kIntakeCradleHeight = 6.inch
     val kArmLength = 24.5.inch
@@ -99,8 +101,8 @@ object Constants {
     val kCenterToForwardIntake = Pose2d((kRobotLength / 2.0) + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
     val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
 
-    val kCenterToFrontCamera = Pose2d((-1.75).inch, 0.35.inch, 0.degree)
-    val kCenterToBackCamera = Pose2d((-6.25).inch, 0.35.inch, 180.degree)
+    val kCenterToFrontCamera = Pose2d((-1.75).inch, 0.0.inch, 0.degree)
+    val kCenterToBackCamera = Pose2d((-6.25).inch, 0.0.inch, 180.degree)
 
 
     // VISION
@@ -113,7 +115,7 @@ object Constants {
 
 
     // DRIVE
-    val kDriveNativeUnitModel = SlopeNativeUnitModel(160.inch, 12094.nativeUnits)
+    val kDriveNativeUnitModel = SlopeNativeUnitModel(138.inch, 10000.nativeUnits)
     val kDriveSensorUnitsPerRotation = 1440.nativeUnits
     val kDriveWheelRadius = kDriveNativeUnitModel.wheelRadius(kDriveSensorUnitsPerRotation)
     val kDriveTrackWidth = 27.75.inch
@@ -188,6 +190,9 @@ object Constants {
 
     const val kElevatorHoldVoltage = 1.07
 
+    val kElevatorBlockingCameraRange = (29.inch.value)..(41.inch.value)
+    val kElevatorVisionPosition = 45.inch
+
     const val kElevatorKp = 1.0
     const val kElevatorKd = 0.0
     const val kElevatorBelowSwitchKg = 0.7889999999999985 / 12.0
@@ -198,7 +203,7 @@ object Constants {
 
     // ARM
     val kArmSensorUnitsPerRotation = 1024.nativeUnits
-    val kArmUpTicks = (-499).nativeUnits
+    val kArmUpTicks = (-530).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,
@@ -215,15 +220,15 @@ object Constants {
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
     val kArmClosedLoopTolerance = 5.degree
     val kArmCruiseVelocity = 260.156 * 1.0.degree.velocity
-    val kArmAcceleration = 250.0 * 1.0.degree.acceleration
+    val kArmAcceleration = 300.0 * 1.0.degree.acceleration
 
     const val kArmEmptyHoldVoltage = 1.0
 
     val kArmEmptyKg = kArmEmptyHoldVoltage / kAccelerationDueToGravity / 12.0
     const val kArmHatchKg = 1.5 / kAccelerationDueToGravity / 12.0
 
-    const val kArmKp = 3.5
-    const val kArmKd = 140.0
+    const val kArmKp = 2.5
+    const val kArmKd = 700.0
     val kArmKf = kArmNativeUnitModel.calculatekF(11.718 - kArmEmptyHoldVoltage, Math.toRadians(260.156))
 
     // CLIMB
@@ -250,13 +255,6 @@ object Constants {
 
     const val kClimbFrontL3Ticks = 22489.0
     const val kClimbBackL3Ticks = 18892.0
-
-    val kEncoderErrorTolerance = 2.inch
-    val kEncoderLidarResetTolerance = 2.5.inch
-
-    val kClimbDistanceBetweenLegs = 21.5.inch
-    val kClimbMaxHeight = 30.inch
-    val kClimbDisableLevelingHeight = 3.inch
 
     const val kClimbWinchPositionKp = 0.85
     const val kClimbWinchLevelingKp = 4.5
@@ -287,8 +285,8 @@ object Constants {
 //    const val kElevatorSlave2Id = 7
 //    const val kElevatorSlave3Id = 8
 //    const val kArmId = 9
-////    const val kIntakeCargoId = 10
-//        const val kIntakeLeftId = 10
+//    //    const val kIntakeCargoId = 10
+//    const val kIntakeLeftId = 10
 //    const val kIntakeRightId = 11
 //    const val kClimbFrontWinchMasterId = 12
 //    const val kClimbFrontWinchSlaveId = 13
@@ -313,15 +311,17 @@ object Constants {
 //    const val kPigeonIMUId = kIntakeLeftId
 ////    const val kPigeonIMUId = kIntakeCargoId
 //
+//    const val kUseMXPForLEDs = false
+//
 //
 //    // PNEUMATICS
 //    const val kPCMId = 41
 //    const val kIntakeExtensionSolenoidForwardId = 0
 //    const val kIntakeExtensionSolenoidReverseId = 1
-////    const val kIntakePushHatchSolenoidForwardId = 0
+//    //    const val kIntakePushHatchSolenoidForwardId = 0
 ////    const val kIntakePushHatchSolenoidReverseId = 1
-//        const val kIntakeLauncherSolenoidId = 5
-////    const val kIntakeHoldHatchSolenoidId = 5
+//    const val kIntakeLauncherSolenoidId = 5
+//    const val kIntakeHoldHatchSolenoidId = 5
 //    const val kDriveSolenoidId = 4
 //
 //
@@ -334,7 +334,7 @@ object Constants {
 //    val kRobotLength = 30.inch
 //
 //    val kBumperThickness = 4.5.inch
-//    val kIntakeProtrusion = 8.inch       // Out of frame protrusion.
+//    val kIntakeProtrusion = 12.inch       // Out of frame protrusion.
 //    val kElevatorCrossbarHeightFromGround = 46.inch
 //    val kIntakeCradleHeight = 6.inch
 //    val kArmLength = 24.5.inch
@@ -348,8 +348,8 @@ object Constants {
 //    val kCenterToForwardIntake = Pose2d((kRobotLength / 2.0) + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
 //    val kBackwardIntakeToCenter = Pose2d(kRobotLength / 2.0 + kIntakeProtrusion, -kBadIntakeOffset, 0.degree)
 //
-//    val kCenterToFrontCamera = Pose2d((-1.75).inch, -0.5.inch, 0.degree)
-//    val kCenterToBackCamera = Pose2d((-6.25).inch, -0.5.inch, 180.degree)
+//    val kCenterToFrontCamera = Pose2d((-1.75).inch, 0.inch, 0.degree)
+//    val kCenterToBackCamera = Pose2d((-6.25).inch, 0.inch, 180.degree)
 //
 //
 //    // VISION
@@ -445,6 +445,9 @@ object Constants {
 //    val kElevatorAcceleration = 122.5.inch.acceleration
 //    val kElevatorCruiseVelocity = 70.inch.velocity
 //
+//    val kElevatorBlockingCameraRange = (29.inch.value)..(41.inch.value)
+//    val kElevatorVisionPosition = 45.inch
+//
 //    const val kElevatorKp = 1.0
 //    const val kElevatorKd = 0.0
 //    const val kElevatorBelowSwitchKg = 0.7889999999999985 / 12.0
@@ -457,7 +460,7 @@ object Constants {
 //
 //    // ARM
 //    val kArmSensorUnitsPerRotation = 1024.nativeUnits
-//    val kArmUpTicks = (-521).nativeUnits
+//    val kArmUpTicks = (-550).nativeUnits
 //
 //    val kArmNativeUnitModel = ArmNativeUnitModel(
 //        kArmUpTicks,
@@ -472,19 +475,19 @@ object Constants {
 //    val kArmCurrentLimit = 20.amp
 //
 //    val kArmClosedLoopVelocityTolerance = 2.degree.velocity
-//    val kArmClosedLoopTolerance = 5.degree
-//    val kArmCruiseVelocity = 4.54 * 1.0.radian.velocity
-//    val kArmAcceleration = 11.95 * 1.0.radian.acceleration
+//    val kArmClosedLoopTolerance = 2.5.degree
+//    val kArmCruiseVelocity = 254 * 1.0.degree.velocity
+//    val kArmAcceleration = 6.28 * 1.0.radian.acceleration
 //
-//    const val kArmEmptyHoldVoltage = 1.9
+//    const val kArmEmptyHoldVoltage = 1.75
 //
 //    val kArmEmptyKg = kArmEmptyHoldVoltage / kAccelerationDueToGravity / 12.0
 //    const val kArmHatchKg = 4.0 / kAccelerationDueToGravity / 12.0
 //
-//    const val kArmKp = 5.0
-//    const val kArmKd = 80.0
+//    const val kArmKp = 6.5
+//    const val kArmKd = 650.0
 //    const val kArmKv = 0.0 / 12.0
-//    val kArmKf = 0.0 //kArmNativeUnitModel.calculatekF(11.366 - kArmEmptyHoldVoltage, Math.toRadians(200.1562))
+//    val kArmKf = kArmNativeUnitModel.calculatekF(12 - kArmEmptyHoldVoltage, Math.toRadians(254.0))
 //
 //    // CLIMB
 //    val kClimbBackWinchNativeUnitModel = SlopeNativeUnitModel(

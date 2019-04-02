@@ -2,11 +2,13 @@ package org.ghrobotics.frc2019.subsystems.drive
 
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.Network
+import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
 import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.debug.LiveDashboard
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature
+import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedEntry
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.Trajectory
 import org.ghrobotics.lib.mathematics.units.*
@@ -29,6 +31,8 @@ class TrajectoryVisionTrackerCommand(
     private var trajectoryFinished = false
     private var hasGeneratedVisionPath = false
 
+    private var prevError = 0.0
+
     @Suppress("LateinitUsage")
     private lateinit var trajectory: Trajectory<Time, TimedEntry<Pose2dWithCurvature>>
 
@@ -50,12 +54,17 @@ class TrajectoryVisionTrackerCommand(
     private var lastKnownTargetPose: Pose2d? = null
 
     override suspend fun execute() {
-        val robotPosition = DriveSubsystem.robotPosition
+        val robotPositionWithIntakeOffset = IntakeSubsystem.robotPositionWithIntakeOffset
 
-        val nextState = DriveSubsystem.trajectoryTracker.nextState(robotPosition)
+        val nextState = DriveSubsystem.trajectoryTracker.nextState(DriveSubsystem.robotPosition)
 
         val withinVisionRadius =
-            robotPosition.translation.distance(trajectory.lastState.state.pose.translation) < radiusFromEnd.value
+            robotPositionWithIntakeOffset.translation.distance(
+                trajectory.lastState.state.pose.translation + Translation2d(
+                    Length.kZero,
+                    IntakeSubsystem.badIntakeOffset
+                )
+            ) < radiusFromEnd.value
 
         if (withinVisionRadius) {
             val newTarget = if (!useAbsoluteVision) {
@@ -73,16 +82,16 @@ class TrajectoryVisionTrackerCommand(
         if (lastKnownTargetPose != null) {
             println("VISION")
             visionActive = true
-            val transform = lastKnownTargetPose inFrameOfReferenceOf robotPosition
+            val transform = lastKnownTargetPose inFrameOfReferenceOf robotPositionWithIntakeOffset
             val angle = Rotation2d(transform.translation.x, transform.translation.y, true)
 
             Network.visionDriveAngle.setDouble(angle.degree)
             Network.visionDriveActive.setBoolean(true)
 
-//            val turn =
-//                kCorrectionKp * (transform.translation.y.value / transform.translation.x.value.absoluteValue) * (if (targetSide == TargetSide.FRONT) 1.0 else -1.0)
-            val turn =
-                kCorrectionKp * (angle + if (!trajectory.reversed) Rotation2d.kZero else Math.PI.radian).radian
+            val error = (angle + if (!trajectory.reversed) Rotation2d.kZero else Math.PI.radian).radian
+            val turn = kCorrectionKp * error + kCorrectionKd * (error - prevError)
+
+
             DriveSubsystem.setOutput(
                 TrajectoryTrackerOutput(
                     nextState.linearVelocity,
@@ -91,6 +100,9 @@ class TrajectoryVisionTrackerCommand(
                     0.radian.acceleration
                 )
             )
+
+            prevError = error
+            
         } else {
             DriveSubsystem.setOutput(nextState)
         }
@@ -119,6 +131,7 @@ class TrajectoryVisionTrackerCommand(
 
     companion object {
         const val kCorrectionKp = 5.5
+        const val kCorrectionKd = 0.0
         var visionActive = false
     }
-}
+} 

@@ -27,7 +27,7 @@ object TrajectoryWaypoints {
 
     // Rocket
     val kRocketN = Pose2d(214.57.inch, 19.57.inch, (-028.75).degree)
-    val kRocketF = Pose2d(244.00.inch, 19.57.inch, (-140.25).degree)
+    val kRocketF = Pose2d(244.00.inch, 19.57.inch, (-151.25).degree)
     val kRocketBay = Pose2d(229.28.inch, 27.50.inch, (-90).degree)
 
     // Loading Station

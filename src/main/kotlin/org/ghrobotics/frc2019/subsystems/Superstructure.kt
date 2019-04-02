@@ -22,14 +22,31 @@ object Superstructure {
         (90.degree - Constants.kArmFlipTolerance)..(90.degree + Constants.kArmFlipTolerance)
 
 
+//    val kFrontHighRocketHatch get() = goToHeightWithAngle(70.inch, 15.degree)
+//    val kFrontMiddleRocketHatch get() = goToHeightWithAngle(50.inch, 5.degree)
+//
+//    val kFrontHighRocketCargo get() = goToHeightWithAngle(83.inch, 15.degree)
+//    val kFrontMiddleRocketCargo get() = goToHeightWithAngle(56.inch, 15.degree)
+//    val kFrontLowRocketCargo get() = goToHeightWithAngle(26.inch, 15.degree)
+//    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(18.inch, 0.degree)
+//    val kBackHatchFromLoadingStation get() = goToHeightWithAngle(20.inch, 170.degree)
+//
+//    val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, (-25).degree)
+//    val kBackCargoIntake get() = elevatorAndArmHeight(0.inch, (-155).degree)
+//
+//    val kFrontCargoIntoCargoShip get() = elevatorAndArmHeight(25.inch, 5.degree)
+//    val kBackCargoFromLoadingStation get() = elevatorAndArmHeight(0.inch, 135.degree)
+//
+//    val kStowedPosition get() = elevatorAndArmHeight(0.inch, 90.degree)
+
     val kFrontHighRocketHatch get() = goToHeightWithAngle(76.inch, 15.degree)
     val kFrontMiddleRocketHatch get() = goToHeightWithAngle(50.inch, 5.degree)
 
-    val kFrontHighRocketCargo get() = goToHeightWithAngle(83.inch, 15.degree)
-    val kFrontMiddleRocketCargo get() = goToHeightWithAngle(56.inch, 15.degree)
-    val kFrontLowRocketCargo get() = goToHeightWithAngle(26.inch, 15.degree)
-    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(16.inch, 0.degree)
-    val kBackHatchFromLoadingStation get() = goToHeightWithAngle(15.2.inch, 180.degree)
+    val kFrontHighRocketCargo get() = goToHeightWithAngle(84.inch, 20.degree)
+    val kFrontMiddleRocketCargo get() = goToHeightWithAngle(58.5.inch, 15.degree)
+    val kFrontLowRocketCargo get() = goToHeightWithAngle(26.5.inch, 15.degree)
+    val kFrontHatchFromLoadingStation get() = goToHeightWithAngle(18.inch, 0.degree)
+    val kBackHatchFromLoadingStation get() = goToHeightWithAngle(16.5.inch, 180.degree)
 
     val kFrontCargoIntake get() = elevatorAndArmHeight(0.inch, (-25).degree)
     val kBackCargoIntake get() = elevatorAndArmHeight(0.inch, (-155).degree)
@@ -95,11 +112,12 @@ object Superstructure {
                             }
 
                             override suspend fun execute() {
-                                if (IntakeSubsystem.isFullyExtended) {
-                                    IntakeSubsystem.wantedExtensionSolenoidState =
-                                        IntakeSubsystem.ExtensionSolenoidState.RETRACTED
-                                    IntakeSubsystem.wantedLauncherSolenoidState = false
-                                }
+                                IntakeSubsystem.wantedFlippingState = true
+//                                IntakeSubsystem.wantedHoldHatchSolenoidState = IntakeSubsystem.HoldHatchSolenoidState.HOLD
+                            }
+
+                            override suspend fun dispose() {
+                                IntakeSubsystem.wantedFlippingState = false
                             }
                         }
                         // Elevator
@@ -147,22 +165,22 @@ object Superstructure {
                             // Wait for elevator to come down to safe height
                             +ConditionCommand(waitCondition)
 
-                            if (elevatorHeightWanted > Constants.kElevatorSafeFlipHeight + Constants.kElevatorClosedLoopTolerance) {
-                                // Consider safe flip if elevator goes up
-                                if (isFrontWanted) {
-                                    if (armAngle < Constants.kArmSafeFlipAngle) {
-                                        //  Use safe flip if it goes near floor
-                                        +ClosedLoopArmCommand(Constants.kArmSafeFlipAngle)
-                                            .overrideExit { ElevatorSubsystem.position > Constants.kElevatorSafeFlipHeight.value }
-                                    }
-                                } else {
-                                    if (armAngle < 180.degree - Constants.kArmSafeFlipAngle) {
-                                        //  Use safe flip if it goes near floor
-                                        +ClosedLoopArmCommand(180.degree - Constants.kArmSafeFlipAngle)
-                                            .overrideExit { ElevatorSubsystem.position > Constants.kElevatorSafeFlipHeight.value }
-                                    }
-                                }
-                            }
+//                            if (elevatorHeightWanted > Constants.kElevatorSafeFlipHeight + Constants.kElevatorClosedLoopTolerance) {
+//                                // Consider safe flip if elevator goes up
+//                                if (isFrontWanted) {
+//                                    if (armAngle < Constants.kArmSafeFlipAngle) {
+//                                        //  Use safe flip if it goes near floor
+//                                        +ClosedLoopArmCommand(Constants.kArmSafeFlipAngle)
+//                                            .overrideExit { ElevatorSubsystem.position > Constants.kElevatorSafeFlipHeight.value }
+//                                    }
+//                                } else {
+//                                    if (armAngle < 180.degree - Constants.kArmSafeFlipAngle) {
+//                                        //  Use safe flip if it goes near floor
+//                                        +ClosedLoopArmCommand(180.degree - Constants.kArmSafeFlipAngle)
+//                                            .overrideExit { ElevatorSubsystem.position > Constants.kElevatorSafeFlipHeight.value }
+//                                    }
+//                                }
+//                            }
 
                             +ClosedLoopArmCommand(armAngle)
                         }

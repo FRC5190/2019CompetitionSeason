@@ -5,6 +5,7 @@ import org.ghrobotics.frc2019.auto.paths.TrajectoryFactory
 import org.ghrobotics.frc2019.auto.paths.TrajectoryWaypoints
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.subsystems.intake.IntakeCloseCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.lib.commands.DelayCommand
 import org.ghrobotics.lib.commands.parallel
@@ -37,8 +38,6 @@ class BottomRocketRoutine : AutoRoutine() {
 
             // Part 1: Go to the far side of the rocket and get ready to place a hatch on the lowest level.
             +parallel {
-                // Make sure the intake is holding the hatch panel.
-                +IntakeHatchCommand(releasing = false)
                 // Follow the trajectory with vision correction to the far side of the rocket.
                 +super.followVisionAssistedTrajectory(
                     path1,
@@ -59,22 +58,24 @@ class BottomRocketRoutine : AutoRoutine() {
                 Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
             )
 
+            val path2 = super.followVisionAssistedTrajectory(
+                path2,
+                Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
+                4.feet, false
+            )
+
             // Part 2: Place hatch and go to loading station.
             +parallel {
-                // Place hatch panel.
-                +IntakeHatchCommand(true)
                 // Follow the trajectory with vision correction to the loading station.
-                +super.followVisionAssistedTrajectory(
-                    path2,
-                    Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
-                    4.feet, false
-                )
+                +path2
                 // Take the superstructure to pickup position and arm hatch intake 3 seconds before arrival.
                 +sequential {
-                    +DelayCommand(path2.duration - 3.second)
-                    // +IntakeHatchCommand(false)
-                    +Superstructure.kBackHatchFromLoadingStation
-                }.withTimeout(3.second)
+                    // Place hatch panel.
+                    +IntakeHatchCommand(true).withTimeout(0.5.second)
+                    +IntakeCloseCommand()
+                    +Superstructure.kBackHatchFromLoadingStation.withTimeout(3.second)
+                    +IntakeHatchCommand(false).withExit { path2.wrappedValue.isCompleted }
+                }
             }
 
             // Reorient position on field based on Vision alignment.
@@ -87,21 +88,20 @@ class BottomRocketRoutine : AutoRoutine() {
             // Part 3: Pickup hatch and go to the near side of the rocket.
             +parallel {
                 // Make sure the intake is holding the hatch panel.
-                +IntakeHatchCommand(false)
+                +IntakeHatchCommand(false).withTimeout(0.5.second)
                 // Follow the trajectory with vision correction to the near side of the rocket.
                 +super.followVisionAssistedTrajectory(
                     path3,
                     Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
-                    6.feet, true
+                    4.feet, true
                 )
                 // Take the superstructure to scoring height.
-                +Superstructure.kFrontHatchFromLoadingStation.withTimeout(2.second)
+                +Superstructure.kFrontHatchFromLoadingStation.withTimeout(4.second)
             }
 
             // Part 4: Score the hatch and go to the loading station for the end of the sandstorm period.
             +parallel {
                 // Score hatch.
-                +IntakeHatchCommand(releasing = true)
                 // Follow the trajectory to the loading station.
                 +DriveSubsystem.followTrajectory(
                     TrajectoryFactory.rocketNToLoadingStation,
@@ -109,7 +109,8 @@ class BottomRocketRoutine : AutoRoutine() {
                 )
                 // Take the superstructure to a position to pick up the next hatch.
                 +sequential {
-                    +DelayCommand(100.millisecond)
+                    +IntakeHatchCommand(releasing = true).withTimeout(0.5.second)
+                    +IntakeCloseCommand()
                     +Superstructure.kBackHatchFromLoadingStation
                 }
             }

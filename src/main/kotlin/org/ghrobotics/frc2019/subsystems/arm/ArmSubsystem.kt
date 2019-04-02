@@ -79,6 +79,8 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
             softLimitReverseEnabled = false
 
             setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10)
+
+            selectProfileSlot(0, 0)
         }
         defaultCommand = DefaultArmCommand
 
@@ -94,10 +96,6 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
             config_kP(0, Constants.kArmKp)
             config_kD(0, Constants.kArmKd)
             config_kF(0, Constants.kArmKf)
-
-            config_kP(1, Constants.kArmKp)
-            config_kD(1, Constants.kArmKd)
-            config_kF(1, 0.0)
         }
     }
 
@@ -108,9 +106,6 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
         armMaster.run {
             config_kP(0, 0.0)
             config_kD(0, 0.0)
-
-            config_kP(1, 0.0)
-            config_kD(1, 0.0)
         }
     }
 
@@ -144,29 +139,14 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
 
         // UPDATE STATE
         val wantedState = this.wantedState
-        val previousState = this.currentState
         this.currentState = wantedState
         when (wantedState) {
             is ArmState.Nothing -> {
                 armMaster.set(ControlMode.Disabled, 0.0)
             }
             is ArmState.MotionMagic -> {
-                if (previousState !is ArmState.MotionMagic) {
-                    armMaster.selectProfileSlot(0, 0)
-                }
                 armMaster.set(
                     ControlMode.MotionMagic,
-                    Constants.kArmNativeUnitModel.toNativeUnitPosition(wantedState.position.value),
-                    DemandType.ArbitraryFeedForward,
-                    arbitraryFeedForward
-                )
-            }
-            is ArmState.Position -> {
-                if (previousState !is ArmState.Position) {
-                    armMaster.selectProfileSlot(1, 0)
-                }
-                armMaster.set(
-                    ControlMode.Position,
                     Constants.kArmNativeUnitModel.toNativeUnitPosition(wantedState.position.value),
                     DemandType.ArbitraryFeedForward,
                     arbitraryFeedForward
@@ -203,7 +183,6 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
         object Nothing : ArmState()
         abstract class SetPointState(val position: Rotation2d) : ArmState()
         class MotionMagic(position: Rotation2d) : SetPointState(position)
-        class Position(position: Rotation2d) : SetPointState(position)
         class OpenLoop(val output: Source<Double>, val useFeedForward: Boolean) : ArmState()
     }
 }

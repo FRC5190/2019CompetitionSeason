@@ -16,6 +16,7 @@ import org.ghrobotics.frc2019.subsystems.elevator.TuneElevatorRoutines
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
+import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.utils.map
 import org.ghrobotics.lib.wrappers.hid.*
 import kotlin.math.pow
@@ -29,7 +30,9 @@ object Controls {
     val driverFalconXbox = xboxController(0) {
         registerEmergencyMode()
 
-        pov(90).changeOn(TuneElevatorRoutines.tuneKgRoutine)
+//        pov(90).changeOn(TuneElevatorRoutines.tuneKgRoutine)
+        pov(270).changeOn { IntakeSubsystem.badIntakeOffset += .25.inch }
+        pov(90).changeOn { IntakeSubsystem.badIntakeOffset -= .25.inch }
 
         state({ !isClimbing }) {
             // Vision align
@@ -65,8 +68,8 @@ object Controls {
         state({ !isClimbing }) {
 
             /** MANUAL CONTROL **/
-            axisButton(1, 0.1) { change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * 0.5 })) }
-            axisButton(5, 0.1) { change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * 0.5 })) }
+            axisButton(1, 0.1) { change(OpenLoopElevatorCommand(source.map { it.pow(2).withSign(-it) * .5 })) }
+            axisButton(5, 0.1) { change(OpenLoopArmCommand(source.map { it.pow(2).withSign(-it) * .5 })) }
 
             /** PRESETS **/
             triggerAxisButton(GenericHID.Hand.kLeft, 0.20) {
@@ -105,6 +108,7 @@ object Controls {
             button(kY).change(AutoClimbRoutines.autoL2Climb)
         }
     }
+
 
     private fun FalconXboxBuilder.registerEmergencyMode() {
         button(kBack).changeOn {
