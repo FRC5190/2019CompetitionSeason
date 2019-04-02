@@ -11,6 +11,8 @@ import org.ghrobotics.lib.utils.Source
 
 object AutoClimbRoutines {
 
+    var resettingFront = false
+
     private val group
         get() = sequential {
             +parallel {
@@ -27,13 +29,17 @@ object AutoClimbRoutines {
                     val resetBack = ResetWinchCommand(resetFront = false)
 
                     +parallel {
-                        +ClosedLoopArmCommand(105.degree)
                         +ClimbWheelCommand(Source(0.05))
                         +resetBack
                     }.withExit { resetBack.wrappedValue.isCompleted }
 
                     +ClimbWheelCommand(Source(1.0)).withExit { ClimbSubsystem.frontOnPlatform }.withTimeout(2.5.second)
-                    +ResetWinchCommand(resetFront = true)
+                    +parallel {
+                        +InstantRunnableCommand { resettingFront = true }
+                        +ResetWinchCommand(resetFront = true)
+                        +ClosedLoopArmCommand(105.degree).withTimeout(1.5.second)
+                    }
+                    +InstantRunnableCommand { resettingFront = false }
                     +DelayCommand(1.second)
                 }
             )
@@ -53,7 +59,9 @@ object AutoClimbRoutines {
                     }
 
                     override suspend fun execute() {
-                        if (!ClimbSubsystem.isFrontReverseLimitSwitchClosed) {
+                        if (resettingFront) {
+                            DriveSubsystem.tankDrive(-.05, -.05)
+                        } else if (!ClimbSubsystem.isFrontReverseLimitSwitchClosed) {
                             DriveSubsystem.tankDrive(-.4, -.4)
                         } else {
                             DriveSubsystem.tankDrive(-.5, -.5)

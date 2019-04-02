@@ -118,12 +118,12 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         frontWinchMaster.motionAcceleration =
             0.8.feet.acceleration.toNativeUnitAcceleration(Constants.kClimbFrontWinchNativeUnitModel)
         frontWinchMaster.motionCruiseVelocity =
-            1.4.feet.velocity.toNativeUnitVelocity(Constants.kClimbFrontWinchNativeUnitModel)
+            1.65.feet.velocity.toNativeUnitVelocity(Constants.kClimbFrontWinchNativeUnitModel)
 
         backWinchMaster.motionAcceleration =
-            0.6.feet.acceleration.toNativeUnitAcceleration(Constants.kClimbBackWinchNativeUnitModel)
+            0.65.feet.acceleration.toNativeUnitAcceleration(Constants.kClimbBackWinchNativeUnitModel)
         backWinchMaster.motionCruiseVelocity =
-            1.15.feet.velocity.toNativeUnitVelocity(Constants.kClimbBackWinchNativeUnitModel)
+            1.2.feet.velocity.toNativeUnitVelocity(Constants.kClimbBackWinchNativeUnitModel)
 
         frontWinchMaster.configAuxPIDPolarity(false)
         backWinchMaster.configAuxPIDPolarity(true)
@@ -145,7 +145,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         backWinchPosition = Constants.kClimbBackWinchNativeUnitModel
             .fromNativeUnitPosition(rawBackWinchPosition.toDouble())
 
-        println(frontOnPlatformSensor.averageVoltage)
+//        println(frontOnPlatformSensor.averageVoltage)
 
         canifier.getPWMInput(CANifier.PWMChannel.PWMChannel0, tempPWMData)
         rollingLidarAverage.add(tempPWMData[0])
@@ -154,7 +154,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         isFrontReverseLimitSwitchClosed = frontWinchMaster.sensorCollection.isRevLimitSwitchClosed
         isBackReverseLimitSwitchClosed = !backHallEffectSensor.get()
 
-        frontOnPlatform = frontOnPlatformSensor.averageVoltage > 1.1
+        frontOnPlatform = frontOnPlatformSensor.averageVoltage > 3.4
 
         // DEBUG PERIODIC
         if (Robot.shouldDebug) {

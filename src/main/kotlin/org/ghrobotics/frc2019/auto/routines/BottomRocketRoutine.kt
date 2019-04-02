@@ -73,7 +73,7 @@ class BottomRocketRoutine : AutoRoutine() {
                     // Place hatch panel.
                     +IntakeHatchCommand(true).withTimeout(0.5.second)
                     +IntakeCloseCommand()
-                    +Superstructure.kBackHatchFromLoadingStation
+                    +Superstructure.kBackHatchFromLoadingStation.withTimeout(3.second)
                     +IntakeHatchCommand(false).withExit { path2.wrappedValue.isCompleted }
                 }
             }
@@ -93,10 +93,10 @@ class BottomRocketRoutine : AutoRoutine() {
                 +super.followVisionAssistedTrajectory(
                     path3,
                     Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
-                    6.feet, true
+                    4.feet, true
                 )
                 // Take the superstructure to scoring height.
-                +Superstructure.kFrontHatchFromLoadingStation.withTimeout(2.second)
+                +Superstructure.kFrontHatchFromLoadingStation.withTimeout(4.second)
             }
 
             // Part 4: Score the hatch and go to the loading station for the end of the sandstorm period.

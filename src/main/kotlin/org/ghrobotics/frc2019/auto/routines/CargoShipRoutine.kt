@@ -54,7 +54,7 @@ class CargoShipRoutine(private val mode: CargoShipRoutine.Mode) : AutoRoutine() 
                 }
             }
 
-            val path2 = followVisionAssistedTrajectory(mode.path2, pathMirrored, 7.feet)
+            val path2 = followVisionAssistedTrajectory(mode.path2, pathMirrored, 4.feet)
 
             +parallel {
                 +path2

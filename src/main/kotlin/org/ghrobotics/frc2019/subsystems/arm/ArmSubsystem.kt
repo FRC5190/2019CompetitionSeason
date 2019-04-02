@@ -149,7 +149,7 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
                     ControlMode.MotionMagic,
                     Constants.kArmNativeUnitModel.toNativeUnitPosition(wantedState.position.value),
                     DemandType.ArbitraryFeedForward,
-                    /* arbitraryFeedForward */ 0.0
+                    arbitraryFeedForward
                 )
             }
             is ArmState.OpenLoop -> {

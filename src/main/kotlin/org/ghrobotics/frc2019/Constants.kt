@@ -87,7 +87,7 @@ object Constants {
     val kRobotLength = 30.inch
 
     val kBumperThickness = 4.5.inch
-    val kIntakeProtrusion = 5.inch       // Out of frame protrusion.
+    val kIntakeProtrusion = 9.inch       // Out of frame protrusion.
     val kElevatorCrossbarHeightFromGround = 46.inch
     val kIntakeCradleHeight = 6.inch
     val kArmLength = 24.5.inch
@@ -115,7 +115,7 @@ object Constants {
 
 
     // DRIVE
-    val kDriveNativeUnitModel = SlopeNativeUnitModel(160.inch, 12094.nativeUnits)
+    val kDriveNativeUnitModel = SlopeNativeUnitModel(138.inch, 10000.nativeUnits)
     val kDriveSensorUnitsPerRotation = 1440.nativeUnits
     val kDriveWheelRadius = kDriveNativeUnitModel.wheelRadius(kDriveSensorUnitsPerRotation)
     val kDriveTrackWidth = 27.75.inch
@@ -203,7 +203,7 @@ object Constants {
 
     // ARM
     val kArmSensorUnitsPerRotation = 1024.nativeUnits
-    val kArmUpTicks = (-499).nativeUnits
+    val kArmUpTicks = (-530).nativeUnits
 
     val kArmNativeUnitModel = ArmNativeUnitModel(
         kArmUpTicks,
@@ -220,15 +220,15 @@ object Constants {
     val kArmClosedLoopVelocityTolerance = 2.degree.velocity
     val kArmClosedLoopTolerance = 5.degree
     val kArmCruiseVelocity = 260.156 * 1.0.degree.velocity
-    val kArmAcceleration = 250.0 * 1.0.degree.acceleration
+    val kArmAcceleration = 300.0 * 1.0.degree.acceleration
 
     const val kArmEmptyHoldVoltage = 1.0
 
     val kArmEmptyKg = kArmEmptyHoldVoltage / kAccelerationDueToGravity / 12.0
     const val kArmHatchKg = 1.5 / kAccelerationDueToGravity / 12.0
 
-    const val kArmKp = 3.5
-    const val kArmKd = 140.0
+    const val kArmKp = 2.5
+    const val kArmKd = 700.0
     val kArmKf = kArmNativeUnitModel.calculatekF(11.718 - kArmEmptyHoldVoltage, Math.toRadians(260.156))
 
     // CLIMB

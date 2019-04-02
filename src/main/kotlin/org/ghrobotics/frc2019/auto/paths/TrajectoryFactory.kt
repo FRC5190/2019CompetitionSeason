@@ -35,11 +35,13 @@ object TrajectoryFactory {
 
     private val cargoShipFLAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kCargoShipFL,
-        transform = Constants.kForwardIntakeToCenter
+        transform = Constants.kForwardIntakeToCenter,
+        translationalOffset = Translation2d(2.inch, 5.inch)
     )
     private val cargoShipFRAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kCargoShipFR,
-        transform = Constants.kForwardIntakeToCenter
+        transform = Constants.kForwardIntakeToCenter,
+        translationalOffset = Translation2d(0.inch, 5.inch)
     )
     private val cargoShipS1Adjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kCargoShipS1,
@@ -63,12 +65,11 @@ object TrajectoryFactory {
     )
     private val rocketFAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kRocketF,
-        transform = Constants.kForwardIntakeToCenter.transformBy(Pose2d(1.inch, 0.inch)),
-        translationalOffset = Translation2d(0.inch, (-3).inch)
+        transform = Constants.kForwardIntakeToCenter.transformBy(Pose2d(-1.inch, 0.inch))
     )
     private val rocketNAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kRocketN,
-        transform = Constants.kForwardIntakeToCenter
+        transform = Constants.kForwardIntakeToCenter.transformBy(Pose2d(4.inch, 0.inch))
     )
 
     /** Trajectories **/

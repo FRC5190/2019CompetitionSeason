@@ -109,6 +109,7 @@ object Controls {
         }
     }
 
+
     private fun FalconXboxBuilder.registerEmergencyMode() {
         button(kBack).changeOn {
             Robot.emergencyReadySystems.forEach { system -> system.activateEmergency() }
