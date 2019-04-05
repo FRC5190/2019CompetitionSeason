@@ -33,7 +33,7 @@ class CargoShipRoutine(private val mode: CargoShipRoutine.Mode) : AutoRoutine() 
         ),
         FRONT(
             TrajectoryFactory.centerStartToCargoShipFL,
-            TrajectoryFactory.cargoShipFLToLoadingStation,
+            TrajectoryFactory.cargoShipFLToRightLoadingStation,
             TrajectoryFactory.loadingStationToCargoShipFR
         )
     }

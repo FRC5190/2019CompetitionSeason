@@ -7,6 +7,7 @@ import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.twodim.trajectory.DefaultTrajectoryGenerator
 import org.ghrobotics.lib.mathematics.twodim.trajectory.constraints.*
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedTrajectory
+import org.ghrobotics.lib.mathematics.twodim.trajectory.types.mirror
 import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.derivedunits.*
 import org.ghrobotics.lib.mathematics.units.feet
@@ -36,7 +37,7 @@ object TrajectoryFactory {
     private val cargoShipFLAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kCargoShipFL,
         transform = Constants.kForwardIntakeToCenter,
-        translationalOffset = Translation2d(2.inch, 5.inch)
+        translationalOffset = Translation2d((-0.75).inch, 0.inch)
     )
     private val cargoShipFRAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kCargoShipFR,
@@ -74,7 +75,7 @@ object TrajectoryFactory {
 
     /** Trajectories **/
 
-    val cargoShipFLToLoadingStation = generateTrajectory(
+    val cargoShipFLToRightLoadingStation = generateTrajectory(
         true,
         listOf(
             cargoShipFLAdjusted,
@@ -84,6 +85,19 @@ object TrajectoryFactory {
         ),
         getConstraints(false, loadingStationAdjusted), 8.feet.velocity, 6.feet.acceleration, kMaxVoltage
     )
+
+    val cargoShipFLToLeftLoadingStation = generateTrajectory(
+        true,
+        listOf(
+            cargoShipFLAdjusted,
+            cargoShipFLAdjusted.position.transformBy(Pose2d((-0.7).feet, 0.feet)).asWaypoint(),
+            Pose2d(10.6.feet, 6.614.feet, 69.degree).mirror.asWaypoint(),
+            loadingStationAdjusted.position.mirror.asWaypoint()
+        ),
+        getConstraints(false, loadingStationAdjusted), 8.feet.velocity, 6.feet.acceleration, kMaxVoltage
+    )
+
+    val cargoShipFRToRightLoadingStation = cargoShipFLToLeftLoadingStation.mirror()
 
     val cargoShipS1ToDepot = generateTrajectory(
         true,
@@ -113,6 +127,8 @@ object TrajectoryFactory {
         ),
         getConstraints(false, cargoShipFLAdjusted), kMaxVelocity, 4.feet.acceleration, kMaxVoltage
     )
+
+    val centerStartToCargoShipFR = centerStartToCargoShipFL.mirror()
 
     val depotToCargoShipS2 = generateTrajectory(
         false,
