@@ -47,6 +47,7 @@ object AutoClimbRoutines {
 
     val autoL3Climb
         get() = sequential {
+            +InstantRunnableCommand { DriveSubsystem.lowGear = true }
             +ClosedLoopClimbCommand(
                 22.7.inch,
                 19.7.inch
@@ -74,6 +75,7 @@ object AutoClimbRoutines {
 
     val autoL2Climb
         get() = sequential {
+            +InstantRunnableCommand { DriveSubsystem.lowGear = true }
             +ClosedLoopClimbCommand(
                 10.inch,
                 11.inch

@@ -61,7 +61,6 @@ object Controls {
         // Climb
         button(kB).changeOn {
             isClimbing = !isClimbing
-            DriveSubsystem.lowGear = true
             Superstructure.kStowedPosition.start()
         }
 
