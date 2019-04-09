@@ -29,9 +29,11 @@ object AutoClimbRoutines {
                     val resetBack = ResetWinchCommand(resetFront = false)
 
                     +parallel {
+                        +InstantRunnableCommand { resettingFront = true }
                         +ClimbWheelCommand(Source(0.05))
-                        +resetBack
+                        +resetBack.withTimeout(3.second)
                     }.withExit { resetBack.wrappedValue.isCompleted }
+                    +InstantRunnableCommand { resettingFront = false }
 
                     +ClimbWheelCommand(Source(1.0)).withExit { ClimbSubsystem.frontOnPlatform }.withTimeout(2.5.second)
                     +parallel {
@@ -77,8 +79,8 @@ object AutoClimbRoutines {
         get() = sequential {
             +InstantRunnableCommand { DriveSubsystem.lowGear = true }
             +ClosedLoopClimbCommand(
-                10.inch,
-                11.inch
+                8.inch,
+                9.inch
             )
             val climbGroup = group
             +parallel {
@@ -91,7 +93,38 @@ object AutoClimbRoutines {
                         DriveSubsystem.tankDrive(-.4, -.4)
                     }
                 }
-                +climbGroup
+                +sequential {
+                    +parallel {
+                        +ClimbWheelCommand(Source(0.75))
+                        +ClosedLoopArmCommand(160.degree)
+                    }.withExit { ClimbSubsystem.lidarRawAveraged < 500 }
+
+                    // Continue climb only if lidar is not faulty
+                    +ConditionalCommand(
+                        { ClimbSubsystem.lidarRawAveraged > 25 },
+                        sequential {
+                            +ClimbWheelCommand(Source(0.5)).withTimeout(200.millisecond)
+
+                            val resetBack = ResetWinchCommand(resetFront = false)
+
+                            +parallel {
+                                +InstantRunnableCommand { resettingFront = true }
+                                +ClimbWheelCommand(Source(0.05))
+                                +resetBack.withTimeout(3.second)
+                            }.withExit { resetBack.wrappedValue.isCompleted }
+                            +InstantRunnableCommand { resettingFront = false }
+
+                            +ClimbWheelCommand(Source(1.0)).withTimeout(2.second)
+                            +parallel {
+                                +InstantRunnableCommand { resettingFront = true }
+                                +ResetWinchCommand(resetFront = true)
+                                +ClosedLoopArmCommand(105.degree).withTimeout(1.5.second)
+                            }
+                            +InstantRunnableCommand { resettingFront = false }
+                            +DelayCommand(1.second)
+                        }
+                    )
+                }
             }
         }
 }

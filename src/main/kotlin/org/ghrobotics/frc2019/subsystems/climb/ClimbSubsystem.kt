@@ -82,8 +82,10 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
         frontWinchSlave.follow(frontWinchMaster)
         backWinchSlave.follow(backWinchMaster)
 
-        frontWinchMaster.inverted = false
+        frontWinchMaster.inverted = true
         frontWinchSlave.inverted = false
+
+        backWinchMaster.inverted = true
 
         allMotors.forEach { motor ->
             motor.brakeMode = NeutralMode.Brake
@@ -110,7 +112,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
             master.selectProfileSlot(0, 0)
             master.selectProfileSlot(2, 1)
 
-            master.encoderPhase = false
+            master.encoderPhase = true
 
             master.selectedSensorPosition = 0
         }

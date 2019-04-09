@@ -48,9 +48,11 @@ object ArmSubsystem : FalconSubsystem(), EmergencyHandleable {
     init {
         // Configure startup settings
         with(armMaster) {
+
+            inverted = true
             // Configure feedback sensor and sensor phase
             feedbackSensor = FeedbackDevice.Analog
-            encoderPhase = true
+            encoderPhase = false
 
             // Brake mode
             brakeMode = NeutralMode.Brake
