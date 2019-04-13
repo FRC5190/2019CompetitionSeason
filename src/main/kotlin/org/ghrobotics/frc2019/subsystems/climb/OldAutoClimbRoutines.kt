@@ -7,9 +7,10 @@ import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.mathematics.units.millisecond
 import org.ghrobotics.lib.mathematics.units.second
+import org.ghrobotics.lib.utils.DoubleSource
 import org.ghrobotics.lib.utils.Source
 
-object AutoClimbRoutines {
+object OldAutoClimbRoutines {
 
     var resettingFront = false
 
