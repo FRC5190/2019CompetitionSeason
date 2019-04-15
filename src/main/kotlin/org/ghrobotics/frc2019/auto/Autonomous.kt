@@ -51,7 +51,6 @@ object Autonomous {
     private val JUST = stateCommandGroup(startingPosition) {
         state(StartingPositions.LEFT, StartingPositions.RIGHT) {
             stateCommandGroup(autoMode) {
-                state(Mode.NEAR_ROCKET, NearRocketRoutine()())
                 state(Mode.TEST_TRAJECTORIES, TestTrajectoriesRoutine())
                 state(Mode.FORWARD_CARGO_SHIP, sequential {})
                 state(Mode.DO_NOTHING, sequential {})
@@ -65,7 +64,6 @@ object Autonomous {
             stateCommandGroup(autoMode) {
                 state(Mode.FORWARD_CARGO_SHIP, CargoShipRoutine(CargoShipRoutine.Mode.FRONT)())
                 state(Mode.TEST_TRAJECTORIES, TestTrajectoriesRoutine())
-                state(Mode.NEAR_ROCKET, sequential {})
                 state(Mode.BOTTOM_ROCKET, sequential {})
                 state(Mode.SIDE_CARGO_SHIP, sequential {})
                 state(Mode.HYBRID_LEFT, HybridRoutine(HybridRoutine.Mode.LEFT))
@@ -84,11 +82,9 @@ object Autonomous {
 
     enum class StartingPositions(val pose: Pose2d) {
         LEFT(TrajectoryWaypoints.kSideStart.mirror),
-        LEFT_90(TrajectoryWaypoints.kSideStart90.mirror),
         CENTER(TrajectoryWaypoints.kCenterStart),
-        RIGHT(TrajectoryWaypoints.kSideStart),
-        RIGHT_90(TrajectoryWaypoints.kSideStart90)
+        RIGHT(TrajectoryWaypoints.kSideStart)
     }
 
-    enum class Mode { TEST_TRAJECTORIES, NEAR_ROCKET, BOTTOM_ROCKET, FORWARD_CARGO_SHIP, SIDE_CARGO_SHIP, HYBRID_LEFT, HYBRID_RIGHT, DO_NOTHING }
+    enum class Mode { TEST_TRAJECTORIES, BOTTOM_ROCKET, FORWARD_CARGO_SHIP, SIDE_CARGO_SHIP, HYBRID_LEFT, HYBRID_RIGHT, DO_NOTHING }
 }

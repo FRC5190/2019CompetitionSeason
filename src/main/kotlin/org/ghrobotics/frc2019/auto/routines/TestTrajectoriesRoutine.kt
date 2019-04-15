@@ -12,7 +12,7 @@ import org.ghrobotics.lib.mathematics.units.second
 import org.ghrobotics.lib.utils.withEquals
 
 class TestTrajectoriesRoutine : AutoRoutine() {
-    private val path1 = TrajectoryFactory.sideStartToRocketN
+    private val path1 = TrajectoryFactory.sideStartToRocketF
     private val path2 = TrajectoryFactory.rocketNToLoadingStation
     private val path3 = TrajectoryFactory.loadingStationToRocketF
     private val path4 = TrajectoryFactory.rocketFToDepot

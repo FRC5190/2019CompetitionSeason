@@ -227,15 +227,6 @@ object TrajectoryFactory {
         getConstraints(true, cargoShipS1Adjusted), kMaxVelocity, kFirstPathMaxAcceleration, kMaxVoltage
     )
 
-    val sideStartToRocketN = generateTrajectory(
-        false,
-        listOf(
-            TrajectoryWaypoints.kSideStart90.asWaypoint(),
-            rocketNAdjusted
-        ),
-        getConstraints(true, rocketNAdjusted), kMaxVelocity, kFirstPathMaxAcceleration, kMaxVoltage
-    )
-
     val sideStartToRocketF = generateTrajectory(
         false,
         listOf(

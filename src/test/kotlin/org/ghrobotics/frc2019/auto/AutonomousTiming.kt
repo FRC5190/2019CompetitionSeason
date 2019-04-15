@@ -1,7 +1,6 @@
 package org.ghrobotics.frc2019.auto
 
 import org.ghrobotics.frc2019.auto.routines.BottomRocketRoutine
-import org.ghrobotics.frc2019.auto.routines.NearRocketRoutine
 import org.junit.Test
 
 class AutonomousTiming {
