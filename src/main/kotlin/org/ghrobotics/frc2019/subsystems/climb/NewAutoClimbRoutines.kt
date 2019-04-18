@@ -20,7 +20,7 @@ object NewAutoClimbRoutines {
             if (isLevel2) {
                 +ClosedLoopClimbCommand(frontTarget = 8.inch, backTarget = 9.inch)
             } else {
-                +ClosedLoopClimbCommand(frontTarget = 22.7.inch, backTarget = 19.7.inch)
+                +ClosedLoopClimbCommand(frontTarget = 22.7.inch, backTarget = 17.7.inch)
             }
 
             // Start moving forward
@@ -32,8 +32,8 @@ object NewAutoClimbRoutines {
                     }
                 } else {
                     +ConditionCommand {
-                        ClimbSubsystem.frontWinchPosition > 21.inch.value &&
-                            ClimbSubsystem.backWinchPosition > 18.inch.value
+                        ClimbSubsystem.frontWinchPosition > 19.inch.value &&
+                            ClimbSubsystem.backWinchPosition > 15.inch.value
                     }
                 }
                 +InstantRunnableCommand { aboveLIDARThresholdHeight = true }
@@ -49,8 +49,8 @@ object NewAutoClimbRoutines {
         // Step 2: Retract back stilts
         +parallel {
             +ResetWinchCommand(resetFront = false)
-            +ClimbWheelCommand { 0.05 }
-            +DriveWithPercentCommand { -0.05 }
+            +ClimbWheelCommand { 0.3 }
+            +DriveWithPercentCommand { -0.01 }
         }.withExit { ClimbSubsystem.isBackReverseLimitSwitchClosed && ClimbSubsystem.rawBackWinchPosition < 2000 }
 
         // Step 3: Drive until the front is safe to retract

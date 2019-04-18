@@ -61,7 +61,7 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
     enum class TargetSide { FRONT, BACK }
 
     companion object {
-        const val kCorrectionKp = 0.8
+        const val kCorrectionKp = 0.6
         const val kCorrectionKd = 8.0
         var isActive = false
             private set

@@ -256,8 +256,8 @@ object Constants {
     const val kClimbFrontL3Ticks = 22489.0
     const val kClimbBackL3Ticks = 18892.0
 
-    const val kClimbWinchPositionKp = 0.85
-    const val kClimbWinchLevelingKp = 4.5
+    const val kClimbWinchPositionKp = 2.0
+    const val kClimbWinchLevelingKp = 9.0
     const val kClimbWinchLevelingKd = 25.0
 
     private fun NativeUnitModel<*>.calculatekF(voltage: Double, velocity: Double) =

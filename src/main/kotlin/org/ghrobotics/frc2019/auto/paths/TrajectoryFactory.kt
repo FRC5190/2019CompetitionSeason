@@ -62,7 +62,7 @@ object TrajectoryFactory {
     private val loadingStationAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kLoadingStation,
         transform = Constants.kBackwardIntakeToCenter,
-        translationalOffset = Translation2d((-3.5).inch, 0.inch)
+        translationalOffset = Translation2d((-6).inch, 0.inch)
     )
     private val rocketFAdjusted = TrajectoryWaypoints.Waypoint(
         trueLocation = TrajectoryWaypoints.kRocketF,
