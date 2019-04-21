@@ -20,7 +20,7 @@ object NewAutoClimbRoutines {
             if (isLevel2) {
                 +ClosedLoopClimbCommand(frontTarget = 8.inch, backTarget = 9.inch)
             } else {
-                +ClosedLoopClimbCommand(frontTarget = 22.7.inch, backTarget = 17.7.inch)
+                +ClosedLoopClimbCommand(frontTarget = 23.5.inch, backTarget = 18.5.inch)
             }
 
             // Start moving forward

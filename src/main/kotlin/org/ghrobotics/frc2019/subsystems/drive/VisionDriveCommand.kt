@@ -7,6 +7,7 @@ import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.units.Rotation2d
 import org.ghrobotics.lib.mathematics.units.radian
+import kotlin.math.absoluteValue
 
 class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveCommand() {
 
@@ -41,10 +42,16 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
             Network.visionDriveAngle.setDouble(angle.degree)
             Network.visionDriveActive.setBoolean(true)
 
-            val error = (angle + if (targetSide == TargetSide.FRONT) Rotation2d.kZero else Math.PI.radian).radian
+            val angleError = angle + if (targetSide == TargetSide.FRONT) Rotation2d.kZero else Math.PI.radian
 
-            val turn =
-                kCorrectionKp * error + kCorrectionKd * (error - prevError)
+            if(angleError.degree.absoluteValue > 45) {
+                // plz no disable us when going to loading station, kthx
+                this.lastKnownTargetPose = null
+            }
+
+            val error = angleError.radian
+
+            val turn = kCorrectionKp * error + kCorrectionKd * (error - prevError)
             tankDrive(source - turn, source + turn)
 
             prevError = error
@@ -61,7 +68,7 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
     enum class TargetSide { FRONT, BACK }
 
     companion object {
-        const val kCorrectionKp = 0.6
+        const val kCorrectionKp = 0.8
         const val kCorrectionKd = 8.0
         var isActive = false
             private set

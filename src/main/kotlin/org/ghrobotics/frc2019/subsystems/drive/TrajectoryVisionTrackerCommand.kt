@@ -130,7 +130,7 @@ class TrajectoryVisionTrackerCommand(
     }
 
     companion object {
-        const val kCorrectionKp = 5.0
+        const val kCorrectionKp = 5.5
         const val kCorrectionKd = 0.0
         var visionActive = false
     }

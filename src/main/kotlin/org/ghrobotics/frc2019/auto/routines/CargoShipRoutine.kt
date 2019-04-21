@@ -70,7 +70,7 @@ class CargoShipRoutine(private val mode: CargoShipRoutine.Mode) : AutoRoutine() 
 
             +parallel {
                 +IntakeHatchCommand(false).withTimeout(0.75.second)
-                +followVisionAssistedTrajectory(mode.path3, pathMirrored, 3.feet, true)
+                +followVisionAssistedTrajectory(mode.path3, pathMirrored, 4.feet, true)
                 +sequential {
                     +executeFor(2.second, Superstructure.kStowedPosition)
                     +Superstructure.kFrontHatchFromLoadingStation.withTimeout(3.second)

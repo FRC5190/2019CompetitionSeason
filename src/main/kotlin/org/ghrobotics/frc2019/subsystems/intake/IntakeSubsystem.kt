@@ -112,7 +112,7 @@ import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 
 object IntakeSubsystem : FalconSubsystem() {
 
-    var badIntakeOffset = -.15.inch
+    var badIntakeOffset = (-1.2).inch
 
     private val intakeMaster = NativeFalconSRX(Constants.kIntakeLeftId)
     private val pigeon = PigeonIMU(intakeMaster)

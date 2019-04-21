@@ -99,20 +99,20 @@ class BottomRocketRoutine : AutoRoutine() {
                 +Superstructure.kFrontHatchFromLoadingStation.withTimeout(4.second)
             }
 
-//            // Part 4: Score the hatch and go to the loading station for the end of the sandstorm period.
-//            +parallel {
-//                // Score hatch.
-//                // Follow the trajectory to the loading station.
-//                +DriveSubsystem.followTrajectory(
-//                    TrajectoryFactory.rocketNToLoadingStation,
-//                    Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
-//                )
-//                // Take the superstructure to a position to pick up the next hatch.
-//                +sequential {
-//                    +IntakeHatchCommand(releasing = true).withTimeout(0.5.second)
-//                    +IntakeCloseCommand()
-//                    +Superstructure.kBackHatchFromLoadingStation
-//                }
-//            }
+            // Part 4: Score the hatch and go to the loading station for the end of the sandstorm period.
+            +parallel {
+                // Score hatch.
+                // Follow the trajectory to the loading station.
+                +DriveSubsystem.followTrajectory(
+                    TrajectoryFactory.rocketNToLoadingStation,
+                    Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
+                )
+                // Take the superstructure to a position to pick up the next hatch.
+                +sequential {
+                    +IntakeHatchCommand(releasing = true).withTimeout(0.5.second)
+                    +IntakeCloseCommand()
+                    +Superstructure.kBackHatchFromLoadingStation
+                }
+            }
         }
 }

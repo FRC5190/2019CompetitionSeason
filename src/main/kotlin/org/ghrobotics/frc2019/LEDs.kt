@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.SerialPort
 import org.ghrobotics.frc2019.subsystems.drive.TrajectoryVisionTrackerCommand
 import org.ghrobotics.frc2019.subsystems.drive.VisionDriveCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
+import org.ghrobotics.frc2019.vision.JeVoisManager
 import org.ghrobotics.lib.wrappers.FalconRobot
 import kotlin.concurrent.thread
 
@@ -44,7 +45,8 @@ object LEDs {
 
     fun update() {
         wantedLEDMode = when {
-            Robot.emergencyActive -> Mode.EMERGENCY
+            Robot.emergencyActive || (Robot.lastRobotMode == FalconRobot.Mode.DISABLED &&
+                (!JeVoisManager.isFrontJeVoisConnected || !JeVoisManager.isBackJeVoisConnected)) -> Mode.EMERGENCY
             Controls.backModifier -> Mode.BACK_MODIFIER
             Controls.isClimbing -> Mode.CLIMB
             VisionDriveCommand.isActive || TrajectoryVisionTrackerCommand.visionActive -> Mode.VISION

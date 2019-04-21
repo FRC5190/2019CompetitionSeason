@@ -3,6 +3,7 @@ package org.ghrobotics.frc2019.vision
 import com.google.gson.JsonObject
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.degree
@@ -13,6 +14,12 @@ import kotlin.math.absoluteValue
 object VisionProcessing {
 
     fun processData(visionData: VisionData) {
+
+        if (visionData.isFront && ElevatorSubsystem.position in Constants.kElevatorBlockingCameraRange) {
+            // Vision cannot see through the carriage
+            return
+        }
+
         val robotPose = DriveSubsystem.localization[visionData.timestamp.second]
 
         TargetTracker.addSamples(

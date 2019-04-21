@@ -74,7 +74,7 @@ class IntakeCargoCommand(
     override suspend fun execute() {
         when (releasing) {
             true -> {
-                if ((System.currentTimeMillis() - startTime > 125 && !IntakeSubsystem.launcherSolenoidState)) {
+                if ((System.currentTimeMillis() - startTime > 75 && !IntakeSubsystem.launcherSolenoidState)) {
                     IntakeSubsystem.wantedLauncherSolenoidState = true
                 }
             }
