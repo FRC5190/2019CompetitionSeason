@@ -49,8 +49,8 @@ object NewAutoClimbRoutines {
         // Step 2: Retract back stilts
         +parallel {
             +ResetWinchCommand(resetFront = false)
-            +ClimbWheelCommand { 0.3 }
-            +DriveWithPercentCommand { -0.01 }
+            +ClimbWheelCommand { 0.5 }
+            +DriveWithPercentCommand { -0.05 }
         }.withExit { ClimbSubsystem.isBackReverseLimitSwitchClosed && ClimbSubsystem.rawBackWinchPosition < 2000 }
 
         // Step 3: Drive until the front is safe to retract

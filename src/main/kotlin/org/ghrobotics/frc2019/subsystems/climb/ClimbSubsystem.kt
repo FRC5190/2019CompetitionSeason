@@ -123,7 +123,7 @@ object ClimbSubsystem : FalconSubsystem(), EmergencyHandleable {
             1.65.feet.velocity.toNativeUnitVelocity(Constants.kClimbFrontWinchNativeUnitModel)
 
         backWinchMaster.motionAcceleration =
-            0.65.feet.acceleration.toNativeUnitAcceleration(Constants.kClimbBackWinchNativeUnitModel)
+            0.55.feet.acceleration.toNativeUnitAcceleration(Constants.kClimbBackWinchNativeUnitModel)
         backWinchMaster.motionCruiseVelocity =
             1.2.feet.velocity.toNativeUnitVelocity(Constants.kClimbBackWinchNativeUnitModel)
 
