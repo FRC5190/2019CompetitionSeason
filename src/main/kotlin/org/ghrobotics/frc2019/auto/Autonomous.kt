@@ -49,12 +49,18 @@ object Autonomous {
 
     // Autonomous Master Group
     private val JUST = stateCommandGroup(startingPosition) {
-        state(StartingPositions.LEFT, StartingPositions.RIGHT) {
+        state(
+            StartingPositions.LEFT,
+            StartingPositions.RIGHT,
+            StartingPositions.LEFT_REVERSED,
+            StartingPositions.RIGHT_REVERSED
+        ) {
             stateCommandGroup(autoMode) {
                 state(Mode.TEST_TRAJECTORIES, TestTrajectoriesRoutine())
                 state(Mode.FORWARD_CARGO_SHIP, sequential {})
                 state(Mode.DO_NOTHING, sequential {})
                 state(Mode.BOTTOM_ROCKET, BottomRocketRoutine()())
+                state(Mode.BOTTOM_ROCKET_2, BottomRocketRoutine2()())
                 state(Mode.SIDE_CARGO_SHIP, CargoShipRoutine(CargoShipRoutine.Mode.SIDE)())
                 state(Mode.HYBRID_LEFT, sequential {})
                 state(Mode.HYBRID_RIGHT, sequential {})
@@ -65,6 +71,7 @@ object Autonomous {
                 state(Mode.FORWARD_CARGO_SHIP, CargoShipRoutine(CargoShipRoutine.Mode.FRONT)())
                 state(Mode.TEST_TRAJECTORIES, TestTrajectoriesRoutine())
                 state(Mode.BOTTOM_ROCKET, sequential {})
+                state(Mode.BOTTOM_ROCKET_2, sequential {})
                 state(Mode.SIDE_CARGO_SHIP, sequential {})
                 state(Mode.HYBRID_LEFT, HybridRoutine(HybridRoutine.Mode.LEFT))
                 state(Mode.HYBRID_RIGHT, HybridRoutine(HybridRoutine.Mode.RIGHT))
@@ -83,8 +90,10 @@ object Autonomous {
     enum class StartingPositions(val pose: Pose2d) {
         LEFT(TrajectoryWaypoints.kSideStart.mirror),
         CENTER(TrajectoryWaypoints.kCenterStart),
-        RIGHT(TrajectoryWaypoints.kSideStart)
+        RIGHT(TrajectoryWaypoints.kSideStart),
+        LEFT_REVERSED(TrajectoryWaypoints.kSideStartReversed.mirror),
+        RIGHT_REVERSED(TrajectoryWaypoints.kSideStartReversed)
     }
 
-    enum class Mode { TEST_TRAJECTORIES, BOTTOM_ROCKET, FORWARD_CARGO_SHIP, SIDE_CARGO_SHIP, HYBRID_LEFT, HYBRID_RIGHT, DO_NOTHING }
+    enum class Mode { TEST_TRAJECTORIES, BOTTOM_ROCKET, BOTTOM_ROCKET_2, FORWARD_CARGO_SHIP, SIDE_CARGO_SHIP, HYBRID_LEFT, HYBRID_RIGHT, DO_NOTHING }
 }
