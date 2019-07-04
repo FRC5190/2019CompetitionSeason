@@ -49,6 +49,8 @@ object TrajectoryWaypoints {
         0.degree
     )
 
+    val kSideStartReversed = Pose2d(kSideStart.translation, 180.degree)
+
     // Starting on Level 1 HAB in the center.
     val kCenterStart = Pose2d(kStartX, 13.5.feet)
 

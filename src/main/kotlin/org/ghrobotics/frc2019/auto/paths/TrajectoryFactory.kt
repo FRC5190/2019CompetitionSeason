@@ -192,6 +192,15 @@ object TrajectoryFactory {
         getConstraints(false, depotAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
     )
 
+    val rocketFPrepareToRocketF = generateTrajectory(
+        false,
+        listOf(
+            Pose2d(24.387.feet, 3.253.feet, 160.degree).asWaypoint(),
+            rocketFAdjusted
+        ),
+        getConstraints(false, Pose2d()), kMaxVelocity, kMaxAcceleration, kMaxVoltage
+    )
+
     val rocketFToDepot = generateTrajectory(
         true,
         listOf(
@@ -237,6 +246,15 @@ object TrajectoryFactory {
             rocketFAdjusted
         ),
         getConstraints(false, rocketFAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
+    )
+
+    val sideStartReversedToRocketFPrepare = generateTrajectory(
+        true,
+        listOf(
+            TrajectoryWaypoints.kSideStartReversed.asWaypoint(),
+            Pose2d(24.387.feet, 3.253.feet, 160.degree).asWaypoint()
+        ),
+        getConstraints(false, Pose2d()), kMaxVelocity, 8.feet.acceleration, kMaxVoltage
     )
 
     /** Generation **/

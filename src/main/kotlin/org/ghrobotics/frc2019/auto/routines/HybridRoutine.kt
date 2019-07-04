@@ -4,6 +4,7 @@ import org.ghrobotics.frc2019.auto.paths.TrajectoryFactory
 import org.ghrobotics.frc2019.auto.paths.TrajectoryWaypoints
 import org.ghrobotics.frc2019.subsystems.Superstructure
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCloseCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
 import org.ghrobotics.lib.commands.DelayCommand
@@ -86,14 +87,13 @@ class HybridRoutine(private val mode: Mode) : AutoRoutine() {
                 // Score hatch.
                 // Follow the trajectory to the loading station.
                 +DriveSubsystem.followTrajectory(
-                    TrajectoryFactory.rocketNToLoadingStation,
+                    TrajectoryFactory.rocketNToDepot,
                     Source(mode.isLeft)
                 )
                 // Take the superstructure to a position to pick up the next hatch.
                 +sequential {
-                    +IntakeHatchCommand(releasing = true).withTimeout(0.5.second)
-                    +IntakeCloseCommand()
-                    +Superstructure.kBackHatchFromLoadingStation
+                    +Superstructure.kBackCargoIntake
+                    +IntakeCargoCommand(releasing = false)
                 }
             }
         }
