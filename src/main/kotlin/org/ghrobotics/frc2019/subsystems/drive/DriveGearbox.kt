@@ -43,8 +43,8 @@ class DriveGearbox(
             motor.voltageCompensationSaturation = 12.volt
             motor.voltageCompensationEnabled = true
 
-            motor.peakCurrentLimit = 0.amp
-            motor.peakCurrentLimitDuration = 0.millisecond
+            motor.peakCurrentLimit = 70.amp
+            motor.peakCurrentLimitDuration = 700.millisecond
             motor.continuousCurrentLimit = Constants.kDriveCurrentLimit
             motor.currentLimitingEnabled = true
 
