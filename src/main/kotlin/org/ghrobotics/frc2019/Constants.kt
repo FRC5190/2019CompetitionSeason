@@ -124,7 +124,7 @@ object Constants {
 
     val kDriveCurrentLimit = 38.amp
 
-    const val kDriveKp = 2.75 // Talon SRX Units
+    const val kDriveKp = 2.35 // Talon SRX Units
     const val kDriveKd = 2.0
 
     const val kDriveLeftKv = 0.1489

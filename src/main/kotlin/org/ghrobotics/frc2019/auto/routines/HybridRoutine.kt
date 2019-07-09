@@ -3,14 +3,12 @@ package org.ghrobotics.frc2019.auto.routines
 import org.ghrobotics.frc2019.auto.paths.TrajectoryFactory
 import org.ghrobotics.frc2019.auto.paths.TrajectoryWaypoints
 import org.ghrobotics.frc2019.subsystems.Superstructure
+import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCargoCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeCloseCommand
 import org.ghrobotics.frc2019.subsystems.intake.IntakeHatchCommand
-import org.ghrobotics.lib.commands.DelayCommand
-import org.ghrobotics.lib.commands.FalconCommand
-import org.ghrobotics.lib.commands.parallel
-import org.ghrobotics.lib.commands.sequential
+import org.ghrobotics.lib.commands.*
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedTrajectory
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.duration
@@ -92,8 +90,14 @@ class HybridRoutine(private val mode: Mode) : AutoRoutine() {
                 )
                 // Take the superstructure to a position to pick up the next hatch.
                 +sequential {
-                    +Superstructure.kBackCargoIntake
-                    +IntakeCargoCommand(releasing = false)
+                    +IntakeHatchCommand(true).withTimeout(0.5.second)
+                    +parallel {
+                        +Superstructure.kBackCargoIntake
+                        +sequential {
+                            +ConditionCommand { ArmSubsystem.position.cos < 0 }
+                            +IntakeCargoCommand(releasing = false)
+                        }
+                    }
                 }
             }
         }
