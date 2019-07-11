@@ -35,7 +35,7 @@ class BottomRocketRoutine2 : AutoRoutine() {
             +parallel {
                 +DriveSubsystem.followTrajectory(
                     path1,
-                    Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
+                    Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT_REVERSED)
                 )
                 +sequential {
                     +DriveSubsystem.notWithinRegion(TrajectoryWaypoints.kHabitatL1Platform)
@@ -45,7 +45,7 @@ class BottomRocketRoutine2 : AutoRoutine() {
 
             +super.followVisionAssistedTrajectory(
                 path2,
-                Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
+                Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT_REVERSED),
                 4.feet,
                 true
             )
@@ -55,12 +55,12 @@ class BottomRocketRoutine2 : AutoRoutine() {
             +relocalize(
                 TrajectoryWaypoints.kRocketF,
                 true,
-                Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
+                Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT_REVERSED)
             )
 
             val path2 = super.followVisionAssistedTrajectory(
                 path3,
-                Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
+                Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT_REVERSED),
                 4.feet, false
             )
 
@@ -82,7 +82,7 @@ class BottomRocketRoutine2 : AutoRoutine() {
             +relocalize(
                 TrajectoryWaypoints.kLoadingStation,
                 false,
-                Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
+                Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT_REVERSED)
             )
 
             // Part 3: Pickup hatch and go to the near side of the rocket.
@@ -92,7 +92,7 @@ class BottomRocketRoutine2 : AutoRoutine() {
                 // Follow the trajectory with vision correction to the near side of the rocket.
                 +super.followVisionAssistedTrajectory(
                     path4,
-                    Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT),
+                    Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT_REVERSED),
                     6.feet, true
                 )
                 // Take the superstructure to scoring height.
@@ -105,7 +105,7 @@ class BottomRocketRoutine2 : AutoRoutine() {
                 // Follow the trajectory to the loading station.
                 +DriveSubsystem.followTrajectory(
                     TrajectoryFactory.rocketNToLoadingStation,
-                    Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT)
+                    Autonomous.startingPosition.withEquals(Autonomous.StartingPositions.LEFT_REVERSED)
                 )
                 // Take the superstructure to a position to pick up the next hatch.
                 +sequential {
