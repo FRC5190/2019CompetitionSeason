@@ -5,7 +5,10 @@
 
 package org.ghrobotics.frc2019
 
+import edu.wpi.cscore.VideoMode
+import edu.wpi.first.cameraserver.CameraServer
 import edu.wpi.first.wpilibj.livewindow.LiveWindow
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
@@ -45,8 +48,10 @@ object Robot : FalconRobot() {
         JeVoisManager
         TargetTracker
 
-//        CameraServer.getInstance().startAutomaticCapture()
-//            .setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 15)
+//        val camera = CameraServer.getInstance().startAutomaticCapture(0)
+//        camera.setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 15)
+//
+//        Shuffleboard.getTab("5190").add(camera).withPosition(3, 2).withSize(3, 3)
     }
 
     override fun periodic() {
