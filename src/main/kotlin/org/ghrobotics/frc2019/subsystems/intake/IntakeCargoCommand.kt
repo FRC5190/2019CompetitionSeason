@@ -1,6 +1,7 @@
 package org.ghrobotics.frc2019.subsystems.intake
 
 import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
+import org.ghrobotics.frc2019.vision.LimelightManager
 import org.ghrobotics.lib.commands.ConditionalCommand
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.sequential
@@ -88,6 +89,9 @@ class IntakeCargoCommand(
     }
 
     override suspend fun dispose() {
+        if (sensedBall != 0L && System.currentTimeMillis() - sensedBall > 1000) {
+            LimelightManager.blinkLEDs()
+        }
         IntakeSubsystem.wantedLauncherSolenoidState = false
         IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
         IntakeSubsystem.zeroOutputs()
