@@ -57,7 +57,7 @@ class Limelight(
 
         TargetTracker.addSamples(
             timestamp, listOfNotNull(
-                Constants.kCenterToFrontCamera + (drive_location + Pose2d(transform))
+                drive_location + (Constants.kCenterToFrontCamera + Pose2d(transform))
             )
         )
     }
