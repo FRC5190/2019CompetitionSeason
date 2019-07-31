@@ -84,7 +84,7 @@ class TrajectoryVisionTrackerCommand(
 
         if (lastKnownTargetPose != null) {
             if (!turnedOnLimelight) {
-                LimelightManager.turnOnVisionPipeline()
+                LimelightManager.turnOnLED()
                 turnedOnLimelight = true
             }
             visionActive = true
@@ -130,7 +130,7 @@ class TrajectoryVisionTrackerCommand(
      * Make sure that the drivetrain is stopped at the end of the command.
      */
     override suspend fun dispose() {
-        LimelightManager.turnOffVisionPipeline()
+        LimelightManager.turnOffLED()
         turnedOnLimelight = false
         DriveSubsystem.zeroOutputs()
         LiveDashboard.isFollowingPath = false

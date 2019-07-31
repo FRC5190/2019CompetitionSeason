@@ -15,8 +15,8 @@ object LimelightManager {
         notifier_.startPeriodic(0.02)
     }
 
-    fun turnOnVisionPipeline() = limelight_.turnOnVisionPipeline()
-    fun turnOffVisionPipeline() = limelight_.turnOffVisionPipeline()
+    fun turnOnLED() = limelight_.turnOnLED()
+    fun turnOffLED() = limelight_.turnOffLED()
     fun blinkLEDs() = limelight_.blinkLEDs()
 
     private fun update() {

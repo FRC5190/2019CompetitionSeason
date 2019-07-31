@@ -18,7 +18,7 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
     private var prevError = 0.0
 
     override suspend fun initialize() {
-        LimelightManager.turnOnVisionPipeline()
+        LimelightManager.turnOnLED()
         isActive = true
         referencePose = DriveSubsystem.robotPosition
     }
@@ -61,7 +61,7 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
     }
 
     override suspend fun dispose() {
-        LimelightManager.turnOffVisionPipeline()
+        LimelightManager.turnOffLED()
         Network.visionDriveActive.setBoolean(false)
         this.lastKnownTargetPose = null
         ElevatorSubsystem.wantedVisionMode = false

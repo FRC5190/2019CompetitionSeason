@@ -3,6 +3,7 @@
 package org.ghrobotics.frc2019.vision
 
 import edu.wpi.first.networktables.NetworkTable
+import edu.wpi.first.networktables.NetworkTableEntry
 import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.Timer
 import org.ghrobotics.frc2019.Constants
@@ -23,15 +24,20 @@ class Limelight(
     private val limelight_table_: NetworkTable = NetworkTableInstance.getDefault().getTable("limelight")
     private val limelight_angle_ = limelight_angle.value
 
+    private val tx_: NetworkTableEntry = limelight_table_["tx"]
+    private val ty_: NetworkTableEntry = limelight_table_["ty"]
+    private val tl_: NetworkTableEntry = limelight_table_["tl"]
+    private val tv_: NetworkTableEntry = limelight_table_["tv"]
+
     var isAlive: Boolean = false
         private set
 
-    fun turnOnVisionPipeline() {
-        limelight_table_["pipeline"].setNumber(1)
+    fun turnOnLED() {
+        limelight_table_["ledMode"].setNumber(0)
     }
 
-    fun turnOffVisionPipeline() {
-        limelight_table_["pipeline"].setNumber(0)
+    fun turnOffLED() {
+        limelight_table_["ledMode"].setNumber(1)
     }
 
     fun blinkLEDs() {
@@ -39,17 +45,17 @@ class Limelight(
     }
 
     fun updateTargetTracker() {
-        val tx: Double = Math.toRadians(limelight_table_["tx"].getDouble(0.0))
-        val ty: Double = Math.toRadians(limelight_table_["ty"].getDouble(0.0))
-        val latency: Double = limelight_table_["tl"].getDouble(0.0) + 11
+        if (!tv_.getBoolean(false)) return
+
+        val tx: Double = Math.toRadians(tx_.getDouble(0.0))
+        val ty: Double = Math.toRadians(ty_.getDouble(0.0))
+        val latency: Double = tl_.getDouble(0.0) + 11
 
         isAlive = latency > 11
 
         val distance_to_target = (target_height - limelight_height) / tan(limelight_angle_ + ty)
 
-        if (distance_to_target < Constants.kRobotLength / 2.2) {
-            return
-        }
+        if (distance_to_target < Constants.kRobotLength / 2.2) return
 
         val timestamp: Double = Timer.getFPGATimestamp() - latency / 1000.0
         val transform = Translation2d(distance_to_target, Rotation2d(tx))
