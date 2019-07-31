@@ -3,6 +3,7 @@ package org.ghrobotics.frc2019.subsystems.drive
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.Network
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
+import org.ghrobotics.frc2019.vision.LimelightManager
 import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.debug.LiveDashboard
@@ -30,6 +31,8 @@ class TrajectoryVisionTrackerCommand(
 
     private var trajectoryFinished = false
     private var hasGeneratedVisionPath = false
+
+    private var turnedOnLimelight = false
 
     private var prevError = 0.0
 
@@ -80,7 +83,10 @@ class TrajectoryVisionTrackerCommand(
         val lastKnownTargetPose = this.lastKnownTargetPose
 
         if (lastKnownTargetPose != null) {
-            println("VISION")
+            if (!turnedOnLimelight) {
+                LimelightManager.turnOnVisionPipeline()
+                turnedOnLimelight = true
+            }
             visionActive = true
             val transform = lastKnownTargetPose inFrameOfReferenceOf robotPositionWithIntakeOffset
             val angle = Rotation2d(transform.translation.x, transform.translation.y, true)
@@ -124,6 +130,8 @@ class TrajectoryVisionTrackerCommand(
      * Make sure that the drivetrain is stopped at the end of the command.
      */
     override suspend fun dispose() {
+        LimelightManager.turnOffVisionPipeline()
+        turnedOnLimelight = false
         DriveSubsystem.zeroOutputs()
         LiveDashboard.isFollowingPath = false
         visionActive = false

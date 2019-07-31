@@ -5,10 +5,7 @@
 
 package org.ghrobotics.frc2019
 
-import edu.wpi.cscore.VideoMode
-import edu.wpi.first.cameraserver.CameraServer
 import edu.wpi.first.wpilibj.livewindow.LiveWindow
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
@@ -16,7 +13,7 @@ import org.ghrobotics.frc2019.subsystems.climb.ClimbSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.frc2019.vision.JeVoisManager
+import org.ghrobotics.frc2019.vision.LimelightManager
 import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.millisecond
@@ -45,7 +42,7 @@ object Robot : FalconRobot() {
 
         Network
         Autonomous
-        JeVoisManager
+        LimelightManager
         TargetTracker
 
 //        val camera = CameraServer.getInstance().startAutomaticCapture(0)

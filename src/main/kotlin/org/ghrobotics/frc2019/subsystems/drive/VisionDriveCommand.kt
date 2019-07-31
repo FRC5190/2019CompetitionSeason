@@ -3,6 +3,7 @@ package org.ghrobotics.frc2019.subsystems.drive
 import org.ghrobotics.frc2019.Network
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
+import org.ghrobotics.frc2019.vision.LimelightManager
 import org.ghrobotics.frc2019.vision.TargetTracker
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.units.Rotation2d
@@ -17,6 +18,7 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
     private var prevError = 0.0
 
     override suspend fun initialize() {
+        LimelightManager.turnOnVisionPipeline()
         isActive = true
         referencePose = DriveSubsystem.robotPosition
     }
@@ -59,6 +61,7 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
     }
 
     override suspend fun dispose() {
+        LimelightManager.turnOffVisionPipeline()
         Network.visionDriveActive.setBoolean(false)
         this.lastKnownTargetPose = null
         ElevatorSubsystem.wantedVisionMode = false

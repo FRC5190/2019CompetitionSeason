@@ -14,7 +14,7 @@ import org.ghrobotics.frc2019.subsystems.climb.ClimbSubsystem
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
 import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.frc2019.subsystems.intake.IntakeSubsystem
-import org.ghrobotics.frc2019.vision.JeVoisManager
+import org.ghrobotics.frc2019.vision.LimelightManager
 import org.ghrobotics.lib.mathematics.units.SILengthConstants
 import org.ghrobotics.lib.wrappers.networktables.enumSendableChooser
 
@@ -148,11 +148,11 @@ object Network {
         frontLimitSwitch.setBoolean(ClimbSubsystem.isFrontReverseLimitSwitchClosed)
         backLimitSwitch.setBoolean(ClimbSubsystem.isBackReverseLimitSwitchClosed)
 
-        visionFrontCameraConnected.setBoolean(JeVoisManager.isFrontJeVoisConnected)
-        visionBackCameraConnected.setBoolean(JeVoisManager.isBackJeVoisConnected)
+        visionFrontCameraConnected.setBoolean(LimelightManager.isAlive)
+        visionBackCameraConnected.setBoolean(LimelightManager.isAlive)
 
-        visionFrontCameraConnected.setBoolean(JeVoisManager.isFrontJeVoisConnected)
-        visionBackCameraConnected.setBoolean(JeVoisManager.isBackJeVoisConnected)
+//        visionFrontCameraConnected.setBoolean(JeVoisManager.isFrontJeVoisConnected)
+//        visionBackCameraConnected.setBoolean(JeVoisManager.isBackJeVoisConnected)
 
         badIntakeOffset.setDouble(IntakeSubsystem.badIntakeOffset.inch)
 
