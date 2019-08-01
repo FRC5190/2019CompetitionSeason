@@ -5,7 +5,7 @@ import org.ghrobotics.lib.mathematics.units.degree
 import org.ghrobotics.lib.mathematics.units.inch
 
 object LimelightManager {
-    private val limelight_ = Limelight(46.inch, (-30).degree, 29.inch)
+    private val limelight_ = Limelight(44.3.inch, (-30).degree, 29.inch)
     private val notifier_ = Notifier(::update)
 
     var isAlive: Boolean = false

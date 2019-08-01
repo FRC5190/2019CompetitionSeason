@@ -29,11 +29,15 @@ class Limelight(
     private val tl_: NetworkTableEntry = limelight_table_["tl"]
     private val tv_: NetworkTableEntry = limelight_table_["tv"]
 
+    init {
+        turnOffLED()
+    }
+
     var isAlive: Boolean = false
         private set
 
     fun turnOnLED() {
-        limelight_table_["ledMode"].setNumber(0)
+        limelight_table_["ledMode"].setNumber(3)
     }
 
     fun turnOffLED() {
@@ -45,18 +49,20 @@ class Limelight(
     }
 
     fun updateTargetTracker() {
-        if (!tv_.getBoolean(false)) return
-
-        val tx: Double = Math.toRadians(tx_.getDouble(0.0))
-        val ty: Double = Math.toRadians(ty_.getDouble(0.0))
         val latency: Double = tl_.getDouble(0.0) + 11
-
         isAlive = latency > 11
+
+        if (tv_.getNumber(0.0) == 0.0) return
+
+        val tx: Double = -Math.toRadians(tx_.getDouble(0.0))
+        val ty: Double = Math.toRadians(ty_.getDouble(0.0))
 
         val distance_to_target = (target_height - limelight_height) / tan(limelight_angle_ + ty)
 
-        if (distance_to_target < Constants.kRobotLength / 2.2) return
+        println(distance_to_target.inch)
 
+
+        if (distance_to_target < Constants.kRobotLength / 2.2) return
         val timestamp: Double = Timer.getFPGATimestamp() - latency / 1000.0
         val transform = Translation2d(distance_to_target, Rotation2d(tx))
         val drive_location = DriveSubsystem.localization[timestamp.second]
