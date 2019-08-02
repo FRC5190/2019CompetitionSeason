@@ -32,8 +32,6 @@ class TrajectoryVisionTrackerCommand(
     private var trajectoryFinished = false
     private var hasGeneratedVisionPath = false
 
-    private var turnedOnLimelight = false
-
     private var prevError = 0.0
 
     @Suppress("LateinitUsage")
@@ -83,10 +81,6 @@ class TrajectoryVisionTrackerCommand(
         val lastKnownTargetPose = this.lastKnownTargetPose
 
         if (lastKnownTargetPose != null) {
-            if (!turnedOnLimelight) {
-                LimelightManager.turnOnLED()
-                turnedOnLimelight = true
-            }
             visionActive = true
             val transform = lastKnownTargetPose inFrameOfReferenceOf robotPositionWithIntakeOffset
             val angle = Rotation2d(transform.translation.x, transform.translation.y, true)
@@ -108,7 +102,7 @@ class TrajectoryVisionTrackerCommand(
             )
 
             prevError = error
-            
+
         } else {
             DriveSubsystem.setOutput(nextState)
         }
@@ -131,7 +125,6 @@ class TrajectoryVisionTrackerCommand(
      */
     override suspend fun dispose() {
         LimelightManager.turnOffLED()
-        turnedOnLimelight = false
         DriveSubsystem.zeroOutputs()
         LiveDashboard.isFollowingPath = false
         visionActive = false

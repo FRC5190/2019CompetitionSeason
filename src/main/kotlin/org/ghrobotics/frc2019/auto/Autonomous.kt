@@ -5,14 +5,12 @@ import org.ghrobotics.frc2019.Robot
 import org.ghrobotics.frc2019.auto.paths.TrajectoryWaypoints
 import org.ghrobotics.frc2019.auto.routines.*
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.vision.LimelightManager
 import org.ghrobotics.lib.commands.S3ND
 import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.commands.stateCommandGroup
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
-import org.ghrobotics.lib.utils.Source
-import org.ghrobotics.lib.utils.and
-import org.ghrobotics.lib.utils.monitor
-import org.ghrobotics.lib.utils.onChangeToTrue
+import org.ghrobotics.lib.utils.*
 import org.ghrobotics.lib.wrappers.FalconRobot
 
 /**
@@ -43,7 +41,11 @@ object Autonomous {
         }
 
         isReadyMonitor.onChangeToTrue {
+            LimelightManager.turnOnLED()
             JUST S3ND IT
+        }
+        isReadyMonitor.onChangeToFalse {
+            LimelightManager.turnOffLED()
         }
     }
 
