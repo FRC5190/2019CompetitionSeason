@@ -54,7 +54,7 @@ class Limelight(
 
         if (tv_.getNumber(0.0) == 0.0) return
 
-        // tx has a negative sign because the Limelight is CCW positive. We don't want that.
+        // tx has a negative sign because the Limelight is CW positive. We don't want that.
         val tx: Double = -Math.toRadians(tx_.getDouble(0.0))
         val ty: Double = +Math.toRadians(ty_.getDouble(0.0))
 
