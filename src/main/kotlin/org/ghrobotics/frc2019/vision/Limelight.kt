@@ -54,15 +54,13 @@ class Limelight(
 
         if (tv_.getNumber(0.0) == 0.0) return
 
+        // tx has a negative sign because the Limelight is CCW positive. We don't want that.
         val tx: Double = -Math.toRadians(tx_.getDouble(0.0))
-        val ty: Double = Math.toRadians(ty_.getDouble(0.0))
+        val ty: Double = +Math.toRadians(ty_.getDouble(0.0))
 
         val distance_to_target = (target_height - limelight_height) / tan(limelight_angle_ + ty)
-
-        println(distance_to_target.inch)
-
-
         if (distance_to_target < Constants.kRobotLength / 2.2) return
+
         val timestamp: Double = Timer.getFPGATimestamp() - latency / 1000.0
         val transform = Translation2d(distance_to_target, Rotation2d(tx))
         val drive_location = DriveSubsystem.localization[timestamp.second]
