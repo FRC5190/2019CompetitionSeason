@@ -1,11 +1,7 @@
 package org.ghrobotics.frc2019.subsystems.intake
 
-import org.ghrobotics.frc2019.subsystems.arm.ClosedLoopArmCommand
 import org.ghrobotics.frc2019.vision.LimelightManager
-import org.ghrobotics.lib.commands.ConditionalCommand
 import org.ghrobotics.lib.commands.FalconCommand
-import org.ghrobotics.lib.commands.sequential
-import org.ghrobotics.lib.mathematics.units.degree
 
 //class IntakeCargoCommand(
 //    private val releasing: Boolean
@@ -54,6 +50,7 @@ class IntakeCargoCommand(
             finishCondition += { sensedBall != 0L && System.currentTimeMillis() - sensedBall > 1000 }
         }
     }
+
     private var startTime = 0L
 
     override suspend fun initialize() {
@@ -89,7 +86,7 @@ class IntakeCargoCommand(
     }
 
     override suspend fun dispose() {
-        if (sensedBall != 0L && System.currentTimeMillis() - sensedBall > 1000) {
+        if (IntakeSubsystem.isSeeingCargo) {
             LimelightManager.blinkLEDs()
         }
         IntakeSubsystem.wantedLauncherSolenoidState = false
