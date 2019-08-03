@@ -85,18 +85,18 @@ object Controls {
             }
             pov(180).changeOn {
                 when {
-                    // backModifier -> Superstructure.kBackHatchFromLoadingStation.start()
+                    backModifier -> Superstructure.kBackHatchFromLoadingStation.start()
                     IntakeSubsystem.isHoldingCargo -> Superstructure.kFrontLowRocketCargo.start()
                     else -> Superstructure.kFrontHatchFromLoadingStation.start()
                 }
             }
             pov(270).changeOn {
-                /* if (backModifier) Superstructure.kBackCargoIntake.start()
-                else*/ Superstructure.kFrontCargoIntake.start()
+                if (backModifier) Superstructure.kBackCargoIntake.start()
+                else Superstructure.kFrontCargoIntake.start()
             }
             triggerAxisButton(GenericHID.Hand.kRight).changeOn {
-                /* if (backModifier) Superstructure.kBackCargoFromLoadingStation.start()
-                else */Superstructure.kFrontCargoIntoCargoShip.start()
+                if (backModifier) Superstructure.kBackCargoFromLoadingStation.start()
+                else Superstructure.kFrontCargoIntoCargoShip.start()
             }
             button(kBumperRight).changeOn(Superstructure.kStowedPosition)
         }

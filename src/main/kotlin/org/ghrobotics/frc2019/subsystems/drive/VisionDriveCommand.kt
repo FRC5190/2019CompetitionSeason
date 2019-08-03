@@ -18,7 +18,9 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
     private var prevError = 0.0
 
     override suspend fun initialize() {
-        LimelightManager.turnOnLED()
+        if (targetSide == TargetSide.FRONT) {
+            LimelightManager.turnOnLED()
+        }
         isActive = true
         referencePose = DriveSubsystem.robotPosition
     }
@@ -46,7 +48,7 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
 
             val angleError = angle + if (targetSide == TargetSide.FRONT) Rotation2d.kZero else Math.PI.radian
 
-            if(angleError.degree.absoluteValue > 45) {
+            if (angleError.degree.absoluteValue > 45) {
                 // plz no disable us when going to loading station, kthx
                 this.lastKnownTargetPose = null
             }
@@ -61,7 +63,9 @@ class VisionDriveCommand(private val targetSide: TargetSide) : ManualDriveComman
     }
 
     override suspend fun dispose() {
-        LimelightManager.turnOffLED()
+        if (targetSide == TargetSide.FRONT) {
+            LimelightManager.turnOffLED()
+        }
         Network.visionDriveActive.setBoolean(false)
         this.lastKnownTargetPose = null
         ElevatorSubsystem.wantedVisionMode = false
