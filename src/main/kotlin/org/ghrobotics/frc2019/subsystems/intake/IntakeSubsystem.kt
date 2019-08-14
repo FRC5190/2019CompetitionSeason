@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.NeutralMode
 import com.ctre.phoenix.sensors.PigeonIMU
 import edu.wpi.first.wpilibj.AnalogInput
-import edu.wpi.first.wpilibj.DigitalOutput
 import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
@@ -112,7 +111,7 @@ import org.ghrobotics.lib.wrappers.ctre.NativeFalconSRX
 
 object IntakeSubsystem : FalconSubsystem() {
 
-    var badIntakeOffset = 0.65.inch
+    var badIntakeOffset = (0.15).inch
 
     private val intakeMaster = NativeFalconSRX(Constants.kIntakeLeftId)
     private val pigeon = PigeonIMU(intakeMaster)
@@ -179,7 +178,8 @@ object IntakeSubsystem : FalconSubsystem() {
         // PERIODIC
         isSeeingCargo = leftBallSensor.averageVoltage > 1.7 || rightBallSensor.averageVoltage > 1.2
         isHoldingCargo = extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.RETRACTED && isSeeingCargo
-        isHoldingHatch = false // extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.RETRACTED && !isFullyExtended
+        isHoldingHatch =
+            false // extensionSolenoidState == IntakeSubsystem.ExtensionSolenoidState.RETRACTED && !isFullyExtended
 
         robotPositionWithIntakeOffset = DriveSubsystem.robotPosition + Pose2d(Length.kZero, -badIntakeOffset)
 
@@ -194,7 +194,7 @@ object IntakeSubsystem : FalconSubsystem() {
         var wantedExtensionSolenoidState = this.wantedExtensionSolenoidState
         var wantedLauncherSolenoidState = this.wantedLauncherSolenoidState
 
-        if(wantedFlippingState) {
+        if (wantedFlippingState) {
             wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
             wantedLauncherSolenoidState = false
         }

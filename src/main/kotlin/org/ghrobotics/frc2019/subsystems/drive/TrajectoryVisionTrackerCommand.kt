@@ -124,7 +124,6 @@ class TrajectoryVisionTrackerCommand(
      * Make sure that the drivetrain is stopped at the end of the command.
      */
     override suspend fun dispose() {
-        LimelightManager.turnOffLED()
         DriveSubsystem.zeroOutputs()
         LiveDashboard.isFollowingPath = false
         visionActive = false

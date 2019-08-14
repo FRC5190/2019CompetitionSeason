@@ -47,7 +47,7 @@ object LEDs {
     fun update() {
         wantedLEDMode = when {
             Robot.emergencyActive || (Robot.lastRobotMode == FalconRobot.Mode.DISABLED &&
-                (!LimelightManager.isAlive || !JeVoisManager.isBackJeVoisConnected)) -> Mode.EMERGENCY
+                (!LimelightManager.isAlive)) -> Mode.EMERGENCY
             Controls.backModifier -> Mode.BACK_MODIFIER
             Controls.isClimbing -> Mode.CLIMB
             VisionDriveCommand.isActive || TrajectoryVisionTrackerCommand.visionActive -> Mode.VISION

@@ -1,6 +1,5 @@
 package org.ghrobotics.frc2019.subsystems.intake
 
-import org.ghrobotics.frc2019.vision.LimelightManager
 import org.ghrobotics.lib.commands.FalconCommand
 
 //class IntakeCargoCommand(
@@ -86,9 +85,6 @@ class IntakeCargoCommand(
     }
 
     override suspend fun dispose() {
-        if (IntakeSubsystem.isSeeingCargo) {
-            LimelightManager.blinkLEDs()
-        }
         IntakeSubsystem.wantedLauncherSolenoidState = false
         IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
         IntakeSubsystem.zeroOutputs()

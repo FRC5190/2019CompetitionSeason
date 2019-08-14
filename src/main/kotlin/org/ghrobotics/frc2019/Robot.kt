@@ -29,6 +29,8 @@ object Robot : FalconRobot() {
     var emergencyActive = false
     var debugActive = false
 
+    var ranCommand = false
+
     val shouldDebug get() = debugActive || !lastEnabledState
 
     // Initialize all systems.
@@ -59,6 +61,15 @@ object Robot : FalconRobot() {
         Autonomous.update()
         Network.update()
         TargetTracker.update()
+
+        if (IntakeSubsystem.isSeeingCargo) {
+            if (!ranCommand) {
+                LimelightManager.blinkCommand.start()
+                ranCommand = true
+            }
+        } else {
+            ranCommand = false
+        }
     }
 
     override operator fun FalconSubsystem.unaryPlus() {

@@ -170,7 +170,7 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
             }
             is ElevatorState.MotionMagic -> {
                 elevatorMaster.set(
-                    ControlMode.MotionMagic,
+                    ControlMode.Disabled,
                     Constants.kElevatorNativeUnitModel.toNativeUnitPosition(wantedState.position),
                     DemandType.ArbitraryFeedForward,
                     arbitraryFeedForward
@@ -179,13 +179,13 @@ object ElevatorSubsystem : FalconSubsystem(), EmergencyHandleable {
             is ElevatorState.OpenLoop -> {
                 if (wantedState.useFeedForward) {
                     elevatorMaster.set(
-                        ControlMode.PercentOutput,
+                        ControlMode.Disabled,
                         wantedState.output(),
                         DemandType.ArbitraryFeedForward,
                         arbitraryFeedForward
                     )
                 } else {
-                    elevatorMaster.set(ControlMode.PercentOutput, wantedState.output())
+                    elevatorMaster.set(ControlMode.Disabled, wantedState.output())
                 }
             }
         }

@@ -65,6 +65,8 @@ class Limelight(
         val transform = Translation2d(distance_to_target, Rotation2d(tx))
         val drive_location = DriveSubsystem.localization[timestamp.second]
 
+        println("adding")
+
         TargetTracker.addSamples(
             timestamp, listOfNotNull(
                 drive_location + (Constants.kCenterToFrontCamera + Pose2d(transform))
