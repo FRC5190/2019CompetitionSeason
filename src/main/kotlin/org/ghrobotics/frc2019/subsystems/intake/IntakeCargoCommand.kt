@@ -76,7 +76,7 @@ class IntakeCargoCommand(
                 }
             }
             false -> {
-                if (IntakeSubsystem.isSeeingCargo && sensedBall == 0L && System.currentTimeMillis() - startTime > 500) {
+                if (IntakeSubsystem.isSeeingCargo && sensedBall == 0L && System.currentTimeMillis() - startTime > 750) {
                     IntakeSubsystem.wantedExtensionSolenoidState = IntakeSubsystem.ExtensionSolenoidState.RETRACTED
                     sensedBall = System.currentTimeMillis()
                 }

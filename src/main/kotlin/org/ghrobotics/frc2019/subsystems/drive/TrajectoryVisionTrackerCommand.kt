@@ -91,10 +91,13 @@ class TrajectoryVisionTrackerCommand(
             val error = (angle + if (!trajectory.reversed) Rotation2d.kZero else Math.PI.radian).radian
             val turn = kCorrectionKp * error + kCorrectionKd * (error - prevError)
 
+            val kLinearKp = 3 / 5.0
+            val distance = transform.translation.x / SILengthConstants.kFeetToMeter
+
 
             DriveSubsystem.setOutput(
                 TrajectoryTrackerOutput(
-                    nextState.linearVelocity,
+                    (kLinearKp * distance).feet.velocity,
                     0.meter.acceleration,
                     turn.radian.velocity,
                     0.radian.acceleration
