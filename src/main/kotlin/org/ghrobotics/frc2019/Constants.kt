@@ -222,7 +222,7 @@ object Constants {
     val kArmCruiseVelocity = 260.156 * 1.0.degree.velocity
     val kArmAcceleration = 300.0 * 1.0.degree.acceleration
 
-    const val kArmEmptyHoldVoltage = 1.0
+    const val kArmEmptyHoldVoltage = 1.5
 
     val kArmEmptyKg = kArmEmptyHoldVoltage / kAccelerationDueToGravity / 12.0
     const val kArmHatchKg = 1.5 / kAccelerationDueToGravity / 12.0

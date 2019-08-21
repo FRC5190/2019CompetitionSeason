@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.Timer
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.drive.DriveSubsystem
+import org.ghrobotics.frc2019.subsystems.elevator.ElevatorSubsystem
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.units.Length
@@ -65,7 +66,9 @@ class Limelight(
         val transform = Translation2d(distance_to_target, Rotation2d(tx))
         val drive_location = DriveSubsystem.localization[timestamp.second]
 
-        println("adding")
+        if (ElevatorSubsystem.position in Constants.kElevatorBlockingCameraRange) {
+            return
+        }
 
         TargetTracker.addSamples(
             timestamp, listOfNotNull(
