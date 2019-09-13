@@ -13,6 +13,7 @@ object NewAutoClimbRoutines {
     fun autoClimb(isLevel2: Boolean) = sequential {
         // Reset LIDAR Threshold
         +InstantRunnableCommand { aboveLIDARThresholdHeight = false }
+        +InstantRunnableCommand { DriveSubsystem.lowGear = true }
 
         // Step 1: Extend stilts and begin moving forward toward the HAB platform.
         +parallel {
@@ -20,7 +21,7 @@ object NewAutoClimbRoutines {
             if (isLevel2) {
                 +ClosedLoopClimbCommand(frontTarget = 8.inch, backTarget = 9.inch)
             } else {
-                +ClosedLoopClimbCommand(frontTarget = 23.5.inch, backTarget = 18.5.inch)
+                +ClosedLoopClimbCommand(frontTarget = 23.5.inch, backTarget = 18.65.inch)
             }
 
             // Start moving forward
@@ -49,14 +50,14 @@ object NewAutoClimbRoutines {
         // Step 2: Retract back stilts
         +parallel {
             +ResetWinchCommand(resetFront = false)
-            +ClimbWheelCommand { 0.5 }
+            +ClimbWheelCommand { 0.65 }
             +DriveWithPercentCommand { -0.05 }
         }.withExit { ClimbSubsystem.isBackReverseLimitSwitchClosed && ClimbSubsystem.rawBackWinchPosition < 2000 }
 
         // Step 3: Drive until the front is safe to retract
         +parallel {
             +DriveWithPercentCommand { -0.4 }
-            +ClimbWheelCommand { 1.0 }
+            +ClimbWheelCommand { 0.5 }
         }.apply {
             if (isLevel2) {
                 withTimeout(1.75.second)

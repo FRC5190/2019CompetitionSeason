@@ -115,7 +115,7 @@ object Constants {
 
 
     // DRIVE
-    val kDriveNativeUnitModel = SlopeNativeUnitModel(138.inch, 10000.nativeUnits)
+    val kDriveNativeUnitModel = SlopeNativeUnitModel(135.inch, 10000.nativeUnits)
     val kDriveSensorUnitsPerRotation = 1440.nativeUnits
     val kDriveWheelRadius = kDriveNativeUnitModel.wheelRadius(kDriveSensorUnitsPerRotation)
     val kDriveTrackWidth = 27.75.inch
@@ -124,7 +124,7 @@ object Constants {
 
     val kDriveCurrentLimit = 38.amp
 
-    const val kDriveKp = 2.35 // Talon SRX Units
+    const val kDriveKp = 2.0 // Talon SRX Units
     const val kDriveKd = 2.0
 
     const val kDriveLeftKv = 0.1489

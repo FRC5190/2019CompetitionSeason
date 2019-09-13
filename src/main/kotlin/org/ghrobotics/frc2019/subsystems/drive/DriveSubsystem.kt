@@ -5,6 +5,9 @@
 
 package org.ghrobotics.frc2019.subsystems.drive
 
+import com.ctre.phoenix.motorcontrol.ControlMode
+import com.ctre.phoenix.motorcontrol.DemandType
+import com.team254.lib.physics.DifferentialDrive
 import edu.wpi.first.wpilibj.Solenoid
 import org.ghrobotics.frc2019.Constants
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
@@ -14,6 +17,7 @@ import org.ghrobotics.lib.localization.TankEncoderLocalization
 import org.ghrobotics.lib.mathematics.twodim.control.RamseteTracker
 import org.ghrobotics.lib.mathematics.twodim.geometry.Rectangle2d
 import org.ghrobotics.lib.subsystems.drive.TankDriveSubsystem
+import kotlin.math.sign
 import kotlin.properties.Delegates.observable
 
 object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
@@ -71,6 +75,32 @@ object DriveSubsystem : TankDriveSubsystem(), EmergencyHandleable {
 //        }
     }
 
+    val wheelRadiusFeet = Constants.kDriveWheelRadius.feet
+
+//    override fun setOutputFromDynamics(
+//        chassisVelocity: DifferentialDrive.ChassisState,
+//        chassisAcceleration: DifferentialDrive.ChassisState
+//    ) {
+//        val wheelVelocities = differentialDrive.solveInverseKinematics(chassisVelocity)
+//        val wheelAccelerations = differentialDrive.solveInverseKinematics(chassisAcceleration)
+//
+//        val leftVelocitySetpoint = wheelRadiusFeet * wheelVelocities.left
+//        val rightVelocitySetpoint = wheelRadiusFeet * wheelVelocities.right
+//        val leftAccelerationSetpoint = wheelRadiusFeet * wheelAccelerations.left
+//        val rightAccelerationSetpoint = wheelRadiusFeet * wheelAccelerations.right
+//
+//        val leftOutput = 0.64 * leftVelocitySetpoint + 0.20 * leftAccelerationSetpoint + 1.2018 * sign(leftVelocitySetpoint)
+//        val rightOutput = 0.69 * rightVelocitySetpoint + 0.18 * rightAccelerationSetpoint + 1.33 * sign(rightVelocitySetpoint)
+//
+////        println("$leftOutput, $rightOutput")
+//
+//        leftMotor.set(ControlMode.PercentOutput,
+//            Constants.kDriveNativeUnitModel.toNativeUnitVelocity(Constants.kDriveWheelRadius.value * wheelVelocities.left) / 10,
+//            DemandType.ArbitraryFeedForward, leftOutput / 12)
+//        rightMotor.set(ControlMode.Velocity,
+//            Constants.kDriveNativeUnitModel.toNativeUnitVelocity(Constants.kDriveWheelRadius.value * wheelVelocities.right) / 10,
+//            DemandType.ArbitraryFeedForward, rightOutput / 12)
+//    }
 
 //    const val kP = 4.0 / 12.0
 //

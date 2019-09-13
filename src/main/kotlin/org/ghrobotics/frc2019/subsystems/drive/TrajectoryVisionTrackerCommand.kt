@@ -68,6 +68,7 @@ class TrajectoryVisionTrackerCommand(
             ) < radiusFromEnd.value
 
         if (withinVisionRadius) {
+            println("within vision radius")
             val newTarget = if (!useAbsoluteVision) {
                 TargetTracker.getBestTarget(!trajectory.reversed)
             } else {
@@ -82,6 +83,7 @@ class TrajectoryVisionTrackerCommand(
 
         if (lastKnownTargetPose != null) {
             visionActive = true
+            println("aligning")
             val transform = lastKnownTargetPose inFrameOfReferenceOf robotPositionWithIntakeOffset
             val angle = Rotation2d(transform.translation.x, transform.translation.y, true)
 
@@ -94,10 +96,11 @@ class TrajectoryVisionTrackerCommand(
             val kLinearKp = 3 / 5.0
             val distance = transform.translation.x / SILengthConstants.kFeetToMeter
 
+            println("applying correction, angle error: ${Math.toDegrees(error)}")
 
             DriveSubsystem.setOutput(
                 TrajectoryTrackerOutput(
-                    (kLinearKp * distance).feet.velocity,
+                    nextState.linearVelocity,
                     0.meter.acceleration,
                     turn.radian.velocity,
                     0.radian.acceleration

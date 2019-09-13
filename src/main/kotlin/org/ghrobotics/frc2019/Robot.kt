@@ -5,7 +5,10 @@
 
 package org.ghrobotics.frc2019
 
+import edu.wpi.cscore.VideoMode
+import edu.wpi.first.cameraserver.CameraServer
 import edu.wpi.first.wpilibj.livewindow.LiveWindow
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import org.ghrobotics.frc2019.auto.Autonomous
 import org.ghrobotics.frc2019.subsystems.EmergencyHandleable
 import org.ghrobotics.frc2019.subsystems.arm.ArmSubsystem
@@ -27,7 +30,7 @@ object Robot : FalconRobot() {
     val emergencyReadySystems = ArrayList<EmergencyHandleable>()
 
     var emergencyActive = false
-    var debugActive = false
+    var debugActive = true
 
     var ranCommand = false
 
@@ -49,10 +52,10 @@ object Robot : FalconRobot() {
         LimelightManager
         TargetTracker
 
-//        val camera = CameraServer.getInstance().startAutomaticCapture(0)
-//        camera.setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 15)
-//
-//        Shuffleboard.getTab("5190").add(camera).withPosition(3, 2).withSize(3, 3)
+        val camera = CameraServer.getInstance().startAutomaticCapture(0)
+        camera.setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 15)
+
+        Shuffleboard.getTab("5190").add(camera).withPosition(3, 2).withSize(3, 3)
     }
 
     override fun periodic() {
@@ -62,7 +65,7 @@ object Robot : FalconRobot() {
         Network.update()
         TargetTracker.update()
 
-        if (IntakeSubsystem.isSeeingCargo) {
+        if (IntakeSubsystem.isSeeingCargo && lastRobotMode != Mode.AUTONOMOUS) {
             if (!ranCommand) {
                 LimelightManager.blinkCommand.start()
                 ranCommand = true

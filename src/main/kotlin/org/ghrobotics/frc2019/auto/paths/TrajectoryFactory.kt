@@ -117,7 +117,7 @@ object TrajectoryFactory {
         listOf(
             cargoShipS1Adjusted,
             Pose2d(15.feet, 4.951.feet, 17.degree).asWaypoint(),
-            loadingStationAdjusted
+            loadingStationAdjusted.position.transformBy(Pose2d(4.inch, 0.inch, 0.degree)).asWaypoint()
         ),
         getConstraints(false, loadingStationAdjusted), kMaxVelocity, kMaxAcceleration, kMaxVoltage
     )

@@ -54,7 +54,7 @@ object Superstructure {
     val kFrontCargoIntoCargoShip get() = elevatorAndArmHeight(30.inch, 5.degree)
     val kBackCargoFromLoadingStation get() = elevatorAndArmHeight(0.inch, 135.degree)
 
-    val kStowedPosition get() = elevatorAndArmHeight(0.inch, 70.degree)
+    val kStowedPosition get() = elevatorAndArmHeight(-2.inch, 75.degree)
 
     private fun goToHeightWithAngle(
         heightAboveGround: Length,

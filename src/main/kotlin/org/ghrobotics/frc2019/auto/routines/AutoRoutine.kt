@@ -45,7 +45,7 @@ abstract class AutoRoutine : Source<FalconCommand> {
     ): FalconCommand = TrajectoryVisionTrackerCommand(
         pathMirrored.map(originalTrajectory.mirror(), originalTrajectory),
         radiusFromEnd,
-        useAbsoluteVision
+        false
     )
 
     protected fun relocalize(position: Pose2d, forward: Boolean, pathMirrored: BooleanSource) = InstantRunnableCommand {
